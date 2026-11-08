@@ -65,3 +65,60 @@ test('v0.6 browser: exact title, local original SVG and actual 16/32 pixel dark/
 test('v0.6 browser: bounded N=32 rendering cost is measured, with no mutation of the gravity model',async()=>{
  const {page:p,context}=await lab();try{await entropy(p);await p.locator('#entropyN').fill('32');const before=await p.evaluate(()=>window.entrolab.inspect());const result=await p.evaluate(()=>{const samples=[];for(let i=0;i<500;i++){const start=performance.now();document.getElementById('entropyStep').click();samples.push(performance.now()-start)}samples.sort((a,b)=>a-b);return {steps:window.entrolabEntropy.inspect().steps,samples:samples.length,medianMs:samples[250],p95Ms:samples[475],maxMs:samples.at(-1),scheduled:window.entrolabEntropy.inspect().scheduled}});assert.equal(result.steps,500);assert.equal(result.scheduled,false);assert(Number.isFinite(result.p95Ms));assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),before);measurements.push({renderCost32:result});console.log('v0.6 render-cost',JSON.stringify(result));}finally{await context.close()}
 });
+
+// Independent v0.6 review regressions; all seventeen pre-review cases remain intact.
+const reviewModel=p=>p.evaluate(()=>{const {bodies,selected,paused,elapsed,collisions,view,forecast}=window.entrolab.inspect();return {physics:{bodies,selected,paused,elapsed,collisions,view,forecast},entropy:window.entrolabEntropy.inspect()}});
+
+test('review P2 browser: context return/Escape and lab navigation preserve visible keyboard focus and physical state',async()=>{
+ for(const [width,locale] of [[1360,'de-DE'],[390,'en-GB']]){
+  const {page:p,context}=await lab({viewport:{width,height:1000},locale});try{
+   await entropy(p);await k(p,6);const before=await reviewModel(p);
+   const firstId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('review sentinel','planet',1,0,0,0,0,'white').id});
+   for(const target of ['blackhole','extreme','gravity','entropy']){
+    const origin=p.locator('.view.active [data-explain]').first();await origin.press('Enter');
+    assert.equal(await p.locator('#physicsGuide').evaluate(e=>e.open),true);
+    await p.locator('#guideReturn').press('Enter');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
+    await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
+    await origin.press('Enter');await p.locator(`[data-tab=${target}]`).press('Enter');
+    assert.equal(await p.locator('#physicsGuide').evaluate(e=>e.open),false,'navigation closes the stale context');
+    assert.equal(await p.locator('#guideReturn').isVisible(),false);assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),target);
+    // A queued activation of the old, now hidden control must not restore stale focus.
+    await p.locator('#guideReturn').evaluate(e=>e.click());await p.keyboard.press('Escape');
+    assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),target);
+    assert.equal(await p.evaluate(()=>!!document.activeElement.getClientRects().length),true);
+   }
+   await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');
+   assert.deepEqual(await reviewModel(p),before);
+   const lastId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('review sentinel','planet',1,0,0,0,0,'white').id});assert.equal(lastId,firstId+1);
+   measurements.push({review:'context-navigation',width,locale,focus:'science',modelUnchanged:true,bodyIdDelta:lastId-firstId});
+  }finally{await context.close()}
+ }
+});
+
+test('review P2 browser: native glossary collapse clears context; a newly opened explanation returns to its own visible origin',async()=>{
+ const {page:p,context}=await lab();try{
+  await entropy(p);const before=await reviewModel(p);await p.locator('#entropy [data-explain]').press('Enter');
+  await p.locator('#physicsGuide > summary').press('Enter');await p.waitForFunction(()=>document.getElementById('guideReturn').hidden);
+  await p.locator('#physicsGuide > summary').press('Enter');assert.equal(await p.locator('#guideReturn').isVisible(),false);
+  await p.locator('[data-tab=blackhole]').click();const origin=p.locator('#blackhole [data-explain=guide-horizon]');await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
+  await p.locator('[data-tab=entropy]').click();assert.deepEqual(await reviewModel(p),before);
+  measurements.push({review:'native-collapse',contextCleared:true});
+ }finally{await context.close()}
+});
+
+test('review P3 browser: actual entropy exports reject sparse/non-Boolean/non-array states before RNG consumption',async()=>{
+ const {page:p,context}=await lab();try{
+  await entropy(p);const before=await reviewModel(p);
+  const result=await p.evaluate(async()=>{
+   const {validateState,macrostate,randomStep,arrangement,sampleArrangement,distribution,multiplicity}=await import('/entropy.mjs');
+   const inherited=[true,false];delete inherited[0];Object.setPrototypeOf(inherited,Object.assign(Object.create(Array.prototype),{0:true}));
+   const invalid=[new Array(2),[true,,false],[,false],[true,],[true,undefined],[true,0],inherited,{length:2,every:()=>true,filter:()=>[],map:()=>[]},new Uint8Array([1,0]),null,undefined,'LR',new Boolean(true)];
+   // [true,] is a valid one-element array, not a hole: explicitly remove a slot instead.
+   invalid[3]=[true,false];delete invalid[3][1];
+   let rejected=0,rngCalls=0;const accepted=[];
+   for(let i=0;i<invalid.length;i++)for(const consume of [validateState,macrostate,s=>randomStep(s,()=>{rngCalls++;return .5})]){try{consume(invalid[i]);accepted.push(i)}catch(e){if(e instanceof TypeError)rejected++;else throw e}}
+   let valid=0;for(const n of [1,2,12,32])for(const k of [0,n]){const state=arrangement(n,k);validateState(state);validateState(randomStep(state,()=>.5));validateState(sampleArrangement(n,k,()=>.5));if(macrostate(state)!==k||distribution(n)[k].omega!==multiplicity(n,k))throw Error('valid boundary changed');valid++}
+   return {rejected,expected:invalid.length*3,accepted,rngCalls,valid};
+  });assert.equal(result.rejected,result.expected);assert.deepEqual(result.accepted,[]);assert.equal(result.rngCalls,0);assert.equal(result.valid,8);assert.deepEqual(await reviewModel(p),before);measurements.push({review:'state-validation',...result});
+ }finally{await context.close()}
+});
