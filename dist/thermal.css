@@ -2,3 +2,5 @@
 @media(max-width:1000px){.thermal-workspace{grid-template-columns:1fr}}
 @media(max-width:420px){.thermal-stage{grid-template-columns:1fr 1fr;padding:15px 8px}.heat-flow{grid-column:1/-1;grid-row:2}.thermal-stage b{font-size:24px}.thermal-stage article{padding:18px 8px}.thermal-metrics{gap:9px}.thermal-metrics article{padding:14px 10px}.thermal-metrics b{font-size:20px}.thermal-metrics label{font-size:11px}.thermal-transport button{flex-basis:100%}.thermal-bridge button{overflow-wrap:anywhere}.quick-start{flex-wrap:wrap}.quick-start>div{min-width:0;width:100%}.quick-start #helpClose{margin-left:auto}}
 @media(prefers-reduced-motion:no-preference){.thermal-stage article{transition:background-color .2s linear}.thermal-stage[data-running=true] .heat-flow>b{animation:heat-breathe 1.5s ease-in-out infinite}@keyframes heat-breathe{50%{opacity:.55}}}
+
+@media(max-width:420px){.thermal-chart svg text{font-size:26px}}

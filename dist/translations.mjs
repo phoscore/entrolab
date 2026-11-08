@@ -1,5 +1,6 @@
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMISCHES LEHRMODELL",
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
   "Zum Labor springen": "Zum Labor springen",
   "ENTROLAB": "ENTROLAB",
@@ -535,6 +536,7 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMIC TEACHING MODEL",
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
   "Zum Labor springen": "Skip to the lab",
   "ENTROLAB": "ENTROLAB",
