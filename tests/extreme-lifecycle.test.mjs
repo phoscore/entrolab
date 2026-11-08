@@ -1,3 +1,4 @@
+import * as i18n from '../dist/i18n.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -11,7 +12,7 @@ function lab(reduce=false){const elements=new Map(),frames=new Map(),events={},t
  const el=id=>{if(!elements.has(id))elements.set(id,{id,value:'',checked:false,disabled:false,textContent:'',dataset:{},style:{},children:[],classList:{active:false,contains(){return this.active}},append(...a){this.children.push(...a)},replaceChildren(...a){this.children=a},addEventListener(){}});return elements.get(id)};
  el('comparisonMode').value='log';
  const doc={hidden:false,getElementById:el,createElement:()=>({style:{},append(){}}),querySelectorAll:sel=>sel==='[data-tab]'?tabs.map(t=>({addEventListener(type,cb){t.click=cb}})):[],addEventListener(type,cb){events[type]=cb}};
- const context=vm.createContext({C,length,scientific,number,...data,performance,document:doc,window:{addEventListener(type,cb){events[type]=cb}},matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false},drawObject(){draws++},drawThermal(){draws++},requestAnimationFrame(cb){const id=next++;frames.set(id,cb);return id},cancelAnimationFrame(id){frames.delete(id)}});
+ const context=vm.createContext({...i18n,C,length,scientific,number,...data,performance,document:doc,window:{addEventListener(type,cb){events[type]=cb}},matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false},drawObject(){draws++},drawThermal(){draws++},requestAnimationFrame(cb){const id=next++;frames.set(id,cb);return id},cancelAnimationFrame(id){frames.delete(id)}});
  new vm.Script(readFileSync(new URL('../dist/extreme-ui.mjs',import.meta.url),'utf8').replace(/^import .*;\n/gm,'')).runInContext(context);
  return {el,frames,doc,motion,get draws(){return draws},tab(active){el('extreme').classList.active=active;tabs[0].click()},tick(now=100){const tasks=[...frames.values()];frames.clear();for(const f of tasks)f(now)},visibility(hidden){doc.hidden=hidden;events.visibilitychange()}}}
 test('extreme UI: hidden lab has no RAF; active/pause/tab cycles retain at most one loop',()=>{const l=lab();assert.equal(l.frames.size,0);assert.equal(l.draws,0);l.tab(true);assert.equal(l.frames.size,1);l.tick();assert.equal(l.frames.size,1);assert(l.draws>0);l.el('extremePlay').onclick();assert.equal(l.frames.size,0);const count=l.draws;l.tick(200);assert.equal(l.draws,count);l.el('extremePlay').onclick();for(let i=0;i<20;i++){l.tab(false);assert.equal(l.frames.size,0);l.tab(true);assert.equal(l.frames.size,1)}l.tab(false);const stop=l.draws;l.tick(300);assert.equal(l.draws,stop)});

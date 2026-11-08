@@ -1,3 +1,4 @@
+import * as i18n from '../dist/i18n.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -25,7 +26,7 @@ function app(){
  const el=id=>{if(!elements.has(id))elements.set(id,new Element());return elements.get(id)};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;
  const window={addEventListener(){}};
- const scope=vm.createContext({...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,window,structuredClone,devicePixelRatio:1,
+ const scope=vm.createContext({...i18n,...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,window,structuredClone,devicePixelRatio:1,
   document:{getElementById:el,createElement:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},activeElement:null},
   Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},
   ResizeObserver:class{observe(){}},requestAnimationFrame:callback=>frames.push(callback),setTimeout(){}});
