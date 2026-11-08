@@ -59,3 +59,35 @@ test('review notice: manual edits, Reset, successful Apply and language keep dra
 test('review baseline fixture: byte-identical original UI remains a reproducible browser reference',async()=>{
  const {readFile}=await import('node:fs/promises'),{createHash}=await import('node:crypto');const b=await readFile(new URL('./fixtures/thermal-ui-f980d883.txt',import.meta.url));assert.equal(createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex'),'bdf90ebccc5cec6ae4a0d05c62d30e6158a5cfcd');
 });
+
+
+test('review P3: rounded display explains a rejected original decimal without allowing out-of-range transfer',()=>{
+ const h=thermalHarness();try{
+  const before=h.inspect(),longKelvin='249.99999999999999999';
+  h.el('temperatureTransferValue').value='250';
+  h.el('kelvinInput').value=longKelvin;
+  h.el('kelvinInput').fire('change');
+  assert.equal(h.el('thermalTransfer').disabled,true);
+  // Existing Extreme Temperature Lab reformats the field on blur; its
+  // original event has already captured the precise text in the bridge.
+  h.el('kelvinInput').value='250';h.language('en');
+  assert.equal(h.el('thermalTransfer').disabled,true);
+  assert.match(h.el('thermalBridgeNote').textContent,/Originally entered: 249\.99999999999999999 K/);
+  assert.match(h.el('thermalBridgeNote').textContent,/shows 250 K/);
+  h.language('de');assert.match(h.el('thermalBridgeNote').textContent,/Ursprünglich eingegeben: 249\.99999999999999999 K/);
+  assert.deepEqual(h.inspect(),before);
+  // The user can now explicitly enter the exact endpoint.
+  h.el('kelvinInput').value='250';h.el('kelvinInput').fire('change');
+  assert.equal(h.el('thermalTransfer').disabled,false);
+  assert.doesNotMatch(h.el('thermalBridgeNote').textContent,/Ursprünglich eingegeben/);
+  const longCelsius='-23.150000000000000001';
+  h.el('temperatureTransferValue').value='249.99999999999997';
+  h.el('celsiusInput').value=longCelsius;h.el('celsiusInput').fire('change');
+  h.el('celsiusInput').value='-23.15';h.language('en');
+  assert.equal(h.el('thermalTransfer').disabled,true);
+  assert.match(h.el('thermalBridgeNote').textContent,/Originally entered: -23\.150000000000000001 °C/);
+  h.el('celsiusInput').value='-23.15';h.el('celsiusInput').fire('change');
+  assert.equal(h.el('thermalTransfer').disabled,false);
+  assert.deepEqual(h.inspect(),before);
+ }finally{h.dispose()}
+});
