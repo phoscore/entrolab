@@ -97,3 +97,25 @@ Die folgenden Primärquellen wurden zur Umsetzung abgerufen/geprüft; Beispielwe
 - [NASA LAMBDA: COBE/FIRAS](https://lambda.gsfc.nasa.gov/product/cobe/firas_overview.html): Hintergrundtemperatur um 2,725 K.
 
 Newtonsche Sandbox-, Softening-, Kollisions-Tunneling- und Hawking-Modellgrenzen bleiben unverändert. Animation und Vergleich bilden keine neue physikalisch exakte Extremmateriesimulation. Der Entwicklungsstand ist zur unabhängigen Prüfung bestimmt, nicht zur automatischen Übernahme oder Veröffentlichung.
+
+## Gezielte Korrekturen nach Codex-Review (8. November 2026)
+
+Ausgangsstand: `32937fbd31cd31ef35e38a7a823bfc7e0239ec9b` auf `develop/v0.4`, PR #3. `AGENTS.md` und `docs/CodexReview_v0.4.md` wurden zuerst gelesen. Drei bestätigte UI-Fehler sind korrigiert:
+
+1. **Slider-Minimum nach Celsius-Eingabe:** `-273.149 °C` ergibt binär weiterhin `0.0009999999999763531 K`; dieser Wert wird nicht auf 0,001 K gerundet oder im Modell verändert. Ausschließlich die Hinweisentscheidung am unteren Sliderende verwendet eine Toleranz von `2 * Number.EPSILON * 273.15` K (ca. 1,21×10⁻¹³ K), entsprechend der Größenordnung des Rundungsfehlers der Celsius-Konversion. Eine tatsächlich darunter liegende Eingabe wie `0.000999999 K` meldet weiterhin den unterschrittenen Sliderbereich. Nullpunkt und Logskalenfunktion bleiben unverändert.
+2. **Negativer Kelvin-Unterlauf:** Beide direkten Kelvin-Ereignisse (`input` und `change`) prüfen zusätzlich auf negatives Gleitkomma-Null (`Object.is(k, -0)`). `-1e-999`, normale negative Werte und ausdrücklich eingegebenes `-0` werden abgelehnt; die aktiven Anzeigen bleiben unverändert. `0`, `0.001`, `0.1` und extrem kleine positive Werte bleiben zulässig. Ein positiver Wert unterhalb des darstellbaren Zahlenbereichs kann weiterhin zu 0 K unterlaufen; das ist die dokumentierte Grenze der Number-Darstellung, keine beliebige Dezimalpräzision.
+3. **Massenfeld und Fehlermeldung:** Sobald `refresh()` den gültigen aktiven Massenwert wieder ins Feld schreibt, löscht es zugleich die zugehörige alte Warnung. Ungültige gerade bearbeitete Texte bleiben stehen und werden weiterhin zurückgewiesen. Reproduktion: `1e42` eingeben → Feld verlassen → Qualität wechseln; jetzt sind gültiger sichtbarer Wert und leerer Fehlerstatus konsistent.
+
+**Visuelle Einordnung:** Der unmittelbar unter dem Canvas sichtbare Hinweis erklärt jetzt ausdrücklich, dass der BH-Halo auch ohne Scheibe künstlerisch bleibt und Halo/Ringe/Bögen keine Eigenemission bzw. berechneten Schatten-/Photonenringe darstellen. Die Geometrie wird als schematische Schwarzschild-Koordinatenradien ohne Eigenabstände präzisiert. Der Renderer, die Scheibenanimation und die sonstige Gestaltung wurden nicht verändert. Die Hinweise reduzieren das Irreführungsrisiko; sie verwandeln das Artwork nicht in eine GR-, Strahlungs- oder Materialsimulation.
+
+### Tatsächlich ausgeführte Verifikation
+
+- Vorher: sämtliche **76/76** vorhandenen Prüfungen bestanden.
+- Drei neue Fälle im bestehenden `tests/extreme-lifecycle.test.mjs`: äquivalente Celsius-/Kelvin-Grenze einschließlich unveränderter Konversion; negativer Kelvin-Unterlauf bei beiden Ereignissen einschließlich Zustandsbewahrung und positiver Gegenproben; Wiederherstellung der Masse einschließlich weiterhin abgelehnter ungültiger Texte. Alle drei Fälle schlugen vor der Korrektur fehl; die drei bestehenden UI-Fälle bestanden dabei weiter.
+- Nachher: `node scripts/test.mjs` erfolgreich, **79/79** = zehn Originalchecks plus 69 Node-Testfälle, keine übersprungenen Fälle. Bestehende Testfälle und Grenzwerte bleiben erhalten.
+- `node scripts/verify-original.mjs`: alle sechs historischen Integritätskontrollen bestanden.
+- `node scripts/benchmark.mjs`: alle zwölf vollständigen Ergebnisobjekte per `assert.deepEqual` exakt gleich zum unmittelbar vor der Korrektur ausgeführten Lauf und zu `docs/numerics-v0.2.json`. Keine Änderung an Referenzdaten.
+- Echte Chromium-/Playwright-Prüfung bei **1440×1100** und **390×844 CSS-Pixeln**: alle drei Fehlerreproduktionen samt positiver/negativer Gegenproben, Kälte-Preset, Objekt-/Geometriewechsel, Hinweis am scheibenlosen Artwork, Pause sowie altes BH-Labor (Erdmasse: 8,87 mm). Kein horizontaler Überlauf und keine JavaScript-Seitenfehler. Der Browser-Smoke-Test wurde temporär außerhalb des Repositorys ausgeführt; die drei Regressionen sind dagegen dauerhaft über den bestehenden CI-Testeinstieg angebunden.
+- Die GitHub-CI wird separat zum gepushten Commit kontrolliert; konkreter Commitstatus und Lauf-Links werden in PR #3 festgehalten. Lokale Ergebnisse werden nicht als Actions-Ergebnis ausgegeben.
+
+Unverändert: physikalische Formeln, Schwarzschild-/Hawking-Rechnung, Sternbeispiele, Massen-Presets, Integrator, Prognose und deren bekannte Modellgrenzen. Keine neue Performance-/GPU-Garantie, kein physischer Smartphone-Test, keine exakte Dezimalarithmetik. Kein Merge und kein Deployment.
