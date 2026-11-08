@@ -1,0 +1,59 @@
+{
+  "runtime": "v24.22.1",
+  "grid": {
+    "states": 1458,
+    "maxEnergyErrorJ": 1.1920928955078125e-7,
+    "maxRelativeEnergyError": 2.0553300978909378e-16,
+    "minEntropyJK": 0,
+    "minEntropyIncrementJK": 0,
+    "maxOvershootK": 0
+  },
+  "halfRelaxation": {
+    "time": 34.657359027997266,
+    "ta": 335,
+    "tb": 305,
+    "eq": 320,
+    "tau": 50,
+    "q": 15000,
+    "power": 300,
+    "energy": 640000,
+    "initialEnergy": 640000,
+    "energyError": 0,
+    "sa": -43.80262265839293,
+    "sb": 50.43085362689191,
+    "entropy": 6.628230968498983,
+    "production": 0.0880841693173477
+  },
+  "equilibrium": {
+    "time": 1000000000000,
+    "ta": 320,
+    "tb": 320,
+    "eq": 320,
+    "tau": 50,
+    "q": 30000,
+    "power": 0,
+    "energy": 640000,
+    "initialEnergy": 640000,
+    "energyError": 0,
+    "sa": -89.61215868968713,
+    "sb": 98.44007281325253,
+    "entropy": 8.827914123565389,
+    "production": 0
+  },
+  "independentRK4": {
+    "parameters": {
+      "a": 400,
+      "b": 280,
+      "ca": 500,
+      "cb": 1500,
+      "g": 4
+    },
+    "stepS": 0.01,
+    "steps": 10000,
+    "timeS": 100,
+    "ta": 340.97384081788863,
+    "tb": 299.6753863940403,
+    "errorAK": 1.5347723092418164e-12,
+    "errorBK": 2.6716406864579767e-12
+  }
+}
