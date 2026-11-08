@@ -137,3 +137,11 @@ Neuer Tab **Extreme Objects**: prozedurale künstlerische Schwarzes-Loch-Ansicht
 Das Temperaturlabor bietet Kelvin/Celsius-Eingaben, getrennte Presets für **0,1 K** und **0,001 K**, einen gesonderten 0-K-Referenzpunkt und einen Slider von 10⁻³ bis 10¹² K. Celsius verwendet den exakt definierten Offset 273,15; die Anzeige ist auf 0,001 °C gerundet. Kelvin bleibt für sehr kleine Temperaturdifferenzen maßgeblich.
 
 `node scripts/test.mjs`: 76 Prüfungen einschließlich der 58 bisherigen. Physikkern, Integrator, bisherige Experimente und historische Originalprüfung bleiben erhalten. Details, Quellen und Grenzen: [Qualitätsbericht v0.4](docs/Qualitaetsupdate_v0.4.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.
+
+## v0.5 – UX & Visual Upgrade (Entwicklungsbranch)
+
+Auf `develop/v0.5`: größere, kontrastreichere Beschriftungen, aufklappbare Erklärungen, freiwillige Erste-Schritte-Hilfe, Fokusmodus und DE/EN für sämtliche App-Bereiche einschließlich dynamischer Meldungen/Canvaslegenden. Sprache lässt sich im Kopfbereich umschalten; Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt** (`0.1`, `1e9`), Anzeigen sind lokalisiert.
+
+Extreme Objects bietet überarbeitete illustrative Sternoberflächen, ein optionales **schematisches Pulsar-Beispiel** beim Neutronenstern sowie „Ansicht zentrieren“ ohne Parameterreset. Kein neues physikalisches Modell. Fokus per Button, Rückkehr mit Escape; Reduced Motion startet pausiert.
+
+`node scripts/test.mjs`: **101 Prüfungen** (79 bisherige + 22 neue). Zwölf numerische Benchmarks unverändert. [Qualitätsbericht v0.5 mit Screenshots, tatsächlichen Browserprüfungen und Einschränkungen](docs/Qualitaetsupdate_v0.5.md). Echte 200-%-Browserzoom-, Betriebssystem-Reduced-Motion- und Smartphone-/Safari-Kontrolle bleiben zur unabhängigen Prüfung offen. Kein automatischer Merge oder Deployment durch diesen Entwicklungsauftrag.
