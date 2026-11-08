@@ -3,7 +3,7 @@
 ## Autorisierung und Umfang
 
 - GitHub-Repository `phoscore/entrolab` ist nach Abschluss der Erstsicherung die zentrale Versionsverwaltung.
-- Diese Aufgabe autorisiert ausschließlich die unveränderte v0.1-Sicherung und Entwicklungsstruktur, keine Version 0.2 oder Fehlerkorrekturen am Original.
+- Aktuell autorisiert: wissenschaftliches Qualitätsupdate v0.2 ausschließlich auf `develop/v0.2` gemäß Nutzerauftrag. Audit zuerst vollständig lesen. Keine Änderungen an main, kein Merge oder Deployment; abschließend Pull Request zur unabhängigen Prüfung. Original v0.1 bleibt erhalten.
 - Nach der Erstsicherung `main` nur mit ausdrücklicher Freigabe des Eigentümers verändern oder zusammenführen. Ein Prüfauftrag, erfolgreiche CI oder ein fertiger Branch sind keine Merge-Freigabe.
 - Keine Veröffentlichung, Releases, Deployment, GitHub Pages oder automatische Produktionsaktualisierung ohne ausdrückliche Zustimmung. Repository-Sichtbarkeit nicht eigenmächtig ändern.
 
@@ -37,3 +37,4 @@
 - `node scripts/verify-original.mjs`: Inhalt des Tags `v0.1` gegen Original-Prüfsummen prüfen.
 - Nur bei der Erstsicherung zusätzlich `node scripts/verify-original.mjs --working-tree` verwenden; spätere Arbeitsdateien dürfen sich auf Entwicklungsbranches ändern.
 - Je nach Änderung passende weitere Regressionstests, Einheiten-/Konvergenzprüfungen oder Browserprüfung ergänzen. Fehlgeschlagene Tests nicht durch Lockerung der Grenzen kaschieren.
+

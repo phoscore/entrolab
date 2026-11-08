@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {run,collisions} from './numerics.mjs';
+import {blackHole,C} from '../dist/physics.mjs';
+import {length,scientific,modelStatus} from '../dist/display.mjs';
+const cases=[['binary',36525,.0006,.0001],['solar',36525,1e-8,1e-8],['hole',36525,1e-7,1e-7],['eccentric',3652.5,.0007,.003],['triple',3652.5,.0001,.00001],['encounter',30,.0001,.00001]];
+for(const [name,days,a,f] of cases)for(const mode of ['adaptive','fixed'])test(`${name}: ${days} days, ${mode}; energy, momentum and angular momentum`,()=>{const r=run(name,mode,days);assert(r.maxEnergy<(mode==='adaptive'?a:f),JSON.stringify(r));assert(r.maxMomentum<1e-10);assert(r.maxAngularMomentum<1e-10)});
+test('fixed Verlet: second-order orbital convergence against h=0.0125 d reference',()=>{const times=365.25*2;const [a,b,c,ref]=[.1,.05,.025,.0125].map(h=>run('eccentric','fixed',times,h));const distance=r=>Math.hypot(...r.positions[1].map((x,i)=>x-ref.positions[1][i]));assert(distance(b)<.35*distance(a));assert(distance(c)<.35*distance(b));console.log('Convergence position differences (AU):',...[a,b,c].map(distance))});
+test('collision mass, impulse, dissipation, chain, BH absorption, non-collision and unresolved spin',collisions);
+test('Earth Schwarzschild radius displays mm; tiny and astronomical lengths remain meaningful',()=>{assert.match(length(blackHole(C.earth).radius),/^8,87/);assert.match(length(blackHole(C.earth).radius),/mm/);assert.match(length(1e-18),/10⁻¹⁸ m/);assert.match(length(C.AU),/1 AU/);assert.match(length(9.4607304725808e15),/1 Lj/);assert.match(scientific(1e40,'Jahre'),/10⁴⁰/);assert.equal(scientific(Infinity),'—')});
+test('BH warnings cover softened regime even beyond 10 Schwarzschild radii',()=>{const bs=[{type:'hole',m:1,x:0,y:0,vx:0,vy:0},{type:'planet',m:1e-6,x:2e-7,y:0,vx:0,vy:0}];assert.match(modelStatus(bs),/außerhalb/);bs[1].x=1;assert.match(modelStatus(bs),/BH-Näherung/);bs[1].vx=C.c*.11*C.day/C.AU;assert.match(modelStatus(bs),/0,1 c/);assert.equal(modelStatus([]),'')});

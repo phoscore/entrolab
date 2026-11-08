@@ -19,7 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax and original calculation tests
+      - name: Syntax, conservation, analytical Kepler and collision regressions
         run: node scripts/test.mjs
-      - name: Verify preserved v0.1 tag
+      - name: Verify preserved v0.1 source commit
         run: node scripts/verify-original.mjs
+
