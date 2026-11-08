@@ -4,7 +4,7 @@ Ein interaktiver Physik-Spielplatz von cosmic insignificance: Newtonsche N-Körp
 
 ## Stand und Original
 
-Diese Erstsicherung enthält die sechs Originaldateien der Anwendung **v0.1** bytegenau, einschließlich `.openai/hosting.json`. Die ursprüngliche Site-Quellrevision ist `095f7f4ae50453a373012ed870fa7175e5b4c5ee`. Der bei der Übertragung anzulegende Git-Tag `v0.1` soll ausschließlich den Originalstand sichern; README, AGENTS.md und CI werden in einem nachfolgenden Infrastruktur-Commit ergänzt. Es gibt hier noch keine Version 0.2.
+Diese Erstsicherung enthält die sechs Originaldateien der Anwendung **v0.1** bytegenau, einschließlich `.openai/hosting.json`. Die ursprüngliche Site-Quellrevision ist `095f7f4ae50453a373012ed870fa7175e5b4c5ee`. Der bei der Übertragung anzulegende Git-Tag `v0.1` soll ausschließlich den Originalstand sichern; README, AGENTS.md und CI werden in einem nachfolgenden Infrastruktur-Commit ergänzt. Auf `develop/v0.2` wird das wissenschaftliche Qualitätsupdate zur Prüfung vorbereitet.
 
 Die Originaldateien sind in `docs/v0.1-original.sha256` mit SHA-256 dokumentiert. Ein Git-Tag ist technisch verschiebbar und muss zusätzlich organisatorisch beziehungsweise durch passende GitHub-Regeln geschützt werden. Niemals `v0.1` verschieben oder löschen.
 
@@ -110,3 +110,8 @@ git push origin refs/tags/v0.1
 ```
 
 Branch- und Tag-Schutz wurden nicht technisch eingerichtet. AGENTS.md legt die Freigaberegeln fest; sie ersetzen keine GitHub-Regeln.
+
+
+## Qualitätsupdate v0.2 (nur Entwicklungsbranch)
+
+Details, Messbedingungen, Grenzen und konkrete Zahlen: [Qualitätsbericht](docs/Qualitaetsupdate_v0.2.md). `node scripts/test.mjs` führt jetzt zusätzlich 16 Qualitätsfälle aus. `node scripts/benchmark.mjs` reproduziert die Vergleichsdaten. Der Integrator bleibt nach dem Vergleich bewusst unverändert. Keine Veröffentlichung oder Merge-Freigabe ist damit verbunden.
