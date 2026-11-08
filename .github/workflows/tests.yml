@@ -1,0 +1,25 @@
+name: ENTROLAB tests
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physics-and-original:
+    name: Physics and v0.1 integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and original calculation tests
+        run: node scripts/test.mjs
+      - name: Verify preserved v0.1 tag
+        run: node scripts/verify-original.mjs
