@@ -1,5 +1,8 @@
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.",
+  "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.",
+
   "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMISCHES LEHRMODELL",
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
   "Zum Labor springen": "Zum Labor springen",
@@ -374,7 +377,7 @@ export const de=Object.freeze({
   "04 / VIELE WEGE ZUM GLEICHGEWICHT": "04 / VIELE WEGE ZUM GLEICHGEWICHT",
   "Ein Zustand. Viele Möglichkeiten.": "Ein Zustand. Viele Möglichkeiten.",
   "DISKRETES STATISTISCHES LEHRMODELL": "DISKRETES STATISTISCHES LEHRMODELL",
-  "Unterscheidbare Marker, zwei gleich große Kammern. Wir zählen Links/Rechts-Zuordnungen – keine realen Gasbahnen.": "Unterscheidbare Marker, zwei gleich große Kammern. Wir zählen Links/Rechts-Zuordnungen – keine realen Gasbahnen.",
+  "Unterscheidbare Marker, zwei gleich große Kammern. Ein Mikrozustand legt für jeden Marker links oder rechts fest; der Makrozustand k zählt nur links. Bildpositionen zählen nicht zusätzlich und sind keine realen Gasbahnen.": "Unterscheidbare Marker, zwei gleich große Kammern. Ein Mikrozustand legt für jeden Marker links oder rechts fest; der Makrozustand k zählt nur links. Bildpositionen zählen nicht zusätzlich und sind keine realen Gasbahnen.",
   "ⓘ Was bedeutet das?": "ⓘ Was bedeutet das?",
   "Das Zwei-Kammer-Experiment": "Das Zwei-Kammer-Experiment",
   "LINKS": "LINKS",
@@ -455,7 +458,7 @@ export const de=Object.freeze({
   "Entropie-Experiment": "Entropie-Experiment",
   "Teilchen & Wahrscheinlichkeit": "Teilchen & Wahrscheinlichkeit",
   "Wärme & Entropie": "Wärme & Entropie",
-  "Zwei unabhängige Modelle: S/kᵦ zählt Zuordnungen; ΔS in J/K beschreibt hier einen Wärmeausgleich. Die Werte werden nicht addiert.": "Zwei unabhängige Modelle: S/kᵦ zählt Zuordnungen; ΔS in J/K beschreibt hier einen Wärmeausgleich. Die Werte werden nicht addiert.",
+  "S/kᵦ = ln Ω: Logarithmus der Zahl der Mikrozustände zu k. ΔS in J/K: Änderung beim Wärmeausgleich. Zwei getrennte Modelle, nicht addieren.": "S/kᵦ = ln Ω: Logarithmus der Zahl der Mikrozustände zu k. ΔS in J/K: Änderung beim Wärmeausgleich. Zwei getrennte Modelle, nicht addieren.",
   "Wärme verteilt sich. Energie bleibt.": "Wärme verteilt sich. Energie bleibt.",
   "Zwei idealisierte Körper, zusammen isoliert: konstante Wärmekapazitäten, homogener Temperaturzustand, fester Wärmeleitwert. Nur 250–600 K; keine Aussage über reale Materialien.": "Zwei idealisierte Körper, zusammen isoliert: konstante Wärmekapazitäten, homogener Temperaturzustand, fester Wärmeleitwert. Nur 250–600 K; keine Aussage über reale Materialien.",
   "KÖRPER A": "KÖRPER A",
@@ -484,7 +487,7 @@ export const de=Object.freeze({
   "ENTROPIEPRODUKTION / W/K": "ENTROPIEPRODUKTION / W/K",
   "Temperatur über Modellzeit": "Temperatur über Modellzeit",
   "Violett: Körper A · Türkis: Körper B · Punkte: aktueller Zustand": "Violett: Körper A · Türkis: Körper B · Punkte: aktueller Zustand",
-  "Analytische Modellkurven ab angewendetem Start; keine Messdaten realer Materialien. Zeitachse in Sekunden, Temperaturen in Kelvin.": "Analytische Modellkurven ab angewendetem Start; keine Messdaten realer Materialien. Zeitachse in Sekunden, Temperaturen in Kelvin.",
+  "Begrenzt abgetastete analytische Modellkurven, keine Materialmessdaten. Lineare Zeitachse in Sekunden, Temperatur in Kelvin. Sehr schnelle Ausgleiche können auf langen Zeitachsen unter einem Bildpunkt liegen.": "Begrenzt abgetastete analytische Modellkurven, keine Materialmessdaten. Lineare Zeitachse in Sekunden, Temperatur in Kelvin. Sehr schnelle Ausgleiche können auf langen Zeitachsen unter einem Bildpunkt liegen.",
   "Wärme ist Übertragung, kein Vorrat.": "Wärme ist Übertragung, kein Vorrat.",
   "Ein Temperaturunterschied erzeugt hier einen Netto-Wärmefluss zum kälteren Körper. Energie bleibt im isolierten Paar erhalten. Die Entropie des abkühlenden Körpers sinkt, die Gesamtentropie steigt oder bleibt bei gleichen Temperaturen konstant. Temperatur ist keine Energie.": "Ein Temperaturunterschied erzeugt hier einen Netto-Wärmefluss zum kälteren Körper. Energie bleibt im isolierten Paar erhalten. Die Entropie des abkühlenden Körpers sinkt, die Gesamtentropie steigt oder bleibt bei gleichen Temperaturen konstant. Temperatur ist keine Energie.",
   "Advanced · Wärmebilanz, Lösung & Grenzen": "Advanced · Wärmebilanz, Lösung & Grenzen",
@@ -536,6 +539,9 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Only conversion roundoff at the boundary was accounted for; source fields are unchanged.",
+  "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Conversion roundoff at the boundary: draft {temp} K. Source fields stay unchanged; only Apply changes the initial state.",
+
   "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMIC TEACHING MODEL",
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
   "Zum Labor springen": "Skip to the lab",
@@ -910,7 +916,7 @@ export const en=Object.freeze({
   "04 / VIELE WEGE ZUM GLEICHGEWICHT": "04 / MANY WAYS TO EQUILIBRIUM",
   "Ein Zustand. Viele Möglichkeiten.": "One state. Many possibilities.",
   "DISKRETES STATISTISCHES LEHRMODELL": "DISCRETE STATISTICAL TEACHING MODEL",
-  "Unterscheidbare Marker, zwei gleich große Kammern. Wir zählen Links/Rechts-Zuordnungen – keine realen Gasbahnen.": "Distinguishable markers, two equal chambers. We count left/right assignments, not real gas trajectories.",
+  "Unterscheidbare Marker, zwei gleich große Kammern. Ein Mikrozustand legt für jeden Marker links oder rechts fest; der Makrozustand k zählt nur links. Bildpositionen zählen nicht zusätzlich und sind keine realen Gasbahnen.": "Distinguishable markers, two equal chambers. A microstate assigns left or right to each marker; macrostate k only counts those on the left. Image positions do not count as extra states or real gas trajectories.",
   "ⓘ Was bedeutet das?": "ⓘ What does this mean?",
   "Das Zwei-Kammer-Experiment": "The two-chamber experiment",
   "LINKS": "LEFT",
@@ -991,7 +997,7 @@ export const en=Object.freeze({
   "Entropie-Experiment": "Entropy experiment",
   "Teilchen & Wahrscheinlichkeit": "Particles & probability",
   "Wärme & Entropie": "Heat & entropy",
-  "Zwei unabhängige Modelle: S/kᵦ zählt Zuordnungen; ΔS in J/K beschreibt hier einen Wärmeausgleich. Die Werte werden nicht addiert.": "Two independent models: S/kᵦ counts assignments; ΔS in J/K describes heat equilibration here. These values are not added.",
+  "S/kᵦ = ln Ω: Logarithmus der Zahl der Mikrozustände zu k. ΔS in J/K: Änderung beim Wärmeausgleich. Zwei getrennte Modelle, nicht addieren.": "S/kᵦ = ln Ω: logarithm of the number of microstates for k. ΔS in J/K: change during heat equilibration. Two separate models; do not add.",
   "Wärme verteilt sich. Energie bleibt.": "Heat redistributes. Energy remains.",
   "Zwei idealisierte Körper, zusammen isoliert: konstante Wärmekapazitäten, homogener Temperaturzustand, fester Wärmeleitwert. Nur 250–600 K; keine Aussage über reale Materialien.": "Two idealised bodies, isolated together: constant heat capacities, uniform temperatures and fixed thermal conductance. Only 250–600 K; no claim about real materials.",
   "KÖRPER A": "BODY A",
@@ -1020,7 +1026,7 @@ export const en=Object.freeze({
   "ENTROPIEPRODUKTION / W/K": "ENTROPY PRODUCTION / W/K",
   "Temperatur über Modellzeit": "Temperature over model time",
   "Violett: Körper A · Türkis: Körper B · Punkte: aktueller Zustand": "Violet: body A · teal: body B · dots: current state",
-  "Analytische Modellkurven ab angewendetem Start; keine Messdaten realer Materialien. Zeitachse in Sekunden, Temperaturen in Kelvin.": "Analytical curves from the applied initial state; not measured material data. Time axis in seconds, temperatures in kelvin.",
+  "Begrenzt abgetastete analytische Modellkurven, keine Materialmessdaten. Lineare Zeitachse in Sekunden, Temperatur in Kelvin. Sehr schnelle Ausgleiche können auf langen Zeitachsen unter einem Bildpunkt liegen.": "Bounded samples of analytical model curves, not measured material data. Linear time axis in seconds, temperature in kelvin. Very fast equilibration may occupy less than one pixel on a long time axis.",
   "Wärme ist Übertragung, kein Vorrat.": "Heat is transfer, not a store.",
   "Ein Temperaturunterschied erzeugt hier einen Netto-Wärmefluss zum kälteren Körper. Energie bleibt im isolierten Paar erhalten. Die Entropie des abkühlenden Körpers sinkt, die Gesamtentropie steigt oder bleibt bei gleichen Temperaturen konstant. Temperatur ist keine Energie.": "Here a temperature difference drives net heat flow towards the colder body. Energy stays within the isolated pair. The cooling body loses entropy, while total entropy increases, or stays constant for equal temperatures. Temperature is not energy.",
   "Advanced · Wärmebilanz, Lösung & Grenzen": "Advanced · heat balance, solution & limits",

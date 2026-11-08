@@ -3,6 +3,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import * as physics from '../dist/thermal-physics.mjs';
 import * as display from '../dist/display.mjs';
+import * as view from '../dist/thermal-view.mjs';
 import * as i18n from '../dist/i18n.mjs';
 export function thermalHarness(){
  const elements=new Map(),events={},subscriptions=[],timers=new Map();let next=0;
@@ -18,7 +19,7 @@ export function thermalHarness(){
  const doc={hidden:false,activeElement:null,getElementById:el,createElementNS:(ns,tag)=>new Element('',tag),addEventListener(k,fn){(events[k]??=[]).push(fn)},dispatchEvent(e){for(const fn of events[e.type]??[])fn(e)},querySelectorAll(q){return q==='[data-tab]'?tabs:q==='[data-entropy-view]'?views:q==='[data-thermal-preset]'?presets:[]},querySelector(q){return tabs.find(b=>q===`[data-tab=${b.dataset.tab}]`)??views.find(b=>q===`[data-entropy-view=${b.dataset.entropyView}]`)}};
  el('entropy').classes.add('active');el('thermalSpeed').value='10';el('temperatureTransferValue').value='.1';el('thermalTransferTarget').value='b';
  i18n.setLanguage('de');const window={};
- const scope=vm.createContext({...physics,...display,...i18n,document:doc,window,structuredClone,Event,matchMedia:()=>({addEventListener(){}}),setTimeout(fn){timers.set(++next,fn);return next},clearTimeout:id=>timers.delete(id),onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))}});
+ const scope=vm.createContext({...physics,...display,...view,...i18n,document:doc,window,structuredClone,Event,matchMedia:()=>({addEventListener(){}}),setTimeout(fn){timers.set(++next,fn);return next},clearTimeout:id=>timers.delete(id),onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))}});
  const source=readFileSync(new URL('../dist/thermal-ui.mjs',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');new vm.Script(source).runInContext(scope);
- return {el,doc,timers,inspect:()=>window.entrolabThermal.inspect(),language:i18n.setLanguage,transfer(k){el('temperatureTransferValue').value=String(k);el('celsiusInput').fire('change');el('thermalTransfer').click()},apply(p){for(const [key,id]of Object.entries({a:'thermalA',b:'thermalB',ca:'thermalCA',cb:'thermalCB',g:'thermalG'}))if(key in p)el(id).value=String(p[key]);el('thermalForm').fire('submit')},dispose(){subscriptions.forEach(fn=>fn());i18n.setLanguage('de')}};
+ return {el,doc,timers,inspect:()=>window.entrolabThermal.inspect(),language:i18n.setLanguage,transfer(k){el('temperatureTransferValue').value=String(k);el('kelvinInput').value=String(k);el('kelvinInput').fire('change');el('thermalTransfer').click()},apply(p){for(const [key,id]of Object.entries({a:'thermalA',b:'thermalB',ca:'thermalCA',cb:'thermalCB',g:'thermalG'}))if(key in p)el(id).value=String(p[key]);el('thermalForm').fire('submit')},dispose(){subscriptions.forEach(fn=>fn());i18n.setLanguage('de')}};
 }
