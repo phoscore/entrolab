@@ -25,7 +25,7 @@ test('review transfer: equivalent decimal/scientific Kelvin and Celsius endpoint
 test('review transfer: genuine outside decimal inputs and non-conversion errors are never clamped',()=>{
  for(const [unit,values,k]of [['kelvin',['249.99999999999999999','249.99999999999997','600.00000000000000001','6.000000000000001e2'],250],['celsius',['-23.150000000000000001','-2.3150000000000000001e1','326.850000000000000001','326.850000000001'],600]])for(const value of values)assert.equal(thermalTransferCandidate(k,{unit,value}),null,value);
  for(const k of [250-1e-12,600+1e-12,0,1e12,NaN,Infinity,-Infinity,'250',null])assert.equal(thermalTransferCandidate(k,{unit:'celsius',value:'-23.15'}),null,String(k));
- assert.equal(thermalTransferCandidate(250-Number.EPSILON*250),null);assert.equal(thermalTransferCandidate(250-Number.EPSILON*250,{unit:'kelvin',value:'250'}),null);
+ assert.equal(thermalTransferCandidate(350,{unit:'celsius',value:'-23.15'}),null);assert.equal(thermalTransferCandidate(250-Number.EPSILON*250),null);assert.equal(thermalTransferCandidate(250-Number.EPSILON*250,{unit:'kelvin',value:'250'}),null);
  assert.equal(thermalTransferCandidate(273.15,{unit:'celsius',value:'0e1000000'}).temperature,273.15);
  for(const value of ['', ' ', 'garbage', 'NaN','Infinity'])assert.equal(thermalTransferCandidate(350,{unit:'celsius',value}),null);
 });
@@ -53,4 +53,8 @@ test('review notice: manual edits, Reset, successful Apply and language keep dra
   h.transfer(400);h.apply({});assert.equal(h.el('thermalTransferNote').textContent,'');assert.equal(h.inspect().params.b,400);
   h.transfer(350);h.el('thermalB').value='360';h.language('de');assert.equal(h.el('thermalTransferNote').textContent,'');assert.equal(h.el('thermalB').value,'360');assert.equal(h.inspect().params.b,400);
  }finally{h.dispose()}
+});
+
+test('review baseline fixture: byte-identical original UI remains a reproducible browser reference',async()=>{
+ const {readFile}=await import('node:fs/promises'),{createHash}=await import('node:crypto');const b=await readFile(new URL('./fixtures/thermal-ui-f980d883.txt',import.meta.url));assert.equal(createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex'),'bdf90ebccc5cec6ae4a0d05c62d30e6158a5cfcd');
 });

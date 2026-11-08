@@ -25,6 +25,7 @@ function sourceInRange(source){
 export function thermalTransferCandidate(kelvin,source=null){
  if(typeof kelvin!=='number'||!Number.isFinite(kelvin))return null;
  if(source&&!sourceInRange(source))return null;
+ if(source){const expected=Number(source.value)+(source.unit==='celsius'?273.15:0),errorBound=2*Number.EPSILON*Math.max(273.15,Math.abs(expected));if(Math.abs(kelvin-expected)>errorBound)return null;}
  if(transferableTemperature(kelvin))return {temperature:kelvin,rounded:false};
  // Only a verified in-range Celsius source may correct conversion roundoff.
  // Two EPSILON-scaled magnitudes cover parsing of c/273.15 and their addition.
