@@ -6,7 +6,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  let rows=distribution(12),markers=[];
  const format=(v,digits=4)=>new Intl.NumberFormat(locale(),{maximumFractionDigits:digits}).format(v);
  const percent=p=>new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:5}).format(p);
- const active=()=>root.classList.contains('active')&&!doc.hidden&&seen;
+ const active=()=>root.classList.contains('active')&&!$('particleExperiment').hidden&&!doc.hidden&&seen;
  const inspect=()=>({state:[...state],steps,playing,n:state.length,k:macrostate(state),scheduled:timer!==null});
  function schedule(){if(timer===null&&playing&&active())timer=setTimer(()=>{timer=null;if(playing&&active()){state=randomStep(state,rng);steps++;render()}schedule();flags()},500);flags()}
  function flags(){root.dataset.playing=String(playing);root.dataset.scheduled=String(timer!==null);root.dataset.step=String(steps);root.dataset.n=String(state.length);root.dataset.k=String(macrostate(state))}
@@ -42,7 +42,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  $('entropyK').oninput=()=>{pause();state=arrangement(state.length,Number($('entropyK').value));render()};
  $('entropyResample').onclick=()=>{pause();state=sampleArrangement(state.length,macrostate(state),rng);render()};
  for(const b of doc.querySelectorAll('[data-tab]'))b.addEventListener('click',sync);
- doc.addEventListener('visibilitychange',sync);
+ doc.addEventListener('visibilitychange',sync);doc.addEventListener('entropy-view-change',sync);
  const motion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');motion?.addEventListener('change',e=>{if(e.matches){pause();render()}});
  let observer;if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{seen=entries[0].isIntersecting;sync()});observer.observe($('entropyChambers'))}
  const unsubscribe=onLanguageChange(()=>{build();render()});build();render();
