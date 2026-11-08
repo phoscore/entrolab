@@ -72,7 +72,7 @@ Der UI-Text grenzt zehn modellinterne Selbstchecks von vollständiger Formelveri
 
 Ausgangsbasis: lokaler Node-Lauf **108/108** (zehn Originalchecks + 98 Node-Fälle). Bestehende GitHub-CI des Plan-Commits [42499418785](https://github.com/phoscore/entrolab/actions/runs/42499418785): dieselben 108, **7/7 Chromium** und sechs Originaldateien erfolgreich.
 
-Aktueller Implementierungslauf: Commit `ee56e537368a0af51bacd52f808b11a4b1eed3c8`, GitHub Actions [42503387218](https://github.com/phoscore/entrolab/actions/runs/42503387218), vollständig erfolgreich:
+Erster vollständig grüner Implementierungslauf: Commit `ee56e537368a0af51bacd52f808b11a4b1eed3c8`, GitHub Actions [42503387218](https://github.com/phoscore/entrolab/actions/runs/42503387218), vollständig erfolgreich:
 
 | Prüfung | Ergebnis |
 | --- | --- |
@@ -144,3 +144,50 @@ Lokale Node-24.22.1-Orientierungswerte (vollständige Daten weiterhin in `docs/n
 - Modul-Worker sind Voraussetzung für die isolierten Selbstchecks; bei Sperre erscheint ein ehrlicher Fehler. Die Sandbox bleibt unabhängig davon bedienbar.
 - Die kleine Kontexthilfe ersetzt keinen vollständigen Cosmic Field Guide. Keine Spekulation wird als berechnete Physik ausgegeben.
 - Abschließende Dokumentations-/Messpräzisierungen werden im PR gesondert durch CI kontrolliert. Vor einem Merge ist weiterhin unabhängiger Review und ausdrückliche Eigentümerfreigabe notwendig.
+
+## Nachtrag: unabhängige Codex-Reviewkorrekturen
+
+8. November 2026, geprüft gegen `f084d203c171e30fd9069a72c2baad55ffb253bb`; weiterhin ausschließlich `develop/v0.6`, bestehender PR #5. Dieser Nachtrag korrigiert zwei technische Restfehler. Wissenschaftliche Annahmen, q=1/4, Formeln, gültige Zustandsausgaben und alle bestehenden Physikmodelle/Integratoren bleiben unverändert.
+
+### P2: Kontextnavigation und Fokus-Lifecycle
+
+**Vor der Korrektur tatsächlich reproduziert:** Entropy Lab → Kontextlink → Black Hole Lab → „Zurück zum Labor“ endete in der gemeinsamen echten Chrome-Vorschau mit `document.activeElement.tagName === 'BODY'`. Das Entropy Lab war unsichtbar. Die Rückwegfunktion hatte den ursprünglichen Kontextlink über den Labwechsel hinweg gespeichert, schloss dann das Glossar und versuchte, den inzwischen verborgenen Link zu fokussieren.
+
+**Korrektur in `dist/guide.mjs`:** Ein Capture-Listener an der bestehenden Hauptnavigation verwirft den Hilfekontext vor dem Ausblenden seines Ursprungs, schließt die kontextuelle Erklärung und verbirgt den Rückwegbutton **ohne** Fokusrückgabe. Die bestehende Navigation behält ihren Fokus auf dem neu aktivierten Labbutton. Ein späterer/alter Rückwegaufruf ist wirkungslos. Normales Zurück und Escape innerhalb einer Erklärung fokussieren weiterhin den Ursprung. Bei einem entfernten, verborgenen, deaktivierten oder anderweitig nicht fokussierbaren Ursprung wird zuerst der sichtbare aktive Navigationstab, danach gegebenenfalls der Hauptinhalt als Rücksprungziel versucht. Die Funktion prüft sowohl DOM-Verbindung/Anzeigerechteck als auch den tatsächlich erhaltenen Fokus. Das native Schließen von Details beendet ebenfalls den Kontext; manuell geöffnetes allgemeines Glossar ohne Kontext wird durch Navigation nicht ungefragt geschlossen. Escape außerhalb der Erklärung wird nicht abgefangen.
+
+Node-Regressionen prüfen direkten Rückweg und Escape, wiederholtes Schließen, Navigation mit Capture-Reihenfolge, alte Rückwegaufrufe, verborgene/deaktivierte/entfernte Ursprünge, natives Details-Schließen und Escape außerhalb der Erklärung. Der bestehende Entropy-UI-DOM-Adapter bekommt nur `isConnected` und `getClientRects()` entsprechend der nun genutzten DOM-Schnittstelle; seine bisherigen Testfälle und Assertions bleiben erhalten.
+
+Echte Chromium-Regressionen ergänzen die Folge über alle vier Labs bei Desktop/DE (1360 px) und schmaler Ansicht/EN (390 px). Aktivierung und Rückweg erfolgen mit Enter, Schließen mit Escape, danach wird die nächste Tab-Taste auf den erwarteten Hauptnavigationsbutton geprüft. Direkte Mausnavigation und natives Schließen/erneutes Öffnen des Glossars sind ebenfalls enthalten. Nach einem Labwechsel ist die Erklärung geschlossen, der alte Rückweg verborgen und der neue Navigationstab fokussiert. Alte programmatisch ausgelöste Rückwegereignisse stellen keinen versteckten Fokus wieder her.
+
+Verglichen werden Körper inklusive IDs/Trails, Auswahl, Pause, simulierte Zeit, Kollisionszahl, Ansicht und bestehender Vorhersagewert sowie der Entropy-Zustand. Die Modellwerte bleiben identisch; Sentinel-Körper-IDs vor/nach den Hilfefolgen unterscheiden sich genau um eins, also keine zusätzliche Körperallokation. Der bereits vor dem Review bei Navigation erhöhte interne `predictionGeneration`-Abbruchzähler ist kein physikalischer Wert und wird durch diese Korrektur nicht verändert. Die bestehende Navigationsbehandlung von Vorhersagen bleibt erhalten. Zusätzlich wurde die korrigierte Originalfolge mit Tastatur im gemeinsamen Chrome interaktiv gegengeprüft: Fokus auf dem Black-Hole-Labbutton; normaler Rückweg und Escape danach auf dem zugehörigen sichtbaren Kontextlink.
+
+### P3: Sparse Arrays und ungültige Zustandstypen
+
+**Vor der Korrektur tatsächlich reproduziert:** `validateState(new Array(2))` akzeptierte das Array; `macrostate(new Array(2))` gab fälschlich 0 zurück, und `randomStep()` erzeugte wieder ein Array mit Länge zwei, aber ohne eigene Indexeinträge. `Array.prototype.every()` und nachfolgende Arraymethoden überspringen Lücken; eine plausible Arraylänge war daher kein Beleg für zwei Marker. Auch ein Array-ähnliches Objekt mit vorgetäuschtem `every()` konnte die alte Prüfung umgehen.
+
+**Korrektur in `dist/entropy.mjs`:** Zuerst `Array.isArray`, dann die unveränderte N-Grenze 1–32, schließlich eine indexweise Prüfung auf **eigene** Einträge und primitive Boolean-Werte. Leere/zu lange echte Arrays bleiben Bereichsfehler (`RangeError`); falsche Zustandstypen, Lücken, geerbte Slots und Nicht-Booleans erzeugen `TypeError`. Die Prüfung liefert ein gültiges Array weiterhin unverändert zurück. `macrostate()` und `randomStep()` nutzen denselben zentralen Guard; ungültige Zustände werden vor RNG-Verbrauch zurückgewiesen und weder aufgefüllt noch verändert. Das ist eine Eingabevertragskorrektur, keine Änderung der Statistik oder der Wechselregel. Interne API-Fehlertexte sind wie die bestehenden Bereichsfehler keine neu sichtbaren UI-Meldungen; die übersetzte Formularvalidierung bleibt unverändert.
+
+Fünf neue Node-Fälle decken vollständig/teilweise sparse Arrays bei N=1/2/12/32, führende/mittlere/letzte Lücken, geerbte Indizes, überschriebenes `every`, Array-ähnliche Objekte, Typed Arrays, primitive Werte, Wrapper, explizites undefined/null und weitere Nicht-Booleans ab. Alle drei zustandslesenden Exporte (`validateState`, `macrostate`, `randomStep`) werden geprüft. RNG-Aufrufzahl und unveränderte Eigenschaftsdeskriptoren sichern den frühen, mutationsfreien Abbruch ab. Für sämtliche zulässigen N/k werden außerdem echte, dichte Zustände aus `arrangement`, `sampleArrangement` und `randomStep` validiert und mit `distribution`/`multiplicity` abgeglichen. Eine zusätzliche echte Chromium-Prüfung importiert dieselben Produktionsmodule, prüft 39 ungültige Funktionsaufrufe, null RNG-Aufrufe und acht gültige Grenzzustände; der Live-Modellzustand bleibt erhalten.
+
+### Ausgeführte Prüfungen und Bewahrung
+
+Vorher: **129/129 reguläre Prüfungen** lokal erneut bestanden. Die neun neu geschriebenen Node-Regressionen wurden noch gegen die unkorrigierten Module ausgeführt: **2 bestanden / 7 fehlgeschlagen**. Nach beiden Korrekturen: **9/9 neue Fälle bestanden** und lokal unter Node 24.22.1 **138/138 regulär** (zehn Original-Selbstchecks + 128 Node-Fälle). Kein bestehender Test und keine alte Assertion wurde entfernt oder gelockert.
+
+Implementierungscommit `c7ab04a2bbaedeb1c4bdaea122837127cd0be80a`; grüner [PR-CI-Lauf 42510109940](https://github.com/phoscore/entrolab/actions/runs/42510109940):
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Bisherige reguläre Fälle | **129/129 erhalten und bestanden** |
+| Neue Node-Regressionen | **9/9** |
+| Regulär insgesamt | **138/138** |
+| Bisherige Chromium-Fälle | **17/17 erhalten und bestanden** |
+| Neue Chromium-Regressionen | **3/3** |
+| Chromium insgesamt | **20/20** |
+| Numerische Vorher/Nachher-Vergleiche im selben Runtime | **12/12 exakt gleich** |
+| Original-Commit-Integrität | **6/6 SHA-256-Prüfungen bestanden** |
+
+Der gesamte vor dem Review bestehende Inhalt von `tests/entropy-browser.test.mjs` wurde bytegleich bewahrt; die drei Fälle sind angehängt. `tests/browser-review.test.mjs` ist unverändert. Syntax-/Node-Tests sind über den bestehenden Einstieg eingebunden; der bestehende Browserbefehl/Workflow führt die angehängten Chromium-Fälle automatisch aus.
+
+Die zwölf lokalen Benchmark-Ausgaben wurden vor/nach dem Reviewfix erneut vollständig berechnet und sind unter Node 24.22.1 bytegleich, ebenso zur unangetasteten historischen JSON-Referenz. SHA-256 weiterhin `743a9773953b40848fb8596e15df1a60ab8ef507222b62400cb23c32c23f307a`. Der bereits vorhandene CI-Guard bestätigt dieselben zwölf vollständigen Resultate gegen die genehmigte v0.5 unter derselben Laufzeit. Keine neue Toleranz oder Referenzkalibrierung.
+
+Lokaler automatisierter Chromium-Start wurde erneut versucht und scheitert weiterhin an `socket() failed: Operation not permitted`. Die angegebenen 20 automatisierten Browserfälle wurden tatsächlich in GitHub Actions ausgeführt. Reale Smartphone-/Touchhardware, Safari/Firefox und vollständige Screenreader-Prüfung bleiben wie zuvor offen. Die abschließende Dokumentation wird zusätzlich am endgültigen PR-Head durch CI kontrolliert. Kein Merge, Deployment, Produktionsupdate oder Eingriff in `main`/v0.1 ist Teil dieser Reparatur. PR #5 bleibt zur erneuten unabhängigen Prüfung offen.

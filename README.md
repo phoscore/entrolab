@@ -50,7 +50,7 @@ node scripts/benchmark.mjs
 node scripts/check-benchmarks.mjs
 ```
 
-Der reguläre Einstieg enthält **129 Prüfungen**: zehn Original-Selbstchecks und 119 Node-Testfälle. Alle bisherigen 108 Prüfungen bleiben enthalten; lediglich zwei VM-DOM-Adapter werden für den isolierten Selbstcheck-Controller erweitert. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
+Der reguläre Einstieg enthält **138 Prüfungen**: zehn Original-Selbstchecks und 128 Node-Testfälle. Alle 129 vor dem v0.6-Review vorhandenen Prüfungen bleiben enthalten; neun gezielte Reviewregressionen kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
 
 Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.6 unverändert.
 
@@ -62,7 +62,7 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browser-Suite umfasst sieben bewahrte v0.5-Fälle und zehn v0.6-Fälle. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
+Die Browser-Suite umfasst **20 Fälle**: sieben bewahrte v0.5-Fälle, zehn bisherige v0.6-Fälle und drei neue Reviewregressionen zu Kontexthilfe/Fokus und Zustandsvalidierung. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
 
 ## Projektstruktur
 

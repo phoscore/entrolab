@@ -86,6 +86,7 @@ test('review P2 browser: context return/Escape and lab navigation preserve visib
     await p.locator('#guideReturn').evaluate(e=>e.click());await p.keyboard.press('Escape');
     assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),target);
     assert.equal(await p.evaluate(()=>!!document.activeElement.getClientRects().length),true);
+    if(target==='blackhole')await p.screenshot({path:resolve(output,'review-context-focus-'+width+'.png')});
    }
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');
    assert.deepEqual(await reviewModel(p),before);
@@ -119,6 +120,6 @@ test('review P3 browser: actual entropy exports reject sparse/non-Boolean/non-ar
    for(let i=0;i<invalid.length;i++)for(const consume of [validateState,macrostate,s=>randomStep(s,()=>{rngCalls++;return .5})]){try{consume(invalid[i]);accepted.push(i)}catch(e){if(e instanceof TypeError)rejected++;else throw e}}
    let valid=0;for(const n of [1,2,12,32])for(const k of [0,n]){const state=arrangement(n,k);validateState(state);validateState(randomStep(state,()=>.5));validateState(sampleArrangement(n,k,()=>.5));if(macrostate(state)!==k||distribution(n)[k].omega!==multiplicity(n,k))throw Error('valid boundary changed');valid++}
    return {rejected,expected:invalid.length*3,accepted,rngCalls,valid};
-  });assert.equal(result.rejected,result.expected);assert.deepEqual(result.accepted,[]);assert.equal(result.rngCalls,0);assert.equal(result.valid,8);assert.deepEqual(await reviewModel(p),before);measurements.push({review:'state-validation',...result});
+  });assert.equal(result.rejected,result.expected);assert.deepEqual(result.accepted,[]);assert.equal(result.rngCalls,0);assert.equal(result.valid,8);assert.deepEqual(await reviewModel(p),before);assert.deepEqual(errors,[]);measurements.push({review:'state-validation',...result});
  }finally{await context.close()}
 });
