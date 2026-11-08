@@ -4,7 +4,7 @@
 
 ## Vorgehen
 
-Für den Newtonschen Zweikörperfall werden die simulierten **relativen Positionen** mit der analytischen Kepler-Lösung verglichen (Keplergleichung (E-e\sin E=M), numerisch bis zur Konvergenz gelöst). 1 AU Anfangsabstand, Sonnenmasse plus planetare Masse (3\times10^{-6}\,M_\odot), exzentrische Fälle starten am Apozentrum. Festschritt = 0,1 Tage, adaptiv = unverändertes `safeStep`. Gleiche Endzeiten für beide Verfahren. Die Referenz ist die **ungeglättete** Newtonsche Keplerbahn; der Simulator verwendet eine kleine Plummer-Glättung `EPS=1e-7` AU. Der dadurch bedingte Modellunterschied ist bei diesen Testabständen klein, aber nicht null.
+Für den Newtonschen Zweikörperfall werden die simulierten **relativen Positionen** mit der analytischen Kepler-Lösung verglichen (Keplergleichung `E − e·sin(E) = M`, numerisch bis zur Konvergenz gelöst). 1 AU Anfangsabstand, Sonnenmasse plus planetare Masse 3 × 10⁻⁶ Sonnenmassen, exzentrische Fälle starten am Apozentrum. Festschritt = 0,1 Tage, adaptiv = unverändertes `safeStep`. Gleiche Endzeiten für beide Verfahren. Die Referenz ist die **ungeglättete** Newtonsche Keplerbahn; der Simulator verwendet eine kleine Plummer-Glättung `EPS=1e-7` AU. Der dadurch bedingte Modellunterschied ist bei diesen Testabständen klein, aber nicht null.
 
 Reproduzieren:
 ```bash
@@ -25,7 +25,7 @@ Für die kreisförmige adaptive Bahn nach zehn Jahren ist die maximale relative 
 
 ## Kollisionserkennung – diagnostischer Grenzfall
 
-Zwei frontal entgegenkommende Körper mit (3\times10^{-6}\,M_\odot), Anfangsabstand (0,0002\) AU und Geschwindigkeiten jeweils `±0.02 AU/Tag`.
+Zwei frontal entgegenkommende Körper mit 3 × 10⁻⁶ Sonnenmassen, Anfangsabstand 0,0002 AU und Geschwindigkeiten jeweils `±0.02 AU/Tag`.
 
 - **Ein einziger Schritt** von `dt=0,02 Tage`: Die Körper durchqueren sich zwischen den diskreten Prüfpunkten; `step()` meldet **0** Kollisionen.
 - **Bestehende adaptive Steuerung:** Im identischen Fall wird eine Kollision nach **6** Schritten erkannt.
