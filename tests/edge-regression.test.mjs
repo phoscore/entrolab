@@ -10,6 +10,7 @@ import {experiment,experimentInfo} from '../dist/experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from '../dist/instruments.mjs';
 import {predict} from '../dist/prediction.mjs';
 import {checks} from '../dist/checks.mjs';
+import {createSelfChecks} from '../dist/self-checks.mjs';
 
 // Execute the real app and physics with a small DOM/Canvas adapter, without browser dependencies.
 // The frame queue is advanced explicitly; a lost RAF or invalid gradient fails the tests.
@@ -17,7 +18,7 @@ function app(){
  const elements=new Map(),frames=[];let gradients=0;
  const context=new Proxy({createRadialGradient(...args){assert(args.every(Number.isFinite),'non-finite Canvas gradient');gradients++;return {addColorStop(){}}}}, {get:(o,k)=>k in o?o[k]:()=>{}});
  class Element{
-  constructor(){this.value='';this.checked=false;this.style={};this.children=[];this.classList={toggle(){}}}
+  constructor(){this.value='';this.checked=false;this.dataset={};this.style={};this.children=[];this.classList={toggle(){}}}
   replaceChildren(...children){this.children=children;this.value=children[0]?.value??''}
   getBoundingClientRect(){return {width:600,height:500,left:0,top:0}}
   getContext(){return context}
@@ -26,7 +27,7 @@ function app(){
  const el=id=>{if(!elements.has(id))elements.set(id,new Element());return elements.get(id)};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;
  const window={addEventListener(){}};
- const scope=vm.createContext({...i18n,...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,window,structuredClone,devicePixelRatio:1,
+ const scope=vm.createContext({...i18n,...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
   document:{getElementById:el,createElement:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},activeElement:null},
   Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},
   ResizeObserver:class{observe(){}},requestAnimationFrame:callback=>frames.push(callback),setTimeout(){}});
