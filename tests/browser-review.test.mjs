@@ -32,7 +32,8 @@ test('browser P2: paused canvas/controls stay stable over 120 frames at narrow/f
   const {page,context}=await lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr});
   try{let frame=page;
    if(!Number.isInteger(width)){await page.setContent(`<iframe src="${url}" style="width:${width}px;height:900px;border:0;display:block"></iframe>`);frame=await(await page.$('iframe')).contentFrame();await ready(frame)}
-   await frame.locator('#universe').scrollIntoViewIfNeeded();await frames(frame,8);assert.equal((await state(frame)).paused,true);
+   // Do not wait for layout stability before measuring the very instability under review.
+   await frame.locator('#universe').evaluate(el=>el.scrollIntoView({block:'center'}));await frames(frame,8);assert.equal((await state(frame)).paused,true);
    const samples=await frame.evaluate(async()=>{const result=[];for(let i=0;i<120;i++){await new Promise(requestAnimationFrame);const canvas=document.getElementById('universe'),r=canvas.getBoundingClientRect(),transport=document.querySelector('.transport').getBoundingClientRect();result.push({w:r.width,h:r.height,controls:transport.top,backingWidth:canvas.width,backingHeight:canvas.height})}return result});
    const range=key=>Math.max(...samples.map(s=>s[key]))-Math.min(...samples.map(s=>s[key]));const record={width,dpr,frames:samples.length,first:samples[0],last:samples.at(-1),heightRange:range('h'),controlsRange:range('controls')};measurements.push(record);console.log('canvas-size',JSON.stringify(record));
    assert(record.heightRange<=.1,JSON.stringify(record));assert(record.controlsRange<=.1,JSON.stringify(record));
