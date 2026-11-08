@@ -1,0 +1,149 @@
+{
+  "runtime": "v24.22.1",
+  "platform": "linux",
+  "note": "CPU time, synchronous consumption of <=50-step chunks, five repeats; excludes UI timers/rendering; not a phone benchmark.",
+  "scenarios": [
+    {
+      "name": "triple",
+      "days": 180,
+      "steps": 1006,
+      "hits": 0,
+      "speedRatio": 4.0817992309713516,
+      "energyDrift": 0.0002037433305100907,
+      "momentumDrift": 2.763730375308675e-15,
+      "angularDrift": 3.011218109242759e-16
+    },
+    {
+      "name": "assist",
+      "days": 180,
+      "steps": 452,
+      "hits": 0,
+      "speedRatio": 1.0386542127504397,
+      "energyDrift": 1.2197274440164396e-15,
+      "momentumDrift": 5.204170427899196e-16,
+      "angularDrift": 2.6295363507367063e-16
+    }
+  ],
+  "predictions": [
+    {
+      "name": "solar",
+      "days": 10,
+      "steps": 48,
+      "points": 49,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.80856,
+      "maximumChunkMilliseconds": 0.8709740000000039,
+      "callsOverFiveRuns": 5
+    },
+    {
+      "name": "solar",
+      "days": 60,
+      "steps": 286,
+      "points": 287,
+      "reason": "complete",
+      "medianCpuMilliseconds": 2.639482000000001,
+      "maximumChunkMilliseconds": 1.3831869999999924,
+      "callsOverFiveRuns": 30
+    },
+    {
+      "name": "solar",
+      "days": 180,
+      "steps": 858,
+      "points": 301,
+      "reason": "complete",
+      "medianCpuMilliseconds": 5.840462000000002,
+      "maximumChunkMilliseconds": 0.6354690000000005,
+      "callsOverFiveRuns": 90
+    },
+    {
+      "name": "triple",
+      "days": 10,
+      "steps": 20,
+      "points": 21,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.014291000000000054,
+      "maximumChunkMilliseconds": 0.017246000000000095,
+      "callsOverFiveRuns": 5
+    },
+    {
+      "name": "triple",
+      "days": 60,
+      "steps": 120,
+      "points": 121,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.0786679999999933,
+      "maximumChunkMilliseconds": 0.035694000000006554,
+      "callsOverFiveRuns": 15
+    },
+    {
+      "name": "triple",
+      "days": 180,
+      "steps": 1006,
+      "points": 301,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.7863360000000057,
+      "maximumChunkMilliseconds": 0.19267099999999004,
+      "callsOverFiveRuns": 105
+    },
+    {
+      "name": "assist",
+      "days": 10,
+      "steps": 20,
+      "points": 21,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.007632000000000971,
+      "maximumChunkMilliseconds": 0.008493000000001416,
+      "callsOverFiveRuns": 5
+    },
+    {
+      "name": "assist",
+      "days": 60,
+      "steps": 203,
+      "points": 170,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.07017600000000357,
+      "maximumChunkMilliseconds": 0.22562000000000637,
+      "callsOverFiveRuns": 25
+    },
+    {
+      "name": "assist",
+      "days": 180,
+      "steps": 452,
+      "points": 301,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.18664199999999198,
+      "maximumChunkMilliseconds": 0.44268800000000397,
+      "callsOverFiveRuns": 50
+    },
+    {
+      "name": "twelve",
+      "days": 10,
+      "steps": 20,
+      "points": 21,
+      "reason": "complete",
+      "medianCpuMilliseconds": 0.207453000000001,
+      "maximumChunkMilliseconds": 0.3011240000000015,
+      "callsOverFiveRuns": 5
+    },
+    {
+      "name": "twelve",
+      "days": 60,
+      "steps": 120,
+      "points": 121,
+      "reason": "complete",
+      "medianCpuMilliseconds": 1.6243609999999933,
+      "maximumChunkMilliseconds": 0.8028409999999866,
+      "callsOverFiveRuns": 15
+    },
+    {
+      "name": "twelve",
+      "days": 180,
+      "steps": 360,
+      "points": 301,
+      "reason": "complete",
+      "medianCpuMilliseconds": 4.02452199999999,
+      "maximumChunkMilliseconds": 0.820208000000008,
+      "callsOverFiveRuns": 40
+    }
+  ]
+}

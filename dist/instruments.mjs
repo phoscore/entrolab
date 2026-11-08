@@ -1,0 +1,5 @@
+import {C,energy} from './physics.mjs';
+export const VELOCITY_KMS=C.AU/C.day/1000;
+export function measure(bs){let px=0,py=0,l=0,ps=0,ls=0;for(const b of bs){px+=b.m*b.vx;py+=b.m*b.vy;l+=b.m*(b.x*b.vy-b.y*b.vx);ps+=b.m*Math.hypot(b.vx,b.vy);ls+=Math.abs(b.m*(b.x*b.vy-b.y*b.vx))}return {energy:energy(bs),px,py,l,ps,ls}}
+export function baseline(bs,reason){return {...measure(bs),reason}}
+export function diagnostics(bs,base,selectedId,referenceId){const q=measure(bs),selected=bs.find(x=>x.id===selectedId),reference=bs.find(x=>x.id===referenceId&&x.id!==selectedId);return {...q,energyDrift:base&&Math.abs(base.energy)>0?Math.abs((q.energy-base.energy)/base.energy):null,momentumDrift:base&&base.ps>0?Math.hypot(q.px-base.px,q.py-base.py)/base.ps:null,angularDrift:base&&base.ls>0?Math.abs(q.l-base.l)/base.ls:null,speedKms:selected?Math.hypot(selected.vx,selected.vy)*VELOCITY_KMS:null,distanceM:selected&&reference?Math.hypot(selected.x-reference.x,selected.y-reference.y)*C.AU:null,referenceName:reference?.name??null}}
