@@ -3,7 +3,7 @@
 ## Autorisierung und Umfang
 
 - GitHub-Repository `phoscore/entrolab` ist nach Abschluss der Erstsicherung die zentrale Versionsverwaltung.
-- Aktuell autorisiert: v0.6 ausschließlich auf `develop/v0.6` gemäß `docs/Plan_v0.6.md` und Nutzerauftrag. Plan, Entwicklungsregeln und v0.5-Qualitätsberichte zuerst vollständig lesen. Alle 108 regulären Prüfungen, sieben Chromium-Regressionen und zwölf numerischen Benchmarks bewahren; gezielte Entropie-, UI-, Sprach- und Selbstcheck-Regressionen hinzufügen. Bestehende Physikmodelle und Integratoren erhalten. Neues Zwei-Kammer-Lab ausdrücklich als diskretes statistisches Lehrmodell abgrenzen. Keine Änderungen an main, kein Merge oder Deployment; abschließend Pull Request zur unabhängigen Prüfung und grüne CI abwarten. Original v0.1 bleibt erhalten.
+- Aktuell autorisiert: v0.7 ausschließlich auf `develop/v0.7` gemäß `docs/Plan_v0.7.md` und Nutzerauftrag. Plan, Entwicklungsregeln und Qualitätsberichte v0.5/v0.6 vollständig lesen. Alle 138 regulären Prüfungen, 20 Chromium-Fälle, zwölf unveränderten numerischen Benchmarks und Originalintegrität bewahren. Isoliertes, begrenztes Wärmeausgleichsmodell und freiwillige interaktive Anleitung ergänzen; ältere Physikmodelle und Integratoren erhalten. Kein Merge, Deployment oder Eingriff in main; abschließend Pull Request zur unabhängigen Prüfung und grüne CI abwarten.
 - Nach der Erstsicherung `main` nur mit ausdrücklicher Freigabe des Eigentümers verändern oder zusammenführen. Ein Prüfauftrag, erfolgreiche CI oder ein fertiger Branch sind keine Merge-Freigabe.
 - Keine Veröffentlichung, Releases, Deployment, GitHub Pages oder automatische Produktionsaktualisierung ohne ausdrückliche Zustimmung. Repository-Sichtbarkeit nicht eigenmächtig ändern.
 

@@ -1,15 +1,15 @@
 # ENTROLAB 🌌
 
-Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisierte Schwarze Löcher, extreme Himmelskörper und ein erstes statistisches Entropy Lab. Browser-Titel: **entrolab - emptiness pro max**.
+Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisierte Schwarze Löcher, extreme Himmelskörper und zwei getrennte Entropie-Lehrmodelle für Wahrscheinlichkeit und Wärmeausgleich. Browser-Titel: **entrolab - emptiness pro max**.
 
 ## Entwicklungsstand und Ausprobieren
 
-**v0.6 auf `develop/v0.6` ist ein Prüfstand, keine Produktionsfreigabe.** Grundlage ist die freigegebene v0.5 auf `main` (`39fde20f812da1d371b4990b15062062cddd102f`). Änderungen gehen ausschließlich als Pull Request zur unabhängigen Prüfung. Kein automatischer Merge.
+**v0.7 auf `develop/v0.7` ist ein Prüfstand, keine Produktionsfreigabe.** Grundlage ist die freigegebene v0.6 auf `main` (`4fe3c48295f66750775fa4fe42c596c26c361830`). Änderungen gehen ausschließlich als Pull Request zur unabhängigen Prüfung. Kein automatischer Merge.
 
 Die Anwendung ist buildlos: moderner Browser mit ES-Modulen, BigInt und Modul-Workern; Python 3 für einen lokalen HTTP-Server. Keine Paketinstallation und kein Backend zum Benutzen nötig.
 
 ```sh
-git clone --branch develop/v0.6 https://github.com/phoscore/entrolab.git
+git clone --branch develop/v0.7 https://github.com/phoscore/entrolab.git
 cd entrolab
 python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
@@ -23,11 +23,13 @@ Schriftarten von Google Fonts sind optional; Systemschrift funktioniert ohne sie
 - **Gravity Sandbox:** fünf Szenarien, Sterne/Planeten/Schwarze Löcher hinzufügen und bearbeiten, Pause/Tempo/Reset, Flugbahnen, Zoom/Vollbild, Messinstrumente und begrenzte numerische Bahnvorhersage. Körper per Klick oder Inspektor wählen. Beim Platzieren bestimmt Ziehen die Anfangsgeschwindigkeit.
 - **Black Hole Lab:** Schwarzschild-Radius und Hawking-Temperatur; Leistung und Lebensdauer als ausdrückliche Modellschätzungen; Größen- und logarithmische Funktionsdiagramme.
 - **Extreme Objects:** künstlerische Schwarzes-Loch- und Sternansichten, schematische Geometrie und optionaler schematischer Pulsar, Radienvergleich sowie Kelvin/Celsius-Temperaturlabor. Artwork ist keine GR- oder Emissionssimulation.
-- **Entropy Lab:** standardmäßig zwölf nummerierte, unterscheidbare Marker in zwei gleich großen Kammern. `N` ist auf 1–32 begrenzt. Alle links starten, `k` manuell wählen, einzelne Zufallsschritte, automatisch mischen, pausieren und zurücksetzen. Mikrozustand anzeigen oder bei gleichem `k` neu auslosen. Exakte Multiplizität, Gleichgewichtsverteilung, Datentabelle und dimensionslose Modellentropie vergleichen.
+- **Entropy Lab · Teilchen & Wahrscheinlichkeit:** standardmäßig zwölf nummerierte, unterscheidbare Marker in zwei gleich großen Kammern. `N` ist auf 1–32 begrenzt. Alle links starten, `k` manuell wählen, einzelne Zufallsschritte, automatisch mischen, pausieren und zurücksetzen. Mikrozustand anzeigen oder bei gleichem `k` neu auslosen. Exakte Multiplizität, Gleichgewichtsverteilung, Datentabelle und dimensionslose Modellentropie vergleichen.
+- **Entropy Lab · Wärme & Entropie:** zwei idealisierte, gemeinsam isolierte Körper mit einstellbaren Anfangstemperaturen (250–600 K), konstanten Wärmekapazitäten und Wärmeleitwert. Analytischer Temperaturverlauf, vorzeichenbehaftete Wärmeleistung/übertragene Energie, Gesamtenergie und thermodynamisches ΔS in J/K. Start/Pause, Zehn-Sekunden-Schritte und Reset; neue Parameter/Beispiele bleiben bis „Übernehmen“ ein Entwurf. Das Extreme Temperature Lab kann ausschließlich zulässige Kelvinwerte für A oder B vormerken. Extreme Werte werden erklärt abgewiesen, niemals angepasst.
+- **Erste Schritte:** vier freiwillige Schritte mit dezent hervorgehobenen echten Bedienelementen. Die Anleitung führt keine Modelländerung selbst aus, bewahrt beim Sprachwechsel den Schritt und lässt sich jederzeit schließen/erneut öffnen.
 - **Kontexthilfe:** „Was bedeutet das?“ öffnet das bestehende Glossar und fokussiert den passenden Begriff; „Zurück zum Labor“ oder Escape führt zum Ausgangslink zurück. Advanced-Infos sind freiwillig aufklappbar. Der Cosmic Field Guide ist nur eine kleine Vorschau.
 - **Modell & Quellen:** zehn isolierte modellinterne Selbstchecks. Jeder Lauf zeigt einen Ausführungszähler, Ergebnisstatus und eine Screenreader-Meldung. Das ist weder die gesamte CI-Suite noch eine vollständige Physikverifikation.
 
-DE/EN im Kopfbereich; auch dynamische Werte, Diagrammbeschriftungen und Fehler sind lokalisiert. Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt**, etwa `0.1` oder `1e9`. Noch nicht angewendete Entwürfe bleiben beim Sprachwechsel erhalten. Der Browser-Titel bleibt in beiden Sprachen identisch. Fokusmodus in Sandbox/Extreme Objects, Escape zum Verlassen. Reduced Motion startet bestehende Simulationen pausiert und unterdrückt Markerübergänge; automatisches Entropy-Mischen beginnt immer erst nach ausdrücklicher Auswahl.
+DE/EN im Kopfbereich; auch dynamische Werte, Diagrammbeschriftungen und Fehler sind lokalisiert. Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt**, etwa `0.1` oder `1e9`. Noch nicht angewendete Entwürfe bleiben beim Sprachwechsel erhalten. Der Browser-Titel bleibt in beiden Sprachen identisch. Fokusmodus in Sandbox/Extreme Objects, Escape zum Verlassen. Reduced Motion startet bestehende Simulationen pausiert und unterdrückt Markerübergänge; automatisches Entropy-Mischen und Wärme-Abspielen beginnen immer erst nach ausdrücklicher Auswahl. Beim Wechsel zu Reduced Motion pausiert das Wärmeexperiment; seine dekorativen Farb-/Flusseffekte werden unterdrückt.
 
 ## Wissenschaftliche Grundlagen und Grenzen
 
@@ -39,6 +41,8 @@ Der BH-Rechner setzt ungeladene, nicht rotierende Löcher voraus. Leistung/Leben
 
 **Entropy Lab:** `Ω(k) = C(N,k)`, insgesamt `2^N` individuelle Zuordnungen; im Gleichgewicht `P_eq(k) = Ω(k)/2^N`. Pro diskretem Schritt wechselt jeder Marker unabhängig und symmetrisch mit `q = 1/4` die Kammer. Die stationäre Verteilung ist binomial; sie ist **nicht** die anfängliche oder bedingte nächste Schrittverteilung. `S/k_B = ln Ω` bezeichnet ausschließlich eine dimensionslose Boltzmann-Modellentropie der groben `k`-Beschreibung. Einzelne Schritte können sie verringern. Keine realen Gasbahnen, Energien, Wärmeflüsse, Temperatur, Diffusionskoeffizienten oder kalibrierte physikalische Zeit. Nicht mit gravitativer oder Bekenstein-Hawking-Entropie gleichsetzen. Ausführlich: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
 
+**Wärme & Entropie:** `dQ/dt = G_th(T_A−T_B)`, `C_A dT_A/dt = −dQ/dt`, `C_B dT_B/dt = +dQ/dt`. Die analytische Relaxation hat `T_eq = (C_A T_A0 + C_B T_B0)/(C_A+C_B)` und `τ = 1/[G_th(1/C_A+1/C_B)]`. Gesamtenergie `U=C_A T_A+C_B T_B` ist bis auf Rundung konstant; der Nullpunkt ist Modellkonvention. `ΔS_i=C_i ln(T_i/T_i0)`, Gesamtänderung in J/K, getrennt von `S/k_B` des Markermodells. Numerisch stabile `expm1`-/`log1p`-Auswertung ohne Entropie-Clamping. Gewählte Bereiche: T 250–600 K, C 1–10⁶ J/K, G_th 0,001–1000 W/K, Modellzeit 0–10¹² s. Keine Phasenwechsel, Strahlung, Arbeit, Außenverluste, inneren Temperaturgradienten oder Materialkalibrierung. Die Grenzen sind didaktisch, kein allgemeiner Materialgültigkeitsnachweis. Detaillierte Ableitung, Quellen, Referenzwerte und Messungen: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
+
 ## Tests reproduzieren
 
 Node.js 22 oder neuer:
@@ -48,11 +52,12 @@ node scripts/test.mjs
 node scripts/verify-original.mjs
 node scripts/benchmark.mjs
 node scripts/check-benchmarks.mjs
+node scripts/measure-thermal.mjs
 ```
 
-Der reguläre Einstieg enthält **138 Prüfungen**: zehn Original-Selbstchecks und 128 Node-Testfälle. Alle 129 vor dem v0.6-Review vorhandenen Prüfungen bleiben enthalten; neun gezielte Reviewregressionen kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
+Der reguläre Einstieg enthält **158 Prüfungen**: zehn Original-Selbstchecks und 148 Node-Testfälle. Alle 149 vor dem v0.7-Review vorhandenen Prüfungen bleiben erhalten; neun gezielte Reviewfälle kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
 
-Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.6 unverändert.
+Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.7 unverändert.
 
 Für die zusätzlichen realen Chromium-Tests (nur Entwicklungsabhängigkeit, Playwright exakt per Lockfile):
 
@@ -62,7 +67,7 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browser-Suite umfasst **20 Fälle**: sieben bewahrte v0.5-Fälle, zehn bisherige v0.6-Fälle und drei neue Reviewregressionen zu Kontexthilfe/Fokus und Zustandsvalidierung. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
+Die Browser-Suite umfasst **36 Fälle**: alle 29 vor dem v0.7-Review vorhandenen Fälle sowie sieben neue Reviewfälle zu Grenzwerten/Originalreproduktion, Zeitachsen, Übernahmehinweisen und Kurvenabtastung. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
 
 ## Projektstruktur
 
@@ -75,6 +80,9 @@ Die Browser-Suite umfasst **20 Fälle**: sieben bewahrte v0.5-Fälle, zehn bishe
 | `dist/extreme-*.mjs` | Daten, berechnete Werte und illustrative Renderer |
 | `dist/entropy.mjs` | Reine Zählmathematik und stochastische Zustandsfunktionen |
 | `dist/entropy-ui.mjs`, `entropy.css` | Kammern, Diagramm, Bedienung und Timer-Lifecycle |
+| `dist/thermal-physics.mjs`, `thermal-ui.mjs`, `thermal.css` | Getrenntes analytisches Wärme-/Entropiemodell und Oberfläche |
+| `dist/discovery.mjs` | Freiwillige Anleitung mit tatsächlichen Bedienhandlungen |
+| `scripts/measure-thermal.mjs` | Reproduzierbare Bilanz-/RK4-Messwerte ohne Referenzänderung |
 | `dist/i18n.mjs`, `translations.mjs`, `ux.mjs`, `guide.mjs` | Sprache, Fokus, Hilfen und Kontextrückweg |
 | `dist/index.html`, `favicon.svg` | Oberfläche, fester Browser-Titel und originales künstlerisches Logo |
 | `scripts/test.mjs`, `.github/workflows/tests.yml` | Reguläre Suite und Browser-CI ohne Deployment |
@@ -82,7 +90,7 @@ Die Browser-Suite umfasst **20 Fälle**: sieben bewahrte v0.5-Fälle, zehn bishe
 
 ## Original und Freigabe schützen
 
-Original v0.1: Commit `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1`. Die sechs Originaldateien einschließlich historischer Hosting-Konfiguration sind über `docs/v0.1-original.sha256` und `docs/v0.1-original-commit.txt` gebunden. Diese Referenzen niemals auf neuere Versionen umstellen. `verify-original.mjs` liest ausdrücklich den Original-Commit; der v0.6-Auftrag verschiebt weder Archive noch Tags.
+Original v0.1: Commit `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1`. Die sechs Originaldateien einschließlich historischer Hosting-Konfiguration sind über `docs/v0.1-original.sha256` und `docs/v0.1-original-commit.txt` gebunden. Diese Referenzen niemals auf neuere Versionen umstellen. `verify-original.mjs` liest ausdrücklich den Original-Commit; der v0.7-Auftrag verschiebt weder Archive noch Tags.
 
 GitHub ist die zentrale Versionsverwaltung. Größere Änderungen auf Entwicklungsbranches, nachvollziehbare Commits und unabhängiger Review vor Freigabe. `main` nur nach ausdrücklicher Eigentümerfreigabe ändern/mergen. **Cloudflare Pages veröffentlicht `main` automatisch auf der bestehenden Produktionsseite.** Deshalb sind Merge und Produktionsveröffentlichung gesonderte Freigabeschritte; diese Entwicklung führt beides nicht aus. Kein neuer Hosting-Standort, kein Release, kein Force-Push und keine eigenmächtige Sichtbarkeitsänderung. Die historische `.openai/hosting.json` wird nicht als Deployment-Auftrag benutzt.
 
@@ -90,8 +98,9 @@ Korrekte Modelle und dokumentierte Grenzen haben Vorrang. Künstlerische Effekte
 
 ## Quellen und bisherige Berichte
 
+- [OpenStax Vol. 2 §1.6: Wärmeübertragung](https://openstax.org/books/university-physics-volume-2/pages/1-6-mechanisms-of-heat-transfer), [§1.4: Kalorimetrie](https://openstax.org/books/university-physics-volume-2/pages/1-4-heat-transfer-specific-heat-and-calorimetry), [§4.6: Entropie](https://openstax.org/books/university-physics-volume-2/pages/4-6-entropy) — Lehrbuchprinzipien; konstante C/G_th und Modellgrenzen sind eigene explizite Annahmen.
 - [OpenStax §15.7: Mikrozustände und Boltzmann-Entropie](https://openstax.org/books/college-physics-ap-courses/pages/15-7-statistical-interpretation-of-entropy-and-the-second-law-of-thermodynamics-the-underlying-explanation) — statistische Grundlagen; die `q = 1/4`-Schrittregel ist eine eigene, explizite Modellwahl.
 - [OpenStax §13.1: Newtonsche Gravitation](https://openstax.org/books/university-physics-volume-1/pages/13-1-newtons-law-of-universal-gravitation).
 - [NASA/JPL: astronomische Einheit](https://ssd.jpl.nasa.gov/glossary/au.html), [NASA: Sternreste/Pulsare](https://science.nasa.gov/exoplanets/stars/), [NASA: BH-Geometrie](https://science.nasa.gov/universe/black-holes/anatomy/).
 - [NIST: Konstanten](https://physics.nist.gov/cuu/Constants/), [Universität Zürich: Hawking-Strahlung](https://www.physik.uzh.ch/groups/jetzer/notes/PHY529_ART_III.pdf), [JILA: Hawking-Strahlung](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html).
-- Historische Qualitätsberichte: [v0.2](docs/Qualitaetsupdate_v0.2.md), [Review-Abschluss v0.2](docs/Reviewabschluss_v0.2.md), [v0.3](docs/Qualitaetsupdate_v0.3.md), [v0.4](docs/Qualitaetsupdate_v0.4.md), [v0.5](docs/Qualitaetsupdate_v0.5.md), [Codex-Review v0.5](docs/CodexReview_v0.5.md). Ihre damaligen Testzahlen/Entwicklungsstände sind keine aktuellen Versionsangaben.
+- Historische Qualitätsberichte: [v0.2](docs/Qualitaetsupdate_v0.2.md), [Review-Abschluss v0.2](docs/Reviewabschluss_v0.2.md), [v0.3](docs/Qualitaetsupdate_v0.3.md), [v0.4](docs/Qualitaetsupdate_v0.4.md), [v0.5](docs/Qualitaetsupdate_v0.5.md), [Codex-Review v0.5](docs/CodexReview_v0.5.md), [v0.6 samt Reviewkorrekturen](docs/Qualitaetsupdate_v0.6.md). Ihre damaligen Testzahlen/Entwicklungsstände sind keine aktuellen Versionsangaben.

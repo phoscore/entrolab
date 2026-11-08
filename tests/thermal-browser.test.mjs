@@ -1,0 +1,161 @@
+// Additional real Chromium cases; the seven v0.5 browser regressions are retained verbatim.
+import {test,before,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {resolve,extname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
+const root=fileURLToPath(new URL('../dist/',import.meta.url)),output=fileURLToPath(new URL('../browser-results/',import.meta.url));
+let server,browser,url;const errors=[],measurements=[];
+before(async()=>{
+ await mkdir(output,{recursive:true});server=createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost');if(u.pathname==='/__fractional'){res.writeHead(200,{'Content-Type':'text/html'}).end('<style>body{margin:0}iframe{border:0;width:320.5px;height:900px}</style><iframe src="/"></iframe>');return}const path=resolve(root,'.'+(u.pathname==='/'?'/index.html':decodeURIComponent(u.pathname)));if(!path.startsWith(root)){res.writeHead(403).end();return}res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(await readFile(path))}catch{res.writeHead(404).end()}});await new Promise(done=>server.listen(0,'127.0.0.1',done));url=`http://127.0.0.1:${server.address().port}`;browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});console.log('v0.7 Chromium',browser.version());
+});
+after(async()=>{await writeFile(resolve(output,'v07-measurements.json'),JSON.stringify({measurements,errors},null,2));await browser?.close();if(server)await new Promise(done=>server.close(done))});
+async function lab(options={}){const context=await browser.newContext({locale:'de-DE',viewport:{width:1360,height:1000},reducedMotion:'reduce',...options});await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,r=>r.abort());const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(url);await ready(page);return {page,context}}
+async function ready(p){await p.waitForFunction(()=>window.entrolabThermal&&window.entrolabEntropy&&window.entrolab&&document.querySelector('#checkRunStatus')?.dataset.run==='1');await p.evaluate(()=>document.fonts.ready)}
+const state=p=>p.evaluate(()=>window.entrolabEntropy.inspect());
+const wait=p=>p.waitForTimeout(1100); // Observe several genuine 200ms heat timer intervals.
+async function entropy(p){await p.locator('[data-tab=entropy]').click();await p.locator('#entropyChambers').scrollIntoViewIfNeeded()}
+async function k(p,value){await p.locator('#entropyK').press('Home');for(let i=0;i<value;i++)await p.locator('#entropyK').press('ArrowRight')}
+
+const heat=p=>p.evaluate(()=>window.entrolabThermal.inspect());
+async function openHeat(p){await p.locator('[data-tab=entropy]').click();await p.locator('[data-entropy-view=thermal]').click();await p.locator('#thermalStage').scrollIntoViewIfNeeded()}
+const otherModels=p=>p.evaluate(()=>{const {bodies,selected,paused,elapsed,collisions,view}=window.entrolab.inspect();return {bodies,selected,paused,elapsed,collisions,view,particles:window.entrolabEntropy.inspect()}});
+
+test('thermal browser: analytical values, explicit apply, validation and DE/EN preserve state and drafts',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);const before=await otherModels(p);await p.locator('#thermalStep').click();let r=await heat(p);assert.equal(r.time,10);assert(Math.abs(r.result.ta-(320+30*Math.exp(-.2)))<1e-11);assert(r.result.entropy>0);assert.match(await p.locator('#thermalDirection').textContent(),/A → B/);await p.locator('#thermalA').fill('700');await p.locator('#thermalApply').click();const state=await heat(p);assert.deepEqual(state,r);assert.match(await p.locator('#thermalError').textContent(),/250–600/);await p.locator('[data-language=en]').click();assert.equal(await p.locator('#thermalA').inputValue(),'700');assert.deepEqual(await heat(p),state);assert.match(await p.locator('#thermalError').textContent(),/Finite/);assert.equal(await p.locator('#thermalA').evaluate(e=>e.validationMessage),await p.locator('#thermalError').textContent());await p.locator('#thermalA').fill('400');await p.locator('#thermalApply').click();r=await heat(p);assert.equal(r.params.a,400);assert.equal(r.time,0);assert.equal(r.playing,false);assert.equal(await p.locator('#thermalError').textContent(),'');assert.deepEqual(await otherModels(p),before);await p.locator('#thermalStep').click();await p.locator('#thermalReset').click();assert.equal((await heat(p)).params.a,400);assert.equal((await heat(p)).time,0)}finally{await context.close()}
+});
+
+test('thermal browser: transfer only drafts the chosen valid temperature and preserves both independent models',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalStep').click();const before=await heat(p);await p.locator('[data-tab=extreme]').click();assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);for(const value of ['0','.001','2.725','1e12','249.99','600.01']){await p.locator('#kelvinInput').fill(value);assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);assert.match(await p.locator('#thermalBridgeNote').textContent(),/250–600/)}await p.locator('#kelvinInput').fill('350');assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);await p.locator('#kelvinInput').fill('-1');assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);assert.match(await p.locator('#thermalBridgeNote').textContent(),/ungültige/);await p.locator('[data-kelvin="293.15"]').click();await p.locator('#thermalTransferTarget').selectOption('b');await p.locator('#thermalTransfer').click();assert.equal(await p.locator('#thermalB').inputValue(),'293.15');assert.equal(await p.evaluate(()=>document.activeElement.id),'thermalB');assert.deepEqual(await heat(p),before);assert.match(await p.locator('#thermalTransferNote').textContent(),/293,15/);await p.locator('[data-language=en]').click();assert.match(await p.locator('#thermalTransferNote').textContent(),/293.15/);await p.locator('[data-tab=extreme]').click();assert.equal(await p.locator('#kelvinInput').inputValue(),'293.15');await openHeat(p);await p.locator('#thermalApply').click();assert.equal((await heat(p)).params.b,293.15);assert.equal((await heat(p)).time,0);assert.equal((await heat(p)).playing,false)}finally{await context.close()}
+});
+
+test('thermal browser: subviews, offscreen, main navigation and synthetic visibility stop all hidden heat ticks',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalPlay').click();await p.waitForFunction(()=>window.entrolabThermal.inspect().time>0);await p.locator('[data-entropy-view=particles]').click();const hidden=await heat(p);assert.equal(hidden.scheduled,false);await wait(p);assert.deepEqual(await heat(p),hidden);await p.locator('[data-entropy-view=thermal]').click();await p.locator('#thermalStage').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabThermal.inspect().scheduled);await p.locator('.thermal-explanation details summary').click();await p.locator('footer').scrollIntoViewIfNeeded();await p.waitForFunction(()=>!window.entrolabThermal.inspect().scheduled);const off=await heat(p);await wait(p);assert.deepEqual(await heat(p),off);await p.locator('#thermalStage').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabThermal.inspect().scheduled);await p.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'))});const docHidden=await heat(p);assert.equal(docHidden.scheduled,false);await wait(p);assert.deepEqual(await heat(p),docHidden);await p.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'))});await p.locator('[data-tab=blackhole]').click();const inactive=await heat(p);await wait(p);assert.deepEqual(await heat(p),inactive);await openHeat(p);await p.locator('#thermalPlay').click();assert.equal((await heat(p)).scheduled,false)}finally{await context.close()}
+});
+
+test('discovery browser: four optional steps require real actions, never silently change model values',async()=>{
+ const {page:p,context}=await lab();try{const original=await heat(p);await p.locator('#helpToggle').click();assert.equal(await p.locator('#quickStart').getAttribute('data-step'),'0');assert.deepEqual(await heat(p),original);await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'entropy');await p.keyboard.press('Enter');await p.locator('#discoveryNext').click();assert.equal(await p.locator('#quickStart').getAttribute('data-step'),'1');await p.locator('[data-entropy-view=thermal]').click();await p.locator('#discoveryNext').click();assert.equal(await p.locator('#discoveryNext').isEnabled(),false);await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'thermalStep');await p.keyboard.press('Enter');assert.equal((await heat(p)).time,10);await p.locator('#discoveryNext').click();await p.locator('#discoveryLocate').click();await p.locator('#thermalA').fill('380');await p.locator('#thermalApply').click();assert.equal((await heat(p)).params.a,380);assert.equal((await heat(p)).time,0);await p.locator('#discoveryNext').click();assert.equal(await p.locator('#quickStart').isVisible(),false);assert.equal(await p.evaluate(()=>document.activeElement.id),'helpToggle');assert.equal(await p.locator('.discovery-highlight').count(),0)}finally{await context.close()}
+});
+
+test('discovery browser: language, navigation, closing/Escape and reopening retain progress with visible focus',async()=>{
+ const {page:p,context}=await lab({viewport:{width:390,height:900}});try{await p.locator('#helpToggle').click();await p.locator('[data-tab=entropy]').press('Enter');await p.locator('#discoveryNext').click();const before=await heat(p);await p.locator('[data-language=en]').click();assert.match(await p.locator('#discoveryProgress').textContent(),/Step 2 of 4/);assert.deepEqual(await heat(p),before);await p.locator('[data-tab=blackhole]').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'blackhole');await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'entropy');await p.keyboard.press('Enter');await p.locator('#helpClose').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'helpToggle');await p.locator('#helpToggle').click();assert.equal(await p.locator('#quickStart').getAttribute('data-step'),'1');await p.keyboard.press('Escape');assert.equal(await p.locator('#quickStart').isVisible(),false);assert.equal(await p.evaluate(()=>document.activeElement.id),'helpToggle');assert.equal(await p.locator('.discovery-highlight').count(),0);assert.deepEqual(await heat(p),before)}finally{await context.close()}
+});
+
+test('thermal browser: narrow/fractional DPR views have bounded controls/diagrams and touch emulation',{timeout:60000},async()=>{
+ for(const [width,dpr]of [[320,1],[390,2],[320.5,1.25],[1360,1]]){const {page:p,context}=await lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr,hasTouch:true});try{let f=p;if(!Number.isInteger(width)){await p.goto(url+'/__fractional');f=await(await p.$('iframe')).contentFrame();await ready(f)}await openHeat(f);await f.locator('[data-language=en]').click();await f.locator('#thermalStage').scrollIntoViewIfNeeded();const result=await f.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,chart:document.getElementById('thermalChart').getBoundingClientRect().width,controls:[...document.querySelectorAll('.thermal-transport button')].map(e=>e.getBoundingClientRect().height)}));assert(result.scroll<=result.width+1,JSON.stringify(result));assert(result.controls.every(h=>h>=44));measurements.push({requestedWidth:width,dpr,...result});await p.screenshot({path:resolve(output,'thermal-'+String(width).replace('.','_')+'.png')})}finally{await context.close()}}
+});
+
+test('thermal browser: reduced-motion changes pause playback and suppress decorative transitions',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);assert.equal((await heat(p)).playing,false);assert.equal(await p.locator('#thermalBodyA').evaluate(e=>getComputedStyle(e).transitionDuration),'0s');await p.emulateMedia({reducedMotion:'no-preference'});await p.locator('#thermalPlay').click();await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>!window.entrolabThermal.inspect().playing);assert.equal((await heat(p)).scheduled,false)}finally{await context.close()}
+});
+
+test('thermal browser: honest presets, signed reverse flow and context help preserve applied state',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);const before=await heat(p);await p.locator('[data-thermal-preset=unequal]').click();assert.deepEqual(await heat(p),before);await p.locator('#thermalApply').click();assert.equal((await heat(p)).result.eq,305);await p.locator('#thermalA').fill('290');await p.locator('#thermalB').fill('350');await p.locator('#thermalApply').click();await p.locator('#thermalStep').click();const state=await heat(p);assert(state.result.power<0&&state.result.q<0);assert.match(await p.locator('#thermalDirection').textContent(),/B → A/);await p.locator('#entropyExplain').press('Enter');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-thermal');assert.deepEqual(await heat(p),state);await p.locator('[data-thermal-preset=balanced]').click();await p.locator('#thermalApply').click();await p.locator('#thermalStep').click();assert.equal((await heat(p)).result.entropy,0);assert.deepEqual(errors,[])}finally{await context.close()}
+});
+
+
+test('thermal browser: measured bounded rendering cost and shared help keep visible focus across experiment switches',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);assert.match(await p.locator('#entropyModelBadge').textContent(),/THERMODYNAMISCHES/);assert.equal(await p.locator('#entropy [data-explain]').count(),1);const before=await otherModels(p);const cost=await p.evaluate(()=>{const samples=[];for(let i=0;i<300;i++){const start=performance.now();document.getElementById('thermalStep').click();samples.push(performance.now()-start)}samples.sort((a,b)=>a-b);return {steps:300,medianMs:samples[150],p95Ms:samples[285],maxMs:samples[299],scheduled:window.entrolabThermal.inspect().scheduled,time:window.entrolabThermal.inspect().time,chartNodes:document.querySelectorAll('#thermalChart *').length}});assert.equal(cost.time,3000);assert.equal(cost.scheduled,false);assert(cost.chartNodes<20);measurements.push({renderCost:cost});console.log('v0.7 render-cost',JSON.stringify(cost));assert.deepEqual(await otherModels(p),before);await p.locator('#entropyExplain').press('Enter');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'entropyExplain');await p.locator('[data-entropy-view=particles]').press('Enter');assert.equal(await p.locator('#entropyExplain').getAttribute('data-explain'),'guide-entropy');assert.match(await p.locator('#entropyModelBadge').textContent(),/STATISTISCHES/);await p.locator('#entropyExplain').press('Enter');await p.locator('#guideReturn').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'entropyExplain');await p.locator('[data-entropy-view=thermal]').press('Enter');await p.locator('[data-language=en]').click();assert.match(await p.locator('#entropyModelBadge').textContent(),/THERMODYNAMIC/);assert.deepEqual(errors,[])}finally{await context.close()}
+});
+
+// Independent-review regressions. All 29 pre-review browser cases above are retained.
+test('review P2 browser: Celsius/Kelvin boundary transfers survive blur without source/model mutation',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);const before=await heat(p);await p.locator('[data-tab=extreme]').click();await p.locator('#celsiusInput').fill('-23.15');await p.locator('#celsiusInput').press('Tab');const raw=await p.locator('#temperatureTransferValue').evaluate(e=>e.value);assert.equal(await p.locator('#thermalTransfer').isEnabled(),true,raw);await p.locator('#thermalTransferTarget').selectOption('b');await p.locator('#thermalTransfer').press('Enter');assert.equal(await p.locator('#thermalB').inputValue(),'250');assert.deepEqual(await heat(p),before);await p.locator('#thermalApply').click();assert.equal((await heat(p)).params.b,250);await p.locator('[data-tab=extreme]').click();assert.equal(await p.locator('#temperatureTransferValue').evaluate(e=>e.value),raw);assert.equal(await p.locator('#celsiusInput').inputValue(),'-23.15');for(const [id,values]of [['celsiusInput',['326.85','-23.15']],['kelvinInput',['600','250']]])for(const value of values){await p.locator('#'+id).fill(value);await p.locator('#'+id).press('Tab');assert.equal(await p.locator('#thermalTransfer').isEnabled(),true,id+':'+value)}for(const [id,values]of [['celsiusInput',['-23.150000000001','326.850000000001']],['kelvinInput',['249.99999999999997','600.0000000000001','249.99','600.01']]])for(const value of values){await p.locator('#'+id).fill(value);await p.locator('#'+id).press('Tab');assert.equal(await p.locator('#thermalTransfer').isEnabled(),false,id+':'+value)}}finally{await context.close()}
+});
+test('review P2 browser: shortest time constant has distinct nonzero time-axis labels',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalForm details summary').click();await p.locator('#thermalCA').fill('1');await p.locator('#thermalCB').fill('1');await p.locator('#thermalG').fill('1000');await p.locator('#thermalApply').click();const axis=await p.locator('#thermalChart text').allTextContents();const times=axis.slice(-3).map(s=>s.trim());assert.equal(new Set(times).size,3,JSON.stringify(times));assert.notEqual(times[2],'0');assert.equal((await heat(p)).result.tau,.0005)}finally{await context.close()}
+});
+test('review P3 browser: a preset replacing the transfer draft removes stale temperature notice',async()=>{
+ const {page:p,context}=await lab();try{await p.locator('[data-tab=extreme]').click();await p.locator('#kelvinInput').fill('400');await p.locator('#thermalTransferTarget').selectOption('b');await p.locator('#thermalTransfer').click();assert.match(await p.locator('#thermalTransferNote').textContent(),/400/);const before=await heat(p);await p.locator('[data-thermal-preset=balanced]').click();assert.equal(await p.locator('#thermalA').inputValue(),'320');assert.equal(await p.locator('#thermalB').inputValue(),'320');assert.equal(await p.locator('#thermalTransferNote').textContent(),'');assert.deepEqual(await heat(p),before)}finally{await context.close()}
+});
+
+test('review browser: tiny, normal and largest time constants have truthful DE/EN axes without state changes',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalForm details summary').click();const cases=[];for(const [ca,cb,g,tau]of [[1,1,1000,.0005],[1000,1000,10,50],[1e6,1e6,.001,5e8]]){
+  await p.locator('#thermalCA').fill(String(ca));await p.locator('#thermalCB').fill(String(cb));await p.locator('#thermalG').fill(String(g));await p.locator('#thermalApply').click();const before=await heat(p);assert(Math.abs(before.result.tau-tau)<=2*Number.EPSILON*tau);
+  for(const language of ['de','en']){await p.locator('[data-language='+language+']').click();const ticks=await p.locator('#thermalChart [data-time]').evaluateAll(es=>es.map(e=>({value:Number(e.dataset.time),label:e.textContent})));assert.equal(ticks.length,3);assert.equal(new Set(ticks.map(x=>x.label)).size,3);for(const tick of ticks){const shown=Number(tick.label.replace(',','.'));assert(Math.abs(shown-tick.value)<=Math.abs(tick.value)*.0005);assert.equal(tick.value===0,shown===0)}assert.deepEqual(await heat(p),before);cases.push({ca,cb,g,tau,language,ticks})}
+ }measurements.push({reviewAxes:cases})}finally{await context.close()}
+});
+test('review browser: all transfer-notice exits, language and keyboard focus stay consistent on mobile',async()=>{
+ const {page:p,context}=await lab({viewport:{width:390,height:900}});try{
+  const draft=async()=>{await p.locator('[data-tab=extreme]').click();await p.locator('#kelvinInput').fill('400');await p.locator('#thermalTransferTarget').selectOption('b');await p.locator('#thermalTransfer').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'thermalB');assert.match(await p.locator('#thermalTransferNote').textContent(),/400/)};
+  await draft();const before=await heat(p),old=await otherModels(p);await p.locator('[data-language=en]').click();assert.match(await p.locator('#thermalTransferNote').textContent(),/400/);assert.equal(await p.evaluate(()=>document.activeElement.id),'thermalB');assert.deepEqual(await heat(p),before);
+  for(const preset of ['balanced','equal','unequal']){await p.locator('[data-thermal-preset='+preset+']').press('Enter');assert.equal(await p.locator('#thermalTransferNote').textContent(),'');assert.deepEqual(await heat(p),before);await draft()}
+  for(const field of ['thermalA','thermalB']){await p.locator('#'+field).fill('410');assert.equal(await p.locator('#thermalTransferNote').textContent(),'');await p.locator('[data-language=de]').click();assert.equal(await p.locator('#'+field).inputValue(),'410');assert.equal(await p.locator('#thermalTransferNote').textContent(),'');assert.deepEqual(await heat(p),before);await draft()}
+  await p.locator('#thermalReset').press('Enter');assert.equal(await p.locator('#thermalTransferNote').textContent(),'');assert.equal(await p.locator('#thermalB').inputValue(),'290');await draft();await p.locator('#thermalApply').press('Enter');assert.equal((await heat(p)).params.b,400);assert.equal(await p.locator('#thermalTransferNote').textContent(),'');assert.deepEqual(await otherModels(p),old);assert((await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)));assert.deepEqual(errors,[])
+ }finally{await context.close()}
+});
+test('review browser: bounded fast-relaxation samples remain analytical after a long time step',async()=>{
+ const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalForm details summary').click();await p.locator('#thermalCA').fill('1');await p.locator('#thermalCB').fill('1');await p.locator('#thermalG').fill('1000');await p.locator('#thermalApply').click();await p.locator('#thermalStep').click();const state=await heat(p);assert.equal(state.time,10);const points=await p.locator('#thermalChart polyline').first().getAttribute('points');const samples=points.split(' ').map(s=>s.split(',').map(Number));assert.equal(samples.length,65);assert(samples.every(p=>p.every(Number.isFinite)));assert(samples[48][0]<54.3);assert(Math.abs(samples[48][1]-(247-210*((320+30*Math.exp(-8))-285)/70))<1e-9);assert.equal(samples.at(-1)[0],624);assert.equal(state.result.ta,320);assert.equal(state.result.energyError,0);measurements.push({reviewFastCurve:{tau:state.result.tau,horizon:10,samples:samples.length,earlyLast:samples[48],final:samples.at(-1)}});await p.locator('#thermalChart').scrollIntoViewIfNeeded();await p.screenshot({path:resolve(output,'review-v07-fast-curve.png')});assert.deepEqual(await heat(p),state)}finally{await context.close()}
+});
+
+
+test('review browser baseline: original UI fixture reproduces the Celsius boundary failure after real blur',async()=>{
+ const {page:p,context}=await lab();try{const original=await readFile(new URL('./fixtures/thermal-ui-f980d883.txt',import.meta.url),'utf8');await p.route('**/thermal-ui.mjs',route=>route.fulfill({status:200,contentType:'text/javascript',body:original}));await p.reload();await ready(p);await p.locator('[data-tab=extreme]').click();await p.locator('#celsiusInput').fill('-23.15');await p.locator('#celsiusInput').press('Tab');const raw=await p.locator('#temperatureTransferValue').evaluate(e=>e.value);assert.equal(Number(raw),249.99999999999997);assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);measurements.push({reviewOriginalBoundary:{commit:'f980d8837d8303f949d7a13b3abdffcb400771b8',celsius:await p.locator('#celsiusInput').inputValue(),rawKelvin:raw,transferEnabled:false}})}finally{await context.close()}
+});
+
+
+test('review P3 browser: precision rejected after native blur is explained in both languages',async()=>{
+ const {page:p,context}=await lab();try{
+  await p.locator('[data-tab=extreme]').click();
+  const original='249.99999999999999999';
+  await p.locator('#kelvinInput').fill(original);
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#kelvinInput').inputValue(),'250');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  let note=await p.locator('#thermalBridgeNote').textContent();
+  assert(note.includes(original),note);
+  assert.match(note,/Ursprünglich eingegeben/);
+  assert.match(note,/250 K/);
+  await p.locator('[data-language=en]').click();
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  note=await p.locator('#thermalBridgeNote').textContent();
+  assert.match(note,/Originally entered/);
+  assert(note.includes(original),note);
+  await p.locator('#kelvinInput').fill('250');
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+  assert.doesNotMatch(await p.locator('#thermalBridgeNote').textContent(),/Originally entered/);
+  const celsius='-23.150000000000000001';
+  await p.locator('#celsiusInput').fill(celsius);
+  await p.locator('#celsiusInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  note=await p.locator('#thermalBridgeNote').textContent();
+  assert.match(note,/Originally entered/);
+  assert(note.includes(celsius),note);
+  await p.locator('#celsiusInput').fill('-23.15');
+  await p.locator('#celsiusInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+ }finally{await context.close()}
+});
+
+
+test('review P3 mobile: long exact source decimals wrap without horizontal page overflow',async()=>{
+ const {page:p,context}=await lab({viewport:{width:320,height:900},deviceScaleFactor:1});
+ try{
+  await p.locator('[data-tab=extreme]').click();
+  const outside='249.'+'9'.repeat(40);
+  await p.locator('#kelvinInput').fill(outside);
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  const note=await p.locator('#thermalBridgeNote').textContent();
+  assert(note.includes(outside),note);
+  const geometry=await p.evaluate(()=>({
+   width:innerWidth,
+   documentWidth:document.documentElement.scrollWidth,
+   noteWidth:document.getElementById('thermalBridgeNote').getBoundingClientRect().width,
+   noteScroll:document.getElementById('thermalBridgeNote').scrollWidth
+  }));
+  assert(geometry.documentWidth<=geometry.width+1,JSON.stringify(geometry));
+  assert(geometry.noteScroll<=geometry.noteWidth+1,JSON.stringify(geometry));
+  await p.locator('[data-language=en]').click();
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  assert.match(await p.locator('#thermalBridgeNote').textContent(),/Originally entered/);
+  const english=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+  assert(english.scroll<=english.width+1,JSON.stringify(english));
+  await p.locator('#kelvinInput').fill('250');
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+ }finally{await context.close()}
+});
