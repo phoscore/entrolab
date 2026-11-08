@@ -120,3 +120,12 @@ Details, Messbedingungen, Grenzen und konkrete Zahlen: [Qualitätsbericht](docs/
 ### Unabhängiger Review-Abschluss
 
 `node scripts/test.mjs` führt nun zehn Originalchecks plus 25 Node-Testfälle aus, darunter sechs analytische Kepler-Bahnen, eine Referenz-Selbstprüfung und zwei Kollisionsregressionen. `node scripts/review-diagnostics.mjs` erzeugt die ergänzenden Messdaten. Ergebnisse, Fehlergrenzen und die weiterhin offene Tunneling-Grenze: [Review-Abschluss](docs/Reviewabschluss_v0.2.md). Physikkern, Integrator und Kollisionsverhalten wurden bei diesem Abschluss nicht verändert.
+
+
+## Experimentierlabor v0.3 (Entwicklungsbranch)
+
+Neue Presets „Dreikörper-Wechselwirkung“ und „Gravitationsschleuder“, aufklappbare Messinstrumente und eine begrenzte numerische Bahnvorhersage. Im linken Bereich „Bahnvorhersage“ öffnen, einschalten, Horizont wählen und bei Bedarf „Neu berechnen“ drücken. Rechts den Körper und unter „Wissenschaftliche Messinstrumente“ einen benannten Referenzkörper wählen.
+
+Die gestrichelte Linie ist eine Momentaufnahme der numerischen Modellvorhersage, keine laufend aktualisierte oder reale Ereignisprognose. Grenze: 12 Körper, 1500 Schritte, 301 Punkte; verfügbare UI-Horizonte 10/60/180 Tage. Änderungen, Kollisionen und Reset verwerfen sie. Integrationsformeln und Modellgrenzen einschließlich Kollisions-Tunneling bleiben bestehen.
+
+`node scripts/test.mjs`: 55 Prüfungen einschließlich aller 35 bisherigen. `node scripts/benchmark-v0.3.mjs`: neue Szenario-/Prognosemessungen. Vollständige Beschreibung, Einheiten und tatsächliche Validierung: [Qualitätsbericht v0.3](docs/Qualitaetsupdate_v0.3.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.

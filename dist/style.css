@@ -4,3 +4,6 @@
 
 .model-warning{margin:0 0 16px;color:#e2c49c;border-color:#6a503c;background:#211b16}.model-warning[hidden]{display:none}.metrics b{overflow-wrap:anywhere}.metrics label{line-height:1.6}
 @media(max-width:600px){.workspace{grid-template-columns:1fr}.simulation{grid-column:1;min-height:480px}.inspector .input-row{flex-direction:column}.inspector .input-row>div{width:100%}button,input[type=number],select{min-height:44px}input[type=number],select{font-size:16px}.canvas-head{padding:10px}.canvas-head>span{font-size:7px}.canvas-head button{min-width:40px}.canvas-head>span{max-width:90px;line-height:1.7}.transport button{min-width:44px;min-height:44px}.metrics{grid-template-columns:1fr 1fr}.chart-legend{flex-wrap:wrap}input[type=range]{height:24px}.type-picks button{min-height:65px}}
+
+
+.instruments,.instrument-controls{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}summary{cursor:pointer;color:#c8b7df;font-size:12px;line-height:1.6}.instruments .diagnostic{display:block}.instruments .diagnostic b{display:block;overflow-wrap:anywhere;margin-top:6px}.instruments .hint{overflow-wrap:anywhere}@media(max-width:600px){summary{min-height:44px;padding:10px 0}}
