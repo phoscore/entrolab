@@ -129,3 +129,33 @@ test('review P3 browser: precision rejected after native blur is explained in bo
   assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
  }finally{await context.close()}
 });
+
+
+test('review P3 mobile: long exact source decimals wrap without horizontal page overflow',async()=>{
+ const {page:p,context}=await lab({viewport:{width:320,height:900},deviceScaleFactor:1});
+ try{
+  await p.locator('[data-tab=extreme]').click();
+  const outside='249.'+'9'.repeat(40);
+  await p.locator('#kelvinInput').fill(outside);
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  const note=await p.locator('#thermalBridgeNote').textContent();
+  assert(note.includes(outside),note);
+  const geometry=await p.evaluate(()=>({
+   width:innerWidth,
+   documentWidth:document.documentElement.scrollWidth,
+   noteWidth:document.getElementById('thermalBridgeNote').getBoundingClientRect().width,
+   noteScroll:document.getElementById('thermalBridgeNote').scrollWidth
+  }));
+  assert(geometry.documentWidth<=geometry.width+1,JSON.stringify(geometry));
+  assert(geometry.noteScroll<=geometry.noteWidth+1,JSON.stringify(geometry));
+  await p.locator('[data-language=en]').click();
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  assert.match(await p.locator('#thermalBridgeNote').textContent(),/Originally entered/);
+  const english=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+  assert(english.scroll<=english.width+1,JSON.stringify(english));
+  await p.locator('#kelvinInput').fill('250');
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+ }finally{await context.close()}
+});
