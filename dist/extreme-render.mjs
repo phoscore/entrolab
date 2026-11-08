@@ -1,0 +1,22 @@
+// Procedural artwork, not GR, radiative-transfer, fluid or thermal-particle dynamics.
+export function fitCanvas(canvas,quality='low'){const rect=canvas.getBoundingClientRect(),d=Math.min(globalThis.devicePixelRatio||1,quality==='high'?1.75:1.25);if(rect.width<1||rect.height<1)return null;const w=rect.width,h=rect.height;if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}const ctx=canvas.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return {ctx,w,h}}
+function circle(x,cx,cy,r,color){x.fillStyle=color;x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.fill()}
+export function drawObject(canvas,s,time){const fit=fitCanvas(canvas,s.quality);if(!fit)return;const {ctx:x,w,h}=fit,cx=w*.5,cy=h*.49,R=Math.min(w*.12,h*.16)*s.zoom; x.fillStyle='#06070d';x.fillRect(0,0,w,h);
+for(let i=0;i<110;i++){const sx=((i*1783+89)%10007)/10007*w,sy=((i*3853+127)%9967)/9967*h;circle(x,sx,sy,i%13===0?1.1:.55,`rgba(199,194,226,${.15+(i%4)*.1})`)}
+const halo=x.createRadialGradient(cx,cy,R*.8,cx,cy,R*4.8);halo.addColorStop(0,s.kind==='blackhole'?'#90602f30':'#7e81d94a');halo.addColorStop(1,'#00000000');x.fillStyle=halo;x.fillRect(0,0,w,h);
+if(s.kind!=='blackhole'){const g=x.createRadialGradient(cx-R*.3,cy-R*.4,R*.05,cx,cy,R);g.addColorStop(0,'#f6f4ff');g.addColorStop(.6,s.kind==='white'?'#a4c6f5':'#9a89e8');g.addColorStop(1,'#272846');circle(x,cx,cy,R,g);x.save();x.beginPath();x.arc(cx,cy,R,0,7);x.clip();for(let i=0;i<22;i++){x.strokeStyle=`rgba(255,255,255,${.02+(i%3)*.025})`;x.lineWidth=2;x.beginPath();x.ellipse(cx+Math.sin(time*.2+i)*R*.15,cy,R*Math.abs(Math.sin(i*.2+time*.1)),R,0,0,7);x.stroke()}x.restore();return}
+if(s.geometry){for(const [factor,color,label] of [[3,'#9274d5','ISCO · 3 rₛ'],[1.5,'#e4bd89','Photonensphäre · 1,5 rₛ'],[1,'#e7e2f5','Horizont · rₛ']]){x.beginPath();x.arc(cx,cy,R*factor,0,7);x.setLineDash(factor===1?[]:[4,5]);x.strokeStyle=color;x.lineWidth=1.2;x.stroke();x.fillStyle=color;x.font='11px system-ui';x.fillText(label,cx+7,Math.max(34,Math.min(h-28,factor===3?cy+R*factor-12:cy-R*factor-8)))}x.setLineDash([]);circle(x,cx,cy,R,'#000');return}
+if(s.disk){
+// Rings, brightness asymmetry and the upper arc are artistic projections only.
+const tilt=.24+.65*s.angle/90;
+x.save();x.translate(cx,cy);x.rotate(-.12);
+for(let i=45;i>=0;i--){const r=R*(1.65+i*.065);x.beginPath();x.ellipse(0,0,r,r*tilt,0,0,7);x.strokeStyle=`rgba(255,${125+Math.floor(i*1.8)},${65+Math.floor(i*2.5)},${.025+.001*(45-i)})`;x.lineWidth=R*.075;x.stroke()}
+x.restore();
+x.save();x.translate(cx,cy);x.rotate(-.12);const n=s.quality==='high'?210:90;for(let i=0;i<n;i++){const radius=R*(1.7+(i%17)*.12),phase=(i*2.399+time*(.2+1.7/(radius/R)))%(Math.PI*2);x.beginPath();x.ellipse(0,0,radius,radius*tilt,0,phase,phase+.12+(i%5)*.012);x.strokeStyle=i%4===0?'#ffe3b8bb':'#f5a57460';x.lineWidth=i%4===0?1.4:.7;x.stroke()}x.restore();
+x.save();x.shadowColor='#ffb478';x.shadowBlur=s.quality==='high'?16:0;x.strokeStyle='#ffe0ad88';x.lineWidth=1.4;x.beginPath();x.ellipse(cx,cy,R*1.78,R*1.78*tilt,-.12,0,7);x.stroke();x.restore();
+x.strokeStyle='#e8b58448';x.lineWidth=R*.065;x.beginPath();x.ellipse(cx,cy,R*1.6,R*1.5,0,Math.PI,Math.PI*2);x.stroke();
+}
+circle(x,cx,cy,R*1.08,'#000');
+if(s.disk){x.strokeStyle='#ffe3b3cc';x.lineWidth=1.1;x.beginPath();x.arc(cx,cy,R*1.1,0,7);x.stroke();x.save();x.beginPath();x.rect(0,cy+R*.18,w,h);x.clip();for(let i=0;i<16;i++){x.beginPath();x.ellipse(cx,cy,R*(1.2+i*.14),R*(.22+i*.025),-.12,0,Math.PI);x.strokeStyle=`rgba(255,${180+i*3},${120+i*4},${.16-i*.006})`;x.lineWidth=1.5;x.stroke()}x.restore()}
+x.fillStyle='#ada1b4';x.font='10px system-ui';x.textAlign='center';x.fillText(s.disk?'Akkretionsscheibe & Silhouette · künstlerisch':'Isoliert ohne Scheibe · Silhouette illustrativ',cx,h-22);x.textAlign='left';}
+export function drawThermal(canvas,k,time,quality){const f=fitCanvas(canvas,quality);if(!f)return;const {ctx:x,w,h}=f;x.fillStyle='#0b0b13';x.fillRect(0,0,w,h);const fraction=k===0?0:Math.min(1,Math.max(0,(Math.log10(k)+3)/15));const hue=240-220*fraction,amount=quality==='high'?70:38;for(let i=0;i<amount;i++){const phase=time*(.08+fraction*1.9);const px=((i*.618)%1)*w+Math.sin(phase+i)*fraction*20,py=((i*.413)%1)*h+Math.cos(phase*1.3+i)*fraction*15;circle(x,(px+w)%w,(py+h)%h,1.5+(i%3)*.7,`hsla(${hue},75%,75%,${.2+(i%5)*.13})`)}x.fillStyle='#b5a9c6';x.font='10px system-ui';x.fillText('ABSTRAKT · keine Teilchen- oder Quantenberechnung',12,h-12)}
