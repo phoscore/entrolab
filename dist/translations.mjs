@@ -368,7 +368,8 @@ export const de=Object.freeze({
   "Neutronenstern · Feldlinien illustrativ": "Neutronenstern · Feldlinien illustrativ",
   "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.": "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.",
   "Logarithmischer Radienvergleich": "Logarithmischer Radienvergleich",
-  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius"
+  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius",
+  "Strahlungskegel rein schematisch · keine berechnete Emissionsphysik.": "Strahlungskegel rein schematisch · keine berechnete Emissionsphysik."
 });
 export const en=Object.freeze({
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
@@ -739,5 +740,6 @@ export const en=Object.freeze({
   "Neutronenstern · Feldlinien illustrativ": "Neutron star · illustrative field lines",
   "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.": "Inputs: decimal point (0.1 or 1e9), no thousands separators.",
   "Logarithmischer Radienvergleich": "Logarithmic radius comparison",
-  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmic chart of temperature, lifetime and radius"
+  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmic chart of temperature, lifetime and radius",
+  "Strahlungskegel rein schematisch · keine berechnete Emissionsphysik.": "Radiation cones are schematic only · no calculated emission physics."
 });
