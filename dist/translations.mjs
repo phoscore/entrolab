@@ -397,7 +397,6 @@ export const de=Object.freeze({
   "S / kᵦ = ln Ω": "S / kᵦ = ln Ω",
   "Dimensionslose Modellentropie": "Dimensionslose Modellentropie",
   "Die Gleichgewichtsverteilung": "Die Gleichgewichtsverteilung",
-  "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken: dein aktueller Makrozustand.": "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken: dein aktueller Makrozustand.",
   "Alle Wahrscheinlichkeiten als Tabelle": "Alle Wahrscheinlichkeiten als Tabelle",
   "Warum ist eine gleichmäßige Verteilung so häufig?": "Warum ist eine gleichmäßige Verteilung so häufig?",
   "„Alle links“ geht nur auf eine Weise. Für eine ausgeglichene Verteilung gibt es viele verschiedene Zuordnungen – wie bei Kopf und Zahl vieler Münzen. Einzelne faire Zuordnungen sind gleich wahrscheinlich, die Anzahlen nicht.": "„Alle links“ geht nur auf eine Weise. Für eine ausgeglichene Verteilung gibt es viele verschiedene Zuordnungen – wie bei Kopf und Zahl vieler Münzen. Einzelne faire Zuordnungen sind gleich wahrscheinlich, die Anzahlen nicht.",
@@ -450,7 +449,8 @@ export const de=Object.freeze({
   "OpenStax · Newtonsche Gravitation": "OpenStax · Newtonsche Gravitation",
   "NASA/JPL · astronomische Einheit": "NASA/JPL · astronomische Einheit",
   "NASA · Ereignishorizont": "NASA · Ereignishorizont",
-  "NASA · Sternreste und Pulsare": "NASA · Sternreste und Pulsare"
+  "NASA · Sternreste und Pulsare": "NASA · Sternreste und Pulsare",
+  "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken und Dreieck: dein aktueller Makrozustand.": "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken und Dreieck: dein aktueller Makrozustand."
 });
 export const en=Object.freeze({
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
@@ -850,7 +850,6 @@ export const en=Object.freeze({
   "S / kᵦ = ln Ω": "S / kᵦ = ln Ω",
   "Dimensionslose Modellentropie": "Dimensionless model entropy",
   "Die Gleichgewichtsverteilung": "The equilibrium distribution",
-  "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken: dein aktueller Makrozustand.": "Bar height: probability of k markers on the left. Bright bar: your current macrostate.",
   "Alle Wahrscheinlichkeiten als Tabelle": "All probabilities in a table",
   "Warum ist eine gleichmäßige Verteilung so häufig?": "Why is an even split so common?",
   "„Alle links“ geht nur auf eine Weise. Für eine ausgeglichene Verteilung gibt es viele verschiedene Zuordnungen – wie bei Kopf und Zahl vieler Münzen. Einzelne faire Zuordnungen sind gleich wahrscheinlich, die Anzahlen nicht.": "There is only one way to put every marker on the left. A balanced split has many different assignments, like heads and tails for many coins. Individual fair assignments are equally likely; their counts are not.",
@@ -903,5 +902,6 @@ export const en=Object.freeze({
   "OpenStax · Newtonsche Gravitation": "OpenStax · Newtonian gravity",
   "NASA/JPL · astronomische Einheit": "NASA/JPL · astronomical unit",
   "NASA · Ereignishorizont": "NASA · event horizon",
-  "NASA · Sternreste und Pulsare": "NASA · stellar remnants and pulsars"
+  "NASA · Sternreste und Pulsare": "NASA · stellar remnants and pulsars",
+  "Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken und Dreieck: dein aktueller Makrozustand.": "Bar height: probability of k markers on the left. Bright bar and triangle: your current macrostate."
 });
