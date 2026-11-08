@@ -1,147 +1,97 @@
 # ENTROLAB 🌌
 
-Ein interaktiver Physik-Spielplatz von cosmic insignificance: Newtonsche N-Körper-Simulation und ein Rechner für idealisierte Schwarze Löcher.
+Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisierte Schwarze Löcher, extreme Himmelskörper und ein erstes statistisches Entropy Lab. Browser-Titel: **entrolab - emptiness pro max**.
 
-## Stand und Original
+## Entwicklungsstand und Ausprobieren
 
-Diese Erstsicherung enthält die sechs Originaldateien der Anwendung **v0.1** bytegenau, einschließlich `.openai/hosting.json`. Die ursprüngliche Site-Quellrevision ist `095f7f4ae50453a373012ed870fa7175e5b4c5ee`. Der bei der Übertragung anzulegende Git-Tag `v0.1` soll ausschließlich den Originalstand sichern; README, AGENTS.md und CI werden in einem nachfolgenden Infrastruktur-Commit ergänzt. Auf `develop/v0.2` wird das wissenschaftliche Qualitätsupdate zur Prüfung vorbereitet.
+**v0.6 auf `develop/v0.6` ist ein Prüfstand, keine Produktionsfreigabe.** Grundlage ist die freigegebene v0.5 auf `main` (`39fde20f812da1d371b4990b15062062cddd102f`). Änderungen gehen ausschließlich als Pull Request zur unabhängigen Prüfung. Kein automatischer Merge.
 
-Die Originaldateien sind in `docs/v0.1-original.sha256` mit SHA-256 dokumentiert. Ein Git-Tag ist technisch verschiebbar und muss zusätzlich organisatorisch beziehungsweise durch passende GitHub-Regeln geschützt werden. Niemals `v0.1` verschieben oder löschen.
-
-## Lokal starten
-
-Voraussetzungen: moderner Browser; Python 3 für den lokalen HTTP-Server. Kein npm, Build-Schritt oder Backend erforderlich.
+Die Anwendung ist buildlos: moderner Browser mit ES-Modulen, BigInt und Modul-Workern; Python 3 für einen lokalen HTTP-Server. Keine Paketinstallation und kein Backend zum Benutzen nötig.
 
 ```sh
-git clone https://github.com/phoscore/entrolab.git
+git clone --branch develop/v0.6 https://github.com/phoscore/entrolab.git
 cd entrolab
 python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
-Unter Windows gegebenenfalls `py` statt `python` verwenden. Dann <http://localhost:8000> öffnen. HTML nicht direkt über `file://` starten, da Browser ES-Module dabei blockieren können.
+Unter Windows gegebenenfalls `py` statt `python` verwenden. Dann <http://localhost:8000> öffnen. Wegen der ES-Module und Worker nicht über `file://` starten. Das private Repository benötigt beim Klonen einen berechtigten GitHub-Zugang.
 
-Schriftarten werden optional von Google Fonts geladen; ohne Verbindung greifen Systemschriftarten. Die Physikberechnungen benötigen keinen Netzwerkzugriff. Quellenlinks benötigen Internet.
+Schriftarten von Google Fonts sind optional; Systemschrift funktioniert ohne sie. Die Berechnungen brauchen kein Internet. Externe Quellenlinks benötigen eine Verbindung. Eine restriktive eigene Content-Security-Policy muss lokale Modul-Worker erlauben; andernfalls melden die Selbstchecks einen Fehler, ohne die Sandbox als Ersatz-Rechenumgebung zu benutzen.
 
-## Funktionen
+## Labs und Bedienung
 
-- Gravity Sandbox: Sterne, Planeten und Schwarze Löcher hinzufügen/entfernen; Masse, Position und Geschwindigkeit bearbeiten.
-- Bewegung, Flugbahnen, Kollisionen, Pause, Zeitraffer, Zurücksetzen, Zoom und optionales Vollbild.
-- Szenarien: Sonnensystem mit acht Planeten, Doppelstern und Erde mit Schwarzem Loch.
-- Black Hole Lab: Masse zwischen 1 und 10⁴¹ kg, Schwarzschild-Radius, Hawking-Temperatur, geschätzte Strahlungsleistung und Verdampfungszeit; logarithmische Diagramme und Größenvergleiche.
-- Modellbeschreibung, Quellen und zehn vorhandene Rechentests in der App.
+- **Gravity Sandbox:** fünf Szenarien, Sterne/Planeten/Schwarze Löcher hinzufügen und bearbeiten, Pause/Tempo/Reset, Flugbahnen, Zoom/Vollbild, Messinstrumente und begrenzte numerische Bahnvorhersage. Körper per Klick oder Inspektor wählen. Beim Platzieren bestimmt Ziehen die Anfangsgeschwindigkeit.
+- **Black Hole Lab:** Schwarzschild-Radius und Hawking-Temperatur; Leistung und Lebensdauer als ausdrückliche Modellschätzungen; Größen- und logarithmische Funktionsdiagramme.
+- **Extreme Objects:** künstlerische Schwarzes-Loch- und Sternansichten, schematische Geometrie und optionaler schematischer Pulsar, Radienvergleich sowie Kelvin/Celsius-Temperaturlabor. Artwork ist keine GR- oder Emissionssimulation.
+- **Entropy Lab:** standardmäßig zwölf nummerierte, unterscheidbare Marker in zwei gleich großen Kammern. `N` ist auf 1–32 begrenzt. Alle links starten, `k` manuell wählen, einzelne Zufallsschritte, automatisch mischen, pausieren und zurücksetzen. Mikrozustand anzeigen oder bei gleichem `k` neu auslosen. Exakte Multiplizität, Gleichgewichtsverteilung, Datentabelle und dimensionslose Modellentropie vergleichen.
+- **Kontexthilfe:** „Was bedeutet das?“ öffnet das bestehende Glossar und fokussiert den passenden Begriff; „Zurück zum Labor“ oder Escape führt zum Ausgangslink zurück. Advanced-Infos sind freiwillig aufklappbar. Der Cosmic Field Guide ist nur eine kleine Vorschau.
+- **Modell & Quellen:** zehn isolierte modellinterne Selbstchecks. Jeder Lauf zeigt einen Ausführungszähler, Ergebnisstatus und eine Screenreader-Meldung. Das ist weder die gesamte CI-Suite noch eine vollständige Physikverifikation.
 
-Körper anklicken oder über den Inspektor auswählen. Beim Platzieren legt Klicken den Ort und Ziehen die Anfangsgeschwindigkeit fest. Der Inspektor zeigt Masse in Sonnenmassen, Position in AU und Geschwindigkeit in km/s.
+DE/EN im Kopfbereich; auch dynamische Werte, Diagrammbeschriftungen und Fehler sind lokalisiert. Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt**, etwa `0.1` oder `1e9`. Noch nicht angewendete Entwürfe bleiben beim Sprachwechsel erhalten. Der Browser-Titel bleibt in beiden Sprachen identisch. Fokusmodus in Sandbox/Extreme Objects, Escape zum Verlassen. Reduced Motion startet bestehende Simulationen pausiert und unterdrückt Markerübergänge; automatisches Entropy-Mischen beginnt immer erst nach ausdrücklicher Auswahl.
 
-## Projektstruktur
+## Wissenschaftliche Grundlagen und Grenzen
 
-| Datei | Zweck |
-| --- | --- |
-| `dist/physics.mjs` | Konstanten, Gravitation, Integrator, Kollisionen, Szenarien und Black-Hole-Gleichungen |
-| `dist/app.mjs` | Simulationsschleife, Interaktion, Canvas und Rechneransicht |
-| `dist/checks.mjs` | Zehn unveränderte Originaltests |
-| `dist/index.html` | Oberfläche, Modellbeschreibung und Quellen |
-| `dist/style.css` | Darstellung und responsive Layouts |
-| `.openai/hosting.json` | Unveränderte Konfiguration der bestehenden Site |
-| `scripts/test.mjs` | CI-Einstieg mit Fehler-Exitcode und Syntaxprüfungen |
-| `scripts/verify-original.mjs` | Prüft Originaldateien oder deren Inhalt am Tag `v0.1` |
-| `.github/workflows/tests.yml` | Automatisierte Tests ohne Deployment |
-| `AGENTS.md` | Verbindliche Entwicklungsregeln |
+Die Sandbox berechnet paarweise gewöhnliche dreidimensionale Newton-Gravitation in einer Ebene, intern in AU, Sonnenmassen und Tagen. Velocity Verlet mit adaptiven Schritten und Plummer-Glättung `ε = 10⁻⁷ AU` (≈ 15 km) bleibt unverändert. Adaptive Schritte liefern keine garantierte Fehlerschranke. Kollisionen werden über Modellradien als vollkommen unelastische Verschmelzungen behandelt; Masse/linearer Impuls bleiben erhalten, aufgelöster Bahndrehimpuls/Bewegungsenergie nicht. Große Schritte können Kontakte weiterhin übersehen. Keine GR, Gezeitenzerreißung, Materialphysik oder echte Ephemeriden.
 
-## Technische Grundlagen und Grenzen
+Bahnvorhersage: separate Kopie, höchstens zwölf Körper, 1.500 Schritte und 301 Punkte; Horizonte 10/60/180 Tage. Keine reale Zukunftsprognose und keine laufende Neuberechnung. Näher am Horizont oder bei relativistischen Geschwindigkeiten ist die Newton-Sandbox physikalisch unzuverlässig.
 
-Browser-ES-Module, HTML, CSS und Canvas 2D; keine Framework-Abhängigkeiten. Intern verwendet die Simulation AU, Sonnenmassen und Tage. Alle Körper beeinflussen einander paarweise, mit O(N²)-Aufwand.
+Der BH-Rechner setzt ungeladene, nicht rotierende Löcher voraus. Leistung/Lebensdauer verwenden die idealisierte Photonen-Schwarzkörper-Näherung im leeren Universum, ohne Greybody-Faktoren, zusätzliche Teilchenarten oder Akkretion. Keine Vorhersage der letzten Quantenphase. Sternmassen/-radien sind gewählte Beispiele, keine gelöste Zustandsgleichung. Temperaturbilder sind abstrakte Illustrationen; Kelvin/Celsius wird mit dem exakt definierten Offset 273,15 umgerechnet.
 
-Die Beschleunigung nutzt Newtonsche Gravitation mit Plummer-Glättung ε = 10⁻⁷ AU (ungefähr 15 km). Velocity Verlet mit an Begegnungszeiten angepassten Zeitschritten integriert die Bewegung. Adaptive Schritte garantieren weder dauerhaft symplektisches Verhalten noch eine feste Fehlerschranke. Das Schrittlimit pro Bild kann den tatsächlichen Zeitraffer reduzieren.
+**Entropy Lab:** `Ω(k) = C(N,k)`, insgesamt `2^N` individuelle Zuordnungen; im Gleichgewicht `P_eq(k) = Ω(k)/2^N`. Pro diskretem Schritt wechselt jeder Marker unabhängig und symmetrisch mit `q = 1/4` die Kammer. Die stationäre Verteilung ist binomial; sie ist **nicht** die anfängliche oder bedingte nächste Schrittverteilung. `S/k_B = ln Ω` bezeichnet ausschließlich eine dimensionslose Boltzmann-Modellentropie der groben `k`-Beschreibung. Einzelne Schritte können sie verringern. Keine realen Gasbahnen, Energien, Wärmeflüsse, Temperatur, Diffusionskoeffizienten oder kalibrierte physikalische Zeit. Nicht mit gravitativer oder Bekenstein-Hawking-Entropie gleichsetzen. Ausführlich: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
 
-Kollisionen werden nach Integrationsschritten anhand modellierter Kugelradien erkannt und als vollkommen unelastische Verschmelzung behandelt. Masse und linearer Impuls bleiben erhalten. Energieerhaltung, Spin, Gezeitenzerreißung, Gasdynamik und Materialstruktur werden dadurch nicht vollständig modelliert. Für Planeten gilt Erddichte, für Sterne Sonnendichte; dies ist kein realistisches Sternstrukturmodell.
+## Tests reproduzieren
 
-Startbahnen sind koplanar und idealisiert kreisförmig, keine astronomischen Ephemeriden. Überhöhte Körpergrößen und Leuchthöfe sind Darstellungshilfen; Flugbahnen beruhen auf berechneten Positionen. Kleine Energiedrift allein beweist keine korrekte Simulation.
-
-Im Labor gelten für ein ungeladenes, nicht rotierendes, isoliertes Schwarzes Loch:
-
-- `r_s = 2 G M / c²`
-- `T = ℏ c³ / (8 π G M k_B)`
-- `P ≈ ℏ c⁶ / (15360 π G² M²)`
-- `τ ≈ 5120 π G² M³ / (ℏ c⁴)`
-
-Leistung und Lebensdauer verwenden ein perfektes Schwarzkörpermodell mit Horizontfläche und nur Photonen, ohne Greybody-Faktoren, weitere Teilchensorten oder Akkretion. Die Lebensdauer gilt für ein leeres Universum, nicht für ein Loch in der heutigen kosmischen Hintergrundstrahlung. Die letzte Quantenphase ist nicht beschrieben. Hawking-Strahlung astrophysikalischer Schwarzer Löcher ist nicht direkt beobachtet.
-
-In der Gravity Sandbox sind Schwarze Löcher dagegen Newtonsche Massen mit vereinfachtem Absorptionsradius. Keine allgemeine Relativität, Zeitdilatation, Lichtablenkung, Präzession, Gravitationswellen oder Hawking-Massenverluste. Nahe dem Horizont oder bei relativistischen Geschwindigkeiten ist dieses Modell unzuverlässig. Versionssicherung bedeutet keine unabhängige wissenschaftliche Zertifizierung; vorhandene Fehler werden im Originalstand bewusst nicht korrigiert.
-
-## Tests
-
-Mit Node.js 22 oder neuer, ohne Paketinstallation:
+Node.js 22 oder neuer:
 
 ```sh
 node scripts/test.mjs
-node scripts/verify-original.mjs --working-tree
 node scripts/verify-original.mjs
+node scripts/benchmark.mjs
+node scripts/check-benchmarks.mjs
 ```
 
-Der erste Befehl prüft Syntax und führt die zehn vorhandenen Rechentests aus (Referenzwerte, idealisierte Erdbahn, Energiedrift, Verschmelzung und Szenarien). Der zweite prüft die sechs aktuellen Dateien gegen das Original. Der dritte prüft ausschließlich den unveränderlichen Original-Tag; er setzt den vorhandenen Tag `v0.1` voraus und bleibt für spätere Entwicklung verwendbar, wenn Arbeitsdateien sich ändern.
+Der reguläre Einstieg enthält **129 Prüfungen**: zehn Original-Selbstchecks und 119 Node-Testfälle. Alle bisherigen 108 Prüfungen bleiben enthalten; lediglich zwei VM-DOM-Adapter werden für den isolierten Selbstcheck-Controller erweitert. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
 
-CI führt Syntax-/Rechentests und die Tag-Prüfung für Pull Requests, Branch-Pushes und manuelle Starts aus. Die vorhandenen Tests decken keine vollständige UI-, Stabilitäts- oder unabhängige Physikprüfung ab. Ohne GitHub-Branch-Regeln sind erfolgreiche Tests noch keine technisch erzwungene Merge-Sperre.
+Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.6 unverändert.
 
-## Entwicklung und Veröffentlichung
-
-GitHub ist nach Abschluss der Erstsicherung die zentrale Versionsverwaltung. Abgeschlossene Arbeit wird mit nachvollziehbaren Commits gespeichert. Größere Änderungen erfolgen auf separaten Branches und per Pull Request. Nach der ausdrücklich autorisierten Erstsicherung sind Änderungen an `main` und Merges nur nach Freigabe des Eigentümers erlaubt. Keine Auto-Merges, Force-Pushes oder Releases/Deployments ohne ausdrückliche Zustimmung.
-
-Wissenschaftliche Modelle brauchen Einheiten, Quellen, Näherungen und Referenzprüfungen. Sci-Fi-Experimente müssen separat und sichtbar als fiktiv beziehungsweise spekulativ gekennzeichnet werden. Ungefähr 90 % wissenschaftliche Fundierung ist eine Gestaltungspräferenz, keine messbare Genauigkeitsgarantie.
-
-Dieses Repository besitzt keine automatische Veröffentlichung. Die bestehende Site bleibt eine separate Laufzeitumgebung; eine GitHub-Sicherung ersetzt oder veröffentlicht sie nicht automatisch. Zugriffssichtbarkeit des Repositorys und Web-Deployment sind unterschiedliche Entscheidungen.
-
-## Quellen
-
-- [NIST: Fundamentalkonstanten](https://physics.nist.gov/cuu/Constants/)
-- [Universität Zürich: Hawking-Strahlung, Kapitel 6](https://www.physik.uzh.ch/groups/jetzer/notes/PHY529_ART_III.pdf)
-- [JILA: Hawking radiation](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html)
-- [Einstein Online: Hawking temperature](https://www.einstein-online.info/en/explandict/hawking-temperature/)
-
-## Stand der GitHub-Erstsicherung
-
-Original-Commit: `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1` erreichbar. Der GitHub-Connector unterstützt keine Tag-Erstellung. Der Tag `v0.1` ist daher noch ausstehend. CI prüft bis dahin und dauerhaft den expliziten Original-Commit aus `docs/v0.1-original-commit.txt` gegen die sechs Prüfsummen. Diese Datei und die Prüfsummen dürfen nicht auf spätere Versionen umgestellt werden. Die Hinweise zur Tag-Prüfung weiter oben beschreiben das Ziel; der aktuelle Prüfbefehl verwendet den Original-Commit.
-
-Zum einmaligen Anlegen des Tags in einem authentifizierten lokalen Git-Klon:
+Für die zusätzlichen realen Chromium-Tests (nur Entwicklungsabhängigkeit, Playwright exakt per Lockfile):
 
 ```sh
-git fetch origin
-git tag v0.1 be2502d51a449de3e515faaf72ab5954b1a739d4
-git push origin refs/tags/v0.1
+npm ci --ignore-scripts --no-audit --no-fund
+npx playwright install --with-deps chromium
+npm run test:browser
 ```
 
-Branch- und Tag-Schutz wurden nicht technisch eingerichtet. AGENTS.md legt die Freigaberegeln fest; sie ersetzen keine GitHub-Regeln.
+Die Browser-Suite umfasst sieben bewahrte v0.5-Fälle und zehn v0.6-Fälle. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
 
+## Projektstruktur
 
-## Qualitätsupdate v0.2 (nur Entwicklungsbranch)
+| Datei | Aufgabe |
+| --- | --- |
+| `dist/physics.mjs` | Unveränderter Physikkern und Integrator |
+| `dist/experiments.mjs`, `instruments.mjs`, `prediction.mjs` | Szenarien, Diagnostik, begrenzte Vorhersage |
+| `dist/app.mjs` | Sandbox, BH-Rechner und Selbstcheck-Anzeige |
+| `dist/checks.mjs`, `checks-worker.mjs`, `self-checks.mjs` | Originalrechnungen, isolierter Worker, Ablauf-/Fehlerkontrolle |
+| `dist/extreme-*.mjs` | Daten, berechnete Werte und illustrative Renderer |
+| `dist/entropy.mjs` | Reine Zählmathematik und stochastische Zustandsfunktionen |
+| `dist/entropy-ui.mjs`, `entropy.css` | Kammern, Diagramm, Bedienung und Timer-Lifecycle |
+| `dist/i18n.mjs`, `translations.mjs`, `ux.mjs`, `guide.mjs` | Sprache, Fokus, Hilfen und Kontextrückweg |
+| `dist/index.html`, `favicon.svg` | Oberfläche, fester Browser-Titel und originales künstlerisches Logo |
+| `scripts/test.mjs`, `.github/workflows/tests.yml` | Reguläre Suite und Browser-CI ohne Deployment |
+| `docs/` | Pläne, Qualitätsberichte, Quellen und unveränderte historische Referenzen |
 
-Details, Messbedingungen, Grenzen und konkrete Zahlen: [Qualitätsbericht](docs/Qualitaetsupdate_v0.2.md). `node scripts/test.mjs` führt jetzt zusätzlich 16 Qualitätsfälle aus. `node scripts/benchmark.mjs` reproduziert die Vergleichsdaten. Der Integrator bleibt nach dem Vergleich bewusst unverändert. Keine Veröffentlichung oder Merge-Freigabe ist damit verbunden.
+## Original und Freigabe schützen
 
+Original v0.1: Commit `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1`. Die sechs Originaldateien einschließlich historischer Hosting-Konfiguration sind über `docs/v0.1-original.sha256` und `docs/v0.1-original-commit.txt` gebunden. Diese Referenzen niemals auf neuere Versionen umstellen. `verify-original.mjs` liest ausdrücklich den Original-Commit; der v0.6-Auftrag verschiebt weder Archive noch Tags.
 
-### Unabhängiger Review-Abschluss
+GitHub ist die zentrale Versionsverwaltung. Größere Änderungen auf Entwicklungsbranches, nachvollziehbare Commits und unabhängiger Review vor Freigabe. `main` nur nach ausdrücklicher Eigentümerfreigabe ändern/mergen. **Cloudflare Pages veröffentlicht `main` automatisch auf der bestehenden Produktionsseite.** Deshalb sind Merge und Produktionsveröffentlichung gesonderte Freigabeschritte; diese Entwicklung führt beides nicht aus. Kein neuer Hosting-Standort, kein Release, kein Force-Push und keine eigenmächtige Sichtbarkeitsänderung. Die historische `.openai/hosting.json` wird nicht als Deployment-Auftrag benutzt.
 
-`node scripts/test.mjs` führt nun zehn Originalchecks plus 25 Node-Testfälle aus, darunter sechs analytische Kepler-Bahnen, eine Referenz-Selbstprüfung und zwei Kollisionsregressionen. `node scripts/review-diagnostics.mjs` erzeugt die ergänzenden Messdaten. Ergebnisse, Fehlergrenzen und die weiterhin offene Tunneling-Grenze: [Review-Abschluss](docs/Reviewabschluss_v0.2.md). Physikkern, Integrator und Kollisionsverhalten wurden bei diesem Abschluss nicht verändert.
+Korrekte Modelle und dokumentierte Grenzen haben Vorrang. Künstlerische Effekte und Humor sind ausdrücklich von berechneter Physik getrennt. „90 % wissenschaftlich fundiert“ ist eine Gestaltungspräferenz, keine gemessene Genauigkeitsgarantie.
 
+## Quellen und bisherige Berichte
 
-## Experimentierlabor v0.3 (Entwicklungsbranch)
-
-Neue Presets „Dreikörper-Wechselwirkung“ und „Gravitationsschleuder“ (Testkörper: 10⁻¹² M☉ ≈ 1,99 × 10¹⁸ kg, ein Kleinkörper, keine Raumsonde), aufklappbare Messinstrumente und eine begrenzte numerische Bahnvorhersage. Im linken Bereich „Bahnvorhersage“ öffnen, einschalten, Horizont wählen und bei Bedarf „Neu berechnen“ drücken. Rechts den Körper und unter „Wissenschaftliche Messinstrumente“ einen benannten Referenzkörper wählen.
-
-Die gestrichelte Linie ist eine Momentaufnahme der numerischen Modellvorhersage, keine laufend aktualisierte oder reale Ereignisprognose. Grenze: 12 Körper, 1500 Schritte, 301 Punkte; verfügbare UI-Horizonte 10/60/180 Tage. Änderungen, Kollisionen und Reset verwerfen sie. Integrationsformeln und Modellgrenzen einschließlich Kollisions-Tunneling bleiben bestehen.
-
-`node scripts/test.mjs`: 55 Prüfungen einschließlich aller 35 bisherigen. `node scripts/benchmark-v0.3.mjs`: neue Szenario-/Prognosemessungen. Vollständige Beschreibung, Einheiten und tatsächliche Validierung: [Qualitätsbericht v0.3](docs/Qualitaetsupdate_v0.3.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.
-
-## Extreme Objects Lab v0.4 (Entwicklungsbranch)
-
-Neuer Tab **Extreme Objects**: prozedurale künstlerische Schwarzes-Loch-Ansicht mit optionaler Scheibe, Geometrie-Umschalter, Massen-Presets, Pause/Tempo/Qualität sowie illustrative Sternbeispiele und Radienvergleich. Keine GR-Lichtablenkung, Materie- oder Akkretionsberechnung.
-
-Das Temperaturlabor bietet Kelvin/Celsius-Eingaben, getrennte Presets für **0,1 K** und **0,001 K**, einen gesonderten 0-K-Referenzpunkt und einen Slider von 10⁻³ bis 10¹² K. Celsius verwendet den exakt definierten Offset 273,15; die Anzeige ist auf 0,001 °C gerundet. Kelvin bleibt für sehr kleine Temperaturdifferenzen maßgeblich.
-
-`node scripts/test.mjs`: 76 Prüfungen einschließlich der 58 bisherigen. Physikkern, Integrator, bisherige Experimente und historische Originalprüfung bleiben erhalten. Details, Quellen und Grenzen: [Qualitätsbericht v0.4](docs/Qualitaetsupdate_v0.4.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.
-
-## v0.5 – UX & Visual Upgrade (Entwicklungsbranch)
-
-Auf `develop/v0.5`: größere, kontrastreichere Beschriftungen, aufklappbare Erklärungen, freiwillige Erste-Schritte-Hilfe, Fokusmodus und DE/EN für sämtliche App-Bereiche einschließlich dynamischer Meldungen/Canvaslegenden. Sprache lässt sich im Kopfbereich umschalten; Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt** (`0.1`, `1e9`), Anzeigen sind lokalisiert.
-
-Extreme Objects bietet überarbeitete illustrative Sternoberflächen, ein optionales **schematisches Pulsar-Beispiel** beim Neutronenstern sowie „Ansicht zentrieren“ ohne Parameterreset. Kein neues physikalisches Modell. Fokus per Button, Rückkehr mit Escape; Reduced Motion startet pausiert.
-
-`node scripts/test.mjs`: **101 Prüfungen** (79 bisherige + 22 neue). Zwölf numerische Benchmarks unverändert. [Qualitätsbericht v0.5 mit Screenshots, tatsächlichen Browserprüfungen und Einschränkungen](docs/Qualitaetsupdate_v0.5.md). Echte 200-%-Browserzoom-, Betriebssystem-Reduced-Motion- und Smartphone-/Safari-Kontrolle bleiben zur unabhängigen Prüfung offen. Kein automatischer Merge oder Deployment durch diesen Entwicklungsauftrag.
+- [OpenStax §15.7: Mikrozustände und Boltzmann-Entropie](https://openstax.org/books/college-physics-ap-courses/pages/15-7-statistical-interpretation-of-entropy-and-the-second-law-of-thermodynamics-the-underlying-explanation) — statistische Grundlagen; die `q = 1/4`-Schrittregel ist eine eigene, explizite Modellwahl.
+- [OpenStax §13.1: Newtonsche Gravitation](https://openstax.org/books/university-physics-volume-1/pages/13-1-newtons-law-of-universal-gravitation).
+- [NASA/JPL: astronomische Einheit](https://ssd.jpl.nasa.gov/glossary/au.html), [NASA: Sternreste/Pulsare](https://science.nasa.gov/exoplanets/stars/), [NASA: BH-Geometrie](https://science.nasa.gov/universe/black-holes/anatomy/).
+- [NIST: Konstanten](https://physics.nist.gov/cuu/Constants/), [Universität Zürich: Hawking-Strahlung](https://www.physik.uzh.ch/groups/jetzer/notes/PHY529_ART_III.pdf), [JILA: Hawking-Strahlung](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html).
+- Historische Qualitätsberichte: [v0.2](docs/Qualitaetsupdate_v0.2.md), [Review-Abschluss v0.2](docs/Reviewabschluss_v0.2.md), [v0.3](docs/Qualitaetsupdate_v0.3.md), [v0.4](docs/Qualitaetsupdate_v0.4.md), [v0.5](docs/Qualitaetsupdate_v0.5.md), [Codex-Review v0.5](docs/CodexReview_v0.5.md). Ihre damaligen Testzahlen/Entwicklungsstände sind keine aktuellen Versionsangaben.
