@@ -91,7 +91,7 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browsersuite verwendet nur einen lokalen Testserver, blockiert Google Fonts gezielt und schreibt `browser-results/measurements.json`. Der Ordner und `node_modules/` sind ignoriert. Bei gebrochenen Breiten wird das vorherige Dokument vollständig verlassen, bevor die iframe-Testhülle geladen wird; deren Layout wird nicht mit einem weiterlebenden Root-App-Scheduler vermischt.
+Die Browsersuite verwendet nur einen lokalen Testserver, blockiert Google Fonts gezielt und schreibt `browser-results/measurements.json`. Der Ordner und `node_modules/` sind ignoriert. Bei gebrochenen Breiten wird zu einer separaten gleichursprünglichen Testserverroute mit iframe navigiert; deren Layout wird nicht mit einem weiterlebenden Root-App-Scheduler vermischt. Eine zwischenzeitliche `about:blank`-Isolierung lief beim Laden des iframe-Moduls in einen Timeout und wurde durch diese gleichursprüngliche Route ersetzt. Messdauer, Größen/DPR und Grenzwerte bleiben unverändert.
 
 ### Grenzen
 

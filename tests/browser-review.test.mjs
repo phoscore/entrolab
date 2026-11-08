@@ -11,7 +11,7 @@ const output=fileURLToPath(new URL('../browser-results/',import.meta.url));
 let server,browser,url;const measurements=[],errors=[];
 before(async()=>{
  await mkdir(output,{recursive:true});
- server=createServer(async(req,res)=>{try{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);const path=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(!path.startsWith(root)){res.writeHead(403).end();return}const body=await readFile(path);res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.png':'image/png'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(body)}catch{res.writeHead(404).end()}});
+ server=createServer(async(req,res)=>{try{const requestURL=new URL(req.url,'http://localhost'),pathname=decodeURIComponent(requestURL.pathname);if(pathname==='/__viewport'){const width=Number(requestURL.searchParams.get('width'));if(!Number.isFinite(width)||width<250||width>2000){res.writeHead(400).end();return}res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'}).end(`<meta charset="utf-8"><style>body{margin:0}iframe{border:0;display:block;width:${width}px;height:900px}</style><iframe src="/"></iframe>`);return}const path=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(!path.startsWith(root)){res.writeHead(403).end();return}const body=await readFile(path);res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.png':'image/png'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(body)}catch{res.writeHead(404).end()}});
  await new Promise(done=>server.listen(0,'127.0.0.1',done));url=`http://127.0.0.1:${server.address().port}`;
  browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});
  console.log('Chromium',browser.version());
@@ -31,7 +31,7 @@ test('browser P2: paused canvas/controls stay stable over 120 frames at narrow/f
  for(const dpr of [1,1.25,2])for(const width of [320,320.5,390.25,1360]){
   const {page,context}=await lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr});
   try{let frame=page;
-   if(!Number.isInteger(width)){await page.goto('about:blank');await page.setContent(`<iframe src="${url}" style="width:${width}px;height:900px;border:0;display:block"></iframe>`);frame=await(await page.$('iframe')).contentFrame();await ready(frame)}
+   if(!Number.isInteger(width)){await page.goto(`${url}/__viewport?width=${width}`);frame=await(await page.$('iframe')).contentFrame();await ready(frame)}
    // Do not wait for layout stability before measuring the very instability under review.
    await frame.locator('#universe').evaluate(el=>el.scrollIntoView({block:'center'}));await frames(frame,8);assert.equal((await state(frame)).paused,true);
    const samples=await frame.evaluate(async()=>{const result=[];for(let i=0;i<120;i++){await new Promise(requestAnimationFrame);const canvas=document.getElementById('universe'),r=canvas.getBoundingClientRect(),transport=document.querySelector('.transport').getBoundingClientRect();result.push({w:r.width,h:r.height,controls:transport.top,backingWidth:canvas.width,backingHeight:canvas.height})}return result});
