@@ -1,0 +1,10 @@
+{
+  "name": "entrolab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/test.mjs",
+    "test:browser": "node --test tests/browser-review.test.mjs"
+  },
+  "devDependencies": {"playwright": "1.62.1"}
+}

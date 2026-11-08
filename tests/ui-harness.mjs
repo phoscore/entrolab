@@ -8,14 +8,14 @@ import {experiment,experimentInfo} from '../dist/experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from '../dist/instruments.mjs';
 import {predict} from '../dist/prediction.mjs';
 import {checks} from '../dist/checks.mjs';
-export function harness(module='app',reduce=false){
- i18n.setLanguage('de');
+export function harness(module='app',reduce=false,startLanguage='de'){
+ i18n.setLanguage(startLanguage);
  const elements=new Map(),frames=new Map(),events={},timeouts=[],subscriptions=[],labels=[],observers=[];let id=0,now=100,draws=0;
  class Element{
   constructor(name=''){this.id=name;this.value='';this.checked=false;this.disabled=false;this.hidden=false;this.textContent='';this.style={};this.dataset={};this.children=[];this.attributes={};this.handlers={};this.classes=new Set();this.classList={contains:x=>this.classes.has(x),toggle:(x,yes)=>yes?this.classes.add(x):this.classes.delete(x),add:x=>this.classes.add(x),remove:x=>this.classes.delete(x)}}
   replaceChildren(...a){this.children=a;this.value=a[0]?.value??''}append(...a){this.children.push(...a)}
   get options(){return this.children}getBoundingClientRect(){return {width:600,height:500,left:0,top:0}}
-  getContext(){return context}addEventListener(k,f){(this.handlers[k]??=[]).push(f)}setAttribute(k,v){this.attributes[k]=v}getAttribute(k){return this.attributes[k]??null}closest(){return null}setCustomValidity(v){this.validity=v}focus(){doc.activeElement=this}
+  getContext(){return context}addEventListener(k,f){(this.handlers[k]??=[]).push(f)}setAttribute(k,v){this.attributes[k]=v}getAttribute(k){return this.attributes[k]??null}closest(){return null}setCustomValidity(v){this.validity=v;this.validationMessage=v}focus(){doc.activeElement=this}
   fire(k){this['on'+k]?.({preventDefault(){}});for(const f of this.handlers[k]??[])f({})}
  }
  const el=name=>{if(!elements.has(name))elements.set(name,new Element(name));return elements.get(name)};
