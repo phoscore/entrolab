@@ -4,3 +4,5 @@
 @media(prefers-reduced-motion:no-preference){.entropy-marker{transition:left .25s ease,top .25s ease,background-color .25s}}
 @media(max-width:950px){.entropy-grid,.entropy-explanations{grid-template-columns:1fr}}
 @media(max-width:400px){.entropy-inputs{grid-template-columns:1fr;gap:0}.entropy-metrics{gap:10px}.entropy-metrics article{padding:14px 10px}.entropy-metrics label{font-size:11px}.entropy-metrics b{font-size:22px}.entropy-metrics small{font-size:12px}.entropy-transport>*{flex-basis:100%}.entropy-experiment{padding:14px}.entropy-marker{width:20px;height:20px;margin-left:-10px;font-size:11px}}
+/* Five navigation entries must also fit with wider system-font fallback. */
+@media(max-width:600px){nav{grid-template-columns:repeat(2,minmax(0,1fr))}.tab{min-width:0;overflow-wrap:anywhere}.entropy-metrics label{overflow-wrap:anywhere}}

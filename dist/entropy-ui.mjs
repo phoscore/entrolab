@@ -17,7 +17,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   rows=distribution(state.length);markers=state.map((_,i)=>{const marker=doc.createElement('span');marker.className='entropy-marker';marker.textContent=i+1;return marker});$('entropyMarkers').replaceChildren(...markers);
   const peak=Math.max(...rows.map(r=>r.probability)),n=state.length;
   const bars=rows.map(r=>svg('rect',{x:32+r.k*600/(n+1),y:180-145*r.probability/peak,width:Math.max(2,600/(n+1)-4),height:145*r.probability/peak,class:'entropy-bar','data-k':r.k}));
-  $('entropyChart').replaceChildren(...bars,svg('path',{d:'M30 25V182H635',fill:'none',stroke:'#73617e'}),svg('text',{x:5,y:19},percent(peak)),...[...new Set([0,Math.floor(n/2),n])].map(k=>svg('text',{x:32+(k+.5)*600/(n+1),y:212,'text-anchor':'middle'},format(k,0))));
+  $('entropyChart').replaceChildren(...bars,svg('path',{'data-current-marker':'',fill:'#fff','aria-hidden':'true'}),svg('path',{d:'M30 25V182H635',fill:'none',stroke:'#73617e'}),svg('text',{x:5,y:19},percent(peak)),...[...new Set([0,Math.floor(n/2),n])].map(k=>svg('text',{x:32+(k+.5)*600/(n+1),y:212,'text-anchor':'middle'},format(k,0))));
   $('entropyTable').replaceChildren(...rows.map(r=>{const tr=doc.createElement('tr');tr.dataset.k=r.k;for(const value of [r.k,format(r.omega,0),percent(r.probability)]){const td=doc.createElement('td');td.textContent=value;tr.append(td)}return tr}));
  }
  function render(){
@@ -28,6 +28,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   $('entropyOmega').textContent=format(row.omega,0);$('entropyTotal').textContent=format(row.total,0);$('entropyProbability').textContent=percent(row.probability);$('entropyValue').textContent=format(row.entropy);
   $('entropyResample').disabled=k===0||k===n;
   $('entropyChart').setAttribute('aria-label',t('Gleichgewichtsverteilung für {n} Marker; aktuelles k = {k}.',{n,k}));
+  const arrowX=32+(k+.5)*600/(n+1);$('entropyChart').querySelector('[data-current-marker]').setAttribute('d',`M${arrowX-5} 193L${arrowX+5} 193L${arrowX} 183Z`);
   for(const bar of $('entropyChart').querySelectorAll('[data-k]'))bar.classList.toggle('current',Number(bar.dataset.k)===k);
   for(const tr of $('entropyTable').children)tr.setAttribute('aria-current',String(Number(tr.dataset.k)===k));
   $('entropyChartNote').textContent=t('k = {k}: {probability} im Gleichgewicht. {n} Marker; keine nächste Schrittverteilung.',{k,n,probability:percent(row.probability)});
