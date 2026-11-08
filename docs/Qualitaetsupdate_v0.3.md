@@ -85,3 +85,36 @@ Desktop-Chrome: Start, Pause, neues Schleuder-Preset, Körperauswahl, Referenzwa
 Kleine Ansicht: lokale QA-Seite mit gleichursprünglichem Iframe von 390×844 CSS-Pixeln (375 Pixel Inhaltsbreite neben der Scrollbar). Geprüft: Szenario, Pause, Prognose ein/180 Tage/neu berechnen, Messbereich aufklappen, Referenz entfernen, Geschwindigkeit auf 55 km/s ändern und anwenden. Die Änderung verwarf die Prognose, meldete neue Baseline und zeigte sofort 55 km/s. BH-Labor mit Erdmasse zeigte weiterhin 8,87 mm. Gemessen: kein horizontaler Überlauf (`scrollWidth=clientWidth=375`); alle fünf Inspektorfelder 44 Pixel hoch und 324,5 Pixel breit.
 
 Dies ist ein echter schmaler Browser-Viewport in einer Testhülle mit Mausbedienung, **kein physisches Smartphone-/Touch-/Safari-Test**. Die lokale Testhülle ist nicht Teil des Commits. Keine umfassende Barrierefreiheitsprüfung oder Mobil-CPU-Messung. Auf Smartphones bleibt wegen der Instrumente vertikales Scrollen erforderlich; Bereiche sind standardmäßig eingeklappt.
+
+## Randfallkorrekturen nach unabhängigem Review (8. November 2026)
+
+Ausgangsstand: `42909ab6f6a7608a7ab80c3cd5f4fcbc6a1ac842`, PR #2. Zwei bestätigte Fehler wurden gezielt korrigiert; keine Änderung an `physics.mjs`, `experiments.mjs`, Integrator, Anfangsdaten, Einheiten oder Modellen.
+
+### Numerischer Stopp und Wiederherstellung der Animation
+
+Reproduktion vorher: Doppelstern pausieren, X der beiden Sterne auf +1e308 bzw. −1e308 setzen, jeweils anwenden und fortsetzen. Die Überlaufrechnung erzeugte NaN. Obwohl die Simulation den numerischen Fehler meldete, gelangte der ungültige Zustand noch an `createRadialGradient`. Dessen Ausnahme verhinderte den nächsten Animationsframe. Reset/Fortsetzen allein konnte die Animation nicht wiederherstellen.
+
+Jetzt werden Zustände vor der Integration und nach jedem Schritt sowie die Schrittweite geprüft. Ein numerischer Fehler verriegelt die Integration bis Reset/Szenariowechsel, verwirft die Prognose und verhindert ungültige Trail-/Canvas-Ausgaben. Fortsetzen ist bis zum Reset gesperrt. Reset stellt Schaltfläche und Status konsistent wieder her; danach setzt Fortsetzen die Animation ohne Seitenneuladen fort. Nicht endliche Kamera-/Projektionswerte werden nicht als Körpergradienten gezeichnet. Die nächste Frame-Anforderung liegt zusätzlich in `finally`, damit eine unerwartete Darstellungs-Ausnahme den Scheduler nicht dauerhaft beendet; unerwartete Ausnahmen werden nicht verschluckt.
+
+Reset nach numerischem Fehler bleibt zunächst pausiert. Extreme Koordinaten werden dadurch nicht physikalisch sinnvoll oder zuverlässig integrierbar; die Korrektur stellt sicheres Anhalten und Wiederherstellbarkeit her.
+
+### Prognose-Unterlauf
+
+`Number.MIN_VALUE` und weitere extrem kleine positive Horizonte bestanden bisher die Budgetprüfung, während `horizon / 300` zu null wurde. Die Sampling-Schleife addierte endlos null und erreichte weder Schrittbudget noch Generator-Unterbrechung.
+
+Der Sampling-Abstand wird jetzt einmal berechnet und vor Integrationsbeginn auf Unterlauf geprüft. Bei Unterlauf endet die Prognose mit `reason: 'numerical-limit'`, null Schritten/Tagen und leerem Pfad. Auch die Fortschrittsfähigkeit jeder Sampling-Inkrementierung wird geprüft. Die UI verwendet weiterhin ausschließlich 10/60/180 Tage; diese Fälle und ihre Rechnung bleiben unverändert.
+
+### Tatsächlich ausgeführte Verifikation
+
+- Vorher: 55/55 vorhandene Prüfungen erfolgreich.
+- Nachher: `node scripts/test.mjs` erfolgreich: zehn Originalchecks und 48 Node-Testfälle, insgesamt **58/58**, keine übersprungen.
+- Drei neue Fälle in `tests/edge-regression.test.mjs`, über denselben CI-Einstieg ausgeführt: numerischer Stopp/Reset/Fortsetzen; überlaufender Kamera-Fit; Prognose-Unterlauf einschließlich unveränderter Eingaben und kleiner noch berechenbarer Horizonte. Der Prognosetest läuft in einem Prozess mit Timeout, damit ein erneuter synchroner Hang den Testlauf nicht blockiert.
+- Die Animationsfälle führen den echten App-Code und die echten Physikmodule mit einem kleinen DOM-/Canvas-Adapter und kontrollierter Frame-Warteschlange aus. Keine separate Nachimplementierung der Animationslogik, keine neuen Browser-/npm-Abhängigkeiten.
+- Gegenprobe auf unverändertem Ausgangsstand in temporärer Kopie: der erste und dritte neue Fall scheitern (nicht endlicher Canvas-Gradient bzw. Timeout); der zusätzliche Kamera-Fall bestand bereits vorher.
+- `node scripts/verify-original.mjs`: alle sechs historischen Dateien erfolgreich geprüft.
+- `node scripts/benchmark.mjs`: alle zwölf vollständigen Ergebnisobjekte per `assert.deepEqual` exakt gleich zum Vorher-Lauf und zu `docs/numerics-v0.2.json`; keine Toleranzlockerung oder Aktualisierung der Referenzdaten.
+- Chromium/Playwright bei 1280×900 und 390×844: ursprüngliche Überlaufreproduktion, Fehlerstatus, Reset/Fortsetzen mit nachweislich wieder bewegten Körpern; anschließend zustandsneutrale 180-Tage-Schleuderprognose mit 452 Schritten sowie BH-Labor/Erdmasse mit 8,87 mm. Keine JavaScript-Seitenfehler. Kein physischer Smartphone-Test.
+
+GitHub-CI wird getrennt von lokalen Ergebnissen betrachtet: Die aktuelle Cloud-Netzwerkrichtlinie enthält `api.github.com` nicht. Sowohl `gh pr view` (GraphQL) als auch der REST-Abruf von PR #2 wurden mit `Forbidden` blockiert; ein direkter HTTPS-Test bestätigte den CONNECT-403. Git-Zugriff ist davon getrennt. Der CI-Status dieses Fixstands ist deshalb hier noch nicht bestätigt. Für die ausstehende Kontrolle muss `api.github.com` in den Umgebungseinstellungen freigegeben werden; erst danach ist der zum gepushten Commit gehörige Actions-Lauf zu prüfen. Keine Aussage „CI grün“ aus lokalen Ergebnissen ableiten.
+
+Kollisions-Tunneling, fehlende allgemeine Prognosefehlergrenzen, Newton-/Softening-Näherungen und fehlende physische Smartphone-Prüfung bleiben unverändert. Keine Merge- oder Deployment-Freigabe.
