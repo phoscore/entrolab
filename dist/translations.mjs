@@ -365,7 +365,10 @@ export const de=Object.freeze({
   "Horizont · rₛ": "Horizont · rₛ",
   "Weißer Zwerg · Oberflächenlicht illustrativ": "Weißer Zwerg · Oberflächenlicht illustrativ",
   "Pulsar-Beispiel · Kegel rein schematisch": "Pulsar-Beispiel · Kegel rein schematisch",
-  "Neutronenstern · Feldlinien illustrativ": "Neutronenstern · Feldlinien illustrativ"
+  "Neutronenstern · Feldlinien illustrativ": "Neutronenstern · Feldlinien illustrativ",
+  "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.": "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.",
+  "Logarithmischer Radienvergleich": "Logarithmischer Radienvergleich",
+  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius"
 });
 export const en=Object.freeze({
   "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
@@ -733,5 +736,8 @@ export const en=Object.freeze({
   "Horizont · rₛ": "Horizon · rₛ",
   "Weißer Zwerg · Oberflächenlicht illustrativ": "White dwarf · illustrative surface light",
   "Pulsar-Beispiel · Kegel rein schematisch": "Pulsar example · schematic cones only",
-  "Neutronenstern · Feldlinien illustrativ": "Neutron star · illustrative field lines"
+  "Neutronenstern · Feldlinien illustrativ": "Neutron star · illustrative field lines",
+  "Eingaben: Dezimalpunkt (0.1 oder 1e9), keine Tausendertrennzeichen.": "Inputs: decimal point (0.1 or 1e9), no thousands separators.",
+  "Logarithmischer Radienvergleich": "Logarithmic radius comparison",
+  "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius": "Logarithmic chart of temperature, lifetime and radius"
 });

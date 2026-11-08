@@ -11,3 +11,5 @@ header{gap:20px;padding:12px 3%;min-height:88px;flex-wrap:wrap}.brand{font-size:
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 /* Translation spans inherit the host's role; unit spans retain their original alignment. */
 label>span[data-i18n]{float:none;color:inherit}.panel-heading>span[data-i18n]{font:inherit;color:inherit;letter-spacing:inherit}.footnote>span[data-i18n]{color:inherit}
+@media(max-width:600px){.transport{flex-wrap:wrap}.elapsed{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:2px 0 0}.elapsed small{margin:0;font-size:11px}.elapsed b{font-size:20px}.canvas-bottom{bottom:145px}.speed{max-width:none}}
+.input-convention{font-size:13px;line-height:1.6;color:#b8adc6;margin:0 0 20px}.has-focus .input-convention{display:none}

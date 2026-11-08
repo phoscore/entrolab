@@ -10,7 +10,7 @@ import {predict} from '../dist/prediction.mjs';
 import {checks} from '../dist/checks.mjs';
 export function harness(module='app',reduce=false){
  i18n.setLanguage('de');
- const elements=new Map(),frames=new Map(),events={},timeouts=[],subscriptions=[],labels=[];let id=0,now=100,draws=0;
+ const elements=new Map(),frames=new Map(),events={},timeouts=[],subscriptions=[],labels=[],observers=[];let id=0,now=100,draws=0;
  class Element{
   constructor(name=''){this.id=name;this.value='';this.checked=false;this.disabled=false;this.hidden=false;this.textContent='';this.style={};this.dataset={};this.children=[];this.attributes={};this.handlers={};this.classes=new Set();this.classList={contains:x=>this.classes.has(x),toggle:(x,yes)=>yes?this.classes.add(x):this.classes.delete(x),add:x=>this.classes.add(x),remove:x=>this.classes.delete(x)}}
   replaceChildren(...a){this.children=a;this.value=a[0]?.value??''}append(...a){this.children.push(...a)}
@@ -26,10 +26,10 @@ export function harness(module='app',reduce=false){
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;el('gravity').classes.add('active');el('comparisonMode').value='log';
  const window={addEventListener(){}};
  const scope=vm.createContext({...physics,...display,...data,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
-  matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false,addEventListener(){}},Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},ResizeObserver:class{observe(){}},
+  matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false,addEventListener(){}},Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},ResizeObserver:class{observe(){}},IntersectionObserver:class{constructor(fn){observers.push(fn)}observe(){}},
   drawObject(){draws++},drawThermal(){draws++},requestAnimationFrame:f=>{frames.set(++id,f);return id},cancelAnimationFrame:i=>frames.delete(i),setTimeout:f=>timeouts.push(f)});
  const source=readFileSync(new URL('../dist/'+(module==='app'?'app.mjs':'extreme-ui.mjs'),import.meta.url),'utf8').replace(/^import .*;\n/gm,'');new vm.Script(source).runInContext(scope);
- return {el,doc,frames,motion,labels,window,get draws(){return draws},language:i18n.setLanguage,dispose(){subscriptions.forEach(f=>f());i18n.setLanguage('de')},
+ return {el,doc,frames,motion,labels,window,intersect(entries){for(const observer of observers)observer(entries)},get draws(){return draws},language:i18n.setLanguage,dispose(){subscriptions.forEach(f=>f());i18n.setLanguage('de')},
   tick(){const pending=[...frames.values()];frames.clear();for(const f of pending)f(now);now+=16},
   tab(name){for(const t of tabs)if(t.dataset.tab===name){if(module!=='app')el('extreme').classList.toggle('active',name==='extreme');t.fire('click')}},
   visibility(value){doc.hidden=value;for(const f of events.visibilitychange??[])f()},flush(){let n=0;while(timeouts.length){if(++n>500)throw Error('timeout loop');timeouts.shift()()}}};
