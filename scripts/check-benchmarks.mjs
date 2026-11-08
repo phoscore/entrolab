@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const reference=JSON.parse(readFileSync(new URL('../docs/numerics-v0.2.json',import.meta.url),'utf8'));
+const result=spawnSync(process.execPath,['scripts/benchmark.mjs'],{cwd:root,encoding:'utf8',maxBuffer:2*1024*1024});
+assert.ifError(result.error);assert.equal(result.status,0,result.stderr);const actual=JSON.parse(result.stdout);
+assert.equal(actual.results.length,12);assert.deepEqual(actual,reference,'Complete numerical outputs must match the preserved v0.2 reference exactly');
+for(const row of actual.results)console.log(`PASS unchanged benchmark: ${row.name} / ${row.mode} / ${row.steps} steps`);
