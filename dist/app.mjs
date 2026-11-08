@@ -5,6 +5,7 @@ import {number,scientific,length,modelStatus} from './display.mjs';
 import {C,G,EPS,blackHole,body,radius,scenario,step,safeStep,energy} from './physics.mjs';
 import {checks} from './checks.mjs';
 const $=id=>document.getElementById(id),num=number,sci=scientific;
+let numericalFault=false;
 let instrumentBase=null,lastStep=null,forecast=null,predictionGeneration=0,predictionBusy=false;
 let bs=[],selected,paused=false,adding=false,newType='planet',elapsed=0,collisions=0,baseline=0,view={x:0,y:0,scale:100},last=0,accum=0,frame=0,tab='gravity',limited=false;
 const canvas=$('universe'),ctx=canvas.getContext('2d');let W=600,H=500,dpr=1;
@@ -18,10 +19,21 @@ function startPrediction(){cancelPrediction();if(!$('predictionOn').checked)retu
 $('referenceBody').onchange=()=>diagnostics();
 $('predictionOn').onchange=()=>{$('predictionOn').checked?startPrediction():cancelPrediction()};$('predictionRefresh').onclick=startPrediction;$('predictionHorizon').onchange=()=>cancelPrediction();
 function rebase(reason='Manueller Eingriff'){baseline=energy(bs);instrumentBase=makeBaseline(bs,reason);lastStep=null;bs.forEach(b=>b.trail=[]);cancelPrediction();$('baselineNote').textContent=reason+' · Baseline neu gesetzt.'}
-function load(){bs=experiment($('scenario').value);selected=bs.find(b=>b.name==='Erde')?.id??bs.find(b=>b.name==='Testkörper')?.id??bs[0]?.id;elapsed=0;collisions=0;accum=0;rebase('Reset / Szenario');list();fit();$('scenarioHint').textContent=experimentInfo[$('scenario').value]}
+function load(){numericalFault=false;updatePlayback();bs=experiment($('scenario').value);selected=bs.find(b=>b.name==='Erde')?.id??bs.find(b=>b.name==='Testkörper')?.id??bs[0]?.id;elapsed=0;collisions=0;accum=0;rebase('Reset / Szenario');list();fit();$('scenarioHint').textContent=experimentInfo[$('scenario').value]}
 $('zoomIn').onclick=()=>view.scale=Math.min(1e9,view.scale*1.7);$('zoomOut').onclick=()=>view.scale=Math.max(.01,view.scale/1.7);
 $('scenario').onchange=load;$('reset').onclick=load;$('fit').onclick=fit;
-$('play').onclick=()=>{paused=!paused;$('play').textContent=paused?'▶':'Ⅱ';$('play').setAttribute('aria-label',paused?'Fortsetzen':'Pausieren');$('runLabel').textContent=paused?'SIMULATION PAUSIERT':'SIMULATION AKTIV'};
+function updatePlayback(){
+ $('play').disabled=numericalFault;
+ $('play').textContent=paused?'▶':'Ⅱ';
+ $('play').setAttribute('aria-label',paused?'Fortsetzen':'Pausieren');
+ $('runLabel').textContent=numericalFault?'NUMERISCHES LIMIT':paused?'SIMULATION PAUSIERT':'SIMULATION AKTIV';
+}
+function stopNumerical(){
+ numericalFault=true;paused=true;accum=0;lastStep=null;updatePlayback();
+ $('baselineNote').textContent='Numerischer Fehler: Simulation angehalten, Reset erforderlich.';
+ cancelPrediction();
+}
+$('play').onclick=()=>{if(numericalFault)return;paused=!paused;updatePlayback()};
 $('objectList').onchange=()=>{selected=Number($('objectList').value);updateReference();cancelPrediction();fill();diagnostics()};
 $('editForm').onsubmit=e=>{e.preventDefault();let b=bs.find(b=>b.id===selected);if(!b)return;let vals=['mass','posX','posY','velX','velY'].map(id=>Number($(id).value));if(!vals.every(Number.isFinite)||vals[0]<=0)return;[b.m,b.x,b.y,b.vx,b.vy]=vals;b.vx*=1000*C.day/C.AU;b.vy*=1000*C.day/C.AU;accum=0;rebase();fill();diagnostics()};
 $('delete').onclick=()=>{bs=bs.filter(b=>b.id!==selected);rebase();list()};
@@ -38,14 +50,37 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();const r=canvas.getBoundin
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await canvas.parentElement.requestFullscreen()}catch{$('pointerHint').textContent='Vollbild wird hier nicht unterstützt.'}};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab!=='gravity')cancelPrediction();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===tab));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));if(tab==='blackhole')drawLab()});
 function draw(){let r=resizeCanvas(canvas);W=r.w;H=r.h;if(!W||!H)return;ctx.clearRect(0,0,W,H);ctx.fillStyle='#090a10';ctx.fillRect(0,0,W,H);for(let i=0;i<145;i++){let x=((i*1783+89)%10007)/10007*W,y=((i*3853+127)%9967)/9967*H;ctx.fillStyle=`rgba(193,185,216,${.13+(i%4)*.08})`;ctx.fillRect(x,y,i%9===0?1.5:.7,i%9===0?1.5:.7)}
+if(numericalFault||![view.x,view.y,view.scale].every(Number.isFinite)||view.scale<=0)return;
 let raw=100/view.scale,pow=10**Math.floor(Math.log10(raw)),spacing=[1,2,5,10].find(n=>n*pow>=raw)*pow,pix=spacing*view.scale;
 if($('grid').checked){ctx.strokeStyle='#77708a12';ctx.lineWidth=1;let startX=((W/2-view.x*view.scale)%pix+pix)%pix,startY=((H/2+view.y*view.scale)%pix+pix)%pix;ctx.beginPath();for(let x=startX;x<W;x+=pix){ctx.moveTo(x,0);ctx.lineTo(x,H)}for(let y=startY;y<H;y+=pix){ctx.moveTo(0,y);ctx.lineTo(W,y)}ctx.stroke();ctx.strokeStyle='#77708a28';let o=toScreen({x:0,y:0});ctx.beginPath();ctx.moveTo(o.x-8,o.y);ctx.lineTo(o.x+8,o.y);ctx.moveTo(o.x,o.y-8);ctx.lineTo(o.x,o.y+8);ctx.stroke()}
-for(let b of bs){let p=toScreen(b);if($('trails').checked&&b.trail.length>1){ctx.beginPath();b.trail.forEach((v,i)=>{let q=toScreen(v);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.strokeStyle=b.color+'65';ctx.lineWidth=.9;ctx.stroke()}let vr=b.type==='star'?8+Math.max(0,Math.log10(b.m+1))*2:b.type==='hole'?10:3.8+Math.max(0,Math.log10(b.m*C.sun/C.earth))*1.1;vr=Math.min(22,Math.max(vr,radius(b)*view.scale));if(p.x< -50||p.y< -50||p.x>W+50||p.y>H+50)continue;
+for(let b of bs){let p=toScreen(b);if($('trails').checked&&b.trail.length>1){ctx.beginPath();b.trail.forEach((v,i)=>{let q=toScreen(v);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.strokeStyle=b.color+'65';ctx.lineWidth=.9;ctx.stroke()}let vr=b.type==='star'?8+Math.max(0,Math.log10(b.m+1))*2:b.type==='hole'?10:3.8+Math.max(0,Math.log10(b.m*C.sun/C.earth))*1.1;vr=Math.min(22,Math.max(vr,radius(b)*view.scale));if(![p.x,p.y,vr].every(Number.isFinite)||p.x< -50||p.y< -50||p.x>W+50||p.y>H+50)continue;
 let glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,vr*4);glow.addColorStop(0,b.color+'35');glow.addColorStop(1,b.color+'00');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(p.x,p.y,vr*4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,vr,0,Math.PI*2);ctx.fillStyle=b.type==='hole'?'#020206':b.color;ctx.fill();if(b.type==='hole'){ctx.strokeStyle=b.color;ctx.lineWidth=1.3;ctx.stroke()}if(b.id===selected){ctx.beginPath();ctx.arc(p.x,p.y,vr+5,0,Math.PI*2);ctx.strokeStyle=b.color+'80';ctx.lineWidth=.7;ctx.stroke()}if($('labels').checked){ctx.fillStyle=b.id===selected?'#e3d8f6':'#9993a7';ctx.font='10px system-ui';ctx.fillText(b.name,p.x+vr+9,p.y+3)}}
 if(forecast&&forecast.id===selected&&$('predictionOn').checked){ctx.beginPath();forecast.points.forEach((b,i)=>{const p=toScreen(b);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)});ctx.strokeStyle='#e5b3ff';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([])}
 if(drag?.adding){ctx.strokeStyle='#b89af1';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(drag.sx,drag.sy);ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([]);let v=Math.hypot(drag.x-drag.sx,drag.y-drag.sy)/view.scale/30*C.AU/C.day/1000;ctx.fillStyle='#ddcaff';ctx.font='11px system-ui';ctx.fillText(num(v)+' km/s',drag.x+10,drag.y-12)}$('scaleLabel').textContent=`┝ ${num(spacing)} AU / Raster`}
 function diagnostics(){const q=readDiagnostics(bs,instrumentBase,selected,Number($('referenceBody').value));$('selectedSpeed').textContent=q.speedKms===null?'—':sci(q.speedKms,'km/s');$('selectedDistance').textContent=q.distanceM===null?'— (keine Referenz)':length(q.distanceM)+' zu '+q.referenceName;$('systemEnergy').textContent=sci(q.energy);$('systemMomentum').textContent='('+sci(q.px)+', '+sci(q.py)+')';$('systemAngular').textContent=sci(q.l);$('momentumDrift').textContent=q.momentumDrift===null?'— (Norm null)':sci(q.momentumDrift);$('angularDrift').textContent=q.angularDrift===null?'— (Norm null)':sci(q.angularDrift);$('integrationStep').textContent=lastStep===null?'—':sci(lastStep,'Tage');  $('time').textContent=num(elapsed,5)+' Tage';$('speedLabel').textContent=num(10**Number($('speed').value))+' Tage/s';$('collisions').textContent=collisions;let e=energy(bs);$('drift').textContent=baseline?sci(Math.abs((e-baseline)/baseline)*100,'%'):'—';const warning=modelStatus(bs);$('modelWarning').hidden=!warning;$('modelWarning').textContent=warning;$('status').textContent=limited?'Schrittlimit erreicht · Zeitraffer wird gebremst.':'Velocity Verlet · adaptiv (unverändert)';if(!document.activeElement?.closest('#editForm'))fill()}
-function loop(now){let wall=Math.min((now-(last||now))/1000,.05);last=now;if(!paused&&tab==='gravity'&&bs.length){accum=Math.min(accum+wall*10**Number($('speed').value),10**Number($('speed').value));let n=0;while(accum>1e-12&&n<800){let dt=Math.min(accum,safeStep(bs));let hit=step(bs,dt);lastStep=dt;elapsed+=dt;accum-=dt;n++;if(hit){collisions+=hit;rebase('Kollision / Verschmelzung');list()}if(!bs.every(b=>[b.x,b.y,b.vx,b.vy].every(Number.isFinite))){paused=true;$('runLabel').textContent='NUMERISCHES LIMIT';$('baselineNote').textContent='Numerischer Fehler: Simulation angehalten, Reset erforderlich.';cancelPrediction();break}}limited=n===800;if(limited)accum=0;if(frame%3===0)bs.forEach(b=>{b.trail.push({x:b.x,y:b.y});if(b.trail.length>1600)b.trail.shift()})}if(tab==='gravity')draw();if(frame%15===0)diagnostics();frame++;requestAnimationFrame(loop)}
+function loop(now){
+ // Keep the scheduler alive even if an unexpected rendering error escapes.
+ try{
+  let wall=Math.min((now-(last||now))/1000,.05);last=now;
+  if(!numericalFault&&!bs.every(b=>Number.isFinite(b.m)&&b.m>0&&[b.x,b.y,b.vx,b.vy].every(Number.isFinite)))stopNumerical();
+  if(!paused&&tab==='gravity'&&bs.length){
+   accum=Math.min(accum+wall*10**Number($('speed').value),10**Number($('speed').value));let n=0;
+   while(accum>1e-12&&n<800){
+    let dt=Math.min(accum,safeStep(bs));
+    if(!Number.isFinite(dt)||dt<=0||!Number.isFinite(elapsed+dt)){stopNumerical();break}
+    let hit=step(bs,dt);lastStep=dt;elapsed+=dt;accum-=dt;n++;
+    if(!bs.every(b=>Number.isFinite(b.m)&&b.m>0&&[b.x,b.y,b.vx,b.vy].every(Number.isFinite))){stopNumerical();break}
+    if(hit){collisions+=hit;rebase('Kollision / Verschmelzung');list()}
+   }
+   limited=n===800;if(limited)accum=0;
+   if(!numericalFault&&frame%3===0)bs.forEach(b=>{b.trail.push({x:b.x,y:b.y});if(b.trail.length>1600)b.trail.shift()});
+  }
+  if(tab==='gravity')draw();
+  if(!numericalFault&&frame%15===0)diagnostics();
+  frame++;
+ }finally{requestAnimationFrame(loop)}
+}
+
 let mass=C.sun;
 function setMass(m){if(!Number.isFinite(m)||m<1||m>1e41){$('bhMass').setCustomValidity('Masse zwischen 1 und 10⁴¹ kg eingeben.');$('bhMass').reportValidity();return}$('bhMass').setCustomValidity('');mass=m;$('bhMass').value=m;$('bhSlider').value=Math.log10(m);drawLab()}
 $('bhMass').onchange=()=>setMass(Number($('bhMass').value));$('bhMass').oninput=()=>$('bhMass').setCustomValidity('');$('bhSlider').oninput=()=>setMass(10**Number($('bhSlider').value));document.querySelectorAll('[data-mass]').forEach(b=>b.onclick=()=>setMass(Number(b.dataset.mass)));
