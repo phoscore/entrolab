@@ -124,7 +124,7 @@ Details, Messbedingungen, Grenzen und konkrete Zahlen: [Qualitätsbericht](docs/
 
 ## Experimentierlabor v0.3 (Entwicklungsbranch)
 
-Neue Presets „Dreikörper-Wechselwirkung“ und „Gravitationsschleuder“, aufklappbare Messinstrumente und eine begrenzte numerische Bahnvorhersage. Im linken Bereich „Bahnvorhersage“ öffnen, einschalten, Horizont wählen und bei Bedarf „Neu berechnen“ drücken. Rechts den Körper und unter „Wissenschaftliche Messinstrumente“ einen benannten Referenzkörper wählen.
+Neue Presets „Dreikörper-Wechselwirkung“ und „Gravitationsschleuder“ (Testkörper: 10⁻¹² M☉ ≈ 1,99 × 10¹⁸ kg, ein Kleinkörper, keine Raumsonde), aufklappbare Messinstrumente und eine begrenzte numerische Bahnvorhersage. Im linken Bereich „Bahnvorhersage“ öffnen, einschalten, Horizont wählen und bei Bedarf „Neu berechnen“ drücken. Rechts den Körper und unter „Wissenschaftliche Messinstrumente“ einen benannten Referenzkörper wählen.
 
 Die gestrichelte Linie ist eine Momentaufnahme der numerischen Modellvorhersage, keine laufend aktualisierte oder reale Ereignisprognose. Grenze: 12 Körper, 1500 Schritte, 301 Punkte; verfügbare UI-Horizonte 10/60/180 Tage. Änderungen, Kollisionen und Reset verwerfen sie. Integrationsformeln und Modellgrenzen einschließlich Kollisions-Tunneling bleiben bestehen.
 

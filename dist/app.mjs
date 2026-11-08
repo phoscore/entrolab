@@ -18,7 +18,7 @@ function startPrediction(){cancelPrediction();if(!$('predictionOn').checked)retu
 $('referenceBody').onchange=()=>diagnostics();
 $('predictionOn').onchange=()=>{$('predictionOn').checked?startPrediction():cancelPrediction()};$('predictionRefresh').onclick=startPrediction;$('predictionHorizon').onchange=()=>cancelPrediction();
 function rebase(reason='Manueller Eingriff'){baseline=energy(bs);instrumentBase=makeBaseline(bs,reason);lastStep=null;bs.forEach(b=>b.trail=[]);cancelPrediction();$('baselineNote').textContent=reason+' · Baseline neu gesetzt.'}
-function load(){bs=experiment($('scenario').value);selected=bs.find(b=>b.name==='Erde')?.id??bs.find(b=>b.name==='Sonde')?.id??bs[0]?.id;elapsed=0;collisions=0;accum=0;rebase('Reset / Szenario');list();fit();$('scenarioHint').textContent=experimentInfo[$('scenario').value]}
+function load(){bs=experiment($('scenario').value);selected=bs.find(b=>b.name==='Erde')?.id??bs.find(b=>b.name==='Testkörper')?.id??bs[0]?.id;elapsed=0;collisions=0;accum=0;rebase('Reset / Szenario');list();fit();$('scenarioHint').textContent=experimentInfo[$('scenario').value]}
 $('zoomIn').onclick=()=>view.scale=Math.min(1e9,view.scale*1.7);$('zoomOut').onclick=()=>view.scale=Math.max(.01,view.scale/1.7);
 $('scenario').onchange=load;$('reset').onclick=load;$('fit').onclick=fit;
 $('play').onclick=()=>{paused=!paused;$('play').textContent=paused?'▶':'Ⅱ';$('play').setAttribute('aria-label',paused?'Fortsetzen':'Pausieren');$('runLabel').textContent=paused?'SIMULATION PAUSIERT':'SIMULATION AKTIV'};
