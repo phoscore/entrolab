@@ -129,3 +129,11 @@ Neue Presets „Dreikörper-Wechselwirkung“ und „Gravitationsschleuder“ (T
 Die gestrichelte Linie ist eine Momentaufnahme der numerischen Modellvorhersage, keine laufend aktualisierte oder reale Ereignisprognose. Grenze: 12 Körper, 1500 Schritte, 301 Punkte; verfügbare UI-Horizonte 10/60/180 Tage. Änderungen, Kollisionen und Reset verwerfen sie. Integrationsformeln und Modellgrenzen einschließlich Kollisions-Tunneling bleiben bestehen.
 
 `node scripts/test.mjs`: 55 Prüfungen einschließlich aller 35 bisherigen. `node scripts/benchmark-v0.3.mjs`: neue Szenario-/Prognosemessungen. Vollständige Beschreibung, Einheiten und tatsächliche Validierung: [Qualitätsbericht v0.3](docs/Qualitaetsupdate_v0.3.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.
+
+## Extreme Objects Lab v0.4 (Entwicklungsbranch)
+
+Neuer Tab **Extreme Objects**: prozedurale künstlerische Schwarzes-Loch-Ansicht mit optionaler Scheibe, Geometrie-Umschalter, Massen-Presets, Pause/Tempo/Qualität sowie illustrative Sternbeispiele und Radienvergleich. Keine GR-Lichtablenkung, Materie- oder Akkretionsberechnung.
+
+Das Temperaturlabor bietet Kelvin/Celsius-Eingaben, getrennte Presets für **0,1 K** und **0,001 K**, einen gesonderten 0-K-Referenzpunkt und einen Slider von 10⁻³ bis 10¹² K. Celsius verwendet den exakt definierten Offset 273,15; die Anzeige ist auf 0,001 °C gerundet. Kelvin bleibt für sehr kleine Temperaturdifferenzen maßgeblich.
+
+`node scripts/test.mjs`: 76 Prüfungen einschließlich der 58 bisherigen. Physikkern, Integrator, bisherige Experimente und historische Originalprüfung bleiben erhalten. Details, Quellen und Grenzen: [Qualitätsbericht v0.4](docs/Qualitaetsupdate_v0.4.md). Kein Merge oder Deployment durch diesen Entwicklungsstand.
