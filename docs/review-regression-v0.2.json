@@ -1,0 +1,122 @@
+{
+  "kepler": [
+    {
+      "eccentricity": 0,
+      "days": 3652.5,
+      "mode": "adaptive",
+      "steps": 7305,
+      "maxPhaseErrorRad": 0.0015562257177806906,
+      "finalPositionErrorAU": 0.0015494021080379777,
+      "maxPositionErrorAU": 0.0015562427251703706,
+      "maxEnergyDrift": 1.3681260748068456e-09,
+      "finalPositionErrorKM": 231787.25622057283
+    },
+    {
+      "eccentricity": 0,
+      "days": 3652.5,
+      "mode": "fixed",
+      "steps": 36526,
+      "maxPhaseErrorRad": 6.225085546673893e-05,
+      "finalPositionErrorAU": 6.197773206649475e-05,
+      "maxPositionErrorAU": 6.225135384351236e-05,
+      "maxEnergyDrift": 2.198366259135005e-12,
+      "finalPositionErrorKM": 9271.736747962726
+    },
+    {
+      "eccentricity": 0.5,
+      "days": 365.25,
+      "mode": "adaptive",
+      "steps": 977,
+      "maxPhaseErrorRad": 0.0005617096477341654,
+      "finalPositionErrorAU": 7.122986485722253e-05,
+      "maxPositionErrorAU": 0.0001883422635987661,
+      "maxEnergyDrift": 0.00010585181343483388,
+      "finalPositionErrorKM": 10655.83611288925
+    },
+    {
+      "eccentricity": 0.5,
+      "days": 365.25,
+      "mode": "fixed",
+      "steps": 3653,
+      "maxPhaseErrorRad": 7.556209985898345e-05,
+      "finalPositionErrorAU": 6.963669610569329e-05,
+      "maxPositionErrorAU": 6.963669610569329e-05,
+      "maxEnergyDrift": 2.6631615484598048e-05,
+      "finalPositionErrorKM": 10417.501459994697
+    },
+    {
+      "eccentricity": 0.8,
+      "days": 365.25,
+      "mode": "adaptive",
+      "steps": 1264,
+      "maxPhaseErrorRad": 0.0018289793064525384,
+      "finalPositionErrorAU": 0.0001675654859372002,
+      "maxPositionErrorAU": 0.00020333050413756792,
+      "maxEnergyDrift": 0.0003850627288237118,
+      "finalPositionErrorKM": 25067.439899015946
+    },
+    {
+      "eccentricity": 0.8,
+      "days": 365.25,
+      "mode": "fixed",
+      "steps": 3653,
+      "maxPhaseErrorRad": 0.0013392294424273683,
+      "finalPositionErrorAU": 0.0005741857567803402,
+      "maxPositionErrorAU": 0.001339227398510561,
+      "maxEnergyDrift": 0.0023342275674975285,
+      "finalPositionErrorKM": 85896.96660060697
+    }
+  ],
+  "collisions": [
+    {
+      "mode": "large",
+      "h": null,
+      "offset": 0,
+      "collisionDistanceAU": 8.51427174032498e-05,
+      "hits": 0,
+      "steps": 1,
+      "elapsedDays": 0.02,
+      "remaining": 2
+    },
+    {
+      "mode": "adaptive",
+      "h": null,
+      "offset": 0,
+      "collisionDistanceAU": 8.51427174032498e-05,
+      "hits": 1,
+      "steps": 6,
+      "elapsedDays": 0.003065169802331135,
+      "remaining": 1
+    },
+    {
+      "mode": "fixed",
+      "h": 0.0001,
+      "offset": 0,
+      "collisionDistanceAU": 8.51427174032498e-05,
+      "hits": 1,
+      "steps": 29,
+      "elapsedDays": 0.002899999999999999,
+      "remaining": 1
+    },
+    {
+      "mode": "fixed",
+      "h": 5e-05,
+      "offset": 0,
+      "collisionDistanceAU": 8.51427174032498e-05,
+      "hits": 1,
+      "steps": 58,
+      "elapsedDays": 0.002900000000000001,
+      "remaining": 1
+    },
+    {
+      "mode": "adaptive",
+      "h": null,
+      "offset": 0.0003,
+      "collisionDistanceAU": 8.51427174032498e-05,
+      "hits": 0,
+      "steps": 15,
+      "elapsedDays": 0.02,
+      "remaining": 2
+    }
+  ]
+}
