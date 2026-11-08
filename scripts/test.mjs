@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checks } from '../dist/checks.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
-for (const file of ['dist/physics.mjs', 'dist/app.mjs', 'dist/checks.mjs', 'dist/display.mjs', 'tests/numerics.mjs', 'tests/quality.test.mjs', 'tests/kepler.test.mjs', 'tests/kepler-reference.mjs', 'tests/independent_kepler_review.mjs', 'tests/collision-review.mjs', 'tests/collision-review.test.mjs', 'scripts/review-diagnostics.mjs', 'scripts/benchmark.mjs', 'scripts/test.mjs', 'scripts/verify-original.mjs']) {
+for (const file of ['dist/physics.mjs', 'dist/app.mjs', 'dist/checks.mjs', 'dist/display.mjs', 'dist/experiments.mjs', 'dist/instruments.mjs', 'dist/prediction.mjs', 'tests/experiments.test.mjs', 'scripts/benchmark-v0.3.mjs', 'tests/numerics.mjs', 'tests/quality.test.mjs', 'tests/kepler.test.mjs', 'tests/kepler-reference.mjs', 'tests/independent_kepler_review.mjs', 'tests/collision-review.mjs', 'tests/collision-review.test.mjs', 'scripts/review-diagnostics.mjs', 'scripts/benchmark.mjs', 'scripts/test.mjs', 'scripts/verify-original.mjs']) {
   const run = spawnSync(process.execPath, ['--check', file], { cwd: root, stdio: 'inherit' });
   if (run.error || run.status !== 0) throw run.error ?? new Error(`Syntaxprüfung fehlgeschlagen: ${file}`);
 }
@@ -12,6 +12,7 @@ for (const result of results) console.log(`${result.ok === true ? 'PASS' : 'FAIL
 if (results.some(result => result.ok !== true)) process.exitCode = 1;
 
 
-const quality = spawnSync(process.execPath, ['--test', 'tests/quality.test.mjs', 'tests/kepler.test.mjs', 'tests/collision-review.test.mjs'], { cwd: root, stdio: 'inherit' });
+const quality = spawnSync(process.execPath, ['--test', 'tests/experiments.test.mjs', 'tests/quality.test.mjs', 'tests/kepler.test.mjs', 'tests/collision-review.test.mjs'], { cwd: root, stdio: 'inherit' });
 if (quality.error || quality.status !== 0) process.exitCode = 1;
+
 
