@@ -48,7 +48,7 @@ export function formatThermalTime(seconds,locale='de-DE'){
 // long linear time axis would otherwise draw a fictitious slow first segment.
 export function thermalCurveTimes(tau,horizon){
  if(!Number.isFinite(tau)||tau<=0||!Number.isFinite(horizon)||horizon<=0||horizon>THERMAL_LIMITS.time[1])throw new RangeError('Invalid curve window');
- if(horizon<=8*tau)return Array.from({length:65},(_,i)=>horizon*i/64);
+ if(horizon<=16*tau)return Array.from({length:65},(_,i)=>horizon*i/64);
  const early=8*tau,times=Array.from({length:49},(_,i)=>early*i/48);
  for(let i=1;i<16;i++)times.push(early+(horizon-early)*i/16);
  times.push(horizon);

@@ -40,6 +40,7 @@ test('review curve sampling: finite sorted bounded analytical times retain the e
  for(const tau of [.0005,1,50,5e8])for(const horizon of [5*tau,Math.max(10,5*tau),1e12]){
   const times=thermalCurveTimes(tau,horizon);assert(times.length<=65);assert.equal(times[0],0);assert.equal(times.at(-1),horizon);assert(times.every((x,i)=>Number.isFinite(x)&&x>=0&&x<=horizon&&(!i||x>times[i-1])));
  }
+ for(const ratio of [5,8,10,16])assert.deepEqual(thermalCurveTimes(1,ratio),Array.from({length:65},(_,i)=>ratio*i/64));
  const tau=.0005,horizon=10,old=Array.from({length:65},(_,i)=>horizon*i/64),now=thermalCurveTimes(tau,horizon),exact=t=>320+30*Math.exp(-t/tau);
  const interp=(times,t)=>{const i=times.findIndex(x=>x>=t);if(i<=0)return exact(times[0]);const a=times[i-1],b=times[i];return exact(a)+(exact(b)-exact(a))*(t-a)/(b-a)};
  let oldMax=0,newMax=0;for(let i=0;i<=1000;i++){const t=8*tau*i/1000;oldMax=Math.max(oldMax,Math.abs(interp(old,t)-exact(t)));newMax=Math.max(newMax,Math.abs(interp(now,t)-exact(t)))}

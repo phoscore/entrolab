@@ -206,7 +206,7 @@ Sprachwechsel erhält einen noch unveränderten Übergabeentwurf samt Hinweis un
 
 Die gemeinsame Modellerklärung sagt nun korrekt **`S/k_B = ln Ω` ist der Logarithmus der Zahl der zu k passenden Mikrozustände**, nicht die Zahl selbst. Ein Mikrozustand legt für jeden nummerierten Marker links/rechts fest; k zählt nur die linken Marker. Die gezeichneten Positionen sind keine zusätzlichen Mikrozustände und keine realen Gasbahnen. Thermodynamisches ΔS bleibt eine getrennte Änderung in J/K. Keine Änderung der Zählmathematik oder q=1/4-Regel. Beide Texte sind DE/EN.
 
-Die Kurven behalten höchstens **65 analytische Stützstellen pro Körper** und denselben linearen Zeitmaßstab. Bis 8τ bleibt die gleichmäßige Abtastung erhalten. Bei längerer Achse liegen 49 Punkte in 0…8τ, die übrigen 16 bis zum Fensterende. Dadurch entsteht nach einem großen sichtbaren Zeitschritt keine fiktive langsame erste Gerade über ein langes, bereits ausgeglichenes Intervall. Kein neuer Timer, Canvas oder zusätzlicher Modellschritt.
+Die Kurven behalten höchstens **65 analytische Stützstellen pro Körper** und denselben linearen Zeitmaßstab. Bis 16τ bleibt die bisherige gleichmäßige Abtastung bytegleich in ihren Zeitpunkten erhalten; mittlere Fenster werden dadurch nicht gröber abgetastet. Bei längerer Achse liegen 49 Punkte in 0…8τ, die übrigen 16 bis zum Fensterende. Dadurch entsteht nach einem großen sichtbaren Zeitschritt keine fiktive langsame erste Gerade über ein langes, bereits ausgeglichenes Intervall. Kein neuer Timer, Canvas oder zusätzlicher Modellschritt.
 
 Unabhängiger Vergleich gegen `T_A=320+30 exp(−t/τ)`, τ=0,0005 s, Fenster 10 s, **1.001 gleichmäßige Referenzzeitpunkte in 0…0,004 s**:
 
