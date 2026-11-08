@@ -28,7 +28,13 @@ function bridge(){
  const raw=$('temperatureTransferValue').value,bad=!!$('temperatureError').textContent||raw==='';
  const candidate=bad?null:thermalTransferCandidate(Number(raw),temperatureSource);
  $('thermalTransfer').disabled=!candidate;
- $('thermalBridgeNote').textContent=bad?t('Korrigiere zuerst die ungültige Temperatureingabe. Der alte gültige Wert wird nicht heimlich übertragen.'):!candidate?t('Dieser Extremwert liegt außerhalb der Wärme-Modellannahmen (250–600 K). Keine Übernahme und kein Clamping.'):candidate.rounded?t('Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.',{temp:fmt(candidate.temperature)}):t('Zulässig: aktueller Wert wird nur vorgemerkt; keine automatische Rechnung.');
+ // The extreme-temperature input may rewrite a high-precision number on blur.
+ // Rejection must remain based on the original decimal, so explain any
+ // discrepancy rather than appearing to reject the rounded, displayed value.
+ const sourceField=temperatureSource?.unit==='kelvin'?$('kelvinInput'):temperatureSource?.unit==='celsius'?$('celsiusInput'):null;
+ const changedDisplay=!candidate&&!bad&&sourceField&&sourceField.value!==temperatureSource.value;
+ const explanation=changedDisplay?' '+t('Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.',{original:temperatureSource.value,display:sourceField.value,unit:temperatureSource.unit==='kelvin'?'K':'°C'}):'';
+ $('thermalBridgeNote').textContent=(bad?t('Korrigiere zuerst die ungültige Temperatureingabe. Der alte gültige Wert wird nicht heimlich übertragen.'):!candidate?t('Dieser Extremwert liegt außerhalb der Wärme-Modellannahmen (250–600 K). Keine Übernahme und kein Clamping.'):candidate.rounded?t('Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.',{temp:fmt(candidate.temperature)}):t('Zulässig: aktueller Wert wird nur vorgemerkt; keine automatische Rechnung.'))+explanation;
  return candidate;
 }
 // Capture the actual input before the existing temperature UI formats it on blur.
