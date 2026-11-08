@@ -31,7 +31,7 @@ test('browser P2: paused canvas/controls stay stable over 120 frames at narrow/f
  for(const dpr of [1,1.25,2])for(const width of [320,320.5,390.25,1360]){
   const {page,context}=await lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr});
   try{let frame=page;
-   if(!Number.isInteger(width)){await page.setContent(`<iframe src="${url}" style="width:${width}px;height:900px;border:0;display:block"></iframe>`);frame=await(await page.$('iframe')).contentFrame();await ready(frame)}
+   if(!Number.isInteger(width)){await page.goto('about:blank');await page.setContent(`<iframe src="${url}" style="width:${width}px;height:900px;border:0;display:block"></iframe>`);frame=await(await page.$('iframe')).contentFrame();await ready(frame)}
    // Do not wait for layout stability before measuring the very instability under review.
    await frame.locator('#universe').evaluate(el=>el.scrollIntoView({block:'center'}));await frames(frame,8);assert.equal((await state(frame)).paused,true);
    const samples=await frame.evaluate(async()=>{const result=[];for(let i=0;i<120;i++){await new Promise(requestAnimationFrame);const canvas=document.getElementById('universe'),r=canvas.getBoundingClientRect(),transport=document.querySelector('.transport').getBoundingClientRect();result.push({w:r.width,h:r.height,controls:transport.top,backingWidth:canvas.width,backingHeight:canvas.height})}return result});
@@ -81,7 +81,7 @@ test('browser P3: confirming the active language persists and overrides a later 
 test('browser: schematic pulsar notice stays visible in focus and translates without model changes',async()=>{
  const {page,context}=await lab({locale:'en-GB',viewport:{width:390,height:844}});try{
   await page.locator('[data-tab=extreme]').click();await page.locator('#extremeObject').selectOption('neutron');await page.locator('#pulsarOn').check();const radius=await page.locator('#extremeRadius').textContent();await page.locator('#extremeFocus').click();
-  assert.equal(await page.locator('#pulsarVisualNote').isVisible(),true);assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematic/);assert.equal(await page.locator('#pulsarNote').isVisible(),false);await page.locator('[data-language=de]').click();assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematisch/);assert.equal(await page.locator('#extremeRadius').textContent(),radius);await page.keyboard.press('Escape');await page.locator('#extremeObject').selectOption('white');assert.equal(await page.locator('#pulsarVisualNote').isVisible(),false);
+  assert.equal(await page.locator('#pulsarVisualNote').isVisible(),true);const noticeBox=await page.locator('#pulsarVisualNote').boundingBox(),canvasBox=await page.locator('#extremeCanvas').boundingBox();assert(noticeBox.y>=canvasBox.y&&noticeBox.y+noticeBox.height<=canvasBox.y+canvasBox.height,'notice is directly inside the animation area');assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematic/);assert.equal(await page.locator('#pulsarNote').isVisible(),false);await page.locator('[data-language=de]').click();assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematisch/);assert.equal(await page.locator('#extremeRadius').textContent(),radius);await page.keyboard.press('Escape');await page.locator('#extremeObject').selectOption('white');assert.equal(await page.locator('#pulsarVisualNote').isVisible(),false);
  }finally{await context.close()}
 });
 

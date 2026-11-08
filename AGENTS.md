@@ -3,7 +3,7 @@
 ## Autorisierung und Umfang
 
 - GitHub-Repository `phoscore/entrolab` ist nach Abschluss der Erstsicherung die zentrale Versionsverwaltung.
-- Aktuell autorisiert: UX & Visual Upgrade v0.5 ausschließlich auf `develop/v0.5` gemäß `docs/Plan_v0.5.md` und Nutzerauftrag. Plan und geforderte Qualitätsberichte zuerst vollständig lesen. Alle 79 bestehenden Prüfungen und zwölf numerischen Benchmarks bewahren. Physikmodelle und Integratoren unverändert lassen. Keine Änderungen an main, kein Merge oder Deployment; abschließend Pull Request zur unabhängigen Prüfung. Original v0.1 bleibt erhalten.
+- Aktuell autorisiert: UX & Visual Upgrade v0.5 ausschließlich auf `develop/v0.5` gemäß `docs/Plan_v0.5.md` und Nutzerauftrag. Plan und geforderte Qualitätsberichte zuerst vollständig lesen. Alle 101 vor dem Codex-Review vorhandenen Prüfungen und zwölf numerischen Benchmarks bewahren. Reviewkorrekturen zusätzlich mit gezielten Node- und Chromium-Regressionen prüfen. Physikmodelle und Integratoren unverändert lassen. Keine Änderungen an main, kein Merge oder Deployment; abschließend Pull Request zur unabhängigen Prüfung. Original v0.1 bleibt erhalten.
 - Nach der Erstsicherung `main` nur mit ausdrücklicher Freigabe des Eigentümers verändern oder zusammenführen. Ein Prüfauftrag, erfolgreiche CI oder ein fertiger Branch sind keine Merge-Freigabe.
 - Keine Veröffentlichung, Releases, Deployment, GitHub Pages oder automatische Produktionsaktualisierung ohne ausdrückliche Zustimmung. Repository-Sichtbarkeit nicht eigenmächtig ändern.
 

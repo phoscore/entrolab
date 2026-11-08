@@ -1,0 +1,289 @@
+{
+  "baseline": {
+    "commit": "d16bc338f75dbd69fbe6510f3fb22ffa6e3a5fac",
+    "applicationCode": "55a94f5b3af8f7d01d8b180ebdcb454475f842e9",
+    "run": 42493129436,
+    "measurement": {
+      "width": 320,
+      "dpr": 1,
+      "frames": 120,
+      "first": {
+        "w": 292.40625,
+        "h": 385.53125,
+        "controls": 647.390625,
+        "backingWidth": 292,
+        "backingHeight": 385
+      },
+      "last": {
+        "w": 292.40625,
+        "h": 504.6875,
+        "controls": 766.546875,
+        "backingWidth": 292,
+        "backingHeight": 504
+      },
+      "heightRange": 119.15625,
+      "controlsRange": 119.15625
+    }
+  },
+  "fixed": {
+    "commit": "5b2f9905170bfa5395a06093407ece3930d18bb1",
+    "run": 42493273081,
+    "measurements": [
+      {
+        "width": 320,
+        "dpr": 1,
+        "frames": 120,
+        "first": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 292,
+          "backingHeight": 370
+        },
+        "last": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 292,
+          "backingHeight": 370
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 320.5,
+        "dpr": 1,
+        "frames": 120,
+        "first": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 293,
+          "backingHeight": 370
+        },
+        "last": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 293,
+          "backingHeight": 370
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 390.25,
+        "dpr": 1,
+        "frames": 120,
+        "first": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 357,
+          "backingHeight": 370
+        },
+        "last": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 357,
+          "backingHeight": 370
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 1360,
+        "dpr": 1,
+        "frames": 120,
+        "first": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 704,
+          "backingHeight": 716
+        },
+        "last": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 704,
+          "backingHeight": 716
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 320,
+        "dpr": 1.25,
+        "frames": 120,
+        "first": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 366,
+          "backingHeight": 463
+        },
+        "last": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 366,
+          "backingHeight": 463
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 320.5,
+        "dpr": 1.25,
+        "frames": 120,
+        "first": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 367,
+          "backingHeight": 463
+        },
+        "last": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 367,
+          "backingHeight": 463
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 390.25,
+        "dpr": 1.25,
+        "frames": 120,
+        "first": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 446,
+          "backingHeight": 463
+        },
+        "last": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 446,
+          "backingHeight": 463
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 1360,
+        "dpr": 1.25,
+        "frames": 120,
+        "first": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 881,
+          "backingHeight": 895
+        },
+        "last": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 881,
+          "backingHeight": 895
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 320,
+        "dpr": 2,
+        "frames": 120,
+        "first": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 585,
+          "backingHeight": 740
+        },
+        "last": {
+          "w": 292.40625,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 585,
+          "backingHeight": 740
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 320.5,
+        "dpr": 2,
+        "frames": 120,
+        "first": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 587,
+          "backingHeight": 740
+        },
+        "last": {
+          "w": 293.34375,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 587,
+          "backingHeight": 740
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 390.25,
+        "dpr": 2,
+        "frames": 120,
+        "first": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 714,
+          "backingHeight": 740
+        },
+        "last": {
+          "w": 356.8125,
+          "h": 370,
+          "controls": 634.859375,
+          "backingWidth": 714,
+          "backingHeight": 740
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      },
+      {
+        "width": 1360,
+        "dpr": 2,
+        "frames": 120,
+        "first": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 1409,
+          "backingHeight": 1432
+        },
+        "last": {
+          "w": 704.40625,
+          "h": 715.890625,
+          "controls": 807.78125,
+          "backingWidth": 1409,
+          "backingHeight": 1432
+        },
+        "heightRange": 0,
+        "controlsRange": 0
+      }
+    ]
+  },
+  "browser": "Chromium 151.0.7922.34",
+  "fontMode": "Google Fonts blocked; system fallback",
+  "notes": "120 consecutive frames after 8 warmup frames; paused via real prefers-reduced-motion browser emulation; finite observation, no lifetime guarantee."
+}

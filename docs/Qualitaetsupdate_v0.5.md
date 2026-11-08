@@ -6,7 +6,7 @@ Datum: 8. November 2026. Ausschließlich `develop/v0.5`. Basis `main`: `5a13686f
 
 Plan, AGENTS, Qualitätsbericht v0.4 und Codex-Review v0.4 wurden vollständig vor der Umsetzung gelesen; zusätzlich die im Plan verlangten v0.4-Plan-/Reviewdateien und die relevanten Module/Tests. Änderungen betreffen Oberfläche, Textausgabe und illustrative Canvas-Gestaltung. Keine neue Physik und kein Sci-Fi-Physikmodus.
 
-Bytegleich zur Branch-Basis bleiben `dist/physics.mjs`, `prediction.mjs`, `instruments.mjs`, `experiments.mjs`, `extreme-data.mjs`, `checks.mjs`, numerische Referenzen, Original-Prüfsummen, bestehender Workflow und Hostingkonfiguration. Newton-Kräfte, Integrator, Kollisionen, Szenariodaten, Vorhersage, Schwarzschild-/Hawking-Formeln sowie Sternmassen/-radien sind unverändert. Das Darstellungsmodul `display.mjs` lokalisiert ausschließlich Formatierung und Modellhinweise.
+Bytegleich zur Branch-Basis bleiben `dist/physics.mjs`, `prediction.mjs`, `instruments.mjs`, `experiments.mjs`, `extreme-data.mjs`, `checks.mjs`, numerische Referenzen, Original-Prüfsummen und Hostingkonfiguration. Der bestehende Workflow wird im unten dokumentierten Reviewnachtrag um einen separaten Browser-Testjob erweitert. Newton-Kräfte, Integrator, Kollisionen, Szenariodaten, Vorhersage, Schwarzschild-/Hawking-Formeln sowie Sternmassen/-radien sind unverändert. Das Darstellungsmodul `display.mjs` lokalisiert ausschließlich Formatierung und Modellhinweise.
 
 **Keine Übernahme nach main, kein Deployment und keine Änderung der archivierten Originalversion.** Die bestehende Produktionswebsite bleibt außerhalb dieses Auftrags. Der Branch ist zur unabhängigen Prüfung bestimmt.
 
@@ -17,7 +17,7 @@ Bytegleich zur Branch-Basis bleiben `dist/physics.mjs`, `prediction.mjs`, `instr
 - Hinzufügen, Körperbearbeitung, Darstellungsoptionen und Ansichtsparameter sind native `<details>`-Bereiche; Diagnostik und Vorhersage behalten ihre vorhandenen zugänglichen Disclosures. Das BH-Diagramm lässt sich aufklappen und startet offen.
 - Wesentliche Modellwarnungen und der Hinweis **„illustrativ, keine exakte GR-, Emissions- oder Oberflächensimulation“** bleiben sichtbar. Die ausführliche Bild-Erklärung ist zusätzlich aufklappbar. Quellen und vollständiges Modellkapitel bleiben erreichbar.
 - Freiwillige, wieder öffnende Erste-Schritte-Hilfe, schließbar mit Button/Escape; kein blockierender Dialog. Erklärungskatalog für AU, Schwarzschild-Radius, ISCO, Hawking-Temperatur und Energieerhaltung.
-- Fokusmodus für Sandbox und Extreme Objects ohne Fullscreen-Abhängigkeit. Seitenpanels werden reduziert, Navigation, Start/Pause und Exit bleiben bedienbar. Escape und Tabwechsel verlassen den Modus; der auslösende Button erhält den Fokus zurück. Im Extreme-Fokus bleibt die Objektauswahl auch ohne sichtbares Label über einen übersetzten Accessible Name bezeichnet.
+- Fokusmodus für Sandbox und Extreme Objects ohne Fullscreen-Abhängigkeit. Seitenpanels werden reduziert, Navigation, Start/Pause und Exit bleiben bedienbar. Escape und direkter Ausstieg verlassen den Modus mit Fokusrückgabe; beim Haupttabwechsel bleibt der neu aktivierte Tab fokussiert (Reviewkorrektur, siehe Nachtrag). Im Extreme-Fokus bleibt die Objektauswahl auch ohne sichtbares Label über einen übersetzten Accessible Name bezeichnet.
 - Mobile simulierte Zeit wieder sichtbar; sie war im bisherigen CSS ausgeblendet. Zahlen und Einheiten dürfen umbrechen. Footer exakt: **„Kein Zauber. Leider. Nur ziemlich seltsame Physik. ✧“**
 
 ## DE/EN-Architektur und Eingabeverhalten
@@ -62,7 +62,7 @@ Stichproben im Shared Chrome bei Qualitätswechseln; nur Objektcanvas sichtbar, 
 
 Keine GPU-Fertigstellungszeit, Durchsatz-/FPS-Messung, belastbare Rangfolge der Qualitätsstufen oder Verbesserung gegenüber v0.4 behauptet. Die Umgebung drosselt Frames und die geringe Stichprobe enthält Scheduling-/Messrauschen. Kein Heap-/Langzeitlastnachweis.
 
-## Tatsächlich ausgeführte automatisierte Prüfungen
+## Automatisierte Prüfungen des ursprünglichen v0.5-Standes
 
 Baseline: `node scripts/test.mjs`: **79/79 bestanden** (zehn Originalchecks + 69 Node-Testfälle). Final: derselbe Einstieg **101/101 bestanden** (zehn Originalchecks + 91 Node-Testfälle), kein Skip/TODO. **22 zusätzliche Prüfungen**, in die vorhandene CI eingebunden.
 
@@ -81,7 +81,7 @@ Die DOM/Canvas/RAF-Adapter prüfen wirklichen Modulcode mit kontrollierter Umgeb
 
 Originalintegrität: lokale Dateikopie hat keine Git-Historie, deshalb `verify-original.mjs` nicht als lokal bestanden behauptet. Die echte Git-Historienprüfung bestand im GitHub-Baseline-Lauf [42445955970](https://github.com/phoscore/entrolab/actions/runs/42445955970) und im ersten Implementierungslauf [42448018578](https://github.com/phoscore/entrolab/actions/runs/42448018578), jeweils einschließlich „Verify preserved v0.1 source commit“. Abschließender Commit-/CI-Status wird im PR separat mit konkretem Lauf festgehalten.
 
-## Tatsächliche Browserprüfung und Grenzen
+## Browserprüfung des ursprünglichen v0.5-Standes und damalige Grenzen
 
 Shared Chrome, Desktop etwa **1363 × 936 CSS-Pixel**; zusätzliche gleichursprüngliche Testhüllen mit **1024 × 900** und **390 × 844 CSS-Pixeln**. Dies sind Browseransichten, **keine physischen Smartphone-Tests**. Die Testhüllen sind nach der Prüfung entfernt und nicht Teil des Projekts.
 
@@ -117,3 +117,25 @@ python3 -m http.server 8000 --directory dist
 `http://localhost:8000` öffnen. DE/EN während Pause und laufender Simulation wechseln; Inspector und fertige Vorhersage kontrollieren. Beide Fokusbuttons mit Enter/Escape bedienen; offene Details beim Wechsel behalten. Extreme Objects → Neutronenstern → Pulsar-Beispiel; danach Weißer Zwerg und Schwarzes Loch vergleichen. Kalte Grenzwerte und ungültige Eingaben prüfen. Für die unabhängige Geräteprüfung bleiben echter 200-%-Browserzoom, echte Reduced-Motion-Browsereinstellung, Smartphone/Touch und Safari ausdrücklich offen.
 
 Physikalische Quellen und Gültigkeitsgrenzen aus dem v0.4-Bericht bleiben maßgeblich. Das Release fügt keine validierte Oberflächen-, Magnetosphären-, Emissions- oder GR-Lichtbahnsimulation hinzu. Pull Request nur zur Prüfung; Freigabe zum Merge bleibt erforderlich.
+
+
+## Nachtrag – Codex-Reviewkorrekturen vor Freigabe
+
+Ausgangscode `55a94f5b`, PR #4; [vollständiger Befund-/Korrekturbericht](CodexReview_v0.5.md). Die ursprünglichen Prüfungen oben beschreiben den damaligen Umfang; sie hatten die jetzt reproduzierten Randfälle nicht ausgeschlossen.
+
+1. **Höhenwachstum:** CSS-Höhe/Flex-Basis und `contain:size` entkoppeln das Canvaslayout von ganzzahligen Bitmap-Attributen. Der Context-Transform berücksichtigt das tatsächliche Verhältnis Bitmap/CSS. Bei 320×900 px, DPR 1, Systemschrift-Fallback wuchs die pausierte Szene vorher in 120 Frames um **119,15625 px**; nach der Korrektur **0 px**. Auch die Transportleiste bleibt stabil. Zwölf Kombinationen aus 320 / 320,5 / 390,25 / 1360 px und DPR 1 / 1,25 / 2: jeweils **0 px** Höhen-/Kontrollleistenänderung. [Tatsächliche Messdaten](review-v0.5-browser.json).
+2. **Formularentwürfe:** Noch nicht angewendete Werte werden als Entwurf behandelt. Sprache und periodische Diagnostik überschreiben sie nicht; alle fünf Felder, sichtbare Validierung und der Editorfokus bleiben beim Sprachwechsel erhalten. Anwenden, explizite Körperauswahl und Reset dürfen weiterhin neu befüllen. Vollständiger Modellzustand unverändert.
+3. **Dynamische Übersetzung:** Initialer EN-Platzierungsbutton wird sofort korrekt gerendert, die gesamte Abstandsaussage übersetzt („1 AU from Sun“), BH-Fehlertext und interner Custom-Validity-Text gemeinsam aktualisiert. Ungültige Eingabe bleibt abgelehnt.
+4. **Fokusnavigation:** Tabwechsel gibt den Fokus nicht an einen versteckten Fokusbutton zurück. Neuer Navigationsbutton bleibt fokussiert; direkter Exit/Escape behalten ihre Rückgabe.
+5. **Sprachwahl:** Auch die explizite Bestätigung einer bereits aktiven Sprache wird gespeichert; kein unnötiger Neurender.
+6. **Pulsarhinweis:** Ein kurzer DE/EN-Hinweis direkt in der Szene bleibt im Fokusmodus sichtbar. Kegel sind rein schematisch, keine Emissionsrechnung. Renderer und Modellwerte unverändert.
+
+**Erweiterte Ergebnisse:** alle **101 bisherigen** Prüfungen erhalten; jetzt **108/108** reguläre Prüfungen und zusätzlich **7/7 echte Chromium-Browserfälle**. Sieben neue Node-Regressionsfälle schlugen vor dem Fix tatsächlich fehl. Die neue Größenregression hatte das Wachstum im unveränderten Anwendungscode vermessen; sie ist kein nachträglich angepasster Referenzwert. Kein Testgrenzwert gelockert.
+
+Alle zwölf vollständigen numerischen Benchmarks bleiben vor/nach Fix und gegenüber der bestehenden v0.2-Referenz exakt gleich. Der [erfolgreiche Implementierungslauf](https://github.com/phoscore/entrolab/actions/runs/42493273081) enthält beide grünen CI-Jobs und die sechs historischen Integritätsprüfungen. Den konkreten finalen Commit-/PR-CI-Lauf hält PR #4 fest.
+
+Playwright 1.62.1 mit Lockfile ist ausschließlich Testabhängigkeit. Der neue CI-Job startet einen lokalen Server und echtes Chromium 151.0.7922.34 mit blockierten Webfonts. Er prüft auch Tastatur-Tabwechsel, Entwürfe/Validierung/Fokus, frischen EN-Start, reale Browser-Custom-Validity, Sprachauswahl-Persistierung und den Pulsarhinweis. Medienemulation für Reduced Motion wurde jetzt im echten CI-Browser erfolgreich geprüft; die entsprechende frühere Beschränkung des Shared-Browser-Smokes gilt nicht mehr für diesen CI-Test. Kein physischer Betriebssystem-/Smartphone-/Safari- oder echter 200-%-Zoom-Test und kein neuer FPS-/GPU-Nachweis.
+
+Lokal scheiterte ein eigener Chromium-Prozess weiterhin am gesperrten Singleton-Socket; die echten Browserergebnisse werden ausschließlich der ausgeführten GitHub-CI zugeschrieben. Reproduktion: `npm ci --ignore-scripts`, `npx playwright install --with-deps chromium`, `npm run test:browser`; reguläre Tests bleiben `node scripts/test.mjs`. Die Anwendung selbst bleibt ohne Buildpflicht und ohne neue Laufzeitabhängigkeit.
+
+Keine Änderung an Physikmodellen/Integrator, keine Änderung an main oder Originalversion, kein Merge und kein Deployment. Der Stand wird erneut zur unabhängigen Prüfung bereitgestellt.
