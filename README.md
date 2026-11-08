@@ -115,3 +115,8 @@ Branch- und Tag-Schutz wurden nicht technisch eingerichtet. AGENTS.md legt die F
 ## Qualitätsupdate v0.2 (nur Entwicklungsbranch)
 
 Details, Messbedingungen, Grenzen und konkrete Zahlen: [Qualitätsbericht](docs/Qualitaetsupdate_v0.2.md). `node scripts/test.mjs` führt jetzt zusätzlich 16 Qualitätsfälle aus. `node scripts/benchmark.mjs` reproduziert die Vergleichsdaten. Der Integrator bleibt nach dem Vergleich bewusst unverändert. Keine Veröffentlichung oder Merge-Freigabe ist damit verbunden.
+
+
+### Unabhängiger Review-Abschluss
+
+`node scripts/test.mjs` führt nun zehn Originalchecks plus 25 Node-Testfälle aus, darunter sechs analytische Kepler-Bahnen, eine Referenz-Selbstprüfung und zwei Kollisionsregressionen. `node scripts/review-diagnostics.mjs` erzeugt die ergänzenden Messdaten. Ergebnisse, Fehlergrenzen und die weiterhin offene Tunneling-Grenze: [Review-Abschluss](docs/Reviewabschluss_v0.2.md). Physikkern, Integrator und Kollisionsverhalten wurden bei diesem Abschluss nicht verändert.
