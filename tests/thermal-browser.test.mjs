@@ -94,3 +94,38 @@ test('review browser: bounded fast-relaxation samples remain analytical after a 
 test('review browser baseline: original UI fixture reproduces the Celsius boundary failure after real blur',async()=>{
  const {page:p,context}=await lab();try{const original=await readFile(new URL('./fixtures/thermal-ui-f980d883.txt',import.meta.url),'utf8');await p.route('**/thermal-ui.mjs',route=>route.fulfill({status:200,contentType:'text/javascript',body:original}));await p.reload();await ready(p);await p.locator('[data-tab=extreme]').click();await p.locator('#celsiusInput').fill('-23.15');await p.locator('#celsiusInput').press('Tab');const raw=await p.locator('#temperatureTransferValue').evaluate(e=>e.value);assert.equal(Number(raw),249.99999999999997);assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);measurements.push({reviewOriginalBoundary:{commit:'f980d8837d8303f949d7a13b3abdffcb400771b8',celsius:await p.locator('#celsiusInput').inputValue(),rawKelvin:raw,transferEnabled:false}})}finally{await context.close()}
 });
+
+
+test('review P3 browser: precision rejected after native blur is explained in both languages',async()=>{
+ const {page:p,context}=await lab();try{
+  await p.locator('[data-tab=extreme]').click();
+  const original='249.99999999999999999';
+  await p.locator('#kelvinInput').fill(original);
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#kelvinInput').inputValue(),'250');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  let note=await p.locator('#thermalBridgeNote').textContent();
+  assert(note.includes(original),note);
+  assert.match(note,/Ursprünglich eingegeben/);
+  assert.match(note,/250 K/);
+  await p.locator('[data-language=en]').click();
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  note=await p.locator('#thermalBridgeNote').textContent();
+  assert.match(note,/Originally entered/);
+  assert(note.includes(original),note);
+  await p.locator('#kelvinInput').fill('250');
+  await p.locator('#kelvinInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+  assert.doesNotMatch(await p.locator('#thermalBridgeNote').textContent(),/Originally entered/);
+  const celsius='-23.150000000000000001';
+  await p.locator('#celsiusInput').fill(celsius);
+  await p.locator('#celsiusInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);
+  note=await p.locator('#thermalBridgeNote').textContent();
+  assert.match(note,/Originally entered/);
+  assert(note.includes(celsius),note);
+  await p.locator('#celsiusInput').fill('-23.15');
+  await p.locator('#celsiusInput').press('Tab');
+  assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);
+ }finally{await context.close()}
+});
