@@ -21,6 +21,8 @@ jobs:
           node-version: '22'
       - name: Syntax, conservation, analytical Kepler and collision regressions
         run: node scripts/test.mjs
+      - name: Verify twelve unchanged complete numerical benchmarks
+        run: node scripts/check-benchmarks.mjs
       - name: Verify preserved v0.1 source commit
         run: node scripts/verify-original.mjs
 

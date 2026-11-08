@@ -8,6 +8,7 @@ import {experiment,experimentInfo} from '../dist/experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from '../dist/instruments.mjs';
 import {predict} from '../dist/prediction.mjs';
 import {checks} from '../dist/checks.mjs';
+import {createSelfChecks} from '../dist/self-checks.mjs';
 export function harness(module='app',reduce=false,startLanguage='de'){
  i18n.setLanguage(startLanguage);
  const elements=new Map(),frames=new Map(),events={},timeouts=[],subscriptions=[],labels=[],observers=[];let id=0,now=100,draws=0;
@@ -25,7 +26,7 @@ export function harness(module='app',reduce=false,startLanguage='de'){
  const motion={matches:reduce,addEventListener(k,f){this.change=f}};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;el('gravity').classes.add('active');el('comparisonMode').value='log';
  const window={addEventListener(){}};
- const scope=vm.createContext({...physics,...display,...data,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
+ const scope=vm.createContext({...physics,...display,...data,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
   matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false,addEventListener(){}},Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},ResizeObserver:class{observe(){}},IntersectionObserver:class{constructor(fn){observers.push(fn)}observe(){}},
   drawObject(){draws++},drawThermal(){draws++},requestAnimationFrame:f=>{frames.set(++id,f);return id},cancelAnimationFrame:i=>frames.delete(i),setTimeout:f=>timeouts.push(f)});
  const source=readFileSync(new URL('../dist/'+(module==='app'?'app.mjs':'extreme-ui.mjs'),import.meta.url),'utf8').replace(/^import .*;\n/gm,'');new vm.Script(source).runInContext(scope);
