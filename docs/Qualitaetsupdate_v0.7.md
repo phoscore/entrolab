@@ -158,3 +158,90 @@ python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
 `http://localhost:8000` → Entropy Lab → Wärme & Entropie oder „Erste Schritte“. README und branchlokaler AGENTS-Umfang aktualisiert. Ausschließlich Entwicklungscommits und Review-PR nach main; **kein Merge, Deployment, Release, Produktionsupdate oder neue Veröffentlichung**. Die öffentliche Website ändert sich erst nach ausdrücklich freigegebenem Merge/Deployment.
+
+## Nachtrag — gezielte Codex-Reviewkorrekturen
+
+8. November 2026, geprüft gegen `f980d8837d8303f949d7a13b3abdffcb400771b8`, weiterhin ausschließlich `develop/v0.7`, bestehender PR #6. Die Abschnitte oben dokumentieren den ursprünglichen Implementierungsstand; dieser Nachtrag beschreibt die anschließenden Korrekturen. Wissenschaftliche Gleichungen, Parameterbereiche, Modelle und Integratoren werden nicht geändert.
+
+### Vorher tatsächlich reproduziert
+
+Baseline lokal erneut **149/149**. Drei neue Node-Fälle gegen den unveränderten tatsächlichen UI-Code: **0/3**, mit den erwarteten Ursachen: gesperrte Übernahme des konvertierten unteren Grenzwerts, Zeitlabels `["0","0","0"]`, nach Preset veralteter Hinweis auf B=400 K. Reproduktionscommit `00161a60c93957d1158946494a876ecbf1b56b68`, [CI 42524224723](https://github.com/phoscore/entrolab/actions/runs/42524224723): alle 149 bisherigen regulären Prüfungen erhalten, genau diese drei zusätzlichen Node-Fälle rot. Alle 29 bisherigen Chromium-Fälle bestanden ebenfalls.
+
+Wichtig zur Testgenauigkeit: Die erste neue Celsius-Browserprüfung benutzte irrtümlich Playwrights `inputValue()` auf einem `<output>` und erreichte deshalb ihre eigentliche Grenzwert-Assertion nicht. Das war ein Testzugriffsfehler, kein zusätzlicher Appfehler. Zeitachsen- und Hinweisfehler wurden bereits in dieser CI tatsächlich reproduziert. Der Zugriff ist auf das echte `output.value` korrigiert. Zusätzlich lädt eine eigene Chromium-Gegenprobe das **bytegleiche ursprüngliche** `thermal-ui.mjs` als Testfixture per Request-Interception: `tests/fixtures/thermal-ui-f980d883.txt`, Git-Blob-SHA `bdf90ebccc5cec6ae4a0d05c62d30e6158a5cfcd`. Sie zeigt nach echter Celsius-Eingabe und Tab/Blur den Rohwert 249.99999999999997 K und den gesperrten Button. Die separate Kandidatenprüfung verlangt dagegen erfolgreiche Übernahme. Das Originalmodul ist ausschließlich eine historische Testfixture, wird von der Anwendung weder geladen noch ausgeliefert; ein Node-Hashguard schützt seine Bytegleichheit.
+
+### 1. Temperaturgrenze: gültige Quelle vor Umrechnungsrundung
+
+`−23.15 + 273.15` wird in binary64 zu **249,99999999999997 K**, Abweichung **−2,842170943040401 × 10⁻¹⁴ K**. Die ursprüngliche strikte Grenzprüfung im Übergang wertete dies als außerhalb liegend. Das bestehende Extreme Temperature Lab und seine Umrechnung bleiben bytegleich, einschließlich seiner bereits vorhandenen Formatierung beim Verlassen eines Felds.
+
+Die neue **Darstellungs-/Übergabeschicht** `dist/thermal-view.mjs` merkt beim Eingabeereignis den ursprünglichen Text und die Einheit, bevor das vorhandene Temperaturmodul beim Blur formatiert. Sie prüft zuerst den tatsächlichen Dezimaltext: Kelvin 250–600, Celsius −23.15 bis 326.85, einschließlich wissenschaftlicher Schreibweise. Ein Vergleich von Vorzeichen, Dezimalordnung und Ziffern vermeidet, dass eine ausdrücklich außerhalb liegende Dezimalzahl zunächst durch `Number()` auf die Grenze gerundet und dann angenommen wird. Beispielsweise bleiben `249.99999999999997 K`, `249.99999999999999999 K`, `600.00000000000000001 K` und `−23.150000000000000001 °C` abgelehnt. Die Quellenprüfung ist keine Erweiterung der physikalischen Grenzen.
+
+**Nur** bei einer nachweislich zulässigen Celsius-Quelle darf der umgerechnete Rohwert innerhalb eines maschinellen Rundungsbudgets als exakter Grenzwert **vorgemerkt** werden. Budget:
+
+`2 · Number.EPSILON · max(273.15, |Celsiuswert|, Grenztemperatur)`.
+
+Damit werden binäre Darstellung der Dezimaloperanden und die Addition abgedeckt: am unteren Rand **1,213029676705446 × 10⁻¹³ K**, am oberen **2,6645352591003757 × 10⁻¹³ K**. Die Toleranz ist keine Messunsicherheit und kein fachlich zulässiger zusätzlicher Temperaturbereich. Die vorherige exakte Quellenprüfung weist jede explizite Grenzüberschreitung zurück; direkte Kelvinwerte erhalten kein nachträgliches Clamping. Eine Konsistenzprüfung verwirft zudem unpassende Quelle-/Rohwertpaare. NaN, Infinity, falsche Typen, unlesbarer Text und größere Abweichungen bleiben ungültig.
+
+Quellfelder und Extreme-Temperaturzustand werden nicht geändert. Der neue Zielentwurf wird gegebenenfalls ausdrücklich als **250 K unter Berücksichtigung einer Umrechnungsrundung** erklärt, auch nach DE/EN-Wechsel. Erst Übernehmen ändert wie bisher den Wärme-Modellstart. `validateThermal()` und `transferableTemperature()` im Physikmodul bleiben unverändert strikt; weder Energie-/Entropierechnung noch bestehende Modelle verwenden eine neue Toleranz.
+
+### 2. Zeitachse: Größenordnung erhalten
+
+Vier signifikante Ziffern ersetzen die festen zwei Nachkommastellen. Unter 0,001 s und ab 10⁶ s verwendet die Achse wissenschaftliche E-Notation; sonst eine passende Dezimaldarstellung ohne Tausendergruppen. Achse und aktuelle Zeitbeschreibung verwenden dieselbe lokale Darstellung. Attribute `data-time` halten die unveränderten numerischen Tickwerte für überprüfbare Browservergleiche; die Darstellung schreibt keine Rechenwerte zurück.
+
+| Fensterende | Ticks, ungerundet | Deutsch | Englisch |
+| --- | --- | --- | --- |
+| 0,0025 s, τ=0,0005 s | 0 / 0,00125 / 0,0025 | 0 / 0,00125 / 0,0025 | 0 / 0.00125 / 0.0025 |
+| 250 s, τ=50 s | 0 / 125 / 250 | 0 / 125 / 250 | 0 / 125 / 250 |
+| ca. 2,5×10⁹ s, τ≈5×10⁸ s | 0 / 1,25×10⁹ / 2,5×10⁹ | 0 / 1,25E9 / 2,5E9 | 0 / 1.25E9 / 2.5E9 |
+| 10¹² s | 0 / 5×10¹¹ / 10¹² | 0 / 5E11 / 1E12 | 0 / 5E11 / 1E12 |
+
+Das größte zulässige τ kann wegen binary64 als 499999999.99999994 s vorliegen. Der Test vergleicht es mit dem analytischen Sollwert mit höchstens zwei EPSILON relativ; Achsentext wird gegen den tatsächlichen Tickwert geprüft. Drei positive/Null-Ticks bleiben eindeutig, ein positiver Tick wird nie als null ausgegeben. Die Rundungsprüfung der formatierten Texte folgt ihrer Vier-Ziffern-Präzision, nicht einer neuen Physiktoleranz.
+
+### 3. Übernahmehinweis: Lebensdauer des Entwurfs
+
+Jedes Preset sowie manuelle `input`-/`change`-Ereignisse im Wärmeformular verwerfen die bisherige Übergabeinformation. Reset und erfolgreiches Übernehmen löschen sie weiterhin. Eine zusätzliche Übereinstimmungsprüfung beim Rendern verhindert einen alten Hinweis auch dann, wenn ein Zielfeld etwa durch einen programmatischen Entwurf ohne Eingabeereignis geändert wurde. Die Prüfung ändert keine Modellparameter.
+
+Sprachwechsel erhält einen noch unveränderten Übergabeentwurf samt Hinweis und fokussiertem Feld. Nach einer manuellen Änderung bleibt der Hinweis auch beim folgenden Sprachwechsel verschwunden. Die sichtbaren neuen Rundungshinweise teilen denselben Lifecycle. Tests prüfen alle drei Presets, beide Temperaturfelder, Input/Change, Reset, Apply, DE/EN und die Erhaltung angewendeter Werte/Modellzeit. Tastatur-Übernahme fokussiert weiterhin das sichtbare Zielfeld; auf 390 px wird derselbe Ablauf geprüft.
+
+### Kleine zusätzliche Klarstellungen und Kurvenabtastung
+
+Die gemeinsame Modellerklärung sagt nun korrekt **`S/k_B = ln Ω` ist der Logarithmus der Zahl der zu k passenden Mikrozustände**, nicht die Zahl selbst. Ein Mikrozustand legt für jeden nummerierten Marker links/rechts fest; k zählt nur die linken Marker. Die gezeichneten Positionen sind keine zusätzlichen Mikrozustände und keine realen Gasbahnen. Thermodynamisches ΔS bleibt eine getrennte Änderung in J/K. Keine Änderung der Zählmathematik oder q=1/4-Regel. Beide Texte sind DE/EN.
+
+Die Kurven behalten höchstens **65 analytische Stützstellen pro Körper** und denselben linearen Zeitmaßstab. Bis 8τ bleibt die gleichmäßige Abtastung erhalten. Bei längerer Achse liegen 49 Punkte in 0…8τ, die übrigen 16 bis zum Fensterende. Dadurch entsteht nach einem großen sichtbaren Zeitschritt keine fiktive langsame erste Gerade über ein langes, bereits ausgeglichenes Intervall. Kein neuer Timer, Canvas oder zusätzlicher Modellschritt.
+
+Unabhängiger Vergleich gegen `T_A=320+30 exp(−t/τ)`, τ=0,0005 s, Fenster 10 s, **1.001 gleichmäßige Referenzzeitpunkte in 0…0,004 s**:
+
+| Maximale Abweichung der gezeichneten linearen Interpolation | Vorher | Jetzt |
+| --- | --- | --- |
+| Temperaturfehler | **29,352517953417134 K** | **0,09584644682576027 K** |
+| Stützstellen insgesamt | 65 | 65 |
+| Stützstellen in den ersten 8τ | 1 | 49 |
+
+Dies ist eine Verbesserung der **Linieninterpolation**, keine neue Genauigkeit der bereits analytisch berechneten Zustandswerte. Sehr schnelle Prozesse bleiben auf einer langen linearen Achse unter Umständen schmaler als ein Bildpunkt; der DE/EN-Hinweis erklärt das. Kein ungeprüftes Autozoom, logarithmischer Zeitmaßstab oder zusätzliche Darstellung. Rohwerte und Referenzvergleich: [review-v0.7-math.json](review-v0.7-math.json); Rechnung und strenge Schranken sind in `tests/review-v07.test.mjs` reproduzierbar.
+
+
+### Nach der Reparatur tatsächlich ausgeführte Prüfungen
+
+Grüner Implementierungsstand **`7d6be971b1583d850153dcde261d4d151dfebc49`**, [PR-CI 42525179135](https://github.com/phoscore/entrolab/actions/runs/42525179135), beide Jobs erfolgreich:
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Bisherige reguläre Prüfungen | **149/149 erhalten** |
+| Neue Node-Reviewfälle | **9/9** |
+| Regulär insgesamt, lokal Node 24.22.1 / CI Node 22.23.4 | **158/158**, zehn Originalchecks + 148 Node-Fälle |
+| Bisherige Chromium-Fälle | **29/29 erhalten** |
+| Neue Chromium-Reviewfälle | **7/7** |
+| Chromium 151.0.7922.34 insgesamt | **36/36**, keine erfassten Seitenfehler, kein Skip |
+| Vollständige numerische Benchmarks | **12/12 exakt gleich** |
+| Historische Originalintegrität | **6/6 SHA-256-Prüfungen bestanden** |
+
+Alle alten regulären Testdateien und Assertions bleiben unverändert. Die 29 alten Browserfälle bleiben bytegleich; neue Fälle sind angehängt. Der neue Node-DOM-Adapter führt den tatsächlichen UI-Modulcode aus; er wird nicht als Browser ausgegeben. Neue reale Browserprüfungen kontrollieren zusätzlich beide Temperatureinheiten nach Blur, Unter-/Obergrenzen, wahrheitsgemäße DE/EN-Achsenticks bei τ=0,0005/50/ca. 5×10⁸ s, Änderungen aller Presets/Temperaturfelder, Reset/Apply, fokussiertes Ziel-/Editorfeld auf 390 px, frühe analytische Kurvenstützstellen und die originale Celsius-Gegenprobe.
+
+Die alten Chromium-Fälle prüfen weiterhin 320/390 px, tatsächlich gebrochene Breiten und DPR 1/1,25/2, Tastatur/Escape, Reduced Motion, Hintergrund-/Offscreen-Lifecycles, Selbstcheck-Worker und Zustandsbewahrung. Neuer 390-px-Ablauf ohne horizontalen Überlauf; keine physische Touchhardware behauptet. Kein neuer Scheduler und keine zusätzliche automatische Zustandsmutation. Die Grenze-/Hinweisprüfung vergleicht angewendete Wärmeparameter/Modellzeit und Gravitations-/Markerzustände vor/nach den Bedienfolgen.
+
+[Reale Browserrohdaten](review-v0.7-browser.json) enthalten sechs DE/EN-Achsenreihen, die ursprüngliche gesperrte Celsius-Übernahme, neue frühe Stützstellen und die vorhandenen Größen-/Performance-Messungen. 300 synchrone Wärme-Schritte im grünen Lauf: **Median 0,70 ms, p95 1,50 ms, Maximum 1,80 ms**, danach 11 SVG-Knoten und kein geplanter Timer. Diese Laufzeiten unterscheiden sich zwischen Runnern und Lastzuständen; keine behauptete Beschleunigung, FPS-, Paint- oder GPU-Garantie. Der [tatsächliche Screenshot des schnellen Ausgleichs](screenshots/v0.7/review-fast-curve.png) wurde visuell geprüft; auf der 10-s-Achse liegt die Millisekunden-Relaxation erwartungsgemäß unter einem Pixel. Kurvennotiz und Zahlen nennen diese Grenze ausdrücklich.
+
+Die zwölf lokalen vollständigen Benchmarkausgaben vor/nach den Reviewkorrekturen und die historische Referenz bleiben bytegleich: SHA-256 **`743a9773953b40848fb8596e15df1a60ab8ef507222b62400cb23c32c23f307a`**. Keine Änderungen an `thermal-physics.mjs`, `physics.mjs`, `extreme-data.mjs`, `extreme-ui.mjs`, `entropy.mjs`, bisherigen Integratoren, Szenarien, Vorhersage, Renderern, Selbstchecks, Original-Prüfsummen, Archiv oder Hosting. Die zwölf Benchmarkfälle und Vergleichsschranken sind unangetastet. Die neue Toleranz ist ausschließlich eine offen erklärte UI-Umrechnungsbehandlung nach strikter Quellenprüfung.
+
+Der lokale automatische Chromium-Start wurde erneut versucht und scheiterte vor dem Seitenstart am gesperrten Singleton-Socket (`socket() failed: Operation not permitted`). Die 36 Browserfälle stammen aus tatsächlich ausgeführter GitHub-CI. Die bisherigen Prüflücken bleiben: Safari/Firefox/iOS, physische Smartphones, vollständiger Screenreader-/Zoom-Audit, Langzeit-GPU-/Speicherverhalten und Materialvalidierung. Keine Verallgemeinerung des Interpolationsvergleichs auf beliebige Darstellungsfenster.
+
+Reproduktion über die unveränderten Hauptbefehle `node scripts/test.mjs`, `node scripts/benchmark.mjs`, `node scripts/check-benchmarks.mjs`, `node scripts/verify-original.mjs`, `npm run test:browser`; gezielt zusätzlich `node --test tests/review-v07.test.mjs`. Für historische Git-Prüfungen ist weiterhin ein vollständiger Klon nötig. README-Zahlen aktualisiert. Der abschließende Dokumentations-Head und seine erneut kontrollierte CI werden in PR #6 mit konkretem Hash/Lauf festgehalten. **Kein Merge, Deployment, Produktionsupdate oder Eingriff in main.**

@@ -1,0 +1,220 @@
+{
+  "commit": "7d6be971b1583d850153dcde261d4d151dfebc49",
+  "run": "https://github.com/phoscore/entrolab/actions/runs/42525179135",
+  "chromium": "151.0.7922.34",
+  "measurements": [
+    {
+      "requestedWidth": 320,
+      "dpr": 1,
+      "width": 320,
+      "scroll": 320,
+      "chart": 256.40625,
+      "controls": [
+        45,
+        45,
+        45
+      ]
+    },
+    {
+      "requestedWidth": 390,
+      "dpr": 2,
+      "width": 390,
+      "scroll": 390,
+      "chart": 320.8125,
+      "controls": [
+        45,
+        45,
+        45
+      ]
+    },
+    {
+      "requestedWidth": 320.5,
+      "dpr": 1.25,
+      "width": 321,
+      "scroll": 321,
+      "chart": 257.34375,
+      "controls": [
+        45,
+        45,
+        45
+      ]
+    },
+    {
+      "requestedWidth": 1360,
+      "dpr": 1,
+      "width": 1360,
+      "scroll": 1360,
+      "chart": 586.203125,
+      "controls": [
+        66,
+        66,
+        66
+      ]
+    },
+    {
+      "renderCost": {
+        "steps": 300,
+        "medianMs": 0.6999999999970896,
+        "p95Ms": 1.5,
+        "maxMs": 1.8000000000029104,
+        "scheduled": false,
+        "time": 3000,
+        "chartNodes": 11
+      }
+    },
+    {
+      "reviewAxes": [
+        {
+          "ca": 1,
+          "cb": 1,
+          "g": 1000,
+          "tau": 0.0005,
+          "language": "de",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 0.00125,
+              "label": "0,00125"
+            },
+            {
+              "value": 0.0025,
+              "label": "0,0025"
+            }
+          ]
+        },
+        {
+          "ca": 1,
+          "cb": 1,
+          "g": 1000,
+          "tau": 0.0005,
+          "language": "en",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 0.00125,
+              "label": "0.00125"
+            },
+            {
+              "value": 0.0025,
+              "label": "0.0025"
+            }
+          ]
+        },
+        {
+          "ca": 1000,
+          "cb": 1000,
+          "g": 10,
+          "tau": 50,
+          "language": "de",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 125,
+              "label": "125"
+            },
+            {
+              "value": 250,
+              "label": "250"
+            }
+          ]
+        },
+        {
+          "ca": 1000,
+          "cb": 1000,
+          "g": 10,
+          "tau": 50,
+          "language": "en",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 125,
+              "label": "125"
+            },
+            {
+              "value": 250,
+              "label": "250"
+            }
+          ]
+        },
+        {
+          "ca": 1000000,
+          "cb": 1000000,
+          "g": 0.001,
+          "tau": 500000000,
+          "language": "de",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 1249999999.9999998,
+              "label": "1,25E9"
+            },
+            {
+              "value": 2499999999.9999995,
+              "label": "2,5E9"
+            }
+          ]
+        },
+        {
+          "ca": 1000000,
+          "cb": 1000000,
+          "g": 0.001,
+          "tau": 500000000,
+          "language": "en",
+          "ticks": [
+            {
+              "value": 0,
+              "label": "0"
+            },
+            {
+              "value": 1249999999.9999998,
+              "label": "1.25E9"
+            },
+            {
+              "value": 2499999999.9999995,
+              "label": "2.5E9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "reviewFastCurve": {
+        "tau": 0.0005,
+        "horizon": 10,
+        "samples": 65,
+        "earlyLast": [
+          54.228,
+          141.96980836348882
+        ],
+        "final": [
+          624,
+          142
+        ]
+      }
+    },
+    {
+      "reviewOriginalBoundary": {
+        "commit": "f980d8837d8303f949d7a13b3abdffcb400771b8",
+        "celsius": "-23.15",
+        "rawKelvin": "249.99999999999997",
+        "transferEnabled": false
+      }
+    }
+  ],
+  "errors": []
+}

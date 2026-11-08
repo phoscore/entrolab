@@ -55,7 +55,7 @@ node scripts/check-benchmarks.mjs
 node scripts/measure-thermal.mjs
 ```
 
-Der reguläre Einstieg enthält **149 Prüfungen**: zehn Original-Selbstchecks und 139 Node-Testfälle. Alle 138 v0.6-Prüfungen bleiben unverändert erhalten; elf neue Wärme-/Validierungs-/Übersetzungsfälle kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
+Der reguläre Einstieg enthält **158 Prüfungen**: zehn Original-Selbstchecks und 148 Node-Testfälle. Alle 149 vor dem v0.7-Review vorhandenen Prüfungen bleiben erhalten; neun gezielte Reviewfälle kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
 
 Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.7 unverändert.
 
@@ -67,7 +67,7 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browser-Suite umfasst **29 Fälle**: alle 20 v0.6-Fälle unverändert sowie neun neue Fälle zu Wärmeexperiment, sicherer Temperaturübernahme, Anleitung, DE/EN, Fokus, schmalen Ansichten, Reduced Motion und Lifecycle/Renderaufwand. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
+Die Browser-Suite umfasst **36 Fälle**: alle 29 vor dem v0.7-Review vorhandenen Fälle sowie sieben neue Reviewfälle zu Grenzwerten/Originalreproduktion, Zeitachsen, Übernahmehinweisen und Kurvenabtastung. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
 
 ## Projektstruktur
 

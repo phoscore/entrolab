@@ -1,0 +1,101 @@
+{
+  "runtime": "v24.22.1",
+  "boundary": {
+    "celsiusText": "-23.15",
+    "rawKelvin": 249.99999999999997,
+    "deltaKelvin": -2.842170943040401e-14,
+    "roundingBoundK": 1.213029676705446e-13,
+    "candidate": {
+      "temperature": 250,
+      "rounded": true
+    },
+    "sameRawAsDirectKelvin": null
+  },
+  "axes": [
+    {
+      "horizon": 0.0025,
+      "values": [
+        0,
+        0.00125,
+        0.0025
+      ],
+      "de": [
+        "0",
+        "0,00125",
+        "0,0025"
+      ],
+      "en": [
+        "0",
+        "0.00125",
+        "0.0025"
+      ]
+    },
+    {
+      "horizon": 250,
+      "values": [
+        0,
+        125,
+        250
+      ],
+      "de": [
+        "0",
+        "125",
+        "250"
+      ],
+      "en": [
+        "0",
+        "125",
+        "250"
+      ]
+    },
+    {
+      "horizon": 2500000000,
+      "values": [
+        0,
+        1250000000,
+        2500000000
+      ],
+      "de": [
+        "0",
+        "1,25E9",
+        "2,5E9"
+      ],
+      "en": [
+        "0",
+        "1.25E9",
+        "2.5E9"
+      ]
+    },
+    {
+      "horizon": 1000000000000,
+      "values": [
+        0,
+        500000000000,
+        1000000000000
+      ],
+      "de": [
+        "0",
+        "5E11",
+        "1E12"
+      ],
+      "en": [
+        "0",
+        "5E11",
+        "1E12"
+      ]
+    }
+  ],
+  "curve": {
+    "tau": 0.0005,
+    "horizon": 10,
+    "samples": 65,
+    "earlySamples": 49,
+    "comparisonPoints": 1001,
+    "comparisonWindowS": [
+      0,
+      0.004
+    ],
+    "oldMaxInterpolationErrorK": 29.352517953417134,
+    "newMaxInterpolationErrorK": 0.09584644682576027
+  }
+}
