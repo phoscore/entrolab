@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node scripts/test.mjs",
-    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs"
+    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs tests/explanations-browser.test.mjs"
   },
   "devDependencies": {"playwright": "1.62.1"}
 }

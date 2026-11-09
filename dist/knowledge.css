@@ -16,3 +16,14 @@
 #knowledgeReturnSlot:empty{display:none}#knowledgeReturnSlot{margin:.7rem 0}.knowledge-model{min-width:0}.knowledge-glossary dd{min-width:0}
 @media(max-width:600px){.knowledge-help>summary{font-size:.82rem}.knowledge-model-index{gap:.3rem}.knowledge-model-index a{padding:.4rem .5rem;font-size:.85rem}.knowledge-formula{font-size:.78rem}.knowledge-definition{max-width:100%}}
 @media(prefers-reduced-motion:reduce){.knowledge-help,.knowledge-advanced{scroll-behavior:auto;transition:none}}
+
+/* One voluntary question per established laboratory context. */
+.learning-question{font-size:.9rem;font-weight:400;letter-spacing:normal;text-transform:none;max-width:76ch;margin:.7rem 0;color:#ded5e7;line-height:1.6}
+.learning-question>summary{cursor:pointer;color:#e5cef7;min-height:44px;padding:.5rem .7rem;border:1px solid #614b70;border-radius:8px;background:#17121e;overflow-wrap:anywhere}
+.learning-question-content{padding:.3rem .8rem}.learning-question h3,.learning-question h4{font:600 .92rem/1.5 system-ui,sans-serif;margin:1rem 0 .25rem;letter-spacing:normal;text-transform:none}
+.learning-question p{font-size:.9rem;line-height:1.65;overflow-wrap:anywhere}.learning-question fieldset{border:1px solid #59465f;border-radius:7px;padding:.75rem;min-width:0}.learning-question legend{padding:0 .3rem;font-weight:500;overflow-wrap:anywhere}
+.learning-option{display:flex;align-items:center;gap:.65rem;min-height:44px;text-transform:none;font:400 .9rem/1.5 system-ui,sans-serif;letter-spacing:normal;cursor:pointer;margin:.25rem 0}
+.learning-option input{width:20px;height:20px;flex:0 0 20px;margin:0;accent-color:#d0a2f0}.learning-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin:.7rem 0}.learning-feedback{color:#f2dbff}.learning-feedback:empty{display:none}
+.learning-answer{border-left:2px solid #9bd6bd;padding:.1rem .8rem}.learning-context-title{font-size:1.1rem;margin:.3rem 0 .7rem}
+.learning-question summary:focus-visible,.learning-question button:focus-visible,.learning-option input:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
+@media(max-width:600px){.learning-question{font-size:.85rem}.learning-question-content{padding:.2rem .3rem}.learning-question fieldset{padding:.6rem}.learning-option{font-size:.85rem}}

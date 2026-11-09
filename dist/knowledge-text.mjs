@@ -571,6 +571,318 @@ const messages={
   "k.ui.close": [
     "Erklärung schließen",
     "Close explanation"
+  ],
+  "k.question.gravity.question": [
+    "Warum kann ein Körper fallen und trotzdem auf einer Umlaufbahn bleiben?",
+    "How can a falling body remain in orbit?"
+  ],
+  "k.question.gravity.observe": [
+    "Die Körper ziehen sich an und bewegen sich mit ihrer gewählten Anfangsgeschwindigkeit.",
+    "Bodies attract one another and move with their chosen initial velocities."
+  ],
+  "k.question.gravity.cause": [
+    "Seitliche Bewegung und fortlaufende gravitative Ablenkung können eine Umlaufbahn ermöglichen. Die Startwerte entscheiden auch darüber, ob eine Bahn gebunden ist.",
+    "Tangential motion and continual gravitational deflection can produce an orbit. Initial conditions also determine whether a trajectory is bound."
+  ],
+  "k.question.gravity.use": [
+    "So lassen sich Satellitenbahnen und Raumfahrtmanöver grundsätzlich verstehen; konkrete Missionen benötigen genauere Daten und Modelle.",
+    "This helps explain satellite orbits and spacecraft manoeuvres; actual missions require more precise data and models."
+  ],
+  "k.question.gravity.limit": [
+    "Hier: geglättete Newton-Numerik, keine relativistische Bahnvorhersage. Endpunktprüfungen können Streifkollisionen übersehen.",
+    "Here: softened Newtonian numerics, not relativistic orbit prediction. Endpoint checks can miss grazing collisions."
+  ],
+  "k.question.gravity.quiz": [
+    "Ändert eine andere seitliche Anfangsgeschwindigkeit bei sonst gleichen Bedingungen die Bahn?",
+    "Does a different tangential initial velocity change the trajectory when other conditions stay the same?"
+  ],
+  "k.question.gravity.answer": [
+    "Ja. Masse, Position und Geschwindigkeit bestimmen gemeinsam die Bewegung. Eine Änderung kann eine andere gebundene oder ungebundene Bahn ergeben; nicht jeder Wert führt zum selben Orbittyp.",
+    "Yes. Mass, position and velocity jointly determine motion. A change can produce a different bound or unbound path; not every value gives the same orbit type."
+  ],
+  "k.question.gravity.try": [
+    "Wähle bewusst einen Körper und pausiere. Öffne „Körper bearbeiten“, ändere eine Geschwindigkeitskomponente und drücke selbst „Übernehmen“. Vergleiche die Bahn; Reset stellt das gewählte Szenario wieder her.",
+    "Choose a body deliberately and pause. Open Edit body, change a velocity component and explicitly press Apply. Compare the path; Reset restores the selected scenario."
+  ],
+  "k.question.gravity.option0": [
+    "Ja, die Anfangsgeschwindigkeit gehört zur Bahn.",
+    "Yes, initial velocity helps determine the path."
+  ],
+  "k.question.gravity.option1": [
+    "Nein, allein die Masse legt die Bahn fest.",
+    "No, mass alone fixes the path."
+  ],
+  "k.question.blackhole.question": [
+    "Was ist ein Ereignishorizont eigentlich?",
+    "What is an event horizon?"
+  ],
+  "k.question.blackhole.observe": [
+    "Der Rechner verbindet Masse, Horizont-Radius und theoretische Strahlungsgrößen im Schwarzschild-Modell.",
+    "The calculator relates mass, horizon radius and theoretical radiation quantities in the Schwarzschild model."
+  ],
+  "k.question.blackhole.cause": [
+    "Der Horizont ist eine kausale Grenze der Raumzeit, keine feste Kugeloberfläche. Aus seinem Inneren erreicht kein zukünftiges Lichtsignal die ferne Außenwelt.",
+    "The horizon is a causal boundary of spacetime, not a solid sphere. No future-directed light signal from inside reaches the distant exterior."
+  ],
+  "k.question.blackhole.use": [
+    "Das hilft, Beobachtungen kompakter Objekte von Modellaussagen zu unterscheiden. Ein beobachteter Emissionsring ist nicht der Horizont selbst.",
+    "This helps distinguish observations of compact objects from model statements. An observed emission ring is not the horizon itself."
+  ],
+  "k.question.blackhole.limit": [
+    "Ungeladen und nicht rotierend. Hawking-Leistung und Lebensdauer sind Modellschätzungen; keine berechnete Akkretionsscheibe oder Lichtbahn.",
+    "Uncharged and non-rotating. Hawking power and lifetime are model estimates; no accretion disk or light path is calculated."
+  ],
+  "k.question.blackhole.quiz": [
+    "Was geschieht mit rₛ, wenn die Masse im Schwarzschild-Modell verdoppelt wird?",
+    "What happens to rₛ when mass doubles in the Schwarzschild model?"
+  ],
+  "k.question.blackhole.answer": [
+    "rₛ = 2GM/c² ist proportional zu M. Doppelte Masse ergibt doppelten Horizont-Radius; die Hawking-Temperatur verhält sich dagegen umgekehrt zur Masse.",
+    "rₛ = 2GM/c² is proportional to M. Twice the mass gives twice the horizon radius; Hawking temperature instead scales inversely with mass."
+  ],
+  "k.question.blackhole.try": [
+    "Wähle selbst „Sonnenmasse“. Notiere rₛ, verdopple die Masseneingabe auf 3.97694e30 kg und verlasse das Feld. Vergleiche die Zahlen, nicht die scheinbare Größe eines Bildes.",
+    "Choose Solar mass yourself. Note rₛ, double the mass input to 3.97694e30 kg and leave the field. Compare the numbers, not an image’s apparent size."
+  ],
+  "k.question.blackhole.option0": [
+    "Der Radius verdoppelt sich.",
+    "The radius doubles."
+  ],
+  "k.question.blackhole.option1": [
+    "Der Radius halbiert sich.",
+    "The radius halves."
+  ],
+  "k.question.blackhole.option2": [
+    "Der Radius bleibt gleich.",
+    "The radius stays unchanged."
+  ],
+  "k.question.objects.question": [
+    "Warum ist ein dichter Sternrest nicht automatisch ein Schwarzes Loch?",
+    "Why is a dense stellar remnant not automatically a black hole?"
+  ],
+  "k.question.objects.observe": [
+    "Verglichen werden zwei festgelegte Sternrest-Beispiele und ein Schwarzschild-Loch.",
+    "The comparison uses two chosen stellar-remnant examples and a Schwarzschild black hole."
+  ],
+  "k.question.objects.cause": [
+    "Gravitation und mikrophysikalische Stützung bestimmen die Struktur. Hier werden die Sternradien vorgegeben; wir lösen keine Sternentwicklung oder Zustandsgleichung.",
+    "Gravity and microscopic support determine structure. Stellar radii are prescribed here; we solve neither stellar evolution nor an equation of state."
+  ],
+  "k.question.objects.use": [
+    "Weiße Zwerge und Pulsare machen kompakte Sternreste astronomisch zugänglich. Nicht jeder Neutronenstern wird als Pulsar beobachtet.",
+    "White dwarfs and pulsars make compact remnants accessible to astronomy. Not every neutron star is observed as a pulsar."
+  ],
+  "k.question.objects.limit": [
+    "Materialradius und Horizont sind verschieden. Leuchten, Scheibe und Pulsarkegel sind illustrativ; eine Logskala ist kein maßstäbliches Bild.",
+    "A material radius and a horizon are different. Glow, disk and pulsar cones are illustrative; a logarithmic scale is not a picture to scale."
+  ],
+  "k.question.objects.quiz": [
+    "Kann ein sehr kleiner Radiusbalken linear fast verschwinden, obwohl er auf der Logskala sichtbar ist?",
+    "Can a tiny radius bar almost disappear on a linear scale while remaining visible on a logarithmic scale?"
+  ],
+  "k.question.objects.answer": [
+    "Ja. Linear sind Balken proportional zum Radius. Der logarithmische Vergleich verteilt Größenordnungen auf die Anzeige; er vergrößert nicht das reale Objekt.",
+    "Yes. Linear bars are proportional to radius. The logarithmic comparison spreads orders of magnitude across the display; it does not enlarge the real object."
+  ],
+  "k.question.objects.try": [
+    "Schalte den vorhandenen Größenvergleich selbst zwischen linear und logarithmisch um. Lies die Radien und den Skalenhinweis gemeinsam.",
+    "Switch the existing size comparison between linear and logarithmic yourself. Read the radii together with the scale note."
+  ],
+  "k.question.objects.option0": [
+    "Ja, maßgeblich bleiben die Zahlen und die Skalenart.",
+    "Yes; the numbers and scale type remain authoritative."
+  ],
+  "k.question.objects.option1": [
+    "Nein, beide Skalen zeigen dieselben relativen Längen.",
+    "No, both scales show the same relative lengths."
+  ],
+  "k.question.temperature.question": [
+    "Bedeutet heißer auch insgesamt energiereicher?",
+    "Does hotter mean more total energy?"
+  ],
+  "k.question.temperature.observe": [
+    "Die Skala vergleicht Temperaturen, keine vollständigen Energiemengen beliebiger Stoffe.",
+    "The scale compares temperatures, not complete energy contents of arbitrary materials."
+  ],
+  "k.question.temperature.cause": [
+    "Temperatur allein genügt nicht: Menge, Stoff und Zustand sind ebenfalls wichtig. Ein winziges heißes System kann weniger Energie enthalten als ein sehr großes kühleres.",
+    "Temperature alone is insufficient: amount, material and state also matter. A tiny hot system can contain less energy than a much larger cooler one."
+  ],
+  "k.question.temperature.use": [
+    "Das ist für Heizungen und Kühlung ebenso wichtig wie beim Vergleich mit Sternplasmen. Die physikalischen Bedingungen sind dabei verschieden.",
+    "This matters for heating and cooling as well as comparisons with stellar plasmas. Their physical conditions differ."
+  ],
+  "k.question.temperature.limit": [
+    "Kein Material- oder Plasma-Solver. Die Übernahmebrücke erlaubt nur 250–600 K und schreibt erst einen Entwurf; „Übernehmen“ bleibt eine eigene Handlung.",
+    "No material or plasma solver. The transfer bridge accepts only 250–600 K and creates a draft; Apply remains a separate action."
+  ],
+  "k.question.temperature.quiz": [
+    "Kann man die gesamte thermische Energie allein aus einer Temperatur ablesen?",
+    "Can total thermal energy be read from temperature alone?"
+  ],
+  "k.question.temperature.answer": [
+    "Nein. Selbst bei konstantem C gilt ΔU = C·ΔT relativ zu einem Bezug. Eine Verdopplung der absoluten Kelvinzahl ist nicht allgemein eine Verdopplung derselben Energieänderung.",
+    "No. Even at constant C, ΔU = C·ΔT uses a reference. Doubling an absolute kelvin value does not generally double the same energy change."
+  ],
+  "k.question.temperature.try": [
+    "Wähle selbst ein Temperaturbeispiel. Nur ein zulässiger Wert kann im Wärmeexperiment vorgemerkt werden. Ändere dort bewusst eine Wärmekapazität und übernimm den Entwurf, um den Modellunterschied zu untersuchen.",
+    "Choose a temperature example yourself. Only an allowed value can be drafted for the heat experiment. Deliberately change a heat capacity there and apply the draft to explore the model difference."
+  ],
+  "k.question.temperature.option0": [
+    "Nein, weitere Eigenschaften des Systems sind nötig.",
+    "No, other properties of the system are needed."
+  ],
+  "k.question.temperature.option1": [
+    "Ja, doppelte Kelvinzahl bedeutet immer doppelte Energieänderung.",
+    "Yes, twice the kelvin value always means twice the energy change."
+  ],
+  "k.question.markers.question": [
+    "Warum gibt es viel mehr ungefähr ausgeglichene Anordnungen?",
+    "Why are there many more roughly balanced arrangements?"
+  ],
+  "k.question.markers.observe": [
+    "Nummerierte Marker ergeben ein konkretes Muster; k zählt lediglich die Marker links.",
+    "Numbered markers form a concrete pattern; k only counts markers on the left."
+  ],
+  "k.question.markers.cause": [
+    "Viele Muster können dieselbe Linksanzahl haben. Bei zwölf Markern passen 924 Muster zu k=6, aber nur eines zu k=12.",
+    "Many patterns share the same left count. For twelve markers, 924 patterns have k=6, but only one has k=12."
+  ],
+  "k.question.markers.use": [
+    "So wird Zählen zur Wahrscheinlichkeit: eine Grundlage von Statistik und statistischer Physik, keine Simulation realer Gasbahnen.",
+    "Counting becomes probability: a basis of statistics and statistical physics, not a simulation of real gas trajectories."
+  ],
+  "k.question.markers.limit": [
+    "Gleichgewichtsverteilung ≠ nächster Mischschritt. Bei N=12 beträgt P_eq(6) etwa 22,56 %, keine absolute Mehrheit. Einzelne Fluktuationen dürfen ln Ω senken.",
+    "Equilibrium distribution ≠ next mixing step. For N=12, P_eq(6) is about 22.56%, not an absolute majority. Individual fluctuations may decrease ln Ω."
+  ],
+  "k.question.markers.quiz": [
+    "Sind bei N=12 mehr Muster mit sechs links möglich als mit zwölf links?",
+    "For N=12, are more patterns possible with six left than with twelve left?"
+  ],
+  "k.question.markers.answer": [
+    "Ja. Ω = C(N,k) zählt die passenden Muster. Im stationären Ensemble sind die 4096 einzelnen Muster gleich wahrscheinlich; Makrozustände mit mehr passenden Mustern sind dadurch wahrscheinlicher.",
+    "Yes. Ω = C(N,k) counts compatible patterns. In the stationary ensemble the 4096 individual patterns are equally likely, so macrostates with more compatible patterns are more probable."
+  ],
+  "k.question.markers.try": [
+    "Stelle N selbst auf 12 und vergleiche mit dem Linksregler k=6 und k=12. Beobachte Ω und P_eq. Ein neuer Mischschritt ist eine andere Frage; die separate N=4-Demo verändert den Livezustand nicht.",
+    "Set N to 12 yourself and compare k=6 with k=12 using the left-count slider. Observe Ω and P_eq. A new mixing step is a different question; the separate N=4 demo changes no live state."
+  ],
+  "k.question.markers.option0": [
+    "Ja: 924 gegenüber 1.",
+    "Yes: 924 versus 1."
+  ],
+  "k.question.markers.option1": [
+    "Nein: beide Makrozustände haben gleich viele Muster.",
+    "No: both macrostates have the same number of patterns."
+  ],
+  "k.question.thermal.question": [
+    "Warum fließt Netto-Wärme von warm nach kalt?",
+    "Why does net heat flow from hot to cold?"
+  ],
+  "k.question.thermal.observe": [
+    "Zwei isolierte Modellkörper tauschen Energie aus. A muss dabei nicht der wärmere Körper sein.",
+    "Two isolated model bodies exchange energy. A need not be the warmer one."
+  ],
+  "k.question.thermal.cause": [
+    "Das passive Leitwertgesetz P = G_th(T_A−T_B) bestimmt bei positivem G_th die Flussrichtung. Die Gesamtentropieproduktion ist dazu nichtnegativ; Energie bleibt erhalten.",
+    "With positive G_th, the passive conductance law P = G_th(T_A−T_B) sets the flow direction. Total entropy production is nonnegative and energy is conserved."
+  ],
+  "k.question.thermal.use": [
+    "Wärmeisolierung verzögert den Ausgleich; reale Kühlschränke benötigen zusätzlich Arbeit. Das ist hier kein simulierter Kühlschrank.",
+    "Thermal insulation delays equilibration; real refrigerators additionally require work. A refrigerator is not simulated here."
+  ],
+  "k.question.thermal.limit": [
+    "Zwei homogene Körper, konstante C und G_th, 250–600 K anfangs; keine Umgebung, Arbeit oder Phasenwechsel. Die Energienullpunkte sind Modellreferenzen.",
+    "Two uniform bodies, constant C and G_th, initial 250–600 K; no surroundings, work or phase changes. Energy zero points are model references."
+  ],
+  "k.question.thermal.quiz": [
+    "Gibt es in diesem passiven Modell Netto-Wärmefluss, wenn beide Körper gleich warm starten?",
+    "Does this passive model have net heat flow when both bodies start at the same temperature?"
+  ],
+  "k.question.thermal.answer": [
+    "Nein. Die Temperaturdifferenz ist null, daher ist die Nettoleistung null. Auch nach einem Zeitschritt bleiben beide Temperaturen gleich, und die Gesamtentropieänderung bleibt null.",
+    "No. The temperature difference is zero, so net power is zero. Both temperatures remain equal after a time step and total entropy change stays zero."
+  ],
+  "k.question.thermal.try": [
+    "Wähle das Preset „Gleiche Anfangstemperatur“ selbst und drücke ausdrücklich „Übernehmen“. Gehe dann zehn Modellsekunden weiter und vergleiche P, ΔS und U.",
+    "Choose the Equal initial temperature preset yourself and explicitly press Apply. Then advance ten model seconds and compare P, ΔS and U."
+  ],
+  "k.question.thermal.option0": [
+    "Nein: P = 0 und σ = 0.",
+    "No: P = 0 and σ = 0."
+  ],
+  "k.question.thermal.option1": [
+    "Ja, die Energie muss trotzdem laufend hinüberfließen.",
+    "Yes, energy must still continually flow across."
+  ],
+  "k.question.ui.observe": [
+    "Was sehe ich?",
+    "What am I seeing?"
+  ],
+  "k.question.ui.cause": [
+    "Warum?",
+    "Why?"
+  ],
+  "k.question.ui.use": [
+    "Wozu ist das nützlich?",
+    "Why is this useful?"
+  ],
+  "k.question.ui.limit": [
+    "Modellgrenze",
+    "Model limit"
+  ],
+  "k.question.ui.predict": [
+    "Was glaubst du, passiert?",
+    "What do you think will happen?"
+  ],
+  "k.question.ui.check": [
+    "Antwort prüfen",
+    "Check answer"
+  ],
+  "k.question.ui.show": [
+    "Lösung anzeigen",
+    "Show solution"
+  ],
+  "k.question.ui.choose": [
+    "Wähle eine Antwort oder zeige die Lösung an.",
+    "Choose an answer or show the solution."
+  ],
+  "k.question.ui.correct": [
+    "Diese Vermutung passt zum Modell.",
+    "This prediction matches the model."
+  ],
+  "k.question.ui.incorrect": [
+    "Im beschriebenen Modell gilt die andere Erklärung.",
+    "This model gives a different explanation."
+  ],
+  "k.question.ui.solution": [
+    "Modellantwort",
+    "Model answer"
+  ],
+  "k.question.ui.try": [
+    "Im Labor ausprobieren",
+    "Try it in the lab"
+  ],
+  "k.question.ui.locate": [
+    "Steuerelement finden",
+    "Find the control"
+  ],
+  "k.question.ui.unavailable": [
+    "Das Steuerelement ist in diesem Kontext gerade nicht verfügbar.",
+    "That control is not currently available in this context."
+  ],
+  "k.question.ui.more": [
+    "Mehr Fragen und Anwendungen",
+    "More questions and applications"
+  ],
+  "k.question.ui.markersTitle": [
+    "Teilchen & Wahrscheinlichkeit",
+    "Particles & probability"
+  ],
+  "k.question.ui.thermalTitle": [
+    "Wärme & Entropie",
+    "Heat & entropy"
   ]
 };
 export const knowledgeDE=Object.freeze(Object.fromEntries(Object.entries(messages).map(([k,v])=>[k,v[0]])));

@@ -621,4 +621,155 @@ export const models=freeze([
 export const termById=freeze(Object.fromEntries(terms.map(t=>[t.id,t])));
 export const modelById=freeze(Object.fromEntries(models.map(m=>[m.id,m])));
 export const CONTEXTS=freeze({gravity:{tab:"gravity",model:"gravity"},blackhole:{tab:"blackhole",model:"blackhole"},objects:{tab:"extreme",model:"objects"},temperature:{tab:"extreme",model:"temperature"},markers:{tab:"entropy",view:"particles",model:"markers"},thermal:{tab:"entropy",view:"thermal",model:"thermal"}});
-export function contentKeys(){return [...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception])]}
+export function contentKeys(){return [...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception]),...explanations.flatMap(q=>[q.question,q.observe,q.cause,q.use,q.limit,q.quiz,q.answer,q.try,...q.options.map(o=>o.label)])]}
+
+export const explanations=freeze([
+  {
+    "id": "gravity",
+    "model": "gravity",
+    "question": "k.question.gravity.question",
+    "observe": "k.question.gravity.observe",
+    "cause": "k.question.gravity.cause",
+    "use": "k.question.gravity.use",
+    "limit": "k.question.gravity.limit",
+    "quiz": "k.question.gravity.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.gravity.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.gravity.option1"
+      }
+    ],
+    "answer": "k.question.gravity.answer",
+    "try": "k.question.gravity.try",
+    "target": "velY",
+    "correct": "a"
+  },
+  {
+    "id": "blackhole",
+    "model": "blackhole",
+    "question": "k.question.blackhole.question",
+    "observe": "k.question.blackhole.observe",
+    "cause": "k.question.blackhole.cause",
+    "use": "k.question.blackhole.use",
+    "limit": "k.question.blackhole.limit",
+    "quiz": "k.question.blackhole.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.blackhole.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.blackhole.option1"
+      },
+      {
+        "id": "c",
+        "label": "k.question.blackhole.option2"
+      }
+    ],
+    "answer": "k.question.blackhole.answer",
+    "try": "k.question.blackhole.try",
+    "target": "bhMass",
+    "correct": "a"
+  },
+  {
+    "id": "objects",
+    "model": "objects",
+    "question": "k.question.objects.question",
+    "observe": "k.question.objects.observe",
+    "cause": "k.question.objects.cause",
+    "use": "k.question.objects.use",
+    "limit": "k.question.objects.limit",
+    "quiz": "k.question.objects.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.objects.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.objects.option1"
+      }
+    ],
+    "answer": "k.question.objects.answer",
+    "try": "k.question.objects.try",
+    "target": "comparisonMode",
+    "correct": "a"
+  },
+  {
+    "id": "temperature",
+    "model": "temperature",
+    "question": "k.question.temperature.question",
+    "observe": "k.question.temperature.observe",
+    "cause": "k.question.temperature.cause",
+    "use": "k.question.temperature.use",
+    "limit": "k.question.temperature.limit",
+    "quiz": "k.question.temperature.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.temperature.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.temperature.option1"
+      }
+    ],
+    "answer": "k.question.temperature.answer",
+    "try": "k.question.temperature.try",
+    "target": "kelvinInput",
+    "correct": "a"
+  },
+  {
+    "id": "markers",
+    "model": "markers",
+    "question": "k.question.markers.question",
+    "observe": "k.question.markers.observe",
+    "cause": "k.question.markers.cause",
+    "use": "k.question.markers.use",
+    "limit": "k.question.markers.limit",
+    "quiz": "k.question.markers.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.markers.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.markers.option1"
+      }
+    ],
+    "answer": "k.question.markers.answer",
+    "try": "k.question.markers.try",
+    "target": "entropyK",
+    "correct": "a"
+  },
+  {
+    "id": "thermal",
+    "model": "thermal",
+    "question": "k.question.thermal.question",
+    "observe": "k.question.thermal.observe",
+    "cause": "k.question.thermal.cause",
+    "use": "k.question.thermal.use",
+    "limit": "k.question.thermal.limit",
+    "quiz": "k.question.thermal.quiz",
+    "options": [
+      {
+        "id": "a",
+        "label": "k.question.thermal.option0"
+      },
+      {
+        "id": "b",
+        "label": "k.question.thermal.option1"
+      }
+    ],
+    "answer": "k.question.thermal.answer",
+    "try": "k.question.thermal.try",
+    "target": "[data-thermal-preset=balanced]",
+    "correct": "a"
+  }
+]);
