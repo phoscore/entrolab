@@ -29,9 +29,11 @@ jobs:
   browser-review:
     name: Chromium UX regressions
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -40,6 +42,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Real browser sizing, drafts, language, focus and pulsar regressions
         run: npm run test:browser
+      - name: Compare v0.8 and baseline rendering on the same runner
+        run: node scripts/measure-v08-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
