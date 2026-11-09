@@ -1,0 +1,64 @@
+{
+  "evidence": {
+    "run": 42693187935,
+    "head": "8b31ae3715edb42449c6e9982482c3068e33f01c",
+    "artifact": 13707379909
+  },
+  "browser": "151.0.7922.34",
+  "measurements": [
+    {
+      "kind": "mount-dispose-100",
+      "countersBefore": {
+        "documents": 1,
+        "nodes": 4742,
+        "jsEventListeners": 247
+      },
+      "countersAfter": {
+        "documents": 1,
+        "nodes": 4742,
+        "jsEventListeners": 247
+      },
+      "heapBefore": {
+        "usedSize": 2124776,
+        "totalSize": 2678784,
+        "embedderHeapUsedSize": 2886312,
+        "backingStorageSize": 375775
+      },
+      "heapAfter": {
+        "usedSize": 2333664,
+        "totalSize": 2940928,
+        "embedderHeapUsedSize": 3749072,
+        "backingStorageSize": 375775
+      },
+      "limit": "single bounded GC sample; not a universal leak proof"
+    },
+    {
+      "kind": "knowledge-layout",
+      "requestedWidth": 320,
+      "dpr": 1,
+      "width": 320,
+      "scroll": 320,
+      "focus": "SUMMARY",
+      "keys": []
+    },
+    {
+      "kind": "knowledge-layout",
+      "requestedWidth": 390,
+      "dpr": 2,
+      "width": 390,
+      "scroll": 390,
+      "focus": "SUMMARY",
+      "keys": []
+    },
+    {
+      "kind": "knowledge-layout",
+      "requestedWidth": 320.5,
+      "dpr": 1.25,
+      "width": 321,
+      "scroll": 321,
+      "focus": "SUMMARY",
+      "keys": []
+    }
+  ],
+  "errors": []
+}
