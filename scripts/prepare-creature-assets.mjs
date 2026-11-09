@@ -15,7 +15,7 @@ if(hash(original)!==expected)throw new Error('Master checksum differs; refusing 
 const definitions=[
  {id:'hero',crop:[0,0,1536,1536],width:512,height:512,purpose:'Complete figure / full original composition'},
  {id:'peek',crop:[340,100,960,960],width:256,height:256,purpose:'Upper body / edge peek; deliberate original-image crop'},
- {id:'icon',crop:[520,180,560,560],width:128,height:128,purpose:'Compact mask; preview only, not the active favicon'}
+ {id:'icon',crop:[520,180,560,560],width:128,height:128,purpose:'Compact mask; decorative in-app icon, not the active favicon'}
 ];
 const manifest={schema:1,approval:'pending-explicit-user-visual-approval',source,sourceSha256:expected,sourceBytes:original.length,sourceWidth:1536,sourceHeight:1536,method:'Only crop + Lanczos resize + opaque WebP encoding; no drawing or generative reinterpretation; black background intentionally retained.',tool:execFileSync('magick',['-version'],{encoding:'utf8'}).split('\n')[0],quality:94,alpha:false,assets:[]};
 const out='dist/assets/creature-candidates';
@@ -29,5 +29,13 @@ for(const d of definitions){
  manifest.assets.push({...d,path,bytes:(await stat(resolve(root,path))).size,sha256:hash(bytes),decodedChannels:decoded.split(' ').slice(2).join(' '),estimatedRgbaBytes:d.width*d.height*4});
 }
 if(hash(await readFile(resolve(root,source)))!==expected)throw new Error('Master changed.');
+// Approval follows only exactly matching source/derivative hashes.
+try{
+ const approval=JSON.parse(await readFile(resolve(root,'docs/v0.8/assets/creature-approval.json'),'utf8'));
+ if(approval.sourceSha256===expected&&manifest.assets.every(a=>approval.assets?.[a.id]===a.sha256)){
+  manifest.approval='approved-in-user-chat';manifest.approvalDate=approval.date;
+  manifest.approvalEvidence='User explicitly replied "approved!" to the displayed Original/Hero/Peek/Icon comparison for Phase E. No merge, deployment, favicon or production-brand approval.';
+ }
+}catch{}
 await writeFile(resolve(root,'docs/v0.8/assets/creature-candidates.json'),JSON.stringify(manifest,null,2)+'\n');
 console.log(JSON.stringify(manifest,null,2));

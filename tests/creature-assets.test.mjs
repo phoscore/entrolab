@@ -29,11 +29,15 @@ test('v0.8 assets: three bounded local WebP crops have recorded hashes and byte 
  assert.equal(manifest.alpha,false);
 });
 
-test('v0.8 assets: candidate preview is separate from app and keeps branding unchanged',()=>{
+test('v0.8 assets: approved creature integration retains the original and existing production branding',()=>{
  const html=bytes('dist/index.html').toString(),review=bytes('dist/asset-review.html').toString();
- assert(!html.includes('creature-candidates'));
+ assert.match(html,/src="creature-ui.mjs"/);
+ assert.equal(manifest.approval,'approved-in-user-chat');
+ const approval=JSON.parse(bytes('docs/v0.8/assets/creature-approval.json'));
+ assert.equal(approval.userReply,'approved!');assert.equal(approval.sourceSha256,manifest.sourceSha256);
+ for(const a of manifest.assets)assert.equal(approval.assets[a.id],a.sha256);
  assert.match(html,/<title>entrolab - emptiness pro max<\/title>/);
  assert.match(html,/rel="icon"[^>]+favicon.svg/);
- assert.match(review,/SICHTFREIGABE AUSSTEHEND/);
+ assert.match(review,/SICHTFREIGABE ERTEILT/);
  assert.match(review,/kein transparenter Freisteller/);
 });

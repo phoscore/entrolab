@@ -44,6 +44,9 @@ jobs:
         run: npm run test:browser
       - name: Compare v0.8 and baseline rendering on the same runner
         run: node scripts/measure-v08-browser.mjs
+      - name: Package private downloadable review source
+        if: always()
+        run: node scripts/package-review.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
