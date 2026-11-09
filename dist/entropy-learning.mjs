@@ -48,9 +48,10 @@ export function initEntropyLearning(doc=globalThis.document){
   const r=liveComparison(Number(root.dataset.n)||12,choice);
   comparisonText.replaceChildren(...[['labelBalanced',r.balanced],['labelEdge',r.edge]].map(([label,row])=>{const p=node('p');p.textContent=t('k.learning.compare.row',{label:t('k.learning.compare.'+label),k:row.k,omega:number(row.omega),probability:percent(row.probability),entropy:number(row.entropy)});return p}));
   for(const [id,b]of Object.entries(comparisonButtons))b.setAttribute('aria-pressed',String(choice===id));
-  for(const e of doc.querySelectorAll('#entropyChart [data-k], #entropyTable [data-k]')){if(Number(e.dataset.k)===r.selected.k)e.dataset.comparison='true';else delete e.dataset.comparison}
+  for(const e of doc.querySelectorAll('#entropyChart [data-k], #entropyTable [data-k]')){if(compare.open&&Number(e.dataset.k)===r.selected.k)e.dataset.comparison='true';else delete e.dataset.comparison}
   compare.dataset.selectedK=r.selected.k;compare.dataset.n=r.n;
  }
+ listen(compare,'toggle',renderComparison);
  const markerObserver=new MutationObserver(records=>{if(records.some(r=>r.attributeName==='data-n'))renderComparison()});markerObserver.observe(root,{attributes:true,attributeFilter:['data-n']});
 
  // Applied thermal results only. No second solver, animation loop or interval.

@@ -20,7 +20,7 @@ test('v0.8 browser: independent N=4 example updates exact patterns without RNG/m
 });
 test('v0.8 browser: comparison highlights existing distribution, keeps live arrow and handles N=1/12/32',async()=>{
  const {p,context}=await h.lab();try{
-  await particles(p);await p.locator('#macrostateComparison > summary').click();const before=await physical(p);
+  await particles(p);assert.equal(await p.locator('#entropyChart [data-comparison]').count(),0);await p.locator('#macrostateComparison > summary').click();const before=await physical(p);
   await p.locator('[data-compare=edge]').click();assert.equal(await p.locator('#macrostateComparison').getAttribute('data-selected-k'),'12');
   await p.locator('[data-compare=balanced]').click();assert.equal(await p.locator('#entropyTable [data-comparison]').getAttribute('data-k'),'6');assert.equal(await p.locator('#entropyTable [aria-current=true]').getAttribute('data-k'),'12');assert.match(await p.locator('#comparisonReadout').textContent(),/924/);assert.deepEqual(await physical(p),before);
   for(const [n,k,count]of [[1,0,'1'],[32,16,'601.080.390']]){await p.locator('#entropyN').fill(String(n));await p.waitForFunction(k=>document.querySelector('#macrostateComparison').dataset.selectedK===String(k),k);assert.equal(await p.locator('#entropyChart [data-comparison]').getAttribute('data-k'),String(k));assert((await p.locator('#comparisonReadout').textContent()).includes(count));}

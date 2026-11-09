@@ -8,7 +8,7 @@ export function initGuide(doc=globalThis.document){
  if(!glossary||!back)return null;
  const originalParent=back.parentNode,originalNext=back.nextSibling,win=doc.defaultView;
  const bound=new WeakSet(),cleanup=[];
- let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false;
+ let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false,coldTerm=false;
  const listen=(target,event,fn,capture=false)=>{target?.addEventListener(event,fn,capture);cleanup.push(()=>target?.removeEventListener?.(event,fn,capture))};
  function focusVisible(target){
   if(!target?.isConnected||target.disabled||!target.getClientRects().length)return false;
@@ -25,10 +25,11 @@ export function initGuide(doc=globalThis.document){
  }
  function close(restore=true){
   if(!origin)return;
-  const previous=origin,from=sourceTab,hash=previousHash,wasModel=kind==='model';
-  origin=null;sourceTab=null;back.hidden=true;putBack();
+  const previous=origin,from=sourceTab,hash=previousHash,wasModel=kind==='model',wasColdTerm=coldTerm;
+  origin=null;sourceTab=null;coldTerm=false;back.hidden=true;putBack();
   if(!wasModel)glossary.open=false;
-  if(restore&&wasModel){activate(from);changeHash(hash,true)}
+  if(restore&&wasModel)activate(from);
+  if(restore&&(wasModel||wasColdTerm))changeHash(hash,true)
   label();
   if(restore&&!focusVisible(previous)&&!focusVisible(doc.querySelector?.('[data-tab].active')))focusVisible(doc.getElementById('mainContent'));
  }
@@ -79,10 +80,10 @@ export function initGuide(doc=globalThis.document){
    close(false);activate(doc.querySelector('[data-tab="'+id+'"]'));focusVisible(doc.querySelector('[data-tab="'+id+'"]'));return true;
   }
   if(id.startsWith('guide-')&&target&&glossary.contains(target)){
-   close(false);glossary.open=true;back.hidden=true;focusVisible(target);return true;
+   close(false);sourceTab=doc.querySelector?.('[data-tab].active');origin=sourceTab??glossary.querySelector?.(':scope > summary');kind='term';coldTerm=true;previousHash=sourceTab?'#'+sourceTab.dataset.tab:'';glossary.open=true;back.hidden=!origin;label();focusVisible(target);return true;
   }
   if(id.startsWith('model-')&&target&&science?.contains(target)){
-   close(false);activate(doc.querySelector('[data-tab="science"]'));back.hidden=true;focusVisible(target);return true;
+   close(false);activate(doc.querySelector('[data-tab="science"]'));sourceTab=doc.querySelector('[data-tab="science"]');origin=sourceTab;kind='model';previousHash='#science';const slot=doc.getElementById('knowledgeReturnSlot');if(slot)slot.append(back);back.hidden=!origin;label();focusVisible(target);return true;
   }
   return false;
  }

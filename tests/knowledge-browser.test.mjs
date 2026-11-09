@@ -42,6 +42,7 @@ test('v0.8 browser: cold science/model/term fragments and browser back/forward r
    await p.goto(h.url+'/?fresh='+hash+'#'+hash);await h.ready(p);
    assert.equal(await p.locator('.view.active').getAttribute('id'),view);
    if(focus)assert.equal(await p.evaluate(()=>document.activeElement.id),focus);
+   if(hash==='guide-horizon'||hash==='model-thermal'){await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),view);assert.equal(await p.locator('#physicsGuide').getAttribute('open'),null);assert.match(p.url(),new RegExp('#'+view+'$'))}
   }
   await p.goto(h.url+'/?history=1');await h.ready(p);
   const help=p.locator('#gravity [data-knowledge-term=orbit]');await help.locator(':scope > summary').click();await help.locator('.knowledge-advanced > summary').click();

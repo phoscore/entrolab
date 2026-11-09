@@ -46,3 +46,16 @@ test('v0.8 browser: open questions fit 320/390px with reduced motion, labels and
   await p.screenshot({path:resolve(h.output,'v08-questions-'+width+'.png')});
  }finally{await context.close()}}
 });
+
+test('v0.8 browser: inline questions preserve completed prediction and calculator values; explicit Science navigation keeps legacy cancellation',async()=>{
+ const {p,context}=await h.lab();try{
+  await p.locator('details:has(#predictionOn) > summary').click();await p.locator('#predictionOn').check();
+  await p.waitForFunction(()=>window.entrolab.inspect().forecast?.points?.length>0);
+  const before=await p.evaluate(()=>{const s=window.entrolab.inspect();return {forecast:s.forecast,generation:s.predictionGeneration}});
+  const values=await p.evaluate(()=>Object.fromEntries(['bhMass','bhSlider','extremeMass','kelvinInput','celsiusInput','temperatureTransferValue'].map(id=>[id,document.getElementById(id).value])));
+  await p.locator('#why-gravity > summary').click();await p.locator('#why-gravity .knowledge-advanced > summary').click();await p.locator('#why-gravity input[value=a]').check();await p.locator('#why-gravity [data-locate-context]').click();
+  assert.deepEqual(await p.evaluate(()=>{const s=window.entrolab.inspect();return {forecast:s.forecast,generation:s.predictionGeneration}}),before);
+  assert.deepEqual(await p.evaluate(()=>Object.fromEntries(['bhMass','bhSlider','extremeMass','kelvinInput','celsiusInput','temperatureTransferValue'].map(id=>[id,document.getElementById(id).value]))),values);
+  await p.locator('#question-model-gravity').click();assert.equal(await p.locator('.view.active').getAttribute('id'),'science');assert.equal(await p.evaluate(()=>window.entrolab.inspect().forecast),null);
+ }finally{await context.close()}
+});
