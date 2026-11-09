@@ -12,7 +12,8 @@
 - **Weitere verwandte Fragen, Beispiele und Fachdetails werden standardmäßig versteckt** und sind erst über einen freiwilligen „Mehr Fragen / genauer verstehen“-Bereich abrufbar. Sie verdrängen die Hauptfrage nicht und lösen keine automatische Änderung an Eingaben/Simulationen aus.
 - Bei Labor- oder Unteransichtswechsel wird exakt die **neue** passende Hauptfrage sichtbar; verborgene Tabs dürfen nicht zusätzliche sichtbare Fragen oder Monsterinstanzen erzeugen. Im Glossar/Science-Bereich gelten kontextuelle Begriffslinks, keine falsche „sechste Simulation“.
 - Bei Sprachwechsel die gewählte Frage und offene/geschlossene Erklärzustände sinnvoll erhalten, keine Übersetzungsschlüssel als Text zeigen. Mobile: maximal eine kompakte Erklärung im sichtbaren Kontext, kein Overlap mit Bedienknöpfen.
-- Diese Entscheidung gilt **nicht** als Implementierungsfreigabe. Noch offen: optionale Mini-Prognose, Einladungsplatzierung im Detail, Nutzen-Mix und endgültige Formulierung aller Hauptfragen.
+- **Zusatzentscheidung vom Nutzer:** Jedes Labor (inklusive beider Entropy-Unteransichten und der Temperature-Ansicht) erhält **ein kleines freiwilliges, standardmäßig eingeklapptes „Was glaubst du, passiert?“-Vorhersageexperiment** innerhalb seiner Hauptfrage. Es erscheint nie als zusätzliche sichtbare Hauptkachel. Erst die Person entscheidet, ob sie es aufklappt, eine Vermutung wählt, eine Erklärung einblendet und das Ergebnis im echten Lab überprüft. Details unten.
+- Diese Entscheidungen gelten **nicht** als Implementierungsfreigabe. Noch offen: Platzierung der Hauptfrage im Detail, Nutzen-Mix und endgültige Formulierungen/Versuchswerte.
 
 ### Konkret zu testender UI-Entwurf (Textskizze)
 
@@ -36,6 +37,35 @@ Nach freiwilligem Öffnen der Frage:
 ```
 
 **Wichtig:** Das ist eine **didaktische Layoutskizze**, nicht die endgültige Entropy-Erklärung. Der vorhandene Markermechanismus bleibt nur ein gewähltes statistisches Lehrmodell, keine echte mikroskopische Gasdynamik.
+
+## Verbindliche Ergänzung – freiwilliges Vorhersageexperiment in allen Laboren (09.11.2026)
+
+**Überall, wo es ein aktives, experimentelles Labor gibt, soll genau ein passendes interaktives Miniexperiment angeboten werden**, erreichbar **erst nach dem freiwilligen Aufklappen** der Hauptfrage, und darin standardmäßig ebenfalls **eingeklappt**. Die Fragen leiten nicht nur zum Raten an, sondern zu einer sichtbaren Veränderung oder einem prüfbaren Zusammenhang im bestehenden Lab.
+
+### Interaktionsvertrag
+
+1. Geschlossen: nur eine gut sichtbare Hauptfrage je aktiver Ansicht; **kein** sichtbares Multiple-Choice-Quiz auf der Standardoberfläche.
+2. Nach Öffnen der Hauptfrage: kurz erklären, was und warum; daneben ein unaufdringlicher, ausdrücklich optionaler Ausklapper **„Was glaubst du, passiert?“**.
+3. Nach Öffnen des Miniversuchs: eine klare physikalische Prognosefrage mit **2–3 kurzen verständlichen Möglichkeiten** oder wo sachgerechter einer qualitativen Vorhersage. Nichts vorab als falsch/richtig markieren. Bei fachlich nicht sauber binärer Vorhersage einen ehrlichen Ergebnisbereich/Modellbezug angeben.
+4. Erst nach Auswahl bzw. explizitem **„Antwort prüfen“** die Erklärung zeigen; freundlich bei Irrtum, niemals Nutzer bewerten. Alternativ **„Lösung anzeigen“** anbieten, niemand muss raten.
+5. Anschließend eine **„Im Labor ausprobieren“**-Anleitung, die auf **einen tatsächlich verfügbaren Regler, Preset oder Anzeigewert** zeigt. Die Anweisung muss genau zu dem aktuell simulierten, gegebenenfalls idealisierten Modell passen. **Nicht automatisch** Werte verändern, Simulation starten, Reset/Apply ausführen oder physikalische Zustände verändern.
+6. Beim Schließen, Navigation oder Sprachwechsel keine verlorenen Entwurfswerte, Fokusfehler oder ungewollte Nebenwirkungen. Antwortwahl darf ohne Simulationsseitenwirkung zurückgesetzt werden. DE/EN, Tastatur und Screenreader bedienen können. Keine Punkte, Streaks, Profile, Bewertung oder Datensammlung.
+7. Der Monstercharakter darf **selten** mit einer Blickänderung/einem scherzhaften Einzeiler erscheinen, **nicht** Antworten verraten, falsche Daten vermitteln oder die richtigen Erklärungen ersetzen. Maximal ein sichtbares In-Page-Wesen.
+
+### Erste zu prüfende Prognosefragen je aktivem Lab / Unterlab
+
+| Bereich | Vorschlag für die im Ausklapper versteckte Frage | Erwartete Erkenntnis / realer Test |
+|---|---|---|
+| Gravity Sandbox | „Ändert sich die Bahn, wenn ein Körper eine andere seitliche Anfangsgeschwindigkeit erhält?“ | **Ja**; im vorhandenen Sandbox-Setup, mit konstanten übrigen Parametern, verschiedene Startgeschwindigkeiten/Trajektorien vergleichen. Nicht so tun, als gäbe es für alle Parameter nur einen Orbittyp. |
+| Black Hole Lab | „Was passiert im nicht rotierenden Schwarzschild-Modell mit dem Horizont-Radius, wenn du die Masse verdoppelst?“ | **Er verdoppelt sich** (\(r_s = 2GM/c^2\)); Masse und Radius mit vorhandener Anzeige vergleichen. |
+| Extreme Objects Lab | „Wird auf einer linearen Vergleichsskala ein viel kleinerer Radius eher unsichtbar als auf einer logarithmischen?“ | **Ja, relativ zum größeren Objekt**; vorhandenen linear/logarithmisch-Umschalter vergleichen; Logskala bedeutet **nicht** maßstabsgetreues Größenbild. |
+| Extreme Temperature Lab | „Reicht die Temperatur eines Objekts, um seine gesamte thermische Energie zu kennen?“ | **Nein**; hängt unter anderem von Menge/Stoff/Zustand ab. Mit Temperatur- und anschließender eingeschränkter Wärmeexperiment-Ansicht nachvollziehen; **keine numerische Energievorhersage allein aus der Extremtemperatur** vortäuschen. |
+| Entropy Lab: diskrete Marker | „Bei zwölf unterscheidbaren Markern: Sind mehr Anordnungen mit sechs links/sechs rechts möglich als mit zwölf links/null rechts?“ | **Ja**: \(\binom{12}{6}=924\) gegenüber \(\binom{12}{12}=1\), sofern aktuelle Zählkonvention genau so gilt; Zähler/Verteilung im bestehenden Lehrmodell ablesen. Keine reale Gasdynamik daraus behaupten. |
+| Entropy Lab: Wärmeausgleich | „Fließt zwischen zwei gleich warmen Körpern in unserem passiven Leitmodell Netto-Wärme?“ | **Nein**, solange beide Anfangstemperaturen gleich sind (\(P = G_{th}(T_A - T_B)=0\)); mit bereits vorhandenem Gleichgewichts-Preset und **bewusstem Übernehmen** testen. Energieerhaltung und Entropieproduktion erklären. |
+
+**Kein Quiz für Science/Glossar als „eigenes sechstes Labor“:** Der Bereich ist eine Referenz und soll Erklärungen/Begriffe verbinden, nicht zusätzliche obligatorische Spielmechanik erhalten.
+
+Diese Beispiele sind **didaktische Vorschläge** und müssen vor dem fertigen Work-Auftrag gegen aktuelle UI-Controls und vorhandene Physikregeln geprüft, sprachlich DE/EN ausgearbeitet und nach Nutzerfreigabe finalisiert werden. Schritt 03 darf die Entropy-Prognosen später inhaltlich vertiefen, muss die **minimalistisch eingeklappte Schnittstelle** aber erhalten.
 
 ## 1. Das eigentliche Problem
 
@@ -145,7 +175,7 @@ Science/Glossar ist **Nachschlage- und Vertiefungsbereich**, keine zusätzliche 
 ## 6. Akzeptanzkriterien und Tests (später von Work nachweisen)
 
 - Alle fünf Hauptbereiche besitzen mindestens einen leicht auffindbaren, relevanten Warum/Wozu-Einstieg; Entropy Lab behandelt **beide** Unterexperimente.
-- Mindestens eine **funktionsfähige und physikalisch sachgerechte** Mini-Vorhersage/Aktion je relevantem Labor, wenn vorhandene Regler dies erlauben; keine neuen Physics-Engines nötig.
+- In **jedem der sechs aktiven Labor-/Unterlaborkontexte** mindestens ein **optional doppelt eingeklapptes**, physikalisch sachgerechtes Vorhersageexperiment mit nachvollziehbarer Antwort, freiwilliger Lösung und konkretem Testhinweis; vorhandene Bedienmöglichkeiten/Modellgrenzen verbindlich prüfen, keine neuen Physics-Engines nötig. Beim Öffnen/Auswählen darf sich kein Simulationszustand ändern. Verhalten zusätzlich per Chromium-Regressionen DE/EN, Fokus, Hidden-Tab und Mobile prüfen.
 - Ein Besucher ohne Vorwissen erkennt je Beispiel Beobachtung, Ursache, Versuch, Anwendung und Modellgrenze, ohne Advanced öffnen zu müssen.
 - Keine widersprüchliche oder doppelt gepflegte wissenschaftliche Faktenbasis gegenüber Schritt 04.
 - Existing simulations/harness inspect() vor/nach bloßem Öffnen/Schließen und Sprachwechsel unverändert; kein Start/Pause/Reset ohne explizite Handlung; keine falschen Flow-/Timeline-Aussagen.
@@ -158,9 +188,11 @@ Science/Glossar ist **Nachschlage- und Vertiefungsbereich**, keine zusätzliche 
 **Entschieden:** Erklärungen standardmäßig **geschlossen**; **genau eine sichtbare Hauptfrage** je aktivem Labor/Unterlabor; andere Beispiele versteckt. Keine sichtbaren Fragekacheln.
 
 **Noch offen:**
-1. Soll es innerhalb der geöffneten Frage ein freiwilliges **„Was glaubst du, passiert?“** mit einer kurzen Vorhersage und anschließender Auflösung geben, oder nur „Probier es“ + Ergebnisbeschreibung ohne Auswahl?
-2. Soll die Hauptfrage **direkt unter dem Labortitel** stehen (gut auffindbar) oder neben dem zentralen Steuerungsbereich? Nicht ausschließlich hinter einem kleinen ⓘ verstecken.
-3. Welche realen Anwendungen priorisieren wir: Alltag/Technik, Universum/Astronomie oder etwa halb-halb? Keine künstlich konstruierten Nutzenbehauptungen.
-4. Nach Freigabe der obigen Punkte: die sechs konkreten Hauptfragen samt Kurzantworten und präzisen Mini-Experimenten abnehmen.
+**Ebenfalls entschieden:** Im Inneren der freiwillig geöffneten Hauptfrage gibt es **für jedes aktive Labor/Unterlabor einen weiteren standardmäßig geschlossenen Vorhersage-Ausklapper** mit Auswahl, optionaler Lösung und anschließendem realen Ausprobieren; **keine** Pflicht und keine automatischen Änderungen an Modellparametern.
 
-**Nächster Schritt:** Die drei offenen Grundentscheidungen und didaktischen Beispiele gemeinsam verfeinern; dann als **inhaltlich freigegeben** markieren. Work erst nach separater Bauentscheidung einsetzen.
+**Noch offen:**
+1. Soll die Hauptfrage **direkt unter dem Labortitel** stehen (Empfehlung: sichtbar) oder neben dem zentralen Steuerungsbereich? Nicht ausschließlich hinter einem kleinen ⓘ verstecken.
+2. Welche realen Anwendungen priorisieren wir: Alltag/Technik, Universum/Astronomie oder etwa halb-halb? Keine künstlich konstruierten Nutzenbehauptungen.
+3. Die sechs konkreten Hauptfragen, Kurzantworten und Beispielprognosen gegen alle vorhandenen Regler/Preset- und Modellgrenzen final prüfen und in DE/EN abnehmen.
+
+**Nächster Schritt:** Die zwei offenen Grundentscheidungen und didaktischen Beispiele gemeinsam verfeinern; dann als **inhaltlich freigegeben** markieren. Work erst nach separater Bauentscheidung einsetzen.
