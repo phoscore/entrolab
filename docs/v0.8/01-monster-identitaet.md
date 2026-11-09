@@ -3,6 +3,12 @@
 
 **Produktkontext:** v0.8 / v0.8.5, siehe [Roadmap](README.md). **Stilrichtung A + Glitch bereits ausdrücklich gewünscht.** Anatomie, Namen, finale Grafik und genaue Auftrittsfrequenz bleiben für gemeinsame Sichtung offen. Noch **keine Freigabe für Work-Implementierung**. **Gewählter Website-/Produktname ist „Reincarnated as a Proton“ (Nutzerentscheidung am 09.11.2026)**; die Domain-/Markenprüfung und Umstellung stehen aus. „Entropy Wraith“ und „Void Beast“ sind weiterhin nur **Arbeitstitel für die Figur**, nicht für die Website.
 
+### Verbindliche Quellen-Hierarchie für v0.8 / v0.8.5 – 09.11.2026
+
+**Unmissverständlich:** Der **neuere, konkret ausgewählte minimalistische rot-schwarze A3/Glitched-Entity-Bildentwurf** und dessen sichtbare Merkmale in diesem Dokument haben **Vorrang** vor dem älteren generischen Stil-A-Text im Folgenden. Die nachstehenden **violetten/türkisen Farbwerte und komplexen 2.5D-Anatomiedetails sind ausschließlich historische Konzeptreste und ausdrücklich NICHT die Produktionsvorgabe**. Sie sollen beim Bauen nicht ohne Freigabe wieder auftauchen. **Aktuelle Sollpalette:** fast Schwarz + kräftige schmale rote Brush-/Glitch-Striche + wenig Weiß für Augen/Grinsen, keine Pflicht zu violettem Glow oder Türkis-Metallpanzer. Siehe [Schritt 08 – finale Designarchitektur](08-design-system-und-finaler-feinschliff.md).
+
+**Asset-Gate:** Die ausgewählte visuelle Chatbildreferenz ist noch kein eingechecktes Produktionsasset. Vor Umsetzung der Figur die tatsächliche Bilddatei oder eine daraus abgeleitete **visuell freigegebene** schlanke SVG-/Vektorversion bereitstellen. Keine freie Neugestaltung durch Work allein aus alten Farbwörtern. **Produktname** „Reincarnated as a Proton“ ist entschieden; **eigener Monstername** ist weiterhin offen und nicht erforderlich, um die Grafik vorzubereiten. Jede Arbeit erst nach separater Work-Freigabe.
+
 ### Visuelle Auswahl vom Nutzer – 09.11.2026
 
 **Gewählter Designentwurf:** stark vereinfachte, skizzenhafte **A3 / Glitched Entity** (vorherige aufwendige violette A3-Variante ausdrücklich als zu detailliert verworfen). Das ausgewählte Bild wurde im gemeinsamen Chat generiert; die Pixel-/Assetdatei ist derzeit **noch nicht als GitHub-Binary eingecheckt**. Work soll vor Implementierung die freigegebene Bildreferenz ausdrücklich erhalten oder eine passende reproduzierbare SVG-/Vektorfassung nach sichtbarer Freigabe herstellen, nicht eine beliebige neue Kreatur erfinden.
