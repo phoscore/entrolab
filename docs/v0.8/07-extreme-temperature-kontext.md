@@ -1,6 +1,8 @@
 # Schritt 07 – Extreme Temperature Lab: von absurden Kelvinzahlen zu Verständnis
 
-## Ausführlicher Diskussionsentwurf für v0.8.5 – NICHT inhaltlich oder technisch freigegeben
+## Inhaltlich freigegebener Ausbau v0.8.5 – noch keine Work-/Merge-/Deployment-Freigabe
+
+**Inhaltliche Nutzerfreigabe (09.11.2026):** Die bisherige Planung ist im Grundsatz bestätigt, ergänzt um das vom Nutzer ausdrücklich gewünschte neue **Material Explorer**-Modul für temperaturabhängige Stoffveränderungen. Der Nutzer hat die konkrete fachlich begrenzte Ausgestaltung und GitHub-Eintragung delegiert („ich vertraue dir“); damit ist der hier beschriebene **didaktische Umfang** beschlossen. Kein Codeauftrag und keine Freigabe zum Merge/Deployment.
 
 **Projekt:** Reincarnated as a Proton. **Release:** v0.8.5, Schritt 07/08. **Ort der Dokumentation:** `develop/v0.8/docs/v0.8/` – nur Planungsbranch; die spätere **Implementierung der Schritte 05–08** erfolgt nach geprüfter und separat freigegebener v0.8 auf einem gesonderten Branch. **Keine Änderung an main oder öffentlicher Website; Work noch nicht beauftragen.**
 
@@ -21,7 +23,7 @@ Relevante Module `dist/extreme-data.mjs`, `dist/extreme-ui.mjs`, `dist/extreme-r
 
 Besuchende sollen an der gigantischen 15-Dekaden-Skala nicht nur eine Zahl hin- und herschieben, sondern **erkennen, welche Art von Temperatur das ist**, **warum der Wert physikalisch interessant ist** und **welche Aussagen gerade NICHT daraus folgen**.
 
-**P0 – ein kleiner zentraler didaktischer Informationsbereich, kein zweites Temperaturmodell:**
+**P0 – ein kleiner zentraler didaktischer Informationsbereich, kein zweites Temperatur-Dynamikmodell; der Material Explorer unten ergänzt einen druckgebundenen Tabellen-/Zustandsvergleich:**
 1. **„Wo bin ich auf der Skala?“**: Beim gewählten Temperaturwert ein kleines, ruhiges, direktes Kontextfeld mit **Temperaturtyp/Referenz**, z. B. „Raumtemperatur“, „kosmische Hintergrundstrahlung“, „Sonnenphotosphäre“, „heißes Plasma“ – aber nur bei fachlich passenden Bereichen und niemals als Behauptung, dass jede Substanz bei diesem T gleich reagiert. Bei frei gewählten T ohne echten Messbezug: **„gewählter Vergleichswert“** statt frei erfundene reale Situation.
 2. **„Was bedeutet das?“**: ein kurzer Aha-Satz zur relevanten Größenordnung und Grenze der Analogie, maximal etwa 1–3 verständliche Sätze. Mehr Hintergrund über den freigegebenen ⓘ-/„Genauer verstehen“-Pfad in Schritt 04, kein neue Doppellexikon.
 3. **„Vergleiche zwei Temperaturen“**: Nutzer darf freiwillig einen zweiten Wert **als reinen Vergleichsmarker** fixieren (A/B-Marker auf der bestehenden logarithmischen Skala). Zeige beide Werte mit **richtiger Einheit und Verhältnis**, wenn beide positiv sind, sowie Temperaturdifferenz in K (numerisch gleich dem Intervall in °C). Bei 0 K **kein Verhältnis zu 0**, kein `Infinity`, keine Behauptung „doppelt so heiß“ als thermischer Gesamtnutzen; Vergleich darf nicht einen fremden Simulatorzustand überschreiben.
@@ -29,6 +31,57 @@ Besuchende sollen an der gigantischen 15-Dekaden-Skala nicht nur eine Zahl hin- 
 5. **„Warum kann ich das nicht übertragen?“**: Der bereits vorhandene Wärmeübergabe-Hinweis zeigt bei Werten außerhalb 250–600 K neben der deaktivierten Aktion **knapp und konkret**: „Nur der idealisierte Wärmekörper-Bereich 250–600 K; dieser Wert würde andere Materiephysik erfordern.“ Ein Button darf für ungültige Werte nicht durch verstecktes Setzen auf Grenzwerte aktiv werden.
 
 **Wichtige UX-Entscheidung offen:** Zweitem Vergleichsmarker dauerhaft sichtbar neben Skala anbieten oder nur über einen kleinen `Vergleich hinzufügen`-Ausklapper. **Empfehlung:** minimal verborgen, um die Grundseite sauber zu halten.
+
+## VERBINDLICHER ZUSATZAUSBAU – „Material Explorer“ (Nutzerauftrag vom 09.11.2026)
+
+**Expliziter Wunsch:** „Temp Lab könnte noch interessanter werden, vielleicht unterschiedliche Materialien bei unterschiedlichen Temperaturen verändern … gib mir ein konkretes Upgrade, übernimm es direkt in Git; ich vertraue dir.“ Deshalb wird dieses Modul **P0 und Bestandteil von Schritt 07**. Es bleibt eine **qualitativ fundierte, interaktive Referenzdaten-Visualisierung**, kein neuer thermodynamischer Solver.
+
+### Kernfunktion: Gleiche Temperatur, völlig anderes Material
+
+Im bestehenden Extreme Temperature Lab lässt sich ein **freiwillig aufklappbarer Bereich „Was passiert mit Material X?“** öffnen. Eine kleine Auswahl mit vier verifizierten Reinstoffen zeigt zur **einen bereits aktiven Kelvin-Temperatur**:
+- Stoffname, Formel/Element, Referenzdruck **1 atm = 101325 Pa**, gemessene/tabellierte Normal-Schmelz- und Siedepunkte (mit K und °C, klar gerundet), **zugehörigen einfachen Aggregatzustand bzw. Modellgrenze**;
+- **schematische, animierbar oder statisch zeichnbare Zustandsillustration**: Kristall/Festkörper, Flüssigkeit, Dampf/Gas. Der Zustandswechsel folgt **tabellierten Grenzen**, nicht einem frei erfundenen Wärme-Energie- oder Teilchenmodell. Kein Versprechen, dass real schlagartig alles schmilzt/verdampft, wenn nur die Temperatur an einem isolierten Objekt „gestellt“ wird;
+- einen kurzen kontextuellen Satz, z. B. „Wasser liegt bei Normaldruck zwischen Schmelz- und Siedepunkt: im Gleichgewichtsmodell flüssig“;
+- am Grenzwert **„Phasenübergang“** und Hinweis auf Schmelz-/Verdampfungsenthalpie statt Behauptung einer festen Flüssig-/Gas-Fraktion ohne Materialmenge, zugeführte Wärme, Gleichgewichtsbedingung oder zeitliche Heizrate;
+- optional **„Vergleiche zwei Materialien bei gleicher Temperatur“**: zwei kleine ruhige Karten nebeneinander, dieselbe globale Temperatur, keine doppelte Skala; nur Nutzerwahl, keine 4 dauerhaft offenen Metrikkacheln. Auf Handy die Karten untereinander. Zustand und Grenzwerte müssen auch **als Text** erkennbar bleiben, nicht nur anhand von Farben/Bewegung.
+
+### Startauswahl / feste Literaturdaten zum Planungsstand
+
+**Alle Werte für reine Stoffe bei ungefähr 1 atm; Quellen vor Codeeinbau noch einmal anhand der genauen Zeile prüfen; nicht als universelle Grenzwerte für Legierungen, Mischungen, Druckänderungen oder andere Phasen ausgeben.**
+
+| Stoff | Schmelzpunkt ca. | Normalsiedepunkt ca. | Warum didaktisch gut |
+| --- | --- | --- | --- |
+| Wasser, H₂O | 0 °C / 273,15 K | 100 °C / 373,15 K | Alltag; fest/flüssig/gasförmig |
+| Ethanol, C₂H₅OH (rein) | −114,1 °C / 159,0 K | 78,3 °C / ~351,5 K | demonstriert, dass zwei farblos flüssige Stoffe völlig unterschiedliche Grenzen haben |
+| Aluminium, Al (rein) | 660,323 °C / 933,473 K | ca. 2519 °C / 2792 K | Metall – wird erst bei deutlich höherem T flüssig |
+| Eisen, Fe (rein) | 1538 °C / 1811 K | ca. 2861 °C / 3134 K | noch höherer Schmelzpunkt; keine Gleichsetzung von Eisen und Stahl |
+
+**Verifizierte Quellenfamilien für die Daten (bei Implementierung pro Material im Wissenssystem aus Schritt 04 verlinken):**
+- [OpenStax, University Physics 2 – Phase Changes](https://openstax.org/books/university-physics-volume-2/pages/1-5-phase-changes) – Wasser, Ethanol, Aluminium; zeigt auch latente Wärme und didaktische Grenzen.
+- [Particle Data Group / Berkeley Lab – Ethanol](https://pdg.lbl.gov/2026/AtomicNuclearProperties/HTML/ethanol.html) – Schmelzen ~159,0 K, Sieden bei 1 atm ~351,4 K.
+- [Royal Society of Chemistry – Aluminium](https://periodic-table.rsc.org/element/13/aluminum) – 933,473 K, 2792 K.
+- [Royal Society of Chemistry – Iron](https://periodic-table.rsc.org/element/26/iron) – 1811 K, 3134 K.
+
+**Wissenschaftliche Einschränkungen, unbedingt:** Die Werte allein beschreiben keine vollständigen Phasendiagramme. Bei einem tabellierten Grenzwert kann Koexistenz vorliegen; ohne Energiebilanz keine Phasenanteile. Unterkühlung, Überhitzung, Keimbildung, Wasseranomalie, unterschiedliche Eisphasen, Druckänderungen, Zersetzung, Chemie, Ionisation und Plasmabildung werden **nicht** berechnet. Die reine „fest/flüssig/gas“-Klassifikation ist nur **nahe dem normalen Stoff- und Druckregime** sinnvoll. Bei extremen Temperaturen (z. B. Sterninneres, 10⁹ K, 10¹² K) explizit auf **„Außerhalb des vereinfachten Materialmodells – weitere Physik erforderlich“** wechseln, niemals stumpf `T > Siedepunkt => Gas` bis 10¹² K behaupten. Der genaue konservative Gültigkeitsbereich soll **pro Stoff anhand Quellen** in der Implementierung festgelegt und dokumentiert werden, nicht willkürlich auf Basis einer Temperaturfarbe.
+
+### Konkreter Aha-Versuch mit dem bisherigen Temperaturregler
+
+- Wähle **293,15 K (20 °C)**: Wasser/Ethanol als flüssig, Aluminium/Eisen als fest (reine Stoffe, ~1 atm, einfache Modellbedingungen).
+- Erhöhe über vorhandene direkte Eingabe auf **373,15 K (100 °C)**: Wasser am normalen Siedepunkt; Aluminium/Eisen nach wie vor fest. Ethanol ist bei geeigneter Normaldruckreferenz oberhalb seines Normal-Siedepunkts; Grenzen oberhalb der üblichen chemischen Stabilität nicht verallgemeinern.
+- Erhöhe auf **933,473 K**: Aluminium am Schmelzpunkt, Eisen noch fest; Wasser/Ethanol liegen weit über ihren Normalsiedepunkten und werden **nicht** mit einer falschen Hochtemperatur-Gas-Simulation gerendert.
+- Öffne die **freiwillige Mini-Prognose** aus Schritt 02: „Welcher Stoff ist bei 100 °C bei ~1 atm noch fest – Aluminium oder Wasser?“ → **Aluminium**; danach `Im Labor ausprobieren` verweist auf den echten vorhandenen Temperaturregler und den aufgeklappten Materialvergleich, ohne selbst Werte zu setzen.
+
+### Implementierung und Erhalt von Grenzen
+
+1. **Wiederverwendung:** Temperaturwert allein aus der vorhandenen `extreme-ui.mjs`-Validierung beziehen. Die Materialkarte ist abgeleiteter, nicht-invasiver Anzeigezustand. Ein kleines statisches, getyptes Datenmodul kann Tabellenwerte/Quellen-IDs halten (`material-data.mjs` oder ähnlich), **kein neuer Online-API-/Physiksolver**. Farben/Icons von reinem Rendering, Zahlen von Datenbasis; Texte DE/EN über das bestehende Wissens-/Lokalisierungssystem.
+2. **Nicht behaupten:** Temperaturen im UI erscheinen wie ein **direkt gewählter Sollwert** – kein echter Erwärmungsprozess, keine Zeit, kein Wärmefluss, keine simulierte Stoffmenge, keine spezifische Wärmekapazität, kein Materialschaden/Druckänderung. **Die Materialzustände sind ein Datenvergleich** bei festem Referenzdruck, keine Materialsimulation im thermischen Entropy-Lab.
+3. **Optional Material-Ansicht** neben dem schon geplanten optionalen Zwei-Temperaturen-Vergleich, ohne dauerhaft sichtbar zusätzliche Doppelpanels aufzuspannen. Ein geöffnetes Fachpanel darf nicht das andere heimlich verändern. Auf 320/390 px ausgezeichnete Zeilenumbrüche.
+4. **Brücke zu Entropy-Thermal unberührt:** weiter nur gültige 250–600 K, originaler exakter Celsius-/Kelvin-Quelltext wird auf mathematische Grenze geprüft; kein Materialrechner hat irgendeinen Einfluss auf Gültigkeit oder „Übernehmen“. Das Zwei-Körper-Wärmeexperiment behandelt **idealisiert homogenes C und G_th**, nicht diese realen Stoffe; keine Materialnamen im Thermal-Experiment als physikalische Eigenschaften übernehmen.
+5. **Schutz der Simulation:** Öffnen/Schließen, Materialwechsel, Materialvergleich, Mini-Prognosen, Sprachwechsel und Bewegung der neuen Illustrationen verändern `state.k`, `thermalTransferCandidate`, Modellzeit, Wärmeparameter, BH-/Gravity-/Entropy-Zustände **nicht**. Nur ein bewusstes Betätigen des existierenden Temperaturreglers verändert den gültigen Temperaturwert.
+6. **Tests:** 293,15 K, 351,5 K, 373,15 K, 933,473 K und 1811 K, Grenzübergänge, Text bei Phasenwechsel und bei Extremtemperaturen, tolerierte Literatur-/Rundungsdaten, DE/EN, Focus/Keyboard, 320/390px, Reduced Motion, keine zusätzlichen Animationsloops. Keine Physikbewertung aus gerundeten UI-Zahlen ohne klar definierte Datenkonvention.
+7. **Quellen- und Rechtegrenzen:** Keine unautorisierten mikroskopischen Filmclips oder fremden wissenschaftlichen Grafiken. Schlichte eigene SVG-/CSS-Schemata sind ausreichend; bei Source-Update muss fachlicher Wert an **einer** zentralen Stelle anpassbar sein.
+
+**Ergebnis:** Das Temperature Lab gewinnt eine neue echte Lernhandlung: **dieselbe Temperatur auf verschiedene Stoffe anwenden und die unterschiedlichen, druckabhängigen Phasengrenzen beobachten**. Der vorhandene Materialvergleich ist die wichtigste neue Erweiterung dieses Schritts, keine weitere dekorative Partikelanimation.
 
 ## 3. Eine fachlich ehrliche Temperaturreise statt 100 beliebiger Presets
 
@@ -102,11 +155,12 @@ Der neue Temperaturvergleich ist **lokal im Temperature Lab** und **kein automat
 4. Vollständige Browser- und numerische Grenzregression, insbesondere die reparierten Celsius/Kelvin-Boundary-Tests.
 5. In der späteren Schritt-08-Designrunde nur Darstellung/Responsiveness ändern, ohne mit neuen Controls die Validierung zu umgehen.
 
-## 9. Noch gemeinsam zu entscheiden – keine implizite Freigabe
+## 9. Vom Nutzer beschlossene didaktische Richtung
 
-1. **Vergleichsmodus:** Ein **freiwillig aufklappbarer Zwei-Temperaturen-Vergleich** mit A/B-Markern und korrekter Differenz/Verhältnis, statt zwei ganze zusätzliche Regler dauerhaft sichtbar (Empfehlung: freiwillig und minimal)?
-2. **„Wofür ist das interessant?“**: Dynamischer kurzer Kontext direkt unter der Skala zu den vorhandenen Presets, optional ergänzt um 1–2 wissenschaftlich belegte Anker wie Sonnenzentrum, aber **kein** endloses Preset-Menü (Empfehlung)?
-3. **Animation:** Bestehende abstrakte thermische Partikelgrafik mit besserer Beschriftung **behalten** (Empfehlung) oder zugunsten eines nüchternen Skalenvergleichs ganz entfernen?
-4. **Vertiefungsumfang:** Fokus auf gut verständliche, konkrete Unterschiede zwischen Temperatur, Wärme, Energie und extremen Strahlungs-/Plasmakontexten, statt ein neues Gas-/Quanten-Simulationsprojekt zu starten (Empfehlung)?
+1. **Freiwillig aufklappbarer Zwei-Temperaturen-Vergleich** mit A/B-Markern und korrekter Kelvin-Differenz/Verhältnis, statt ständig sichtbarer Doppelregler.
+2. **Dynamischer kurzer Kontext** zu vorhandenen Presets, 1–2 neue belegte Referenzanker nur wenn didaktisch sinnvoll, kein großes Preset-Menü.
+3. **Bestehende abstrakte thermische Partikelillustration bleibt** mit klaren Grenzen; kein echter Maxwell-/Quanten-Solver.
+4. Fokus auf Temperatur, Wärme, Gesamtenergie, Vergleich von Strahlung, Plasma und Materialkontext, **keine** neuen physikalischen Dynamikmodelle.
+5. **Neu verbindlich P0: Material Explorer.** Vier Reinstoffe (Wasser, Ethanol, Aluminium, Eisen) bei ~1 atm, qualitativ korrekte Aggregatzustände/Phasengrenzen in einfachen Regimen, sauber begrenzte Zustandsauskunft bei Extremtemperaturen, eigene schematische Visualisierungen, optionale Gegenüberstellung bei derselben ausgewählten Temperatur. Die bestehenden Temperatur- und Entropy-Wärme-Modelle bleiben ausdrücklich unabhängig.
 
-**Status:** detaillierter **Diskussionsentwurf** für Schritt 07. Nach expliziter Nutzerfreigabe inhaltlich fixieren und dann **Schritt 08 – Gesamtdesign** besprechen. Work-Implementierung erst später, nach Planung aller Schritte und gesonderter Zustimmung.
+**Status: SCHRITT 07 INHALTLICH FREIGEGEBEN (09.11.2026).** Die Referenzdaten und konservativen Stoff-Gültigkeitsfenster werden bei Work pro Quellenlage dokumentiert und geprüft. Danach Schritt 08 gemeinsam besprechen und separat freigeben. Work-Implementierung erst nach vollständiger Planung und erneuter ausdrücklicher Zustimmung; keine Änderungen an main/öffentlicher Website.
