@@ -136,6 +136,19 @@ Im ersten nativen Layoutvergleich vergrößerten die neuen Seitenhilfen die Grav
 Alle acht Stichproben: 1801 gemessene Frameintervalle in etwa 30,016 s (rund 60 Hz), **null beobachtete Long Tasks über 50 ms**, keine Seitenfehler. Taskzeit ist gemessene Main-Thread-Arbeit, nicht gleichbedeutend mit CPU-Gesamtauslastung oder ausschließlich App-JavaScript. Die App ist hier etwas aufwendiger, nicht schneller. Zwei Stichproben erlauben keine belastbare universelle Prozent-/10-%-Garantie; beide Szenen liegen in diesem Lauf unter 10 % Mehrarbeit. Offene Lernpanels, reale Mobilhardware und eine nach Sichtfreigabe integrierte Monsteranimation brauchen ihre eigene Abnahme.
 
 
+### Erneute Gegenprobe am Dokumentationsstand
+
+Nach der ersten Tabelle wurde derselbe unveränderte Laufzeitcode auf `23e4084745777cb1953cd783db2e844327cb7360` erneut gemessen: [Run 42695465392](https://github.com/phoscore/entrolab/actions/runs/42695465392), [Rohdaten der Gegenprobe](v0.8/qa/v08-performance-repeat.json), [Artefakt](https://github.com/phoscore/entrolab/actions/runs/42695465392/artifacts/13709022667). Auch 176/55/12/6 vollständig grün.
+
+| Erneute acht 30-s-Stichproben | Basis Taskzeit / 30 s | Kandidat / 30 s | Änderung | Frame-p95 Basis / Kandidat |
+| --- | ---: | ---: | ---: | --- |
+| Gravity pausiert | 3,3035655 s | 3,6688725 s | **+11,06 %** | 16,7 / 16,7 ms |
+| Vorhandene BH-Animation | 6,834299 s | 6,916494 s | **+1,20 %** | 16,7–16,8 / 16,7 ms |
+
+Auch hier keine beobachteten Long Tasks >50 ms. Die Frameintervalle sind stabil, die CPU-/Taskzeitdifferenz schwankt und liegt für Gravity in dieser Gegenprobe über 10 %. **Das wird nicht als Messfehler wegdefiniert oder durch den günstigeren früheren Lauf ersetzt.** Größere DOM-/Layoutarbeit ist als Ursache möglich; Runner- und Engineeffekte sind nicht hinreichend getrennt. Keine universelle CPU-Mehrarbeitsgarantie und keine nachgewiesene numerische Beschleunigung.
+
+A13 schlägt ein Budget für vergleichbare p95-Zeiten vor, nicht pauschal für kumulierte CPU-Taskzeit. Hier sind Frame-p95 und kumulierte CDP-Arbeit gemessen; eine isolierte Paint-Dauerverteilung wurde **nicht** aufgezeichnet. Deshalb keine vollständige Paint-Budgetabnahme behaupten. Vor endgültiger Freigabe, besonders nach Phase E, bleiben längere Messreihen und gezieltes Paint-/Layoutprofil sinnvoll. Eine Änderung des geschützten bisherigen Idle-Renderers wurde für diesen Inhaltsauftrag bewusst nicht als Nebenprojekt begonnen.
+
 ## 6. Gefundene und behobene Probleme
 
 1. **BigInt als gerundete exakte Anzahl (P2):** Die neue Vergleichsansicht verwendete zunächst sechs signifikante Stellen auch für Ω und zeigte bei N=32 601.080.000 statt 601.080.390. Getrennte Ganzzahlformatierung ohne signifikante Rundung für BigInt; DE/EN exakt. Tatsächliche Chromium-Assertion prüft den vollständigen N=32-Text.

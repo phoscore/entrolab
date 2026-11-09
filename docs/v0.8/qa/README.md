@@ -7,3 +7,5 @@ Die drei UI-/Lifecycle-JSON-Dateien und die schmale EN-Demoaufnahme stammen aus 
 Weitere Screenshots aller getesteten Ansichten sind im CI-Artefakt zugänglich. Die hohe Elementaufnahme der Wärmebilanz zeigte eine Fixed-Layer-Überlagerung des Skip-Links; sie wird nicht als perfekte visuelle Abnahme ausgewählt. Native Desktop-Viewportaufnahme und DOM-Stilprüfung zeigten den ungefokussierten Skip-Link korrekt bei top=-100px außerhalb des Bildes. Dieser Capture-Unterschied ist im Qualitätsbericht dokumentiert.
 
 Einzelne GC-/Heap-Stichproben sind kein allgemeiner Beweis für vollständige Speicherleckfreiheit. Performancevergleiche gelten nur für dokumentierte Szenen/Umgebung. Sie ersetzen weder reale Assistenztechnik noch Mobilhardware oder eine spätere Monsterabnahme.
+
+`v08-performance-repeat.json`: erneuter Lauf 42695465392, Commit23e4084745777cb1953cd783db2e844327cb7360, Artefakt13709022667. Einschließlich höherer gemessener Gravity-Taskmehrarbeit (+11,06 %); keine Auswahl nur des günstigeren Laufs. Beide Rohdatenreihen bleiben erhalten.
