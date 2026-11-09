@@ -889,8 +889,8 @@ const messages={
     "Move four markers yourself · independent example"
   ],
   "k.learning.demo.scope": [
-    "Diese N=4-Demo ist unabhängig vom laufenden Experiment. A–D behalten ihre Identität; nur links/rechts zählt. Kein Zufall, keine Modellzeit, keine Änderungen an N oder k oben.",
-    "This N=4 demo is independent of the running experiment. A–D retain their identity; only left/right counts. No randomness, no model time, no changes to N or k above."
+    "Diese N=4-Demo ist unabhängig vom laufenden Experiment. A–D behalten ihre Identität; nur links/rechts zählt. Kein Zufall, keine Modellzeit, keine Änderungen an N oder k im laufenden Experiment.",
+    "This N=4 demo is independent of the running experiment. A–D retain their identity; only left/right counts. No randomness, no model time, no changes to N or k in the running experiment."
   ],
   "k.learning.demo.toggle": [
     "Marker {marker}: {side}. Aktivieren wechselt die Kammer.",

@@ -12,7 +12,7 @@ export function initEntropyLearning(doc=globalThis.document){
  const node=(tag,key,cls)=>{const e=doc.createElement(tag);if(cls)e.className=cls;if(key){e.dataset.i18n=key;e.textContent=t(key)}return e};
  const detail=(key,id)=>{const e=node('details',null,'learning-panel');if(id)e.id=id;e.append(node('summary',key));return e};
  const listen=(e,type,fn)=>{e.addEventListener(type,fn);cleanup.push(()=>e.removeEventListener(type,fn))};
- const number=v=>new Intl.NumberFormat(locale(),{maximumSignificantDigits:6}).format(v);
+ const number=v=>new Intl.NumberFormat(locale(),typeof v==='bigint'?{maximumFractionDigits:0}:{maximumSignificantDigits:6}).format(v);
  const percent=v=>new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:6}).format(v);
  const link=(model,label='k.ui.model')=>{const a=node('a',label,'knowledge-model-link');a.href='#'+modelById[model].target;a.dataset.modelLink=modelById[model].target;return a};
 
@@ -80,7 +80,7 @@ export function initEntropyLearning(doc=globalThis.document){
  for(const app of applications){const d=node('details',null,'knowledge-advanced');d.append(node('summary',app.title),node('p',app.text),link(app.model));const list=node('ul',null,'knowledge-sources');for(const id of app.sources){const s=sources[id],li=node('li'),a=node('a');a.textContent=s.publisher+' · '+s.title;a.href=s.url;a.target='_blank';a.rel='noopener';li.append(a);list.append(li)}d.append(list);extras.append(d)}
  balance.after(extras);owned.push(extras);
  // Conceptual, not numerical, route between the two established subviews.
- const bridge=node('p',null,'learning-concept-route'),bridgeButton=node('button','k.question.ui.thermalTitle','secondary');bridgeButton.type='button';bridge.append(bridgeButton);compare.after(bridge);owned.push(bridge);
+ const bridge=node('p',null,'learning-concept-route'),bridgeButton=node('button','k.question.ui.thermalTitle','secondary');bridgeButton.type='button';bridge.append(bridgeButton);compare.append(bridge);owned.push(bridge);
  listen(bridgeButton,'click',()=>{const original=doc.querySelector('[data-entropy-view=thermal]');original?.click();original?.focus()});
  for(const e of [demo,compare,balance,extras])listen(e,'keydown',event=>{if(event.key!=='Escape'||event.defaultPrevented)return;const d=event.target.closest('details');if(d&&e.contains(d)&&d.open){d.open=false;d.querySelector(':scope > summary')?.focus();event.preventDefault();event.stopPropagation()}});
  const unsubscribe=onLanguageChange(()=>{renderDemo();renderComparison();renderBalance(true)});renderDemo();renderComparison();renderBalance(true);
