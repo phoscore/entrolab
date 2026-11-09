@@ -136,3 +136,7 @@ Der optionale stilisierte kosmische Hintergrund verwendet sehr wenige langsam dr
 - welche wenigen UI-Elemente beim allerersten Besuch die beste Demonstration ergeben.
 
 **Status (09.11.2026):** Master unverändert, drei abgeleitete WebP-Kandidaten und separate Vergleichsvorschau vorhanden. [Manifest](assets/creature-candidates.json), [Screenshot](assets/comparison-candidates.png), lokale Seite `dist/asset-review.html`. Ausdrückliche Sichtfreigabe steht aus; keine breite Integration, kein neuer Creature-Manager oder Monster-RAF. Phase E folgt ausschließlich nach dieser Freigabe. Keine Änderung an main, Domain oder Produktion.
+
+### Sichtfreigabe erteilt · 09.11.2026
+
+**„approved!“** bestätigt die drei gezeigten Derivate für Phase E. Die Original-/Derivathashes bleiben unverändert. Frühere offene Sichtstatus-Angaben in diesem Plan sind durch diese konkrete Freigabe überholt. Ein kompakter, reservierter Platz je Hauptbereich und im globalen Guide ersetzt riskante Canvas-/Control-Overlays; nur eine Figur, seltene CSS-Reaktionen, Ruhig/Aus/Reduced Motion. Kein Favicon-, Domain-, Merge- oder Deploymentauftrag.

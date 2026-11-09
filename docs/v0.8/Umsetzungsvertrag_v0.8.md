@@ -68,3 +68,7 @@ Die Wärmebilanz liest ausschließlich vorhandene Resultate. Energie in J, ΔS i
 5. Thematische Commits, Qualitätsbericht, private lokale Vorschau und PR nach main. Separater lesender Codex-Review soweit verfügbar. Kein Selbst-Approve, kein Merge/Deployment.
 
 Die Sichtfreigabe ist aktuell offen. Ohne sie endet ein Zwischenstand ausdrücklich mit „Phase E ausstehend“, statt v0.8 fälschlich als vollständig abgeschlossen zu melden.
+
+## Sichtfreigabe Phase E · 09.11.2026
+
+Der Nutzer hat auf die gezeigte Original/Hero/Peek/Icon-Montage ausdrücklich mit **„approved!“** geantwortet. Damit ist die Integration dieser drei unveränderten Derivate als eine dekorative Instanz freigegeben. Manifest und `assets/creature-approval.json` halten die konkreten Hashes fest. Frühere Hinweise auf eine noch fehlende Sichtfreigabe beschreiben den vorherigen Zwischenstand. Phase E wird nun umgesetzt und separat getestet. Kein Merge, Deployment, Original-/Physikumbau oder Beginn von v0.8.5.

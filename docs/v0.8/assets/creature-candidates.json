@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "approval": "pending-explicit-user-visual-approval",
+  "approval": "approved-in-user-chat",
   "source": "docs/v0.8/assets/a3-glitched-entity-master.jpg",
   "sourceSha256": "5dfb6a91195d7c3925cee9ae202332c26476de257b1a2f5b1469da1c08536ab3",
   "sourceBytes": 144400,
@@ -62,5 +62,7 @@
       "decodedChannels": "srgb  3.0",
       "estimatedRgbaBytes": 65536
     }
-  ]
+  ],
+  "approvalDate": "2026-11-09",
+  "approvalEvidence": "User explicitly replied \"approved!\" to the displayed Original/Hero/Peek/Icon comparison for Phase E. No merge, deployment, favicon or production-brand approval."
 }
