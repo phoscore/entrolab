@@ -1,5 +1,7 @@
 # Schritt 08 – Das visuelle Gesamtsystem: Reincarnated as a Proton
-## Umfassender Diskussionsentwurf für v0.8.5 – noch NICHT freigegeben oder implementiert
+## Inhaltlich freigegeben (09.11.2026) – behutsamer Design-Finalpass, NICHT implementiert
+
+**Explizite Entscheidung des Eigentümers am 09.11.2026:** „behutsam modernisieren“, nicht zu aufwendig; Design ist vorerst zweitrangig gegenüber **funktionierenden Experimenten, sauberen Animationen, guter Bedienbarkeit und Tests**. Kein extremes Redesign und kein großflächiges Umstrukturieren. Die **bestehenden Hauptbereiche, Unterbereiche, Modelle, mathematischen Grundlagen, Regler und vertrauten Nutzungsabläufe bleiben grundsätzlich erhalten**; neue freigegebene Inhalte aus Schritten 02–07 werden in diese Struktur integriert. Begrenzter optischer Feinschliff ist gewünscht, aber nur risikobewusst und wo er die Benutzung verbessert. Damit ist Schritt 08 **inhaltlich freigegeben**, nicht technisch beauftragt. Jeder ambitioniertere unten noch als Idee beschriebene Designvorschlag ist gegenüber dieser Entscheidung **nachrangig**.
 
 **Stand:** 09.11.2026. **Repository:** `phoscore/entrolab`, Planungsbranch `develop/v0.8`. **Releases:** Planung 01–08 vollständig vor Work; danach **Phase 1 v0.8 (01–04)**, testen und unabhängig reviewen, **Phase 2 v0.8.5 (05–08)** auf dem ausdrücklich genehmigten v0.8-Stand. Keine automatische Merge-/Domain-/Cloudflare-Freigabe. **Schritt 08 soll besonders sorgfältig gestaltet und mit echten Desktop-/Mobile-Vorschauen abgenommen werden.** Dieses Dokument beschreibt die technische und gestalterische Richtung, nicht die fertigen Screenshots oder den Work-Auftrag.
 
@@ -15,9 +17,9 @@ Auf aktuellem `main` wurden geprüft: `dist/style.css`, `dist/ux.css`, `dist/ent
 - **Extremely long site title:** `Reincarnated as a Proton` passt nicht in jede mobile Header-Leiste. Gezielte mobile Brand-Zeilenumbrüche/kompakte Navigationsanordnung statt abgeschnittener Überschrift oder winziger Text.
 - **Schritt 01 enthält historische widersprüchliche ältere Stilabschnitte (violett/türkis, 2.5D-Monster).** Das explizit zuletzt vom Nutzer ausgewählte **rote, schlichte A3-Skizzenmonster hat Vorrang**. Die ursprüngliche konkrete Bildreferenz muss Work als tatsächlicher visueller Input bereitgestellt werden; diese Textspezifikation ist kein Ersatz für den ausgewählten Bildstand.
 
-## 2. Visuelle Leitidee: „Experimental Cosmic Notebook“
+## 2. Visuelle Leitidee: behutsame Verbesserung statt Redesign
 
-**Ästhetik:** ein präzises, fast schwarzes Forschungs-Interface trifft eine kleine fehlerhafte kosmische Entität. **Nicht** die Seite wie ein generisches Neon-Gaming-Dashboard umbauen: großzügiger Raum, zurückhaltende Linien, große gut lesbare Ergebnisse, charakteristische kompakte Beschriftungen, sparsame starke Farbe, seltene handgezeichnete rote Glitch-Elemente. Ruhig genug für echte wissenschaftliche Werte; neugierig genug, dass man weiterklickt.
+**Ästhetik:** Die bereits funktionierende dunkle Forschungsoberfläche **wird wiedererkennbar bleiben**. Nur offensichtliche Reibung beseitigen: kleinere Kontrast-/Typografiefehler, inkonsistente Abstände, eine sparsame rote Akzentführung zur bereits freigegebenen roten Skizzenfigur und saubere Darstellung neuer Features. Der frühere Arbeitstitel „Experimental Cosmic Notebook“ war eine mögliche Stimmung, **keine Freigabe für ein vollständiges Designkonzept**. Keine neuen Hero-Layouts, keine unnötige Navigation, kein großflächiger Farb-/Schriftenwechsel; vorhandene Farben für Graphenserien dürfen bestehen. Gut lesbare Daten, ruhige Erklärungen und solide Animationen zählen mehr als eine neue Optik.
 
 **Visuelle Priorität in jedem View:**
 1. **Hauptfrage** direkt unter der jeweiligen aktiven Laborüberschrift (02, geschlossen).
@@ -32,7 +34,7 @@ Keine messbaren Inhalte unter permanente „parallax“ oder Atmosphäre-Layer l
 
 **Primäres Markenzeichen:** nahezu schwarzer Hintergrund mit **roten skizzenhaften Linien des Monsters**, dessen zwei hellen Augen/Grinsen auch ohne Glow erkennbar bleiben. **Das frühere violette Monster-Concept ist verworfen.** Violett darf nur aus begründeter fachlicher Graphen-/Messfarbsemantik übernommen werden, nicht als konkurrierende Markennormalfarbe.
 
-**Start-Tokens als Designprototyp, erst nach echten Kontrast-/Browserchecks festschreiben:**
+**Nur optionale, KEINE verpflichtende Neufärbung:** Die folgenden Tokens sind eine **unverbindliche Referenz**, keine Zielpalette, die überall eingeführt werden muss. Vorhandene dunkle Farben und Kontraste bevorzugt erhalten und nur konkrete inkonsistente Komponenten gezielt angleichen. Exakt diese Hexwerte nicht als Abnahmekriterium verwenden:
 - `--cosmos-bg`: `#090B10` (tiefer dunkler Hintergrund);
 - `--cosmos-panel`: `#12161E` (angehobene matte Versuchsfläche);
 - `--cosmos-elevated`: `#1B222C` (Interaktionen, geöffnete Erklärungen);
@@ -44,9 +46,9 @@ Keine messbaren Inhalte unter permanente „parallax“ oder Atmosphäre-Layer l
 - `--space-*`, `--radius-*`, `--font-*`, `--focus-ring`, `--touch-min`, `--canvas-backdrop` statt zufälliger Einzelpixelwerte. Verwendete Tokens werden aus zentraler Grundlage konsistent durch alle CSS-Schichten abgeleitet.
 - **Contrast before color:** Ziel **WCAG 2.2 AA**: normale Textgrößen mindestens 4.5:1, großer Text mindestens 3:1 und wesentliche Nichttext-UI-Elemente mindestens 3:1 soweit jeweils zutreffend; durch programmatische Messung der tatsächlichen Vorder-/Hintergründe prüfen. Focus darf nie nur über einen minimalen kaum sichtbaren Farbwechsel vermittelt werden.
 
-**Typografie:** maximal zwei derzeit bestehende Schriftfamilien (Space Grotesk für Titel / DM Sans für Erklärung und Controls) mit zuverlässigen System-Fallbacks. Bestehenden Google-Fonts-Import und Offline-/Datenschutz-Aspekte beim Build prüfen; Ressourcen dürfen keine Voraussetzung für bedienbare UI sein. Basistext in normalen Lesebereichen ungefähr 16px, erklärende Absätze 16–18px, Hilfetext nicht zu klein (<13–14px) und nicht nur blassgrau. Messwerte mit tabellarischen Ziffern, Einheiten in gut lesbarer konstanter Nähe; lange Exponentenschreibweisen umbrechen, nicht abschneiden. `font-variant-numeric: tabular-nums` für Zahlenkarten.
+**Typografie:** bestehende Schriftgrößen und Hierarchie soweit funktionierend beibehalten; maximal zwei derzeit bestehende Schriftfamilien (Space Grotesk für Titel / DM Sans für Erklärung und Controls) mit zuverlässigen System-Fallbacks. Bestehenden Google-Fonts-Import und Offline-/Datenschutz-Aspekte beim Build prüfen; Ressourcen dürfen keine Voraussetzung für bedienbare UI sein. Basistext in normalen Lesebereichen ungefähr 16px, erklärende Absätze 16–18px, Hilfetext nicht zu klein (<13–14px) und nicht nur blassgrau. Messwerte mit tabellarischen Ziffern, Einheiten in gut lesbarer konstanter Nähe; lange Exponentenschreibweisen umbrechen, nicht abschneiden. `font-variant-numeric: tabular-nums` für Zahlenkarten.
 
-## 4. Layoutarchitektur – jedes Gerät bekommt denselben Inhalt
+## 4. Bestehende Layoutarchitektur erhalten – jedes Gerät bekommt denselben Inhalt
 
 ### Desktop (ca. >= 1200 CSS px)
 - Begrenzte sinnvolle Inhaltsbreite; bei Gravity vorhandene Seitenkontrollen plus zentrale Bühne, Hilfen rechts oder darunter, aber wissenschaftliche Messanzeigen stets gut lesbar.
@@ -69,7 +71,7 @@ Keine messbaren Inhalte unter permanente „parallax“ oder Atmosphäre-Layer l
 
 ## 5. Komponentensystem: dieselbe Erklärung fühlt sich überall gleich an
 
-**Nur ein Satz wiederverwendbarer Bausteine; keine neue UI-Framework-Abhängigkeit:**
+**Die bestehenden DOM- und CSS-Strukturen behalten; lediglich ähnliche neue UI-Elemente (Schritte 02–07) konsistent gestalten. Die folgenden Bezeichnungen sind logische Muster, keine Forderung, eine neue Komponentenbibliothek oder flächendeckende Architektur zu refaktorieren; keine neue UI-Framework-Abhängigkeit:**
 - `LabHeader`: Lab-Titel, kleines sachliches Modelllabel, genau **eine** sichtbare Hauptfrage (02) und optionaler zweiter Prognose-Ausklapper **innerhalb der geöffneten Frage**.
 - `Metric`: beschriftete Einheit, gut lesbare Zahl, kurze ⓘ-Erklärung aus 04, optionales Vorzeichen/Fehlerlabel.
 - `ControlGroup`: richtige HTML-`label`, Eingabe, optionaler Min/Max-/Apply-Zustand, Fehlertext und aussagekräftiges disabled-Verhalten.
@@ -92,7 +94,7 @@ Keine messbaren Inhalte unter permanente „parallax“ oder Atmosphäre-Layer l
 
 ## 7. Kosmischer Hintergrund & Motion Design: nur Hauch Entropie
 
-Ein optionaler sehr zurückhaltender **abstrakter Entropie-Hintergrund** (vereinzelte Fragmentlinien/Speckles, wenige langsame Richtungswechsel), vorzugsweise CSS/SVG ohne neue WebGL-Pipeline. **Er symbolisiert nur die Ästhetik; keine Entropie-Messung** und keine in das Marker-/Wärmemodell einschreibende Größe.
+**Nice-to-have, nicht Pflichtumfang:** ein optionaler extrem zurückhaltender **abstrakter Entropie-Hintergrund** (vereinzelte Fragmentlinien/Speckles, höchstens sehr langsame Richtungseffekte) **standardmäßig statisch bzw. weglassbar**, vorzugsweise CSS/SVG ohne neue WebGL-Pipeline. Ist dies wegen Performance, Layout oder Tests aufwendig, **vollständig streichen statt Kernfeatures zu gefährden**. **Er symbolisiert nur die Ästhetik; keine Entropie-Messung** und keine in das Marker-/Wärmemodell einschreibende Größe.
 
 **Bewegungsbudget:**
 - Hintergrund **nur wenn Seite sichtbar, Bedienung nicht fokuskritisch und Hardware hinreichend**; Standard darf sogar komplett statisch sein. `prefers-reduced-motion` und Nutzeroption „Atmosphäre aus“ zwingend. Beim Überschreiten eines Performancebudgets: zuerst Hintergrund deaktivieren, niemals echte Simulationen ausbremsen.
@@ -136,12 +138,14 @@ Science ist ein gut gegliedertes ruhiges Nachschlagewerk (04), der neue Guide au
 
 **Bestandsschutz:** Keine neue React-/Vue-/WebGL-App. Bei Implementierung gezielt moderne CSS-Features und kleine JS-Komponenten verwenden, wenn die Browsermatrix sie unterstützt.
 
-**Technische Reihenfolge innerhalb Schritt 08:**
-1. **Audit und Baseline:** echte Screenshots/Viewportvideos, DOM-Kontrollinventar, Page-Gewichte, CSS-Token/Kaskade, bestehende Performance und Tests auf dem v0.8.5-Branch **vor** Änderungen dokumentieren.
-2. **Design-Tokens konsolidieren:** Farben/Typo/Abstände/Fokus/Status anhand der vorhandenen `style.css`, `ux.css`, `entropy.css`, `thermal.css`; spezifische Farben dort lassen, wo sie fachliche Graphserien codieren. Nicht die Site durch eine letzte gigantische `!important`-CSS-Datei manipulieren. Farbkontrast automatisiert checken.
-3. **Globale Komponenten und mobile Hierarchie** zuerst (Header, Tabs, Panels, Labels, Hauptfragen, Formulare, Message-Styles, Quellenlinks). Dann Lab **für Lab** kontrollieren.
-4. **Monster- und Hintergrundintegration** als *letzter* optionaler Atmosphäre-Layer mit klaren Performance-Guards, einer sichtbaren Entität und passenden ausgeschalteten Zuständen.
-5. **Visuelle/Accessibility-Regressions**, Screenshots/Browser-Interaktion und manuelles Nutzerfeedback; erst korrigieren, dann unabhängige Codex-Review und separat ein PR.
+**Technische Reihenfolge innerhalb Schritt 08 (risikoarm und mit klaren Stop-Kriterien):**
+1. **Baseline:** relevante Desktop-/Handy-Screenshots, bestehende Render-/Animierungsperfomance, CSS-Kaskade und volle bestehende Tests **vor** dem Feinschliff erfassen. Keine unnötige Komplettinventur, die den Fortschritt an den Laboren blockiert.
+2. **Zuerst funktionieren alle Fachfeatures:** Ergebnisse aus 01–07 in der vorhandenen Navigation, mit stabilen Modellen, gültigen Grenzwerten, echten Eingaben und gut funktionierenden Animationen. **Die BH-Animation aus Schritt 06 und die realitätsgetreue qualitative Materialansicht aus Schritt 07 bekommen Vorrang.**
+3. **Nur gezielte UI-Korrekturen** an nachgewiesenen Problemen: zu lange Labels, abgeschnittene Zahlen, mobile Spalten, schlechte Kontraste, nicht erreichbare Bedienelemente, unklare aktive Auswahl, fehlerhafte Fokusführung. Wenn eine existierende Komponente gut ist: **nicht ändern**.
+4. **Sparsame Markenangleichung:** Name, roter Skizzen-Mascot an geeigneten Stellen, einzelne Akzent-/Abstandsanpassungen. Keine CSS-Token-Migration ohne konkreten funktionalen/visuellen Nutzen. Vorhandene `style.css`/`ux.css`/`entropy.css`/`thermal.css` **nicht** ohne Not flächendeckend neu schreiben. Monster und dekorativer Hintergrund sind verzichtbare Atmosphäre, nicht Blocker für funktionierende Labore; **das ausgewählte Bildasset** bleibt allerdings für eine originalgetreue Mascot-Umsetzung erforderlich.
+5. **Regressions- und UX-Prüfung:** Browser-Screenshots, Mobile, Tastatur, Reduced Motion, wissenschaftliche Testfälle, Idle-Performance; nach konkreten Problemen nachbessern, keine Refactor-Ketten starten. Dann unabhängiger Review und separater PR.
+
+**Stop-Kriterien:** Wenn eine Designänderung eine größere Umstrukturierung aller Hauptansichten, neue Physikpfade, geänderte Navigationssemantik, zusätzliche nicht angefragte Animationen, erhebliche Leistungseinbußen oder neue ungeprüfte Abhängigkeiten erfordert, **abbrechen bzw. separat zur Freigabe vorlegen**. Ein moderater stilistischer Unterschied ist kein Grund für eine Komplettmigration.
 
 **Design-Single-Source-of-Truth:** Das zuletzt vom Nutzer genehmigte rot-schwarze A3-Monster, nicht ältere violette Beschreibungen; zentrale Tokens statt verstreuten Farbduplikaten; die Fachquelle in Schritt 04 statt neuer Design-Fachtexte. Bei Kontrastkonflikten die Farbhelligkeit anpassen, **nicht** die wissenschaftliche Warnung entfernen.
 
@@ -158,7 +162,7 @@ Science ist ein gut gegliedertes ruhiges Nachschlagewerk (04), der neue Guide au
 
 **Sichtbare Qualität:**
 1. Vorher-/Nachher-Screenshots (DE/EN) für alle fünf Haupttabs, beide Entropy-Unterexperimente, Extreme Objects, Extreme Temperature / Material Explorer, beide BH-Ansichten und statische Reduced-Motion-Zustände; mindestens **Desktop 1440px und Smartphone 320/390px**, weitere Breiten nach Risiko.
-2. **Einheitliche Komponenten**, keine gequetschten Messwertkarten, nicht skalierten Schriftbilder, verdeckten Buttons, Überläufe oder versetzten Touch-Targets. Hauptfrage unter aktivem Labtitel überall schnell auffindbar, Zusatzfragen standardmäßig geschlossen.
+2. **Bestehende Komponenten gezielt verbessert statt komplett ersetzt**, keine gequetschten Messwertkarten, nicht skalierten Schriftbilder, verdeckten Buttons, Überläufe oder versetzten Touch-Targets. Hauptfrage unter aktivem Labtitel überall schnell auffindbar, Zusatzfragen standardmäßig geschlossen.
 3. **Ausgewähltes rot-schwarzes Monster tatsächlich getroffen**, im Hero-/Rand-/Kompaktzustand erkennbar und in derselben Identität. Nicht einfach alte violette Wraith kopiert. Die echte Referenz vor Implementierung bereitstellen und auf Screenshots explizit freigeben.
 4. Nur ein In-Page-Monster, die Figure darf Texte/Werte nicht verdecken. „Monsterbewegung aus“, „Monster aus“ und Reduced Motion funktionieren auch nach Tab-/Sprachwechsel; Hintergrund ebenfalls optional und nicht irreführend.
 5. Black Hole visuell nachvollziehbar, aber **schematisch** mit dem beschlossenen Blickwinkel, keine fiktiven GR-Metriken; Temperature Material Explorer zeigt bei hohem T Grenzen statt erfundene Ergebnisse. Wissenschaftliche Werte priorisiert.
@@ -175,15 +179,25 @@ Science ist ein gut gegliedertes ruhiges Nachschlagewerk (04), der neue Guide au
 12. CI-Historie, geänderte CSS-Dateien, neue Assets, Performance-Messungen und vorher/nachher visuelle Evidenz im Qualitätsdokument; unabhängigen Codex-Review mit Antworten auf echte Befunde, kein Review „durch den Autor allein“ als unabhängig ausgeben.
 13. Erst nachdem der Eigentümer die Vorschau sieht und ausdrücklich **Merge/Deployment** genehmigt: Release. Private Repo-/Domain-/Brand-Migration, Cloudflare-Schaltung und Short-URL nicht ungefragt ändern.
 
-## 13. Planungsabschluss / noch Nutzerentscheidungen
+## 13. Abschließende Entscheidung: behutsames Design, stabile Experimente
 
-**Meine vorausgewählte Empfehlung für die Freigabebesprechung von Schritt 08:**
-1. **Ruhiges dunkles Wissenschaftsdesign mit roten Markenakzenten**, aber semantisch weiterhin wenige andere gut kontrastierende Farben für Messungen. Nicht alles rot einfärben.
-2. **Schlichte responsive Layouts**, die auf dem Handy **so lesbar wie Desktop** sind; keine „Mobile Lite“-Version mit ausgelassenen Inhalten.
-3. **Reduziertes kosmisches Hintergrundrauschen** nur außerhalb der eigentlichen Experimente; am besten standardmäßig dezent/statisch, mit abschaltbarer Bewegung.
-4. **Ein rot-skizzenhaftes Monster**, selten, eigenständig abschaltbar; ausgewählte Chatbildreferenz muss vor Umsetzung als Datei/SVG verfügbar sein und visuell abgenommen werden.
-5. **Wissenschaft/Bedienung hat immer Vorrang**; als Qualitätssignal priorisieren wir abgenommene echte Screenshots, mobile Bedienbarkeit, messbare Performance und fachlich stabile Regressionsprüfungen.
+**Vom Nutzer am 09.11.2026 ausdrücklich festgelegt und für Schritt 08 inhaltlich freigegeben:**
 
-**Offen vor technischer Umsetzung, nicht als Zustimmung unterstellen:** Welche endgültige rote Brand-Akzentabstimmung am besten gefällt, ob atmosphärischer Hintergrund standardmäßig bewegt oder statisch sein soll, und wie häufig das Monster in der realen Vorschau auftauchen darf. Diese visuellen Details können **anhand echter UI-Vorschauen** statt anhand abstrakter Farbnamen entschieden werden. Der bereits ausgewählte rote Monsterentwurf, dessen Asset noch fehlt, bleibt unverrückbare visuelle Referenz.
+1. **Funktion vor Optik.** Alle vorhandenen Haupt- und Unterabschnitte, Modelle, Formeln, Datenflüsse und grundsätzlich vertrauten Workflows **beibehalten**, nur bereits beschlossene Feature-Erweiterungen aus Schritten 01–07 ergänzen.
+2. **Animationen wirklich gut machen:** zuerst die anschauliche, solide Black-Hole-Darstellung (zwei Modi + illustrativer Blickwinkel), die Entropievisualisierungen und die Temperatur-/Materialdarstellungen funktional optimieren. Kein Grafik-Gimmick darf die fachliche Berechnung verschlechtern.
+3. **Design nur behutsam modernisieren:** bestehende Dark-UI als Basis; leichte rote Branding-Akzente, einheitlichere Hilfen und lesbare Karten, gezielte Kontrast-/Spacing-/Mobilverbesserungen. **Kein extremes Redesign, kein globaler Komponenten-Neubau, keine neue Hauptnavigation.**
+4. **Monster anhand des ausgewählten roten Skizzenentwurfs** an wenigen passenden Kontexten zeigen; dieselbe eine Figur, abschaltbar. Ausstehendes Asset/visuelle Abnahme vor Umsetzung; alte violette Variante ist verworfen.
+5. **Dekorativen Entropie-Hintergrund optional und niedrig priorisieren**; wenn realer Aufwand/Performanceproblem entsteht: weglassen. Bereits funktionierende Animationen nicht allein für Einheitlichkeit neu schreiben.
+6. **Echte Tests statt optischer Selbsttäuschung:** Wissenschafts-/Grenzregressionen, Desktop/320/390px, DE/EN, Fokus, Reduced Motion, Performance, kein Mehrfach-RAF. Qualitätsprobleme vor Merge beheben; nichts unabhängig vom Nutzer deployen.
 
-**Planungsstatus:** **UMFASSENDER DISKUSSIONSENTWURF**, kein Work-Bauauftrag. Auf Nutzerfreigabe warten; danach als inhaltlich freigegeben markieren, die gesamten Schritte 01–08 auf Widersprüche prüfen und die **Work-Aufträge samt expliziten Implementierungs-/Merge-Gates** vorbereiten. 
+### Prioritätenbudget innerhalb von Schritt 08
+
+**P0 / MUSS:** Integration ohne Regression, bewährte Layoutstruktur, Animationen performant und bedienbar, korrekte Einheiten/Warnungen, kleinere Layout-/Kontrastprobleme beheben, Monster nur korrekt anhand freigegebener Vorlage oder als klar gekennzeichnetes ungelöstes Asset-Gate, DE/EN und Accessibility. **Die im Schritt 01 bereits gewählte Monsteridentität und in 06/07 beschlossenen Features werden nicht stillschweigend aus Scope entfernt; lediglich zusätzliche Dekoration ist optional.**
+
+**P1 / SOLL:** dezente Konsistenz von Button-/Panel-/Typografiedetails, ausgewählte Header-/Akzentänderungen, kleine unaufdringliche Monster-Animationen.
+
+**P2 / KANN ENTFALLEN:** neue Hintergrundpartikel, zusätzliche Parallaxe, farbintensive Spezialeffekte, größere visuelle Neukompositionen und rein kosmetische Umschreibungen funktionierender Komponenten.
+
+### Planung und Umsetzungsgates
+
+**Status: SCHRITT 08 INHALTLICH FREIGEGEBEN (09.11.2026).** Dies beschließt **die achtstufige inhaltliche Planung**, nicht die technische Implementierung. Für Work fehlen noch: kontrollierte Konsistenzprüfung aller acht Planungsdokumente auf Widersprüche, die Original-Bildreferenz des Monsters bzw. visuell freigegebene SVG-Reproduktion und – für spätere öffentliche Umstellung – Domain-/Namensprüfung sowie ein **separater ausdrücklicher Work-Bauauftrag**. Work zuerst auf v0.8 (01–04), Tests, unabhängiger Review und eigene Mergefreigabe; v0.8.5 danach getrennt (05–08). Keine Code- oder Cloudflare-Änderung jetzt.
