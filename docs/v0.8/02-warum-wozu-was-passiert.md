@@ -1,7 +1,7 @@
 # Schritt 02 – Warum passiert das? Wozu sollte mich das interessieren?
-## Diskussionsentwurf v0.8 – noch nicht zur Implementierung freigegeben
+## Inhaltlich freigegebener Plan v0.8 – noch keine Implementierungsfreigabe
 
-**Projektname:** Reincarnated as a Proton (vom Eigentümer gewählt, noch keine Domain-/Produktionsumstellung). **Scope:** v0.8 Phase 1, Schritt 02 von 08; siehe [Roadmap](README.md). **Entscheidungsstatus: TEILWEISE FESTGELEGT (Minimal-Variante); Gesamtschritt weiter ENTWURF.** Dieses Dokument hält einen Vorschlag fest, über den wir mit dem Eigentümer sprechen. Erst seine inhaltliche Freigabe erlaubt die spätere Umwandlung in einen Work-Implementierungsauftrag. Keine Codeänderung jetzt.
+**Projektname:** Reincarnated as a Proton (vom Eigentümer gewählt, noch keine Domain-/Produktionsumstellung). **Scope:** v0.8 Phase 1, Schritt 02 von 08; siehe [Roadmap](README.md). **Entscheidungsstatus: VOM EIGENTÜMER INHALTLICH FREIGEGEBEN (09.11.2026)**. Die Auswahl des minimalen Erklärformats, der kleinen optionalen Prognose-Ausklapper in allen Laboren sowie der Positionierung und des Anwendungsmixes ist beschlossen. Alle Beispieltexte, Antwortmöglichkeiten und Verbindungen zu Controls müssen bei der Umsetzung gegen die echte App und wissenschaftliche Quellen geprüft werden. **Dies ist keine Freigabe, Code zu schreiben, in main zu mergen oder die Website zu deployen.**
 
 ## Verbindliche Nutzerentscheidung – Minimal-Variante (09.11.2026)
 
@@ -13,7 +13,7 @@
 - Bei Labor- oder Unteransichtswechsel wird exakt die **neue** passende Hauptfrage sichtbar; verborgene Tabs dürfen nicht zusätzliche sichtbare Fragen oder Monsterinstanzen erzeugen. Im Glossar/Science-Bereich gelten kontextuelle Begriffslinks, keine falsche „sechste Simulation“.
 - Bei Sprachwechsel die gewählte Frage und offene/geschlossene Erklärzustände sinnvoll erhalten, keine Übersetzungsschlüssel als Text zeigen. Mobile: maximal eine kompakte Erklärung im sichtbaren Kontext, kein Overlap mit Bedienknöpfen.
 - **Zusatzentscheidung vom Nutzer:** Jedes Labor (inklusive beider Entropy-Unteransichten und der Temperature-Ansicht) erhält **ein kleines freiwilliges, standardmäßig eingeklapptes „Was glaubst du, passiert?“-Vorhersageexperiment** innerhalb seiner Hauptfrage. Es erscheint nie als zusätzliche sichtbare Hauptkachel. Erst die Person entscheidet, ob sie es aufklappt, eine Vermutung wählt, eine Erklärung einblendet und das Ergebnis im echten Lab überprüft. Details unten.
-- Diese Entscheidungen gelten **nicht** als Implementierungsfreigabe. Noch offen: Platzierung der Hauptfrage im Detail, Nutzen-Mix und endgültige Formulierungen/Versuchswerte.
+- **Abschließende Nutzerentscheidung vom 09.11.2026:** Die eine Hauptfrage steht **direkt unter der jeweiligen Laborüberschrift**, gut auffindbar und anfangs geschlossen. Erklärungen enthalten ungefähr **halb Alltag/Technik und halb Universum/Kosmos**, aber **nur bei fachlich passenden Themen** – je Lab darf die Gewichtung abweichen. Die vorgesehene kompakte „Warum/Wozu“-Struktur und der freiwillige Prognose-Ausklapper sind damit **inhaltlich freigegeben**, vorbehaltlich der fachlichen Prüfung konkreter Beispielwerte und der späteren gesonderten Baufreigabe.
 
 ### Konkret zu testender UI-Entwurf (Textskizze)
 
@@ -183,16 +183,15 @@ Science/Glossar ist **Nachschlage- und Vertiefungsbereich**, keine zusätzliche 
 - Wissenschaftliche Aussagen mit seriösen Primär- oder etablierten Bildungsquellen verifizieren; Trennung idealisierter Modellwahl vs. beobachtete Natur.
 - Frühere numerische Benchmarks und v0.1-Originalintegrität unverändert; neue Tests für neue Erklärungskomponenten, Zustands-/Navigationsschutz.
 
-## 7. Offene gemeinsame Entscheidungen – vor Freigabe
+## 7. Entscheidungen abgeschlossen – technische Verifikation vor Umsetzung
 
-**Entschieden:** Erklärungen standardmäßig **geschlossen**; **genau eine sichtbare Hauptfrage** je aktivem Labor/Unterlabor; andere Beispiele versteckt. Keine sichtbaren Fragekacheln.
+**Inhaltlich freigegeben durch den Eigentümer:**
+1. Eine gut erkennbare **Hauptfrage direkt unter jedem aktiven Labortitel** (einschließlich Unterexperimente); standardmäßig geschlossen.
+2. Zusätzliche Inhalte und Fragen versteckt und freiwillig erweiterbar, keine sichtbare Fragenkachel-Flut.
+3. Im Inneren der geöffneten Frage je Lab ein **zweiter optionaler, standardmäßig eingeklappter Prognose-Ausklapper** („Was glaubst du, passiert?“), verständliche Alternativen, Auflösung und manuelle Laborprobe.
+4. Reale Anwendungsbeispiele **ungefähr 50 % Alltag/Technik und 50 % Kosmos/Universum** über die Website, mit fachlich sinnvollen Abweichungen je Labor. Keine künstlich konstruierten Bezüge.
+5. Keine automatischen Eingabewertänderungen, keine Pflichtquizze, keine Fake-Physik, keine Merge-/Deployment-Erlaubnis.
 
-**Noch offen:**
-**Ebenfalls entschieden:** Im Inneren der freiwillig geöffneten Hauptfrage gibt es **für jedes aktive Labor/Unterlabor einen weiteren standardmäßig geschlossenen Vorhersage-Ausklapper** mit Auswahl, optionaler Lösung und anschließendem realen Ausprobieren; **keine** Pflicht und keine automatischen Änderungen an Modellparametern.
+**Umsetzungsaufgaben (keine neuen Produktentscheidungen):** Alle konkreten Hauptfragen, Kurzantworten, Vorhersageoptionen, Regler-/Preset-Zuordnungen, Modellgrenzen und Quellen gegen den dann aktuellen Code prüfen und in DE/EN final redigieren. Die sechs Tabellenbeispiele sind Ausgangspunkte, **keine Lizenz für nicht existierende UI-Controls**. Änderungen der didaktischen Grundentscheidungen erst wieder mit Eigentümer abstimmen.
 
-**Noch offen:**
-1. Soll die Hauptfrage **direkt unter dem Labortitel** stehen (Empfehlung: sichtbar) oder neben dem zentralen Steuerungsbereich? Nicht ausschließlich hinter einem kleinen ⓘ verstecken.
-2. Welche realen Anwendungen priorisieren wir: Alltag/Technik, Universum/Astronomie oder etwa halb-halb? Keine künstlich konstruierten Nutzenbehauptungen.
-3. Die sechs konkreten Hauptfragen, Kurzantworten und Beispielprognosen gegen alle vorhandenen Regler/Preset- und Modellgrenzen final prüfen und in DE/EN abnehmen.
-
-**Nächster Schritt:** Die zwei offenen Grundentscheidungen und didaktischen Beispiele gemeinsam verfeinern; dann als **inhaltlich freigegeben** markieren. Work erst nach separater Bauentscheidung einsetzen.
+**Status:** Inhaltlicher Plan für Schritt 02 abgeschlossen. Als Nächstes Schritt 03 gemeinsam ausarbeiten. **Work-Baufreigabe ausdrücklich separat.**
