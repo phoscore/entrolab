@@ -8,7 +8,7 @@ export function initGuide(doc=globalThis.document){
  if(!glossary||!back)return null;
  const originalParent=back.parentNode,originalNext=back.nextSibling,win=doc.defaultView;
  const bound=new WeakSet(),cleanup=[];
- let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false,coldTerm=false;
+ let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false,coldTerm=false,suspendedTerm=null;
  const listen=(target,event,fn,capture=false)=>{target?.addEventListener(event,fn,capture);cleanup.push(()=>target?.removeEventListener?.(event,fn,capture))};
  function focusVisible(target){
   if(!target?.isConnected||target.disabled||!target.getClientRects().length)return false;
@@ -25,11 +25,17 @@ export function initGuide(doc=globalThis.document){
  }
  function close(restore=true){
   if(!origin)return;
-  const previous=origin,from=sourceTab,hash=previousHash,wasModel=kind==='model',wasColdTerm=coldTerm;
-  origin=null;sourceTab=null;coldTerm=false;back.hidden=true;putBack();
+  const previous=origin,from=sourceTab,hash=previousHash,wasModel=kind==='model',wasColdTerm=coldTerm,resume=suspendedTerm;
+  origin=null;sourceTab=null;coldTerm=false;suspendedTerm=null;back.hidden=true;putBack();
   if(!wasModel)glossary.open=false;
   if(restore&&wasModel)activate(from);
-  if(restore&&(wasModel||wasColdTerm))changeHash(hash,true)
+  if(restore&&(wasModel||wasColdTerm))changeHash(hash,true);
+  if(restore&&wasModel){
+   for(let p=previous.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
+   // One bounded return frame for glossary → model → glossary. Direct lab
+   // navigation discards it; a second Escape then returns to the lab trigger.
+   if(resume){({origin,kind,sourceTab,previousHash,coldTerm}=resume);back.hidden=false}
+  }
   label();
   if(restore&&!focusVisible(previous)&&!focusVisible(doc.querySelector?.('[data-tab].active')))focusVisible(doc.getElementById('mainContent'));
  }
@@ -39,9 +45,10 @@ export function initGuide(doc=globalThis.document){
   const science=doc.getElementById('science');
   if(mode==='model'&&(!id.startsWith('model-')||!science?.contains(target)))return false;
   const from=doc.querySelector?.('[data-tab].active'),hash=win?.location.hash??'';
+  const resume=mode==='model'&&glossary.contains(link)&&kind==='term'&&origin?{origin,kind,sourceTab,previousHash,coldTerm}:null;
   close(false);
   if(mode==='model')activate(doc.querySelector('[data-tab="science"]'));
-  origin=link;kind=mode;sourceTab=from;previousHash=hash;
+  origin=link;kind=mode;sourceTab=from;previousHash=hash;suspendedTerm=resume;
   if(mode==='model'){
    const slot=doc.getElementById('knowledgeReturnSlot');if(slot)slot.append(back);
    for(let p=target.parentElement;p&&p!==science;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;

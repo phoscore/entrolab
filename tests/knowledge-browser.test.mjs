@@ -101,3 +101,17 @@ test('v0.8 browser: candidate images decode at recorded sizes on 320/390px and d
   await p.screenshot({path:resolve(h.output,'v08-assets-'+width+'.png')});
  }finally{await context.close()}}
 });
+
+test('v0.8 browser: global glossary to model and back restores the actual link, open disclosures and original lab return',async()=>{
+ const {p,context}=await h.lab();try{
+  await p.locator('[data-tab=entropy]').click();const before=await physical(p);
+  for(const exit of ['return','escape']){
+   await p.locator('#entropyExplain').click();const dd=p.locator('#guide-entropy + dd');
+   if(!await dd.locator('details').evaluate(e=>e.open))await dd.locator('details > summary').click();
+   const link=dd.locator('[data-model-link]'),id=await link.getAttribute('id');await link.click();assert.equal(await p.locator('.view.active').getAttribute('id'),'science');
+   if(exit==='return')await p.locator('#guideReturn').click();else await p.keyboard.press('Escape');
+   assert.equal(await p.locator('.view.active').getAttribute('id'),'entropy');assert.equal(await p.evaluate(()=>document.activeElement.id),id);assert.equal(await p.locator('#physicsGuide').getAttribute('open'),'');assert.equal(await dd.locator('details').getAttribute('open'),'');
+   await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'entropyExplain');assert.equal(await p.locator('#physicsGuide').getAttribute('open'),null);assert.deepEqual(await physical(p),before);
+  }
+ }finally{await context.close()}
+});
