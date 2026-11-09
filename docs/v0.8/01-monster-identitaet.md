@@ -3,6 +3,14 @@
 
 **Produktkontext:** v0.8 / v0.8.5, siehe [Roadmap](README.md). **Stilrichtung A + Glitch bereits ausdrücklich gewünscht.** Anatomie, Namen, finale Grafik und genaue Auftrittsfrequenz bleiben für gemeinsame Sichtung offen. Noch **keine Freigabe für Work-Implementierung**. Der finale Markenname ist noch offen; „Entropy Wraith“ und „Void Beast“ sind vorläufige **Arbeitstitel für die Figur**.
 
+### Visuelle Auswahl vom Nutzer – 09.11.2026
+
+**Gewählter Designentwurf:** stark vereinfachte, skizzenhafte **A3 / Glitched Entity** (vorherige aufwendige violette A3-Variante ausdrücklich als zu detailliert verworfen). Das ausgewählte Bild wurde im gemeinsamen Chat generiert; die Pixel-/Assetdatei ist derzeit **noch nicht als GitHub-Binary eingecheckt**. Work soll vor Implementierung die freigegebene Bildreferenz ausdrücklich erhalten oder eine passende reproduzierbare SVG-/Vektorfassung nach sichtbarer Freigabe herstellen, nicht eine beliebige neue Kreatur erfinden.
+
+**Bindende visuelle Merkmale:** nahezu rein schwarzer Hintergrund; kräftige, sparsame **rote Skizzen-/Brush-Striche** als Körperkontur, wenige hellweiße Augenschlitze und schiefes Grinsen. Deutlich asymmetrische, gehörnte/fragmentierte Maskensilhouette mit hohlem Kreis im Stirnbereich, grober gebrochener Ring um den Kopf; dunkler leichter Oberkörper mit einer ringförmigen Leerstelle in der Brust, zwei vereinfachte kantige Greifhände, abstrakter nach unten auslaufender Schweif. Nur vereinzelte eckige Glitch-Striche an der Maske, keine komplizierte 3D-Rüstung, keine Fototexturen, kein violett-türkiser Effektnebel, kein bildfüllendes Poster und keine filigranen 200 Einzelteile. Der ausgewählte Entwurf ist **noch kein finaler produktionsfertiger UI-Asset**: auf 32–64 px muss er gezielt vereinfacht und mit reduziertem Bewegungsaufwand sinnvoll erkennbar gemacht werden. Keine Gameplay-/Physikdaten überlagern.
+
+**Namensstand:** `entrivial-lab` war ein **provisorischer Text auf den Visualisierungen**, ausdrücklich **nicht** der endgültig freigegebene Website-Name. Nutzer hat die früheren generischen Fantasienamen verworfen; die Namensfindung ist offen. Erst nach ausdrücklicher Namenswahl Metadaten/Branding ändern.
+
 ### 1. Identität und Aufgabe
 
 Das Wesen ist **das lebendige Markenzeichen** der ganzen Wissenschaftswebsite. Es soll gleichzeitig:
