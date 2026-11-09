@@ -1,6 +1,6 @@
-# ENTROLAB – gemeinsame Roadmap v0.8 / v0.8.5
+# Reincarnated as a Proton – gemeinsame Roadmap v0.8 / v0.8.5
 
-**Status: Planungsphase; NICHT zur Implementierung freigegeben.** Erst nach Gespräch und ausdrücklicher Zustimmung zu *jedem* detaillierten Teilplan darf Work mit dem betreffenden Umfang starten. Version und neuer öffentlicher Produktname sind noch **nicht endgültig** beschlossen. Vorläufige Arbeitsbezeichnung: ENTROLAB; Repository bleibt bis zur getrennten Entscheidung `phoscore/entrolab`.
+**Status: Planungsphase; NICHT zur Implementierung freigegeben.** Erst nach Gespräch und ausdrücklicher Zustimmung zu *jedem* detaillierten Teilplan darf Work mit dem betreffenden Umfang starten. **Vom Eigentümer am 09.11.2026 ausdrücklich gewählter künftiger Website-/Produktname: „Reincarnated as a Proton“.** Die konkrete Domain, URL-Slug, Marken-/Domainverfügbarkeit und technische Umstellung sind noch offen und getrennt abzusichern. Bis zum genehmigten Branding-Release bleiben Repository `phoscore/entrolab`, bestehende Domain, bestehender Website-Titel und `main` unverändert.
 
 **Basis:** Freigegebene v0.7 auf `main`, Merge-Commit `8b856086877ea21579cf7d74190ad08155d70c7f` (PR #6). V0.8-Planung nur auf `develop/v0.8`; kein Merge, keine Änderung an `main`, kein Produktions-Deployment. Behalte `archive/v0.1`, alle Originalprüfsummen, zwölf historische numerische Benchmarks und die abgesicherten v0.7-Tests. Auch bestehende DE/EN-, Accessibility- und Reduced-Motion-Funktionen erhalten. Lies `AGENTS.md` und Qualitätsberichte, bevor entwickelt wird.
 
@@ -30,7 +30,7 @@ Aus einem technisch funktionierenden Physik-Spielplatz ein verständliches, einl
 
 Das Monster ist ein zentraler Markencharakter: **asymmetrischer 2.5D-artiger Entropy Wraith / Void Beast**, kein Kreis-mit-Smiley, kein Chibi. Ein einziges gleichzeitig sichtbares In-Page-Wesen, aber an zahlreichen Kontextstellen. Situationsabhängige, seltene Aktionen, nicht nervig, mit subtilen Glitch-/Fragment-Effekten. Wenige Akzentfarben und ruhiger Hintergrund; niemals verwirrende Veränderungen wissenschaftlicher Werte. Vollständiger Spezifikationsentwurf: **[`01-monster-identitaet.md`](01-monster-identitaet.md)**.
 
-**Noch zu entscheiden:** Name samt Marken-/Domain-/ähnlicher Bezeichnungen-Suche; definitive Silhouette und Ausdrücke anhand von Designentwürfen; genauer Grad an Horror vs. Humor; Nutzereinstellung für weniger/keine Monster. Registrierbarkeit/Markenfreiheit nicht allein aus einer Suchmaschinenlücke behaupten. Erst nach Namensentscheidung Metadaten, sichtbaren Titel und ggf. Domain/Repository in separatem, sicheren Ablauf umstellen; keine Weiterleitungen ungefragt.
+**Name entschieden:** „Reincarnated as a Proton“ (09.11.2026); noch zu prüfen: identische/ähnliche Marken, Domains und Slug, bevor Domain gekauft oder öffentlich umgestellt wird. **Monster-Vorlage entschieden:** minimalistische, skizzenhafte rote/schwarze A3 Glitched Entity (Details im Einzelplan); die ausgewählte Bilddatei ist noch nicht als Repository-Asset hinterlegt. Noch zu entscheiden: Mimik-/Animationstiefe, genaue Auftrittsfrequenz, Abschaltoption und technische Integration. Produktname und Monstername sind getrennt; vorläufiger Figurenname bleibt offen. Keine URL-Weiterleitungen oder Repository-Umbenennung ungefragt.
 
 ### 02 – Konsistentes „Warum / Wozu / Was passiert?“-Erklärformat
 **Status: offen zur gemeinsamen Detailplanung.**
@@ -73,4 +73,4 @@ Bisheriger Science-Bereich, Glossar und Kontextlinks sollen **eine konsistente W
 
 ## Nächster gemeinsamer Schritt
 
-**Schritt 01** endgültig festlegen: Namens-/Domainstrategie, Monster-Silhouette, Reaktionen, Häufigkeit und visuelle Referenzen. Das ausführliche Monster-Grundkonzept ist als Entwurf angelegt. Diese Roadmap **autorisiert noch keinen Work-Implementierungsauftrag**.
+**Nächster gemeinsamer Planungspunkt: Schritt 02 – Erklärformat „Warum / Wozu / Was passiert?“**. Schritt 01 besitzt inzwischen die freigegebene Grundrichtung und den ausdrücklich gewählten Produktnamen, bleibt aber technisch/gestalterisch ein Entwurf, bis die Domain-/Marken- und Monster-Integrationsfragen geklärt und der Arbeitsauftrag bestätigt sind. Diese Roadmap **autorisiert noch keinen Work-Implementierungsauftrag**.
