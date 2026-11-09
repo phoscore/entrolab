@@ -1,7 +1,7 @@
 # Schritt 03 – Entropie endlich wirklich verstehen
-## Detaillierter Diskussionsentwurf · NICHT zur Implementierung freigegeben
+## Inhaltlich freigegebener Umfang – noch keine Work-/Merge-/Deployment-Freigabe
 
-**Produkt:** Reincarnated as a Proton. **Phase:** v0.8, Schritt 03 von 08. **Priorität P0.** Grundlage [Roadmap](README.md), [freigegebener Schritt 02](02-warum-wozu-was-passiert.md), `AGENTS.md`, `docs/Plan_v0.7.md`, `docs/Qualitaetsupdate_v0.7.md`. Dieser Entwurf ist zur gemeinsamen Entscheidung angelegt, nicht als stillschweigende Baufreigabe; weder main noch Produktionswebsite ändern.
+**Produkt:** Reincarnated as a Proton. **Phase:** v0.8, Schritt 03 von 08. **Priorität P0. Inhaltlich am 09.11.2026 durch den Eigentümer mit „perfekt, übernimm das einfach mal so“ bestätigt.** Grundlage [Roadmap](README.md), [freigegebener Schritt 02](02-warum-wozu-was-passiert.md), `AGENTS.md`, `docs/Plan_v0.7.md`, `docs/Qualitaetsupdate_v0.7.md`. Dieses Dokument beschreibt den **inhaltlich genehmigten Schritt 03**. Inhaltliche Kernentscheidung: **beide** Visualisierungen (Mikrozustände zum Anfassen und Energie-/Entropiebilanz), plus verständliche Häufigkeitsansicht und wenige hochwertige Alltagserklärungen. Die reichhaltigeren kosmologischen Themen nur als sorgsam begrenzte freiwillige Advanced-/Quellenverknüpfung, keine neue Kosmologie-Engine. Monster-Einzeiler selten und unaufdringlich, wissenschaftliche Kernerklärung sachlich; im Ausgangszustand keine zusätzlichen sichtbaren Erklärwände. Präzise Illustrationsdetails dürfen bei der Work-Umsetzung angepasst werden, ohne die Modellgrenzen oder Schritt-02-Minimalarchitektur zu verletzen. **Keine Erlaubnis, jetzt zu programmieren, in main zu mergen oder zu deployen.**
 
 ## 1. Was das Lab *heute tatsächlich* kann – v0.7 auf main
 
@@ -124,12 +124,12 @@ Diese erscheinen **nicht als acht sichtbare Hauptkarten**. Sie sind im Schritt-0
 - Stanford Encyclopedia of Philosophy: [Philosophy of Statistical Mechanics](https://plato.stanford.edu/entries/statphys-statmech/) für fortgeschrittene Grenzen der Zeitrichtung/Gleichgewichtsargumente; **nicht** als inhaltliche Grundlage einer einfachen sofort wahren Gewissheit verkaufen.
 - Diese Quellen legitimieren Lehrbuchaussagen, **nicht** die Richtigkeit jeder spezifischen Codeberechnung. Code eigenständig gegen Modelle/Referenzwerte prüfen.
 
-## 9. Entscheidungen zur gemeinsamen Besprechung – bitte nicht stillschweigend festlegen
+## 9. Inhaltliche Entscheidungen – vom Eigentümer bestätigt
 
-1. **Visualisierung:** Mehr Wert auf einen interaktiven **„Mikrozustände zum Anfassen“**-Modus, ein **„Energiebilanz / Entropiebilanz“**-Bild, oder **beides** (Empfehlung: beide klein, in bestehenden Ansichten)?
-2. **Tiefe:** Sollen die wichtigsten acht Themen als kurze, freiwillig aufklappbare **„Mehr verstehen“-Fragen** zur Verfügung stehen oder nur 3–4 Kernbeispiele plus Quellenweiterleitungen (Empfehlung: 3–4 hochwertige zuerst)?
-3. **Kosmos:** Sollen Zeitpfeil/Universumsende als **vorsichtig begrenzte Advanced-Themen** bereits in v0.8 angesprochen werden, oder erst nach v0.8.5? Keine falsche Gleichsetzung mit dem Marker-Lehrmodell.
-4. **Ton:** mehr lockere Monster-Einzeiler in den freiwilligen Erklärungen oder nur sehr selten? Die wissenschaftliche Kernerklärung ist immer sachlich.
-5. **Darstellung:** permanent sichtbare, schmale „Energie bleibt / Entropie wächst“-Merksätze vs. strikt nur im geöffneten Erklärbereich (Schritt 02 spricht eher für das Letztere).
+1. **Beide** visuellen Kernverbesserungen: kompakter interaktiver Mikro-/Makrozustandsvergleich **und** gleichzeitiger einfacher Energie-/Entropiebilanzvergleich; daneben das vorhandene Histogramm verständlicher machen. Die einzelnen bereits vorhandenen Lehrmodelle nicht verschmelzen.
+2. **3–4 richtig gute Alltagsbeispiele als erste Vertiefung** (Wärme von Getränken, Thermoskanne, Kühlschrank und Motoren – immer unter deutlicher Benennung der Grenzen des aktuellen Modells); weitere Fragen über freiwillige tiefergehende Quellen-/Advanced-Verknüpfungen, statt alles auf einmal offen darzustellen.
+3. **Zeitpfeil, Leben und Langzeitkosmologie** dürfen in v0.8 nur als vorsichtige, quellengestützte „Mehr verstehen“-Hinweise erscheinen, nicht als simulierte Gewissheit, Prognose über das Universumsende oder falsche Ableitung aus zwei Kammern.
+4. **Monster-Humor selten und unaufdringlich**, Physiktext sachlich; eine sichtbare Monsterinstanz im gesamten Interface.
+5. **Kein neuer offener Haupt-Infoblock:** eine sichtbare Leitfrage je aktivem Labor/Unterexperiment (Schritt 02), tiefergehende Inhalte bleiben freiwillig eingeklappt. Bestehende wichtige Messwerte und Modellkennzeichnungen natürlich weiterhin sichtbar.
 
-**Nächster Schritt:** Mit dem Eigentümer diese Fragen priorisieren, Umfang kontrollieren, präzise Akzeptanzkriterien finalisieren und erst nach explizitem Beschluss den Status in „inhaltlich freigegeben“ ändern. **Kein Work-Auftrag vor separater Freigabe aller v0.8-Pläne.**
+**Status:** Schritt 03 **inhaltlich freigegeben**, jedoch **nicht implementiert**. Technische Details und Übersetzungen in der späteren Work-Phase an der aktuellen Codebasis verifizieren; Änderungen an wissenschaftlichen Modellen/Scope erfordern ausdrückliche zusätzliche Zustimmung. Als Nächstes gemeinsam Schritt 04 planen. **Keine Work-Implementierung, bis v0.8 als Umsetzungspaket separat freigegeben wird.**
