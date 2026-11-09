@@ -1,5 +1,7 @@
+import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  ...knowledgeDE,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.",
   "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.",
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.",
@@ -540,6 +542,7 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  ...knowledgeEN,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Originally entered: {original} {unit}. After rounding, the temperature field shows {display} {unit}; validation uses the original entry.",
   "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Only conversion roundoff at the boundary was accounted for; source fields are unchanged.",
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Conversion roundoff at the boundary: draft {temp} K. Source fields stay unchanged; only Apply changes the initial state.",

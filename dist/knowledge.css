@@ -1,0 +1,18 @@
+/* Additive teaching components. Existing simulation sizing/containment is untouched. */
+.knowledge-help{margin:.45rem 0;font-size:.85rem;font-weight:400;line-height:1.5;max-width:100%;color:#d7cce5;letter-spacing:normal;text-transform:none}
+.knowledge-help>summary{list-style:none;display:inline-flex;align-items:center;gap:.35rem;min-height:44px;padding:.35rem .55rem;border:1px solid #554260;border-radius:7px;font:inherit;cursor:pointer;color:#e4cdfb;background:#17121e;max-width:100%;overflow-wrap:anywhere}
+.knowledge-help>summary::-webkit-details-marker{display:none}.knowledge-help[open]>summary{background:#30203b;border-color:#b994d8}
+.knowledge-definition{padding:.5rem 0;max-width:72ch}.knowledge-definition p{font-size:.9rem;line-height:1.6;text-transform:none;letter-spacing:normal;overflow-wrap:anywhere}
+.knowledge-advanced{margin:.65rem 0}.knowledge-advanced>summary{min-height:44px;padding:.55rem 0;cursor:pointer;color:#d7baff;line-height:1.5}
+.knowledge-advanced h3,.knowledge-advanced h4{font:600 .92rem/1.5 system-ui,sans-serif;letter-spacing:normal;text-transform:none;margin:1rem 0 .3rem}
+.knowledge-model-index,.knowledge-term-links{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.knowledge-model-index a,.knowledge-term-links a,.knowledge-model-link{display:inline-flex;align-items:center;min-height:44px;padding:.45rem .7rem;color:#dbc0ff;text-decoration:underline;text-underline-offset:3px;border-radius:6px;overflow-wrap:anywhere}
+.knowledge-model-index a{border:1px solid #51405e;background:#15111c}.knowledge-term-links a{padding:.4rem .5rem;font-size:.85rem}
+.knowledge-limit{border-left:2px solid #b896d3;padding-left:.8rem;color:#cfc4dc;line-height:1.6;font-size:.9rem}
+.knowledge-formula{font:400 .88rem/1.7 ui-monospace,monospace;white-space:normal;overflow-wrap:anywhere;color:#e4d8f1}
+.knowledge-sources{padding-left:1.2rem;font-size:.85rem;line-height:1.7}.knowledge-sources li{margin:.5rem 0;overflow-wrap:anywhere}.knowledge-sources a{color:#cfb1f5}.knowledge-sources small{display:block;color:#bbb0c9}
+.knowledge-glossary dt:focus,.knowledge-model:focus{outline:3px solid #d9b5ff;outline-offset:5px;scroll-margin-top:110px}
+.knowledge-help summary:focus-visible,.knowledge-advanced summary:focus-visible,.knowledge-model-index a:focus-visible,.knowledge-term-links a:focus-visible,.knowledge-model-link:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
+#knowledgeReturnSlot:empty{display:none}#knowledgeReturnSlot{margin:.7rem 0}.knowledge-model{min-width:0}.knowledge-glossary dd{min-width:0}
+@media(max-width:600px){.knowledge-help>summary{font-size:.82rem}.knowledge-model-index{gap:.3rem}.knowledge-model-index a{padding:.4rem .5rem;font-size:.85rem}.knowledge-formula{font-size:.78rem}.knowledge-definition{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.knowledge-help,.knowledge-advanced{scroll-behavior:auto;transition:none}}
