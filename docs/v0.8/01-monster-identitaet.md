@@ -1,7 +1,7 @@
 # Schritt 01 – Das Entropie-Wesen: Entropy Wraith / Void Beast
 ## Ausführliche Design- und Implementierungsspezifikation – ENTWURF
 
-**Produktkontext:** v0.8 / v0.8.5, siehe [Roadmap](README.md). **Stilrichtung A + Glitch bereits ausdrücklich gewünscht.** Anatomie, Namen, finale Grafik und genaue Auftrittsfrequenz bleiben für gemeinsame Sichtung offen. Noch **keine Freigabe für Work-Implementierung**. Der finale Markenname ist noch offen; „Entropy Wraith“ und „Void Beast“ sind vorläufige **Arbeitstitel für die Figur**.
+**Produktkontext:** v0.8 / v0.8.5, siehe [Roadmap](README.md). **Stilrichtung A + Glitch bereits ausdrücklich gewünscht.** Anatomie, Namen, finale Grafik und genaue Auftrittsfrequenz bleiben für gemeinsame Sichtung offen. Noch **keine Freigabe für Work-Implementierung**. **Gewählter Website-/Produktname ist „Reincarnated as a Proton“ (Nutzerentscheidung am 09.11.2026)**; die Domain-/Markenprüfung und Umstellung stehen aus. „Entropy Wraith“ und „Void Beast“ sind weiterhin nur **Arbeitstitel für die Figur**, nicht für die Website.
 
 ### Visuelle Auswahl vom Nutzer – 09.11.2026
 
@@ -9,7 +9,7 @@
 
 **Bindende visuelle Merkmale:** nahezu rein schwarzer Hintergrund; kräftige, sparsame **rote Skizzen-/Brush-Striche** als Körperkontur, wenige hellweiße Augenschlitze und schiefes Grinsen. Deutlich asymmetrische, gehörnte/fragmentierte Maskensilhouette mit hohlem Kreis im Stirnbereich, grober gebrochener Ring um den Kopf; dunkler leichter Oberkörper mit einer ringförmigen Leerstelle in der Brust, zwei vereinfachte kantige Greifhände, abstrakter nach unten auslaufender Schweif. Nur vereinzelte eckige Glitch-Striche an der Maske, keine komplizierte 3D-Rüstung, keine Fototexturen, kein violett-türkiser Effektnebel, kein bildfüllendes Poster und keine filigranen 200 Einzelteile. Der ausgewählte Entwurf ist **noch kein finaler produktionsfertiger UI-Asset**: auf 32–64 px muss er gezielt vereinfacht und mit reduziertem Bewegungsaufwand sinnvoll erkennbar gemacht werden. Keine Gameplay-/Physikdaten überlagern.
 
-**Namensstand:** `entrivial-lab` war ein **provisorischer Text auf den Visualisierungen**, ausdrücklich **nicht** der endgültig freigegebene Website-Name. Nutzer hat die früheren generischen Fantasienamen verworfen; die Namensfindung ist offen. Erst nach ausdrücklicher Namenswahl Metadaten/Branding ändern.
+**Namensstand:** Der Eigentümer hat **„Reincarnated as a Proton“** als zukünftigen Website-/Produktnamen ausdrücklich festgelegt. `entrivial-lab` war ausschließlich provisorischer Text auf früheren Entwürfen und ist verworfen. **Noch keine Umbenennung der bestehenden Domain, GitHub-Repo, öffentlichen UI oder Metadaten:** erst Domain-/Marken- und Migrationsentscheidung. Der Name der Monsterfigur selbst ist unabhängig davon noch offen.
 
 ### 1. Identität und Aufgabe
 
@@ -126,7 +126,7 @@ Der optionale stilisierte kosmische Hintergrund verwendet sehr wenige langsam dr
 ### 9. Offene Entscheidungen im Gespräch
 
 - endgültiger visueller Prototyp, Gesicht/Augen, Körperglieder, Glitchintensität;
-- endgültiger neuer Projektname und Bezeichnung des Wesens;
+- Projektname **festgelegt: Reincarnated as a Proton**; offen sind Domain-/Markenprüfung, URL-Strategie und eigenständige Bezeichnung des Wesens;
 - wie oft ruhige Überraschungsauftritte erwünscht sind;
 - vollständige separate Abschaltoption (empfohlen) und etwaige Sichtbarkeit bei sehr schmalem Handybildschirm;
 - ob das Monster gelegentlich interaktive Fragen stellt oder sich zunächst nur als dezenter Beobachter zeigt;
