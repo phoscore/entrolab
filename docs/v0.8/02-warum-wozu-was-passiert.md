@@ -1,7 +1,41 @@
 # Schritt 02 – Warum passiert das? Wozu sollte mich das interessieren?
 ## Diskussionsentwurf v0.8 – noch nicht zur Implementierung freigegeben
 
-**Projektname:** Reincarnated as a Proton (vom Eigentümer gewählt, noch keine Domain-/Produktionsumstellung). **Scope:** v0.8 Phase 1, Schritt 02 von 08; siehe [Roadmap](README.md). **Entscheidungsstatus: ENTWURF.** Dieses Dokument hält einen Vorschlag fest, über den wir mit dem Eigentümer sprechen. Erst seine inhaltliche Freigabe erlaubt die spätere Umwandlung in einen Work-Implementierungsauftrag. Keine Codeänderung jetzt.
+**Projektname:** Reincarnated as a Proton (vom Eigentümer gewählt, noch keine Domain-/Produktionsumstellung). **Scope:** v0.8 Phase 1, Schritt 02 von 08; siehe [Roadmap](README.md). **Entscheidungsstatus: TEILWEISE FESTGELEGT (Minimal-Variante); Gesamtschritt weiter ENTWURF.** Dieses Dokument hält einen Vorschlag fest, über den wir mit dem Eigentümer sprechen. Erst seine inhaltliche Freigabe erlaubt die spätere Umwandlung in einen Work-Implementierungsauftrag. Keine Codeänderung jetzt.
+
+## Verbindliche Nutzerentscheidung – Minimal-Variante (09.11.2026)
+
+**Eine einzige Hauptfrage pro gerade aktivem Labor bzw. sichtbarer Unteransicht** (inkl. eigenständigem Entropy-Marker- oder Wärme-Unterexperiment und Extreme-Objects-/Temperature-Kontext). Keine sichtbaren Mehrfach-Fragenkacheln, kein vorgeschaltetes Pflicht-Tutorial, kein permanent offener Erklärblock.
+
+- Standardansicht: **geschlossen**, aber mit **einer gut sichtbaren, prägnanten Frage als kleinem Erklär-Trigger** nahe der jeweiligen Laborüberschrift oder dem Haupt-Experiment; die Frage selbst ist der verständliche Zugang, nicht ein bloßes ⓘ-Symbol. Die eigentliche Simulation bleibt visuell dominant.
+- Öffnen per Klick, Enter oder Space: eine überschaubare Antwort mit **Was passiert? / Warum? / Probier es aus / Wo ist das nützlich?**. Optionaler Link zu **Modellgrenzen & Quellen**. Die kurze Erklärung darf mehrere 1–2-Satz-Absätze enthalten, aber keine Textwand.
+- **Weitere verwandte Fragen, Beispiele und Fachdetails werden standardmäßig versteckt** und sind erst über einen freiwilligen „Mehr Fragen / genauer verstehen“-Bereich abrufbar. Sie verdrängen die Hauptfrage nicht und lösen keine automatische Änderung an Eingaben/Simulationen aus.
+- Bei Labor- oder Unteransichtswechsel wird exakt die **neue** passende Hauptfrage sichtbar; verborgene Tabs dürfen nicht zusätzliche sichtbare Fragen oder Monsterinstanzen erzeugen. Im Glossar/Science-Bereich gelten kontextuelle Begriffslinks, keine falsche „sechste Simulation“.
+- Bei Sprachwechsel die gewählte Frage und offene/geschlossene Erklärzustände sinnvoll erhalten, keine Übersetzungsschlüssel als Text zeigen. Mobile: maximal eine kompakte Erklärung im sichtbaren Kontext, kein Overlap mit Bedienknöpfen.
+- Diese Entscheidung gilt **nicht** als Implementierungsfreigabe. Noch offen: optionale Mini-Prognose, Einladungsplatzierung im Detail, Nutzen-Mix und endgültige Formulierung aller Hauptfragen.
+
+### Konkret zu testender UI-Entwurf (Textskizze)
+
+```text
+┌───────────────────────────────────────────────┐
+│ ENTROPY LAB — Teilchenverteilung              │
+│                                               │
+│ › Warum sind ungefähr gleiche Verteilungen   │
+│   so viel häufiger?                           │
+│                                               │
+│ [Hier unverändert die eigentliche Simulation] │
+└───────────────────────────────────────────────┘
+
+Nach freiwilligem Öffnen der Frage:
+▾ Warum sind ungefähr gleiche Verteilungen so viel häufiger?
+  Weil viel mehr einzelne Anordnungen zur ungefähr
+  hälftigen Verteilung passen als zu einer Extremverteilung.
+  → Probier es: Vergleiche die Möglichkeiten im Diagramm.
+  → Bezug: Zufall und große Zahlen in der statistischen Physik.
+  [Modell & Quellen] [Mehr Fragen ...]
+```
+
+**Wichtig:** Das ist eine **didaktische Layoutskizze**, nicht die endgültige Entropy-Erklärung. Der vorhandene Markermechanismus bleibt nur ein gewähltes statistisches Lehrmodell, keine echte mikroskopische Gasdynamik.
 
 ## 1. Das eigentliche Problem
 
@@ -121,10 +155,12 @@ Science/Glossar ist **Nachschlage- und Vertiefungsbereich**, keine zusätzliche 
 
 ## 7. Offene gemeinsame Entscheidungen – vor Freigabe
 
-1. Sollen die Erklärungen standardmäßig **geschlossen** sein (Empfehlung) und lediglich einen Satz als Einladung zeigen?
-2. Soll jede Hauptansicht **eine** Hauptfrage besitzen und optional 2–3 alternative Fragen, oder direkt 2–3 sichtbare Themenkarten?
-3. Ist ein kleines freiwilliges „**Was glaubst du, passiert?**“ als konkrete Mini-Prognose erwünscht, oder reichen Handlungsempfehlung + anschließende Deutung?
-4. Soll die kurze „Warum/Wozu“-Funktion schon beim Start im Blick sein oder nur nach einem kleinen Info-Klick?
-5. Welche Anwendungen sind für das Zielpublikum besonders wichtig: Alltag und Technik / Universum und Kosmos / ungefähr halb-halb (Empfehlung)?
+**Entschieden:** Erklärungen standardmäßig **geschlossen**; **genau eine sichtbare Hauptfrage** je aktivem Labor/Unterlabor; andere Beispiele versteckt. Keine sichtbaren Fragekacheln.
 
-**Nächster Schritt:** Diese fünf Entscheidungen gemeinsam besprechen; danach Inhalte, Verlinkungen, UI-Lage und Testkriterien verfeinern, als **inhaltlich freigegeben** markieren. Work erst nach separater Bauentscheidung einsetzen.
+**Noch offen:**
+1. Soll es innerhalb der geöffneten Frage ein freiwilliges **„Was glaubst du, passiert?“** mit einer kurzen Vorhersage und anschließender Auflösung geben, oder nur „Probier es“ + Ergebnisbeschreibung ohne Auswahl?
+2. Soll die Hauptfrage **direkt unter dem Labortitel** stehen (gut auffindbar) oder neben dem zentralen Steuerungsbereich? Nicht ausschließlich hinter einem kleinen ⓘ verstecken.
+3. Welche realen Anwendungen priorisieren wir: Alltag/Technik, Universum/Astronomie oder etwa halb-halb? Keine künstlich konstruierten Nutzenbehauptungen.
+4. Nach Freigabe der obigen Punkte: die sechs konkreten Hauptfragen samt Kurzantworten und präzisen Mini-Experimenten abnehmen.
+
+**Nächster Schritt:** Die drei offenen Grundentscheidungen und didaktischen Beispiele gemeinsam verfeinern; dann als **inhaltlich freigegeben** markieren. Work erst nach separater Bauentscheidung einsetzen.
