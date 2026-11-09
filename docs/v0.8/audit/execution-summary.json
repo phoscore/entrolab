@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "date": "2026-11-09",
+  "scope": "read-only technical audit; audit/test documentation only",
+  "planningBase": "d43f2a2d864011794fc95a1d75b56167f39921ca",
+  "productionBase": "8b856086877ea21579cf7d74190ad08155d70c7f",
+  "testedAuditHead": "3212db998e691b0d099edf5c6f589da3730d1e01",
+  "runs": [
+    {
+      "id": 42637035015,
+      "name": "v0.8 read-only technical audit",
+      "head": "3212db998e691b0d099edf5c6f589da3730d1e01",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/phoscore/entrolab/actions/runs/42637035015"
+    },
+    {
+      "id": 42637035279,
+      "name": "ENTROLAB tests",
+      "head": "3212db998e691b0d099edf5c6f589da3730d1e01",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/phoscore/entrolab/actions/runs/42637035279"
+    }
+  ],
+  "regular": {
+    "selfChecks": 10,
+    "nodeCases": 149,
+    "total": 159,
+    "passed": 159
+  },
+  "chromium": {
+    "cases": 38,
+    "passed": 38
+  },
+  "historicalBenchmarks": {
+    "count": 12,
+    "exact": true,
+    "referenceCommit": "39fde20f812da1d371b4990b15062062cddd102f",
+    "localOutputSha256": "743a9773953b40848fb8596e15df1a60ab8ef507222b62400cb23c32c23f307a"
+  },
+  "originalIntegrity": {
+    "files": 6,
+    "passed": 6,
+    "commit": "be2502d51a449de3e515faaf72ab5954b1a739d4",
+    "archiveRef": "refs/heads/archive/v0.1",
+    "archiveTarget": "be2502d51a449de3e515faaf72ab5954b1a739d4",
+    "tagRef": "refs/tags/v0.1",
+    "tagLookup": "404; matching tag refs empty; no tag mutation performed"
+  },
+  "applicationBlobCheck": {
+    "matched": 28,
+    "mismatches": 0
+  },
+  "evidenceArtifact": {
+    "id": 13683736744,
+    "name": "v08-independent-audit-evidence",
+    "size_in_bytes": 1602064,
+    "expired": false,
+    "created_at": "2026-11-09T14:41:44Z",
+    "expires_at": "2027-02-07T14:40:48Z",
+    "updated_at": "2026-11-09T14:41:44Z",
+    "digest": "sha256:9a784bc9d76bd61616247d96a66d4abc426b2802d7627219c00a106c8771e064",
+    "workflow_run": {
+      "id": 42637035015,
+      "repository_id": 1449838107,
+      "head_repository_id": 1449838107,
+      "head_branch": "develop/v0.8",
+      "head_sha": "3212db998e691b0d099edf5c6f589da3730d1e01"
+    }
+  },
+  "limits": [
+    "local Chromium launch denied before navigation; real browser evidence is GitHub Actions",
+    "no actual screen reader, physical phone, Safari or Firefox",
+    "native desktop zoom shortcut did not change DPR; actual zoom not verified",
+    "bounded computed contrast/name inventory is not WCAG certification",
+    "no full heap/CPU-throttling/long-task profile",
+    "no feature implementation, model changes, merge or deployment"
+  ]
+}

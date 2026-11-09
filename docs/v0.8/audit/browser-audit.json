@@ -1,0 +1,1346 @@
+{
+  "schema": 1,
+  "scopeBase": "d43f2a2d864011794fc95a1d75b56167f39921ca",
+  "productionBase": "8b856086877ea21579cf7d74190ad08155d70c7f",
+  "executionHead": "3212db998e691b0d099edf5c6f589da3730d1e01",
+  "runtime": "v22.23.4",
+  "measurements": {
+    "master": {
+      "bytes": 144400,
+      "sha256": "5dfb6a91195d7c3925cee9ae202332c26476de257b1a2f5b1469da1c08536ab3",
+      "gitBlob": "b6f41e288ac18b60dd19bd79773e205c73048f15",
+      "jpegSignature": "ffd8ff",
+      "decode": {
+        "width": 1536,
+        "height": 1536,
+        "rgbaEstimateBytes": 9437184,
+        "cornerPixels": [
+          [
+            2,
+            0,
+            1,
+            255
+          ],
+          [
+            2,
+            0,
+            1,
+            255
+          ],
+          [
+            1,
+            1,
+            1,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            255
+          ]
+        ]
+      }
+    },
+    "views": [
+      {
+        "tab": "gravity",
+        "language": "de",
+        "width": 1440,
+        "scroll": 1440,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "predictionOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Modellvorhersage anzeigen",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "trails",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Flugbahnen",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "labels",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Beschriftungen",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "grid",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Koordinatengitter",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "universe",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Interaktiver Weltraum: Körper anklicken, ziehen zum Verschieben der Ansicht, Mausrad zum Zoomen",
+            "width": 779.625,
+            "height": 715.890625,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "blackhole",
+        "language": "de",
+        "width": 1440,
+        "scroll": 1440,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [
+          {
+            "id": "sizes",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmischer Radienvergleich",
+            "width": 1006.625,
+            "height": 185,
+            "disabled": false
+          },
+          {
+            "id": "bhChart",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmisches Diagramm für Temperatur, Lebensdauer und Radius",
+            "width": 1006.625,
+            "height": 235,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "extreme",
+        "language": "de",
+        "width": 1440,
+        "scroll": 1440,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "diskOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Akkretionsscheibe · illustrativ",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "geometryOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Geometrie statt Artwork",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "extremeCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Illustrative Ansicht des ausgewählten extremen Himmelskörpers",
+            "width": 1013.625,
+            "height": 520,
+            "disabled": false
+          },
+          {
+            "id": "thermalCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Abstrakte Animation für thermische Anregung, keine reale Materiesimulation",
+            "width": 552,
+            "height": 210,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "entropy",
+        "language": "de",
+        "width": 1440,
+        "scroll": 1440,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "science",
+        "language": "de",
+        "width": 1440,
+        "scroll": 1440,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      }
+    ],
+    "directScienceFragment": {
+      "hash": "#science",
+      "activeView": "gravity",
+      "scienceVisible": false
+    },
+    "keyboardPlacement": {
+      "placementLabel": "✕ Platzieren abbrechen",
+      "bodiesBefore": 9,
+      "bodiesAfter": 9,
+      "canvasTabIndex": -1,
+      "focusPath": [
+        "SUMMARY",
+        "SUMMARY",
+        "zoomOut",
+        "zoomIn",
+        "fit",
+        "gravityFocus",
+        "full",
+        "play",
+        "reset",
+        "speed",
+        "objectList",
+        "SUMMARY",
+        "SUMMARY",
+        "BODY",
+        "A",
+        "A",
+        "BUTTON",
+        "BUTTON",
+        "BUTTON",
+        "BUTTON",
+        "BUTTON",
+        "helpToggle",
+        "BUTTON",
+        "BUTTON",
+        "SUMMARY",
+        "A",
+        "A",
+        "scenario",
+        "SUMMARY",
+        "BUTTON",
+        "BUTTON",
+        "BUTTON",
+        "add",
+        "SUMMARY",
+        "SUMMARY"
+      ]
+    },
+    "navigationPrediction": {
+      "forecastBefore": true,
+      "forecastAfter": false,
+      "bodiesEqual": true,
+      "generationBefore": 3,
+      "generationAfter": 4
+    },
+    "pausedGravity": {
+      "before": 35,
+      "after": 95,
+      "paused": true
+    },
+    "thermalLiveChanges2s": 9,
+    "navigation100": {
+      "modelsBefore": {
+        "gravity": {
+          "bodies": [
+            {
+              "id": 1,
+              "name": "Sonne",
+              "type": "star",
+              "m": 1,
+              "x": 0,
+              "y": 0,
+              "vx": -0.00000661030075871763,
+              "vy": -0.000003536894215902632,
+              "color": "#ffd19a",
+              "trail": []
+            },
+            {
+              "id": 2,
+              "name": "Merkur",
+              "type": "planet",
+              "m": 1.6601e-7,
+              "x": 0.387,
+              "y": 0,
+              "vx": -0.00000661030075871763,
+              "vy": 0.027648843677457863,
+              "color": "#c1aaa0",
+              "trail": []
+            },
+            {
+              "id": 3,
+              "name": "Venus",
+              "type": "planet",
+              "m": 0.0000024478,
+              "x": 0.22797806801177925,
+              "y": 0.6861158797940888,
+              "vx": -0.01920558484794471,
+              "vy": 0.006375771986360301,
+              "color": "#e9c18d",
+              "trail": []
+            },
+            {
+              "id": 4,
+              "name": "Erde",
+              "type": "planet",
+              "m": 0.0000030034146856628466,
+              "x": -0.8011436155469337,
+              "y": 0.5984721441039565,
+              "vx": -0.010301742999152808,
+              "vy": -0.013785097011564018,
+              "color": "#6cceec",
+              "trail": []
+            },
+            {
+              "id": 5,
+              "name": "Mars",
+              "type": "planet",
+              "m": 3.227e-7,
+              "x": -1.2505324605854906,
+              "y": -0.8710594497633318,
+              "vx": 0.00795788671582306,
+              "vy": -0.01143773011050891,
+              "color": "#e38976",
+              "trail": []
+            },
+            {
+              "id": 6,
+              "name": "Jupiter",
+              "type": "planet",
+              "m": 0.0009546,
+              "x": 1.4758943509651663,
+              "y": -4.98928300107231,
+              "vx": 0.007225173058078007,
+              "vy": 0.0021357180256627805,
+              "color": "#cfac92",
+              "trail": []
+            },
+            {
+              "id": 7,
+              "name": "Saturn",
+              "type": "planet",
+              "m": 0.0002858,
+              "x": 9.531749101607051,
+              "y": -0.3164301882140494,
+              "vx": 0.00017820939178361193,
+              "vy": 0.005563741462797141,
+              "color": "#ddc9a0",
+              "trail": []
+            },
+            {
+              "id": 8,
+              "name": "Uranus",
+              "type": "planet",
+              "m": 0.00004366,
+              "x": 6.651931749254146,
+              "y": 18.00021955430724,
+              "vx": -0.003690048164409488,
+              "vy": 0.0013576674620809843,
+              "color": "#a3e5df",
+              "trail": []
+            },
+            {
+              "id": 9,
+              "name": "Neptun",
+              "type": "planet",
+              "m": 0.00005151,
+              "x": -23.480029706024876,
+              "y": 18.785449289388566,
+              "vx": -0.0019663999165610976,
+              "vy": -0.0024530880168814762,
+              "color": "#729bf5",
+              "trail": []
+            }
+          ],
+          "selected": 4,
+          "paused": true,
+          "elapsed": 0,
+          "collisions": 0,
+          "view": {
+            "x": -6.974140302208912,
+            "y": 6.898083144158129,
+            "scale": 18.166592656403367
+          },
+          "forecast": null,
+          "predictionGeneration": 5
+        },
+        "entropy": {
+          "state": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "steps": 0,
+          "playing": false,
+          "n": 12,
+          "k": 12,
+          "scheduled": false
+        },
+        "thermal": {
+          "params": {
+            "a": 350,
+            "b": 290,
+            "ca": 1000,
+            "cb": 1000,
+            "g": 10
+          },
+          "time": 20,
+          "playing": false,
+          "scheduled": false,
+          "result": {
+            "time": 20,
+            "ta": 340.1096013810692,
+            "tb": 299.8903986189308,
+            "eq": 320,
+            "tau": 50,
+            "q": 9890.398618930822,
+            "power": 402.19202762138366,
+            "energy": 640000,
+            "initialEnergy": 640000,
+            "energyError": 0,
+            "sa": -28.665231815963278,
+            "sb": 33.53614698662146,
+            "entropy": 4.870915170658182,
+            "production": 0.15859352839322016
+          },
+          "applied": 0
+        }
+      },
+      "modelsAfter": {
+        "gravity": {
+          "bodies": [
+            {
+              "id": 1,
+              "name": "Sonne",
+              "type": "star",
+              "m": 1,
+              "x": 0,
+              "y": 0,
+              "vx": -0.00000661030075871763,
+              "vy": -0.000003536894215902632,
+              "color": "#ffd19a",
+              "trail": []
+            },
+            {
+              "id": 2,
+              "name": "Merkur",
+              "type": "planet",
+              "m": 1.6601e-7,
+              "x": 0.387,
+              "y": 0,
+              "vx": -0.00000661030075871763,
+              "vy": 0.027648843677457863,
+              "color": "#c1aaa0",
+              "trail": []
+            },
+            {
+              "id": 3,
+              "name": "Venus",
+              "type": "planet",
+              "m": 0.0000024478,
+              "x": 0.22797806801177925,
+              "y": 0.6861158797940888,
+              "vx": -0.01920558484794471,
+              "vy": 0.006375771986360301,
+              "color": "#e9c18d",
+              "trail": []
+            },
+            {
+              "id": 4,
+              "name": "Erde",
+              "type": "planet",
+              "m": 0.0000030034146856628466,
+              "x": -0.8011436155469337,
+              "y": 0.5984721441039565,
+              "vx": -0.010301742999152808,
+              "vy": -0.013785097011564018,
+              "color": "#6cceec",
+              "trail": []
+            },
+            {
+              "id": 5,
+              "name": "Mars",
+              "type": "planet",
+              "m": 3.227e-7,
+              "x": -1.2505324605854906,
+              "y": -0.8710594497633318,
+              "vx": 0.00795788671582306,
+              "vy": -0.01143773011050891,
+              "color": "#e38976",
+              "trail": []
+            },
+            {
+              "id": 6,
+              "name": "Jupiter",
+              "type": "planet",
+              "m": 0.0009546,
+              "x": 1.4758943509651663,
+              "y": -4.98928300107231,
+              "vx": 0.007225173058078007,
+              "vy": 0.0021357180256627805,
+              "color": "#cfac92",
+              "trail": []
+            },
+            {
+              "id": 7,
+              "name": "Saturn",
+              "type": "planet",
+              "m": 0.0002858,
+              "x": 9.531749101607051,
+              "y": -0.3164301882140494,
+              "vx": 0.00017820939178361193,
+              "vy": 0.005563741462797141,
+              "color": "#ddc9a0",
+              "trail": []
+            },
+            {
+              "id": 8,
+              "name": "Uranus",
+              "type": "planet",
+              "m": 0.00004366,
+              "x": 6.651931749254146,
+              "y": 18.00021955430724,
+              "vx": -0.003690048164409488,
+              "vy": 0.0013576674620809843,
+              "color": "#a3e5df",
+              "trail": []
+            },
+            {
+              "id": 9,
+              "name": "Neptun",
+              "type": "planet",
+              "m": 0.00005151,
+              "x": -23.480029706024876,
+              "y": 18.785449289388566,
+              "vx": -0.0019663999165610976,
+              "vy": -0.0024530880168814762,
+              "color": "#729bf5",
+              "trail": []
+            }
+          ],
+          "selected": 4,
+          "paused": true,
+          "elapsed": 0,
+          "collisions": 0,
+          "view": {
+            "x": -6.974140302208912,
+            "y": 6.898083144158129,
+            "scale": 18.166592656403367
+          },
+          "forecast": null,
+          "predictionGeneration": 105
+        },
+        "entropy": {
+          "state": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "steps": 0,
+          "playing": false,
+          "n": 12,
+          "k": 12,
+          "scheduled": false
+        },
+        "thermal": {
+          "params": {
+            "a": 350,
+            "b": 290,
+            "ca": 1000,
+            "cb": 1000,
+            "g": 10
+          },
+          "time": 20,
+          "playing": false,
+          "scheduled": false,
+          "result": {
+            "time": 20,
+            "ta": 340.1096013810692,
+            "tb": 299.8903986189308,
+            "eq": 320,
+            "tau": 50,
+            "q": 9890.398618930822,
+            "power": 402.19202762138366,
+            "energy": 640000,
+            "initialEnergy": 640000,
+            "energyError": 0,
+            "sa": -28.665231815963278,
+            "sb": 33.53614698662146,
+            "entropy": 4.870915170658182,
+            "production": 0.15859352839322016
+          },
+          "applied": 0
+        }
+      },
+      "domNodesBefore": 1241,
+      "domNodes": 1241,
+      "pageErrors": []
+    },
+    "nativeZoomAttempt": {
+      "beforeDpr": 1,
+      "afterDpr": 1,
+      "verified": false
+    },
+    "reflow": [
+      {
+        "tab": "gravity",
+        "language": "en",
+        "width": 320,
+        "height": 900,
+        "scroll": 320,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "predictionOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Show model prediction",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "trails",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Trails",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "labels",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Labels",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "grid",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Coordinate grid",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "universe",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Interactive space: click bodies, drag to pan, scroll to zoom",
+            "width": 292.40625,
+            "height": 370,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "blackhole",
+        "language": "en",
+        "width": 320,
+        "height": 900,
+        "scroll": 320,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [
+          {
+            "id": "sizes",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic radius comparison",
+            "width": 256.40625,
+            "height": 185,
+            "disabled": false
+          },
+          {
+            "id": "bhChart",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic chart of temperature, lifetime and radius",
+            "width": 256.40625,
+            "height": 235,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "extreme",
+        "language": "en",
+        "width": 320,
+        "height": 900,
+        "scroll": 320,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "diskOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Accretion disk · illustrative",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "geometryOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Geometry instead of artwork",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "extremeCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Illustrative view of the selected extreme object",
+            "width": 292.40625,
+            "height": 360,
+            "disabled": false
+          },
+          {
+            "id": "thermalCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Abstract animation of thermal excitation, not a real matter simulation",
+            "width": 258.40625,
+            "height": 150,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "entropy",
+        "language": "en",
+        "width": 320,
+        "height": 900,
+        "scroll": 320,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "science",
+        "language": "en",
+        "width": 320,
+        "height": 900,
+        "scroll": 320,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": [],
+        "boundaryTransferEnabled": true
+      },
+      {
+        "tab": "gravity",
+        "language": "en",
+        "width": 390,
+        "height": 844,
+        "scroll": 390,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "predictionOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Show model prediction",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "trails",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Trails",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "labels",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Labels",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "grid",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Coordinate grid",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "universe",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Interactive space: click bodies, drag to pan, scroll to zoom",
+            "width": 356.8125,
+            "height": 370,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "blackhole",
+        "language": "en",
+        "width": 390,
+        "height": 844,
+        "scroll": 390,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [
+          {
+            "id": "sizes",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic radius comparison",
+            "width": 320.8125,
+            "height": 185,
+            "disabled": false
+          },
+          {
+            "id": "bhChart",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic chart of temperature, lifetime and radius",
+            "width": 320.8125,
+            "height": 235,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "extreme",
+        "language": "en",
+        "width": 390,
+        "height": 844,
+        "scroll": 390,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "diskOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Accretion disk · illustrative",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "geometryOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Geometry instead of artwork",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "extremeCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Illustrative view of the selected extreme object",
+            "width": 356.8125,
+            "height": 360,
+            "disabled": false
+          },
+          {
+            "id": "thermalCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Abstract animation of thermal excitation, not a real matter simulation",
+            "width": 322.8125,
+            "height": 150,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "entropy",
+        "language": "en",
+        "width": 390,
+        "height": 844,
+        "scroll": 390,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "science",
+        "language": "en",
+        "width": 390,
+        "height": 844,
+        "scroll": 390,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": [],
+        "boundaryTransferEnabled": true
+      },
+      {
+        "tab": "gravity",
+        "language": "en",
+        "width": 844,
+        "height": 390,
+        "scroll": 844,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "predictionOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Show model prediction",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "trails",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Trails",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "labels",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Labels",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "grid",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Coordinate grid",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "universe",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Interactive space: click bodies, drag to pan, scroll to zoom",
+            "width": 791.375,
+            "height": 551,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "blackhole",
+        "language": "en",
+        "width": 844,
+        "height": 390,
+        "scroll": 844,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [
+          {
+            "id": "sizes",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic radius comparison",
+            "width": 751.375,
+            "height": 185,
+            "disabled": false
+          },
+          {
+            "id": "bhChart",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic chart of temperature, lifetime and radius",
+            "width": 751.375,
+            "height": 235,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "extreme",
+        "language": "en",
+        "width": 844,
+        "height": 390,
+        "scroll": 844,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "diskOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Accretion disk · illustrative",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "geometryOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Geometry instead of artwork",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "extremeCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Illustrative view of the selected extreme object",
+            "width": 791.375,
+            "height": 440,
+            "disabled": false
+          },
+          {
+            "id": "thermalCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Abstract animation of thermal excitation, not a real matter simulation",
+            "width": 737.375,
+            "height": 150,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "entropy",
+        "language": "en",
+        "width": 844,
+        "height": 390,
+        "scroll": 844,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "science",
+        "language": "en",
+        "width": 844,
+        "height": 390,
+        "scroll": 844,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": [],
+        "boundaryTransferEnabled": true
+      },
+      {
+        "tab": "gravity",
+        "language": "en",
+        "width": 360,
+        "height": 900,
+        "scroll": 360,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "predictionOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Show model prediction",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "trails",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Trails",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "labels",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Labels",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "grid",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Coordinate grid",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "universe",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Interactive space: click bodies, drag to pan, scroll to zoom",
+            "width": 329.21875,
+            "height": 370,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "blackhole",
+        "language": "en",
+        "width": 360,
+        "height": 900,
+        "scroll": 360,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [
+          {
+            "id": "sizes",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic radius comparison",
+            "width": 293.21875,
+            "height": 185,
+            "disabled": false
+          },
+          {
+            "id": "bhChart",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Logarithmic chart of temperature, lifetime and radius",
+            "width": 293.21875,
+            "height": 235,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "extreme",
+        "language": "en",
+        "width": 360,
+        "height": 900,
+        "scroll": 360,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [
+          {
+            "id": "diskOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Accretion disk · illustrative",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          },
+          {
+            "id": "geometryOn",
+            "tag": "INPUT",
+            "type": "checkbox",
+            "tabIndex": 0,
+            "name": "Geometry instead of artwork",
+            "width": 18,
+            "height": 18,
+            "disabled": false
+          }
+        ],
+        "canvases": [
+          {
+            "id": "extremeCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Illustrative view of the selected extreme object",
+            "width": 329.21875,
+            "height": 360,
+            "disabled": false
+          },
+          {
+            "id": "thermalCanvas",
+            "tag": "CANVAS",
+            "tabIndex": -1,
+            "name": "Abstract animation of thermal excitation, not a real matter simulation",
+            "width": 295.21875,
+            "height": 150,
+            "disabled": false
+          }
+        ],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "entropy",
+        "language": "en",
+        "width": 360,
+        "height": 900,
+        "scroll": 360,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": []
+      },
+      {
+        "tab": "science",
+        "language": "en",
+        "width": 360,
+        "height": 900,
+        "scroll": 360,
+        "active": "BUTTON",
+        "controlsWithoutName": [],
+        "smallTargetCandidates": [],
+        "canvases": [],
+        "contrastCandidates": [],
+        "boundaryTransferEnabled": true
+      }
+    ],
+    "extremeLifecycle": {
+      "visibleBefore": {
+        "frames": 16,
+        "animating": "true",
+        "paintMs": "0.600"
+      },
+      "visibleAfter": {
+        "frames": 55,
+        "animating": "true",
+        "paintMs": "0.600"
+      },
+      "hiddenStart": "57",
+      "hiddenEnd": "57",
+      "reducedStart": "58",
+      "reducedEnd": "58",
+      "reducedAnimating": "false"
+    }
+  },
+  "pageErrors": [],
+  "limits": [
+    "candidate name-width calculation is not a rebranding implementation",
+    "computed contrast candidates need human review",
+    "viewport emulation is not physical touch hardware",
+    "native desktop zoom is only verified if DPR actually changes",
+    "no actual screen reader used"
+  ],
+  "chromium": "151.0.7922.34"
+}
