@@ -8,6 +8,28 @@ const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwrigh
 const base='33947cfeccd738512c83d21bab47a696ee57e923',scratch=await mkdtemp(join(tmpdir(),'entrolab-v08-perf-'));
 const output=resolve('browser-results');await mkdir(output,{recursive:true});
 let browser,server;
+async function beginTrace(cdp){
+ try{await cdp.send('Tracing.start',{transferMode:'ReturnAsStream',traceConfig:{recordMode:'recordAsMuchAsPossible',includedCategories:['devtools.timeline']}});return {available:true}}
+ catch(error){return {available:false,error:String(error.message)}}
+}
+async function finishTrace(cdp,start){
+ if(!start.available)return {status:'unavailable',error:start.error};
+ let stream;
+ try{
+  const complete=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));await cdp.send('Tracing.end');const result=await complete;stream=result.stream;
+  if(!stream)throw Error('No trace stream returned');const chunks=[];let eof=false;
+  while(!eof){const chunk=await cdp.send('IO.read',{handle:stream,size:1024*1024});chunks.push(chunk.base64Encoded?Buffer.from(chunk.data,'base64'):Buffer.from(chunk.data));eof=chunk.eof}
+  const trace=JSON.parse(Buffer.concat(chunks).toString('utf8')),events=trace.traceEvents??[];
+  const stats={};
+  for(const name of ['Paint','Layout','UpdateLayoutTree','RasterTask']){
+   const values=events.filter(e=>e.name===name&&e.ph==='X'&&Number.isFinite(e.dur)&&e.dur>=0).map(e=>e.dur/1000).sort((a,b)=>a-b);
+   stats[name]={count:values.length,p50:values.length?values[Math.floor(values.length*.5)]:null,p95:values.length?values[Math.floor(values.length*.95)]:null,max:values.at(-1)??null,total:values.reduce((a,b)=>a+b,0)};
+  }
+  return {status:result.dataLossOccurred?'incomplete':'recorded',dataLossOccurred:!!result.dataLossOccurred,traceEvents:events.length,units:'ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency',stats};
+ }catch(error){return {status:'unavailable',error:String(error.message)}}
+ finally{if(stream)await cdp.send('IO.close',{handle:stream})}
+}
+
 try{
  const archive=execFileSync('git',['archive',base,'dist'],{maxBuffer:20*1024*1024});execFileSync('tar',['-x','-C',scratch],{input:archive});
  const roots={baseline:join(scratch,'dist'),current:resolve('dist')};
@@ -26,17 +48,17 @@ try{
    // responsive grid legitimately grows with its sidebar content.
    await page.addStyleTag({content:'#universe{width:704px!important;height:600px!important;min-height:600px!important;max-height:600px!important;flex:0 0 600px!important}'});
    const canvas=scene==='gravity-paused'?'#universe':'#extremeCanvas';if(scene==='extreme-visible')await page.locator('[data-tab=extreme]').click();await page.locator(canvas).evaluate(e=>e.scrollIntoView({block:'center',behavior:'auto'}));
-   await page.evaluate(()=>new Promise(done=>{let n=0;function tick(){if(++n===60)done();else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
+   await page.evaluate(()=>new Promise(done=>{let n=0;function tick(){if(++n===180)done();else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
    const cdp=await context.newCDPSession(page);await cdp.send('Performance.enable');await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.collectGarbage');
-   const before=await cdp.send('Performance.getMetrics');
+   const traceStart=await beginTrace(cdp),before=await cdp.send('Performance.getMetrics');
    const frames=await page.evaluate(()=>new Promise(done=>{const intervals=[],longTasks=[];let last,start;const observer=new PerformanceObserver(list=>{for(const e of list.getEntries())longTasks.push(e.duration)});observer.observe({type:'longtask'});function tick(now){if(start===undefined)start=now;if(last!==undefined)intervals.push(now-last);last=now;if(now-start>=30000){observer.disconnect();intervals.sort((a,b)=>a-b);done({duration:now-start,frames:intervals.length,p50:intervals[Math.floor(intervals.length*.5)],p95:intervals[Math.floor(intervals.length*.95)],max:intervals.at(-1),longTasks})}else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
    const after=await cdp.send('Performance.getMetrics'),get=(r,k)=>r.metrics.find(m=>m.name===k)?.value;
    const cpu=Object.fromEntries(['TaskDuration','ScriptDuration','LayoutDuration','RecalcStyleDuration'].map(k=>[k,get(after,k)-get(before,k)]));
-   const rect=await page.locator(canvas).boundingBox(),dom=await cdp.send('Memory.getDOMCounters');
-   measurements.push({repetition,scene,variant,frames,cpu,rect,dom,errors});console.log(JSON.stringify(measurements.at(-1)));
+   const paint=await finishTrace(cdp,traceStart),rect=await page.locator(canvas).boundingBox(),dom=await cdp.send('Memory.getDOMCounters');
+   measurements.push({repetition,scene,variant,frames,cpu,paint,rect,dom,errors});console.log(JSON.stringify(measurements.at(-1)));
    if(errors.length)throw Error('Page errors: '+errors.join('; '));
   }finally{await context.close()}
  }
- const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),viewport:[1360,1000],dpr:1,font:'system fallback; Google fonts blocked',drawingFixture:'Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change',durationPerSampleSeconds:30,repetitions:2,scope:'same GitHub runner/browser, paused gravity and visible existing BH animation; two order-reversed pairs, not a mobile-hardware or universal 10% guarantee',measurements};
+ const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),viewport:[1360,1000],dpr:1,font:'system fallback; Google fonts blocked',drawingFixture:'Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change',durationPerSampleSeconds:30,repetitions:2,warmupFrames:180,paintTrace:'CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported',scope:'same GitHub runner/browser, paused gravity and visible existing BH animation; two order-reversed pairs, not a mobile-hardware or universal 10% guarantee',measurements};
  await writeFile(join(output,'v08-performance.json'),JSON.stringify(report,null,2));
 }finally{await browser?.close();if(server)await new Promise(done=>server.close(done));await rm(scratch,{recursive:true,force:true})}
