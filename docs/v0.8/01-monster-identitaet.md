@@ -1,4 +1,6 @@
 # Schritt 01 – Das Entropie-Wesen: Entropy Wraith / Void Beast
+
+> **Aktueller Umsetzungsstand (09.11.2026):** Schritte 01–04 sind ausdrücklich zur Implementierung auf dem isolierten Entwicklungsbranch freigegeben. Frühere Aussagen „keine Work-/Codefreigabe“ in diesem Plan sind damit für 01–04 überholt. Monsterintegration erst nach Sichtfreigabe; Merge, Deployment, Domain-/öffentliches Rebranding und Schritte 05–08 bleiben gesperrt. Verbindliche Präzisierungen: [Umsetzungsvertrag v0.8](Umsetzungsvertrag_v0.8.md).
 ## Ausführliche Design- und Implementierungsspezifikation – ENTWURF
 
 **Produktkontext:** v0.8 / v0.8.5, siehe [Roadmap](README.md). **Stilrichtung A + Glitch bereits ausdrücklich gewünscht.** Anatomie, Namen, finale Grafik und genaue Auftrittsfrequenz bleiben für gemeinsame Sichtung offen. Noch **keine Freigabe für Work-Implementierung**. **Gewählter Website-/Produktname ist „Reincarnated as a Proton“ (Nutzerentscheidung am 09.11.2026)**; die Domain-/Markenprüfung und Umstellung stehen aus. „Entropy Wraith“ und „Void Beast“ sind weiterhin nur **Arbeitstitel für die Figur**, nicht für die Website.
@@ -40,28 +42,11 @@ Das Wesen ist **das lebendige Markenzeichen** der ganzen Wissenschaftswebsite. E
 
 **Leitsatz:** „Kosmischer Beobachter mit eigenem Charakter, nicht schwarzer Kreis mit Smiley.“ Das alte SL-Smile-Favicon darf als historische Vorversion erhalten bleiben, soll aber nicht die neue volle Kreatur definieren. Keine Vermarktung der erfundenen Figur als wissenschaftlich beobachtbares Phänomen.
 
-### 2. Stil A: asymmetrische, greifbare Silhouette mit räumlicher Wirkung
+### 2. Verbindliche Grafik und Größenvarianten
 
-**Grundkörper / Haltung (Hero-Version, ca. 180–320 px):**
-- Silhouette eines frei schwebenden, nicht eindeutig humanoiden Wesens. Deutlich **länger als breit**, organisch-geometrisch asymmetrisch, leicht nach vorn gebeugt wie beim Beobachten.
-- Dunkler, tiefer Kern/Brustkorb mit 3–5 versetzten, unvollständigen Rippen-/Panzersegmenten; keine glatte Kugel.
-- Zwei unterschiedlich auslaufende seitliche Arm-/Greifformen; eine lang und neugierig, die andere fragmentiert und fast unsichtbar. Keine klassischen Cartoon-Hände; eher abgebrochene Fingerglieder/gespannte Partikelstreifen.
-- Oberteil/Kopf als schräger maskenartiger Keil mit **zwei ungleich großen, leuchtenden Augen** oder zeitweise nur einem sichtbaren Spalt; ein **schmales rissiges Grinsen** ist ikonisches Detail. Mimik situativ verändern, nicht dauerhaft überzeichnen.
-- Oben/seitlich 2–4 gebrochene Halo-/Ring-/Hornfragmente; keine echte Krone, kein klassischer Helm. Unterkörper läuft in schwebende Schleier, rissige Flächen, dünne Linien und eine kleine Partikelspur aus; keine notwendigen Beine.
-- Mindestens **drei Tiefenlagen** (vor/hinter dem Kern schwebende Fragmente, innere Kanten-/Schattierung, äußere gedämpfte Aura): grafisch 2.5D-Charakter statt flacher Icon-Scheibe. Dies kann mit Vektorformen, Masken, leichter Parallaxe und Schatten realisiert werden; **keine Pflicht zu echter 3D-Engine**.
-- Erkennbar als EINE einheitliche Figur auch ohne Glow oder Partikeleffekt. Die Silhouette muss ohne Farbe in einem kleinen Graustufen-Test eindeutig lesbar bleiben.
+Die unveränderte rote/schwarze Masterreferenz ist alleinige gestalterische Quelle. Frühere violett/türkise 2.5D-, Panzer-, Tiefenlagen- und Mimikforderungen sind verworfene Konzepte und keine zusätzliche Abnahme. Hero, Peek und Icon sind Ausschnitte/Skalierungen derselben Figur. Keine freie Neugenerierung oder neue Anatomie. Derivat-Montage mit 32/64/128/240 px und Original zuerst visuell abnehmen. Kein aktiver Faviconwechsel ohne separates Branding-Gate.
 
-**Nicht gewünscht:** Chibi, klassisches niedliches Haustier, glatter 2D-Kreis, Emojis statt Design, generischer Dämon mit Hörnern/Flügeln, zu filigrane Fantasy-Illustration, unzählige Tentakel, roter Horrorblut-Look, fotorealistische Monsterhaut, schwere 3D-Rendering-Pipeline.
-
-**Skalierung:** (a) kompakter Kopf/Fragment-Ausschnitt ca. 30–48 px, (b) halber Körper ca. 80–150 px, (c) vollständige Silhouette ca. 180–320 px. Diese sind **Darstellungszustände derselben Kreatur** und dürfen **niemals zeitgleich als mehrere sichtbare Monster** verwendet werden. Ein reduziertes Symbol soll trotz Größe noch nach dem großen Wesen aussehen; dabei können filigrane Partikel wegfallen. Das Favicon zählt als statisches Browser-Chrome-Branding, nicht als zweite In-Page-Figur.
-
-### 3. Palette, Formen und „Glitch“-Charakter
-
-**Primärfarben (Vorschlagswerte, nach visueller Abnahme anpassbar):**
-- Kern: fast schwarz / Tintenblau (#0B0C17), tiefes Indigo (#21172F).
-- Kontur/Kanten: mattes Violett (#9676C6), wenige hellere Akzente (#C3A5F2).
-- Augen / Information: gedämpftes Türkis (#77DCD0).
-- Seltene Temperatur-/Energie-Reaktion: gedämpftes warmes Amber (#E7A96B), nicht immer gleichzeitig mit allen anderen Akzentfarben.
+### 3. Sparsame Bewegung statt neuer Anatomie
 
 **Glitch:** kein zufälliges Stroboskop, keine kaputten Schriften. Stattdessen:
 - Für **einzelne sehr kurze Momente** 1–3 px Segmentversatz an Augen/Ringen oder Farbkanten;
@@ -128,10 +113,10 @@ Der optionale stilisierte kosmische Hintergrund verwendet sehr wenige langsam dr
 
 ### 8. Visuelle Tests und Abnahme – vor der großflächigen Integration
 
-**Zuerst drei visuelle Prototypen derselben Stilrichtung A** (z. B. hero / Rand-Peek / kompakt), keine drei völlig unterschiedlichen Charaktere. Dazu 2–3 Mimikzustände und ein sehr subtiler Glitch-Moment. Die Vorschauen müssen bei dunklem Hintergrund und auf kleinen Anzeigen funktionieren. Erst nachdem der Nutzer einen Prototyp freigegeben hat, eine breite Integration beginnen.
+**Zuerst drei visuelle Prototypen derselben Stilrichtung A** (z. B. hero / Rand-Peek / kompakt), keine drei völlig unterschiedlichen Charaktere. Optional ein subtiler Transform-Zustand derselben Grafik; keine zusätzlichen Mimik-/Neuzeichnungsanforderungen. Die Vorschauen müssen bei dunklem Hintergrund und auf kleinen Anzeigen funktionieren. Erst nachdem der Nutzer einen Prototyp freigegeben hat, eine breite Integration beginnen.
 
 **Abnahmekriterien – bei Work-Implementierung prüfbar:**
-1. Der Körper hat an mindestens zwei Größen eine deutlich organisch-asymmetrische Silhouette und mehrere Tiefen-/Panzer-/Fragmentebenen; **nicht** nur eine 2D-Kugel mit Gesicht.
+1. Die abgenommenen Varianten erhalten die asymmetrische rote Skizzenidentität des Masters in mindestens zwei Größen; keine Pflicht zu neuen Tiefen-/Panzer-/Fragmentebenen.
 2. Bei 10+ schnellen UI-Interaktionen/überlappenden aufklappbaren Erklärungen gleichzeitig **höchstens ein** sichtbares Monster; beim Tabwechsel, ESC und Schließen keine verwaisten Elemente.
 3. Nützlich an fast allen relevanten Hauptbereichen; demonstriere mindestens je einen sinnvollen Kontextauftritt in Gravity, BH, Extreme/Temperature, Entropy und Guide/Science, ohne jeden Klick mit einer Animation zu quittieren.
 4. Reduced Motion und „aus“ entfernen automatische Bewegungen/Glitches zuverlässig; keine Timer im Hintergrund, keine unnötige CPU-Arbeit.

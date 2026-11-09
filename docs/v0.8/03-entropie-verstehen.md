@@ -1,5 +1,7 @@
 # Schritt 03 – Entropie endlich wirklich verstehen
-## Inhaltlich freigegebener Umfang – noch keine Work-/Merge-/Deployment-Freigabe
+
+> **Aktueller Umsetzungsstand (09.11.2026):** Schritte 01–04 sind ausdrücklich zur Implementierung auf dem isolierten Entwicklungsbranch freigegeben. Frühere Aussagen „keine Work-/Codefreigabe“ in diesem Plan sind damit für 01–04 überholt. Monsterintegration erst nach Sichtfreigabe; Merge, Deployment, Domain-/öffentliches Rebranding und Schritte 05–08 bleiben gesperrt. Verbindliche Präzisierungen: [Umsetzungsvertrag v0.8](Umsetzungsvertrag_v0.8.md).
+## Freigegebene Umsetzung v0.8 – kein Merge/Deployment
 
 **Produkt:** Reincarnated as a Proton. **Phase:** v0.8, Schritt 03 von 08. **Priorität P0. Inhaltlich am 09.11.2026 durch den Eigentümer mit „perfekt, übernimm das einfach mal so“ bestätigt.** Grundlage [Roadmap](README.md), [freigegebener Schritt 02](02-warum-wozu-was-passiert.md), `AGENTS.md`, `docs/Plan_v0.7.md`, `docs/Qualitaetsupdate_v0.7.md`. Dieses Dokument beschreibt den **inhaltlich genehmigten Schritt 03**. Inhaltliche Kernentscheidung: **beide** Visualisierungen (Mikrozustände zum Anfassen und Energie-/Entropiebilanz), plus verständliche Häufigkeitsansicht und wenige hochwertige Alltagserklärungen. Die reichhaltigeren kosmologischen Themen nur als sorgsam begrenzte freiwillige Advanced-/Quellenverknüpfung, keine neue Kosmologie-Engine. Monster-Einzeiler selten und unaufdringlich, wissenschaftliche Kernerklärung sachlich; im Ausgangszustand keine zusätzlichen sichtbaren Erklärwände. Präzise Illustrationsdetails dürfen bei der Work-Umsetzung angepasst werden, ohne die Modellgrenzen oder Schritt-02-Minimalarchitektur zu verletzen. **Keine Erlaubnis, jetzt zu programmieren, in main zu mergen oder zu deployen.**
 
@@ -32,12 +34,12 @@ Eine Person ohne Vorkenntnisse soll innerhalb weniger Minuten verständlich bean
 ## 3. Drei miteinander verbundene visuelle Aha-Stufen (Arbeitsvorschlag)
 
 ### Stufe A: „1 Zustand, viele Wege dorthin“ – Mikrozustand → Makrozustand
-**Ein neuer einfacher, optionaler Anschauungsmodus im BESTEHENDEN Markerexperiment**: mit 4 oder 6 unterscheidbaren Markern ein leicht lesbares Beispiel; einzelne Anordnung gegen dieselbe Links/Rechts-Anzahl mit vertauschten Markeridentitäten stellen. Nicht als sechstes Experiment, eher eine aufklappbare „Zeig mir den Unterschied“-Skizze.
+**Eine unabhängige, ausdrücklich als N=4-Beispiel bezeichnete optionale Anschauungsdemo innerhalb des BESTEHENDEN Markerbereichs**: mit 4 oder 6 unterscheidbaren Markern ein leicht lesbares Beispiel; einzelne Anordnung gegen dieselbe Links/Rechts-Anzahl mit vertauschten Markeridentitäten stellen. Nicht als sechstes Experiment, eher eine aufklappbare „Zeig mir den Unterschied“-Skizze.
 
 Vorschlag vier Marker A B C D:
 - `LLRR`, `LRLR`, `RLLR` etc. sind verschiedene **Mikrozustände** bei **demselben Makrozustand k=2**.
 - Zeige maximal sechs Beispielanordnungen, optisch eindeutig identifizierbar, ohne für N=32 tatsächlich Milliarden Zustände einzeln zu rendern.
-- Lässt man selbst Marker wechseln, zählt k automatisch und die passende Anzahl `Ω` wird an einer **sichtbaren Verbindung** zur Grafik/Tabelle hervorgehoben. Die bislang vorhandenen Regler dürfen erhalten bleiben; keine widersprüchliche doppelte Modellsteuerung.
+- In der separaten Vierer-Demo zählt k automatisch und Ω wird in deren eigener kleinen Vergleichsgrafik/-liste hervorgehoben. Die Demo verändert niemals N, k, Schritte oder RNG des laufenden Modells. Der Live-Histogrammvergleich ist ebenfalls nur eine Präsentationsmarkierung.
 - **Merksatz:** „Der grobe Zustand kann gleich aussehen, obwohl die einzelnen Marker anders verteilt sind.“
 
 ### Stufe B: „Die große Zahl gewinnt“ – Häufigkeit und Rückschwankungen
@@ -110,7 +112,7 @@ Diese erscheinen **nicht als acht sichtbare Hauptkarten**. Sie sind im Schritt-0
 3. Einzelne kleine Markerfolgen können zu niedrigeren Makrozustands-`ln Ω` führen. UI/Erklärungen dürfen diesen Fall niemals als Programmfehler oder „Physik bricht“ kennzeichnen.
 4. Thermalmodelle: `T_A,T_B,T_eq,Q,P,ΔS_A,ΔS_B,ΔS_total,σ,U` konsistent mit dem existierenden exakten Modell. Tests mit T_A>T_B, T_A<T_B, T_A=T_B, ungleichen Kapazitäten, Randwerten und langfristigem Gleichgewicht. `U(t)-U(0)` nahe numerischem Fehler; `ΔS_total` nicht negativ für zulässige passive Wärmeausgleichszeit.
 5. Originaltests, v0.1-Integrität und ursprüngliche zwölf Benchmarks erhalten; **keine** Lockerung alter Toleranzen. Neu: UI-Snapshot/DOM-Checks, visuelle Chromium-Testfälle, deutsche/englische Texte, Smartphone 320/390 px, Tastatur, Screenreader-Namen, Reduced Motion.
-6. Aufklappen, Prognoseauswahl, Sprachwechsel, Tabwechsel oder Mascot-Animation ändern keine Modellparameter, Zufalls-Seeds, Modellzeit oder unfertige Eingaben. Ausdrücklich nur originaler „Übernehmen“-Vorgang ändert Thermalstart.
+6. Aufklappen, Prognoseauswahl, Sprachwechsel oder Mascot-Animation schreiben nicht in Modellparameter, Zufalls-Seeds oder unfertige Eingaben. Modellzeit bei laufender Simulation regulär fortschreiten lassen; vorhandene Sichtbarkeitspausen und Vorhersageabbrüche bei Tabwechsel bewahren. Ausdrücklich nur originaler „Übernehmen“-Vorgang ändert Thermalstart.
 7. Nahe 0-/großen Entropieänderungen dürfen positive Werte nicht durch formatting oder subtraktive Auslöschung unphysikalisch falsch negativ wirken; vorhandene stabile Implementierung beibehalten. Keine erneute floating-point Randprüfung umgehen.
 8. Belege und Modelleinschränkungen nahe allen neuen Aussagen; Quellen/Deep-Link-Struktur in Schritt 04 konsolidieren. Kein Anspruch „wissenschaftlich zertifiziert“.
 
