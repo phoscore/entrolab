@@ -1,7 +1,7 @@
 # Schritt 04 – Modelle, Quellen und Begriffe als ein Wissenssystem
-## Ausführlicher Diskussionsentwurf – noch NICHT inhaltlich oder technisch freigegeben
+## Inhaltlich freigegeben – technische Umsetzung weiterhin nicht autorisiert
 
-**Website:** Reincarnated as a Proton (Name beschlossen; Domain und öffentliches Rebranding noch offen). **Version:** v0.8, Schritt 04 von 08, Abschluss der ersten vier Planungsbereiche. **Grundlage:** [Roadmap](README.md), [freigegebene Erklärungskarten Schritt 02](02-warum-wozu-was-passiert.md) und [freigegebener Entropie-Ausbau Schritt 03](03-entropie-verstehen.md), `AGENTS.md`, `docs/Plan_v0.7.md`, `docs/Qualitaetsupdate_v0.7.md`. Die folgende Ausgestaltung ist ausdrücklich **VORSCHLAG zur Diskussion**. Kein Auftrag für Work, Code, Merge oder Deployment.
+**Website:** Reincarnated as a Proton (Name beschlossen; Domain und öffentliches Rebranding noch offen). **Version:** v0.8, Schritt 04 von 08, Abschluss der ersten vier Planungsbereiche. **Grundlage:** [Roadmap](README.md), [freigegebene Erklärungskarten Schritt 02](02-warum-wozu-was-passiert.md) und [freigegebener Entropie-Ausbau Schritt 03](03-entropie-verstehen.md), `AGENTS.md`, `docs/Plan_v0.7.md`, `docs/Qualitaetsupdate_v0.7.md`. **Freigabe:** Der Eigentümer hat am 09.11.2026 das gesamte vorgestellte Schritt-04-Paket mit „passt“ bestätigt: dezente kontextuelle ⓘ-Hilfen, ein vorhandener und sinnvoll gegliederter Science-Tab, kurze Erklärungen mit optionalen Formeln und Quellen, konkrete belegte Aussagen und eine überschaubare kanonische Begriffsmenge. **Dies ist nur die inhaltliche Planfreigabe**, keine Erlaubnis für Work, Code, Merge oder Deployment.
 
 ## 1. Bestandsaufnahme: was bereits existiert (v0.7, main)
 
@@ -136,12 +136,12 @@ Mindestens: Masse, Kraft, Beschleunigung, Orbit, Softening/Modellfehler, Lichtge
 - Umbau der existierenden fünffachen Hauptnavigation in ein neues Paradigma.
 - Komplette wissenschaftliche Fachmonographie, die die gesamte Webseite überfrachtet. Es geht um **präzise Nachvollziehbarkeit auf Abruf**.
 
-## 9. Offene Produktentscheidungen – gemeinsam festlegen
+## 9. Vom Nutzer bestätigte Produktentscheidungen
 
-1. **Schnellhilfe-Form:** kleines **ⓘ direkt beim Fachwort/Wert**, das bei Klick/Tastatur eine 1–3-Satz-Kurzdefinition öffnet; oder Fachbegriffe selbst als dezent unterstrichener Link? **Empfehlung:** klar erkennbarer, ausreichend großer Info-Trigger bei schwierigen Messwerten, Fachbegriffe dezent verlinkt; auf Handy keine Hover-Abhängigkeit.
-2. **Science-Seite:** vorhandener Tab als **ein einziges gut gegliedertes Nachschlagewerk** mit fünf modellbezogenen Abschnitten und freiwillig aufgeklappten Formeln, oder mehrere sichtbare großflächige Kategorien? **Empfehlung:** ein Tab mit kleinem Inhaltsverzeichnis und kompakten Abschnitten. Keine neue Hauptnavigation.
-3. **Tiefe pro Modell:** kurze Erklärung sichtbar; Formeln, Präzisionsgrenzen und Quellen **freiwillig in Advanced**. Doch essenzielle Modellwarnungen weiterhin bei Grafik/Wert, nicht verstecken. **Empfehlung:** ja.
-4. **Quellen:** 1–2 **direkt zu passenden Aussagen** + eine vollständige zusammengefasste Referenzliste am Ende des jeweiligen Modellabschnitts, statt eine unkommentierte globale Quellenwand. **Empfehlung:** ja.
-5. **Umfang der Begriffe:** zunächst die wichtigsten 12–18 Begriffe und alle Modellkapitel sauber integrieren, dann bei der Implementierung nötige weitere Begriffe ergänzen; keine 100-Punkte-Lexikonpflicht. **Empfehlung:** ja.
+1. **Schnellhilfe:** kleine, ausreichend große und per Tastatur/Touch bedienbare **ⓘ-Hinweise direkt bei schwierigen Fachbegriffen und Werten** mit 1–3 Sätzen; Fachbegriffe bei Bedarf dezent als Links, niemals reine Hover-Abhängigkeit.
+2. **Science-Seite:** der vorhandene Tab **„Modell & Quellen“ bleibt**, wird **ein einziges gut gegliedertes Nachschlagewerk** mit verständlichen kompakten Kapiteln, Sprungzielen und optionalen Formeln; keine zusätzliche Hauptnavigation.
+3. **Tiefe:** kurze verständliche Erklärung sichtbar, Advanced-Formeln, Präzisionsdetails und ausführliche Quellen freiwillig aufklappbar. **Sicherheitsrelevante und physikalisch wesentliche Modellwarnungen bleiben auch ohne Advanced sichtbar.**
+4. **Quellen:** 1–2 geeignete, beim Review verifizierte Referenzen direkt an relevante Behauptungen und eine zusammengefasste Referenzliste je Modell. Keine ungeprüften Quellenzitate oder globale Linkwand.
+5. **Umfang:** ungefähr **12–18 häufig benötigte Begriffe** plus alle Modellkapitel zuerst zuverlässig ausarbeiten; bei fachlich nötigen Ergänzungen kann Work den Umfang begründet erhöhen, aber keine enzyklopädische Totalumstellung.
 
-**Nächster Schritt:** Nutzerentscheidungen zu UI-Tiefe und Quellenansicht bestätigen/ändern, dann als „inhaltlich freigegeben“ markieren. **Nach Abschluss Schritt 04: v0.8-Planung reviewen, Work-Paket für Schritte 01–04 vorbereiten und erst nach ausdrücklicher Gesamt-Baufreigabe umsetzen. Nicht automatisch mergen oder veröffentlichen.**
+**Status: Schritt 04 am 09.11.2026 inhaltlich freigegeben.** Schritt 01 (Brand-/Monster-Verarbeitung), 02, 03 und 04 bilden die erste Implementierungsetappe, **doch vorher werden auf Wunsch des Nutzers auch Schritte 05–08 vollständig geplant**. Danach gesonderte Work-Baufreigabe für Phase 1, Reviews/Tests und erst anschließend Phase 2; keine automatische Freigabe für main, Produktionsdeployment oder Domainwechsel.
