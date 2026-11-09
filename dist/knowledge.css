@@ -27,3 +27,16 @@
 .learning-answer{border-left:2px solid #9bd6bd;padding:.1rem .8rem}.learning-context-title{font-size:1.1rem;margin:.3rem 0 .7rem}
 .learning-question summary:focus-visible,.learning-question button:focus-visible,.learning-option input:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
 @media(max-width:600px){.learning-question{font-size:.85rem}.learning-question-content{padding:.2rem .3rem}.learning-question fieldset{padding:.6rem}.learning-option{font-size:.85rem}}
+
+.learning-panel{margin:1rem 0;padding:.65rem .8rem;border:1px solid #50425d;border-radius:9px;background:#121019;color:#ded6e8;font-size:.9rem;max-width:100%;line-height:1.6}
+.learning-panel>summary{min-height:44px;padding:.5rem 0;cursor:pointer;color:#e5cef7;font-weight:500}.learning-panel p{line-height:1.65;font-size:.9rem;overflow-wrap:anywhere}.learning-panel h3{font:600 .95rem/1.5 system-ui,sans-serif;margin:1rem 0 .5rem;letter-spacing:normal;text-transform:none}
+.learning-demo-chambers{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1rem 0}.learning-demo-chambers>div{padding:.65rem;min-width:0;border:1px solid #79618c;border-radius:8px;min-height:130px}.learning-demo-chambers h3{margin:0 0 .5rem;font-size:.85rem;text-transform:uppercase}.learning-marker{display:inline-flex;justify-content:center;align-items:center;min-width:44px;min-height:44px;width:44px;margin:.2rem;border:1px solid #dec5fa;background:#3d294c;color:#fff;font-size:1rem;font-weight:600;border-radius:50%}
+.learning-patterns{padding-left:1.6rem;font:400 .85rem/1.75 ui-monospace,monospace;overflow-wrap:anywhere}.learning-patterns li{padding:.25rem 0}
+#entropyChart [data-comparison]{stroke:#ffbd79;stroke-width:3px}#entropyTable [data-comparison]{background:#392817;box-shadow:inset 3px 0 #ffbd79}
+.learning-actions [aria-pressed=true]{border-color:#ffbd79;background:#392817;color:#ffe0bb}.learning-balance-row p{margin:.7rem 0 .3rem;font-variant-numeric:tabular-nums}
+.learning-energy-track,.learning-entropy-track{height:14px;position:relative;overflow:hidden;background:#282331;border:1px solid #54475f;border-radius:3px}.learning-energy-track>span{display:block;height:100%;background:#be9ade}.learning-balance-row[data-body=B] .learning-energy-track>span{background:#88d5d0}.learning-entropy-track:after{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:#f0e4fc}.learning-entropy-track>span{position:absolute;top:0;bottom:0;background:#aad7bc}.learning-entropy-track [data-sign=negative]{background:#d9adf3}.learning-concept-route{margin:1rem 0}
+.learning-panel summary:focus-visible,.learning-panel button:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
+@media(max-width:600px){.learning-panel{padding:.5rem}.learning-demo-chambers{gap:.5rem}.learning-demo-chambers>div{padding:.4rem}.learning-marker{margin:.15rem}.learning-patterns{font-size:.76rem}}
+@media(prefers-reduced-motion:reduce){.learning-panel *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Inline definitions must not increase min-content widths of legacy metric grids. */
+.metrics:has(.knowledge-help)>article{min-width:0;overflow-wrap:anywhere}.knowledge-help>summary>span{min-width:0}.page-heading:has(.learning-question)>div{min-width:0;max-width:100%}.learning-question{min-width:0}.learning-question legend{max-width:100%}

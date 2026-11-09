@@ -12,7 +12,8 @@ export function initExplanations(doc=globalThis.document){
  for(const q of explanations){
   let anchor=doc.querySelector(anchors[q.id]??'#'+(q.id==='markers'?'particleExperiment':'thermalExperiment'));
   if(!anchor)continue;
-  if(q.id==='markers'||q.id==='thermal'){const heading=node('h2','k.question.ui.'+q.id+'Title','learning-context-title');anchor.prepend(heading);owned.push(heading);anchor=heading}
+  if(q.id==='thermal')anchor=anchor.querySelector(':scope > h2')??anchor;
+  if(q.id==='markers'){const heading=node('h2','k.question.ui.'+q.id+'Title','learning-context-title');anchor.prepend(heading);owned.push(heading);anchor=heading}
   const details=node('details',null,'learning-question');details.id='why-'+q.id;details.dataset.context=q.id;
   const summary=node('summary',q.question);summary.id=details.id+'-summary';details.append(summary);
   const content=node('div',null,'learning-question-content');

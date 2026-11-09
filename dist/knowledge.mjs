@@ -136,6 +136,14 @@ export const sources=freeze({
     "section": "Implemented model and strict domains",
     "kind": "implementation",
     "checked": "2026-11-09"
+  },
+  "openstax-applications": {
+    "publisher": "OpenStax",
+    "title": "Physics · Applications of Thermodynamics",
+    "section": "12.4 · heat engines, heat pumps and refrigerators",
+    "url": "https://openstax.org/books/physics/pages/12-4-applications-of-thermodynamics-heat-engines-heat-pumps-and-refrigerators",
+    "kind": "textbook",
+    "checked": "2026-11-09"
   }
 });
 export const terms=freeze([
@@ -621,7 +629,7 @@ export const models=freeze([
 export const termById=freeze(Object.fromEntries(terms.map(t=>[t.id,t])));
 export const modelById=freeze(Object.fromEntries(models.map(m=>[m.id,m])));
 export const CONTEXTS=freeze({gravity:{tab:"gravity",model:"gravity"},blackhole:{tab:"blackhole",model:"blackhole"},objects:{tab:"extreme",model:"objects"},temperature:{tab:"extreme",model:"temperature"},markers:{tab:"entropy",view:"particles",model:"markers"},thermal:{tab:"entropy",view:"thermal",model:"thermal"}});
-export function contentKeys(){return [...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception]),...explanations.flatMap(q=>[q.question,q.observe,q.cause,q.use,q.limit,q.quiz,q.answer,q.try,...q.options.map(o=>o.label)])]}
+export function contentKeys(){return [...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception]),...applications.flatMap(a=>[a.title,a.text]),...explanations.flatMap(q=>[q.question,q.observe,q.cause,q.use,q.limit,q.quiz,q.answer,q.try,...q.options.map(o=>o.label)])]}
 
 export const explanations=freeze([
   {
@@ -773,3 +781,5 @@ export const explanations=freeze([
     "correct": "a"
   }
 ]);
+
+export const applications=freeze([{"id": "tea", "title": "k.learning.extras.tea.title", "text": "k.learning.extras.tea.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "thermos", "title": "k.learning.extras.thermos.title", "text": "k.learning.extras.thermos.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "fridge", "title": "k.learning.extras.fridge.title", "text": "k.learning.extras.fridge.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "engine", "title": "k.learning.extras.engine.title", "text": "k.learning.extras.engine.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "boundary", "title": "k.learning.extras.boundary.title", "text": "k.learning.extras.boundary.text", "model": "markers", "sources": ["foundations", "statmech"]}]);

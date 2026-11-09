@@ -1,4 +1,4 @@
-// Canonical bilingual content, merged into the existing i18n catalogs. No independent translator.
+// One bilingual catalog, consumed by the existing i18n engine. No independent translator.
 const messages={
   "k.term.au.label": [
     "Astronomische Einheit (AU)",
@@ -883,6 +883,170 @@ const messages={
   "k.question.ui.thermalTitle": [
     "Wärme & Entropie",
     "Heat & entropy"
+  ],
+  "k.learning.demo.title": [
+    "Vier Marker selbst umlegen · unabhängiges Beispiel",
+    "Move four markers yourself · independent example"
+  ],
+  "k.learning.demo.scope": [
+    "Diese N=4-Demo ist unabhängig vom laufenden Experiment. A–D behalten ihre Identität; nur links/rechts zählt. Kein Zufall, keine Modellzeit, keine Änderungen an N oder k oben.",
+    "This N=4 demo is independent of the running experiment. A–D retain their identity; only left/right counts. No randomness, no model time, no changes to N or k above."
+  ],
+  "k.learning.demo.toggle": [
+    "Marker {marker}: {side}. Aktivieren wechselt die Kammer.",
+    "Marker {marker}: {side}. Activate to switch chambers."
+  ],
+  "k.learning.demo.left": [
+    "links",
+    "left"
+  ],
+  "k.learning.demo.right": [
+    "rechts",
+    "right"
+  ],
+  "k.learning.demo.summary": [
+    "Makrozustand: {left} links / {right} rechts · Ω = {omega} von 16 Mustern · P_eq = {probability} · ln Ω = {entropy} (dimensionslos).",
+    "Macrostate: {left} left / {right} right · Ω = {omega} of 16 patterns · P_eq = {probability} · ln Ω = {entropy} (dimensionless)."
+  ],
+  "k.learning.demo.patterns": [
+    "Alle {count} Mikrozustände mit dieser Anzahl links",
+    "All {count} microstates with this number on the left"
+  ],
+  "k.learning.demo.pattern": [
+    "Muster {index}: {pattern}",
+    "Pattern {index}: {pattern}"
+  ],
+  "k.learning.demo.patternNote": [
+    "Jede Zeile ordnet A, B, C und D einer Kammer zu. Zeilen sind gleich wahrscheinlich im festgelegten Gleichgewichtsensemble; Positionen im Bild erzeugen keine zusätzlichen Zustände.",
+    "Each row assigns A, B, C and D to a chamber. Rows are equally probable in the defined equilibrium ensemble; image positions create no additional states."
+  ],
+  "k.learning.compare.title": [
+    "Zwei Makrozustände vergleichen · Modell unverändert",
+    "Compare two macrostates · model unchanged"
+  ],
+  "k.learning.compare.balanced": [
+    "Ausgeglichenes k hervorheben",
+    "Highlight a balanced k"
+  ],
+  "k.learning.compare.edge": [
+    "Alle links hervorheben",
+    "Highlight all on the left"
+  ],
+  "k.learning.compare.row": [
+    "{label}: k = {k}, Ω = {omega}, P_eq = {probability}, ln Ω = {entropy}.",
+    "{label}: k = {k}, Ω = {omega}, P_eq = {probability}, ln Ω = {entropy}."
+  ],
+  "k.learning.compare.labelBalanced": [
+    "Ausgeglichen",
+    "Balanced"
+  ],
+  "k.learning.compare.labelEdge": [
+    "Alle links",
+    "All left"
+  ],
+  "k.learning.compare.note": [
+    "Orange Markierung: gewählter Vergleich im vorhandenen Gleichgewichtsdiagramm und in der Tabelle. Weißer Pfeil: tatsächliches k. Diese Auswahl versetzt keine Marker. Die häufigste einzelne Verteilung ist nicht automatisch eine Mehrheit aller Fälle; für N=1 sind beide gleich häufig.",
+    "Orange highlight: selected comparison in the existing equilibrium chart and table. White arrow: actual k. This selection moves no markers. The most frequent individual split need not be a majority of all cases; for N=1 both are equally likely."
+  ],
+  "k.learning.compare.units": [
+    "ln Ω ist hier eine dimensionslose Boltzmann-Zählgröße S_Modell/k_B. Das entspricht nicht der Entropie aller Gaspositionen oder Energien und lässt sich nicht zu den J/K des Wärmeexperiments addieren.",
+    "Here ln Ω is a dimensionless Boltzmann counting quantity S_model/k_B. It does not include all gas positions or energies and cannot be added to the heat experiment’s J/K."
+  ],
+  "k.learning.compare.next": [
+    "Gleichgewicht ist keine Vorhersage des nächsten Schritts: von k=N liegt der Erwartungswert danach bei 0,75 N (q=1/4 je Marker). Einzelne Schritte dürfen ln Ω verkleinern.",
+    "Equilibrium does not predict the next step: from k=N the next expectation is 0.75 N (q=1/4 per marker). Individual steps may decrease ln Ω."
+  ],
+  "k.learning.balance.title": [
+    "Energie bleibt. Entropie wird erzeugt.",
+    "Energy is conserved. Entropy is produced."
+  ],
+  "k.learning.balance.scope": [
+    "Die Balken lesen den angewandten Wärme-Modellzustand. Entwürfe verändern sie erst nach „Übernehmen“. J und J/K bleiben getrennt; keine gemeinsame Skala.",
+    "The bars read the applied heat-model state. Drafts change them only after Apply. J and J/K remain separate; there is no shared scale."
+  ],
+  "k.learning.balance.energy": [
+    "Energiebilanz · J",
+    "Energy balance · J"
+  ],
+  "k.learning.balance.energyRow": [
+    "Körper {body}: U = {energy} J · übertragen ΔU = {transfer} J",
+    "Body {body}: U = {energy} J · transferred ΔU = {transfer} J"
+  ],
+  "k.learning.balance.total": [
+    "U_A + U_B = {total} J · Anfang {initial} J · Rechenrest {error} J.",
+    "U_A + U_B = {total} J · initial {initial} J · numerical residual {error} J."
+  ],
+  "k.learning.balance.energyNote": [
+    "U_i = C_i T_i mit festem Modellnullpunkt. Balken: Anteil an der anfänglichen Gesamtenergie (gemeinsame Skala). Das ist eine Bilanzhilfe für konstantes C, keine universelle absolute Materialenergie.",
+    "U_i = C_i T_i with a fixed model reference. Bars show fractions of initial total energy (shared scale). This is an accounting aid for constant C, not universal absolute material energy."
+  ],
+  "k.learning.balance.entropy": [
+    "Entropiebilanz · ΔS in J/K",
+    "Entropy balance · ΔS in J/K"
+  ],
+  "k.learning.balance.entropyRow": [
+    "{body}: {value} J/K",
+    "{body}: {value} J/K"
+  ],
+  "k.learning.balance.sum": [
+    "Gesamt",
+    "Total"
+  ],
+  "k.learning.balance.production": [
+    "Entropieproduktion σ = {value} W/K. Dies ist keine Wärmeleistung.",
+    "Entropy production σ = {value} W/K. This is not heat power."
+  ],
+  "k.learning.balance.entropyNote": [
+    "Nullachse in der Mitte; negative Änderungen links, positive rechts. Gemeinsame Skala je Moment, Werte sind maßgeblich. ΔS_total wird numerisch stabil berechnet; gerundete Einzelwerte können in der letzten Stelle abweichen.",
+    "Zero axis in the centre; negative changes left, positive right. Shared scale at each instant; numbers are authoritative. ΔS_total uses stable numerical evaluation; rounded individual values may differ in the last digit."
+  ],
+  "k.learning.balance.lesson": [
+    "Beim passiven Ausgleich nimmt die Temperaturdifferenz ab, während die Gesamtenergie erhalten bleibt. Eine geeignete Maschine könnte aus Temperaturunterschieden Arbeit gewinnen; dieses Modell enthält keine Maschine und berechnet kein Arbeitsmaximum. Bei gleichen Temperaturen sind Nettoleistung und Entropieproduktion null.",
+    "Passive equilibration reduces the temperature difference while conserving total energy. A suitable engine could extract work from temperature differences; this model contains no engine and computes no maximum work. At equal temperatures net power and entropy production are zero."
+  ],
+  "k.learning.extras.title": [
+    "Mehr Fragen · Alltag und Modellgrenzen",
+    "More questions · everyday physics and model limits"
+  ],
+  "k.learning.extras.tea.title": [
+    "Warum wird Tee kalt?",
+    "Why does tea cool?"
+  ],
+  "k.learning.extras.tea.text": [
+    "Bei einem Temperaturunterschied kann Energie durch Wärmeleitung, Strömung, Verdunstung und Strahlung an die Umgebung gehen. Ein echtes Teeglas ist meist ein offenes System. Unser isoliertes Körperpaar zeigt nur den idealisierten Austausch zwischen zwei homogenen Körpern, ohne diese Mechanismen einzeln zu berechnen.",
+    "With a temperature difference, energy can pass to the surroundings by conduction, convection, evaporation and radiation. A real cup of tea is usually an open system. Our isolated pair only illustrates idealised exchange between two uniform bodies; it does not calculate those mechanisms separately."
+  ],
+  "k.learning.extras.thermos.title": [
+    "Was macht eine Thermoskanne?",
+    "What does a vacuum flask do?"
+  ],
+  "k.learning.extras.thermos.text": [
+    "Isolierung vermindert den Wärmeaustausch. Sie schaltet Entropie nicht ab. Kleineres G_th verlängert hier die Zeitkonstante, bildet aber weder Vakuumwände, Deckelverluste noch Strahlung eines echten Gefäßes vollständig ab.",
+    "Insulation reduces heat exchange. It does not switch entropy off. A smaller G_th increases this model’s time constant, but does not fully describe vacuum walls, lid losses or radiation in a real flask."
+  ],
+  "k.learning.extras.fridge.title": [
+    "Wie kann ein Kühlschrank innen kälter werden?",
+    "How can a refrigerator become colder inside?"
+  ],
+  "k.learning.extras.fridge.text": [
+    "Ein Kühlschrank braucht Arbeit und gibt Energie als Wärme an die Umgebung ab. Die Entropie des Innenraums darf abnehmen; die Bilanz muss Kühlschrank und Umgebung einschließen. Unser passives isoliertes Körperpaar hat weder Arbeitszufuhr noch Kältemittelkreislauf und simuliert keinen Kühlschrank.",
+    "A refrigerator requires work and releases energy as heat to its surroundings. Entropy inside may decrease; accounting must include the refrigerator and surroundings. Our passive isolated pair has no work input or refrigerant cycle and does not simulate a refrigerator."
+  ],
+  "k.learning.extras.engine.title": [
+    "Warum kann ein Motor aus Wärme Arbeit gewinnen?",
+    "Why can an engine obtain work from heat?"
+  ],
+  "k.learning.extras.engine.text": [
+    "Eine Wärmekraftmaschine kann beim Wärmetransport zwischen heißem und kaltem Reservoir einen Teil der Energie in Arbeit umsetzen. Der zweite Hauptsatz begrenzt den Wirkungsgrad; vollständige zyklische Umwandlung aus einem einzigen Reservoir ist nicht möglich. Hier fehlen Arbeitsentnahme und Kreisprozess: Die Energie bleibt im Körperpaar, ein Wirkungsgrad wird nicht berechnet.",
+    "A heat engine can convert part of the energy into work while transferring heat between hot and cold reservoirs. The second law limits efficiency; complete cyclic conversion from a single reservoir is impossible. Work extraction and a cycle are absent here: energy stays in the pair, and no efficiency is calculated."
+  ],
+  "k.learning.extras.boundary.title": [
+    "Weiterdenken: Struktur, Zeit und Universum",
+    "Going further: structure, time and the universe"
+  ],
+  "k.learning.extras.boundary.text": [
+    "Entropie ist nicht einfach sichtbares Chaos. Leben kann als offenes System lokal Struktur aufbauen und Energie sowie Entropie mit seiner Umgebung austauschen. Zeitpfeil und kosmologische Anfangsbedingungen verlangen weitere Annahmen. Expansion, Gravitation und Horizonte machen das Universum komplexer als zwei Kammern oder zwei Körper. Diese Demos beweisen weder Evolution noch ein bestimmtes Universumsende.",
+    "Entropy is not simply visible chaos. As an open system, life can build local structure while exchanging energy and entropy with its surroundings. The arrow of time and cosmological initial conditions require further assumptions. Expansion, gravity and horizons make the universe more complex than two chambers or bodies. These demos prove neither evolution nor a particular fate of the universe."
   ]
 };
 export const knowledgeDE=Object.freeze(Object.fromEntries(Object.entries(messages).map(([k,v])=>[k,v[0]])));

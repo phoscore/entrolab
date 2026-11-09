@@ -2,6 +2,7 @@ import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {de,en} from '../dist/i18n.mjs';
 import {browserHarness,physical} from './v08-browser-harness.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
@@ -19,7 +20,7 @@ test('v0.8 browser: all six questions and predictions are voluntary; check, reve
    await prediction.getByRole('button',{name:'Antwort prüfen',exact:true}).click();assert(await prediction.locator('[role=status]').textContent());assert(await prediction.locator('.learning-answer').isHidden());
    await prediction.locator('input[value=b]').check();await prediction.getByRole('button',{name:'Antwort prüfen',exact:true}).click();assert(await prediction.locator('.learning-answer').isVisible());
    await prediction.locator('input[value=a]').check();assert(await prediction.locator('.learning-answer').isHidden());
-   await prediction.getByRole('button',{name:'Lösung zeigen',exact:true}).click();assert(await prediction.locator('.learning-answer').isVisible());
+   await prediction.getByRole('button',{name:de['k.question.ui.show'],exact:true}).click();assert(await prediction.locator('.learning-answer').isVisible());
    await prediction.locator('input[value=a]').focus();await p.keyboard.press('Escape');assert.equal(await prediction.getAttribute('open'),null);assert.equal(await p.evaluate(()=>document.activeElement.tagName),'SUMMARY');
    await d.locator('[data-locate-context]').click();assert.notEqual(await p.evaluate(()=>document.activeElement.tagName),'BODY');assert.deepEqual(await physical(p),before,id);
   }
@@ -33,7 +34,7 @@ test('v0.8 browser: language preserves quiz selection, disclosure, feedback, foc
   await d.locator('input[value=b]').focus();const before=await physical(p);
   await p.evaluate(async()=>{(await import('/i18n.mjs')).setLanguage('en')});
   assert.equal(await p.evaluate(()=>document.activeElement.id),'why-gravity-b');assert(await d.locator('input[value=b]').isChecked());assert(await d.locator('.learning-answer').isVisible());assert.match(await d.locator('.learning-feedback').textContent(),/different/i);
-  await p.evaluate(async()=>{(await import('/i18n.mjs')).setLanguage('de')});assert.match(await d.locator('.learning-feedback').textContent(),/anders/i);assert.deepEqual(await physical(p),before);
+  await p.evaluate(async()=>{(await import('/i18n.mjs')).setLanguage('de')});assert.match(await d.locator('.learning-feedback').textContent(),/andere/i);assert.deepEqual(await physical(p),before);
   assert.deepEqual(await p.evaluate(async()=>[...(await import('/i18n.mjs')).missingKeys]),[]);
  }finally{await context.close()}
 });
