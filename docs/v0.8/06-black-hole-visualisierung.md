@@ -1,8 +1,10 @@
 # Schritt 06 – Black Hole Lab: eindrucksvolle, aber wissenschaftlich ehrliche Visualisierung
 
-## Ausführlicher DISKUSSIONSENTWURF für v0.8.5 – noch NICHT freigegeben
+## Inhaltlich freigegeben (09.11.2026) – noch keine Work-, Merge- oder Deployment-Freigabe
 
 **Projekt:** Reincarnated as a Proton. **Phase:** Schritt 06 von 08, nach dem bereits freigegebenen Schritt 05. **Planungsort:** `develop/v0.8/docs/v0.8/`, ausschließlich zur gemeinsamen Abstimmung. **Spätere Umsetzung:** v0.8.5 auf eigenem Branch, der erst aus geprüfter und separat veröffentlichungsfreigegebener v0.8 erstellt wird. Bis dahin **keine Codeänderung, kein GitHub-Merge und kein Cloudflare-Deployment**.
+
+**Explizite Nutzerentscheidung (09.11.2026):** Zwei umschaltbare Ansichten **„Schwarzes Loch & Umgebung“** und **„Licht & Horizont“** im **selben** Black-Hole-Lab-Bildbereich, **zusätzlich ein optionaler schematischer Blickwinkelwechsel**. Diese drei Funktionen sind verbindlicher Umfang, nicht nur P1-Komfort. Sie müssen klar als Illustration ohne berechnetes relativistisches Raytracing beschrieben sein. Alle bestehenden numerischen Werte, Formeln, Warnungen und Diagramme bleiben erhalten. Der Nutzer hat den Schritt-06-Inhalt damit freigegeben, aber **keine Umsetzung beauftragt**.
 
 **Abhängigkeiten:** Name/rotes skizzenhaftes Monster (Schritt 01), eine sichtbare freiwillige Hauptfrage je aktivem Lab mit optionalem Prognose-Experiment (Schritt 02), kanonisches Wissen/Modelle/Quellen (Schritt 04), freiwilliger neuer Guide (Schritt 05), konsistentes Design/Performance (Schritt 08). `AGENTS.md` und bestehende Qualitätsnachweise vor jeder Umsetzung erneut lesen.
 
@@ -14,6 +16,7 @@ Aus `dist/index.html`, `dist/app.mjs`, `dist/physics.mjs` auf dem aktuellen frei
 - `blackHole(m)` liefert `r_s=2GM/c²` (m), semiklassische Hawking-`T=ℏc³/(8πGMk_B)` (K), **stark idealisierte** nur-Photonen-`P=ℏc⁶/(15360πG²M²)` (W), `τ=5120πG²M³/(ℏc⁴)` (s). Schätzungen für leeres Universum/Schwarzkörper: keine Greybody-Faktoren, kein vollständiges Teilchenspektrum, keine Akkretion, keine zuverlässige Aussage über letzte Quantenphase. Der Kommentar zu kosmischer Hintergrundstrahlung muss erhalten bleiben.
 - `drawLab()` zeichnet ein **logarithmisches Radienvergleichs-Canvas `#sizes`** und ein **log–log-Skalierungsdiagramm `#bhChart`**. Weder Bildzeichen noch Diagramm berechnen relativistische Lichtgeodäten. `app.mjs` besitzt bislang **keine dedizierte photorealistische Akkretionsscheiben-/Lensing-/Photon-Ring-Simulation im Black Hole Lab.**
 - Im getrennten Gravity-Canvas kann ein typisierter `hole`-Körper schematisch dunkel/glühend gezeichnet werden. Die Newtonsche 2D-Sandbox simuliert **keine** relativistischen geodätischen Lichtbahnen oder Akkretion; diese Darstellung ist kein Ersatz für einen visuellen Black-Hole-Lab-Kernbereich.
+- **Wiederverwendbarer Bestand aus dem anderen Lab:** `dist/extreme-ui.mjs` und `dist/extreme-render.mjs` im **Extreme Objects**-Bereich haben bereits `state.angle` / `#extremeAngle`, `state.disk` / `#diskOn`, `state.geometry` / `#geometryOn`, pausierbare RAF-Animation, reduzierte Qualität/DPR und eine **künstlerische schematische BH-Scheibe** mit Winkelprojektion. Das ist **kein** relativistischer Strahlverfolger. **Vor Neubau diese vorhandene Kunst-/Bühnenlogik prüfen und nötigenfalls als gemeinsame, reine Rendererfunktion wiederverwenden**, ohne die beiden Labore ungewollt an dieselbe Masse / dieselben GUI-Zustände zu koppeln.
 - **Bestehende Funktionen unverändert korrekt erhalten:** Massenvalidierung, alle vier Zahlen/Formeln, Quellen/Begrenzungshinweise, Radienvergleich und Logarithmusskalen. Im Umsetzungsprozess prüfen, ob UI-Details sich durch v0.8 verändert haben.
 
 ## 2. Zielbild: ein zentraler visueller „Aha“-Bereich, kein Sci-Fi-Solver
@@ -47,7 +50,7 @@ Das Labor soll ein außergewöhnliches, ruhiges und erkennbares **kosmisches Hau
 - **Ein/aus statt Dauerlabels**, damit das Motiv weiterhin visuell stark ist; auf Touch als sichtbare kurze Liste neben/unter dem Bild, nicht versteckte Hover-Hotspots.
 - Übergang zu `Modelle & Quellen` aus Schritt 04 und zur freiwilligen Hauptfrage/Prognose aus Schritt 02. Die `M87*`-/`Sagittarius A*`-Presets zeigen Referenzmassen und **keine** aus Originaldaten berechnete EHT-Radiokarte.
 
-**Produktentscheidung offen:** Nutzer kann wählen zwischen **einem** zentralen animierten Bild mit einem optionalen Lichtschaubild (**MVP**) und drei Modi (**komfortabler**). Zusätzliche Modi nicht nur aus ästhetischen Gründen bauen, wenn sie Performance oder Zugänglichkeit verschlechtern.
+**Entschieden:** genau **zwei Ansichten im selben Bildbereich** (Umgebung und Licht/Horizont) plus ein **freiwilliger schematischer Blickwinkelwechsel**. Die in Ansicht C beschriebenen Labels sind nur eine optionale Beschriftung **innerhalb** der zwei Modi, **keine dritte umschaltbare Hauptansicht**. Modus und Perspektive beeinflussen ausschließlich die Visualisierung, nie die physikalisch berechneten Ausgaben.
 
 ## 4. Was an der Masse visuell gekoppelt wird
 
@@ -77,7 +80,8 @@ Das Labor soll ein außergewöhnliches, ruhiges und erkennbares **kosmisches Hau
 
 **P0 – das muss funktionieren:**
 - Ein neuer, sinnvoll platzierter, visuell deutlich besserer, aber leichtgewichtiger zentraler **Black-Hole-Illustrationsbereich** im existierenden Layout; skalierbar und unverwechselbar, kein schwerer WebGL-Shader-Stack als Standardzwang.
-- **Zwei Ansichten** als sicherer Grundumfang: „Umgebung“ (optional Scheibe, stilisiert) und „Licht & Horizont“ (qualitative Pfade/Erklärungen). Detailmarker/„Was ist real?“ kann als zuschaltbare Beschriftung innerhalb derselben Darstellung erfolgen.
+- **Zwei verbindliche Ansichten**: „Umgebung“ (optional Scheibe, stilisiert) und „Licht & Horizont“ (qualitative Pfade/Erklärungen). Detailmarker/„Was ist real?“ dürfen als zuschaltbare Beschriftung innerhalb derselben Darstellung erfolgen.
+- **Verbindlich: ein optionaler schematischer Blickwinkelregler** (z. B. `von oben / schräg / fast Kante` oder vorhandenen `extremeAngle`-Mechanismus übertragen), nur innerhalb des Illustrationsbereichs. Beschriftung `Künstlerischer Blickwinkel – keine relativistisch berechnete Kameraposition`. Regler ändert lediglich Projektionsellipse, illustrative Lage/Schichtung, **keine** Horizont-/Photonensphären-Radien, Hawkingwerte, Massenparameter oder echte Lensing-Kurven. Im Licht/Horizont-Modus ggf. Blickwinkelregler deaktivieren mit erklärendem Hinweis, falls dort keine sinnvolle Projektion zu ändern ist; keine irreführende scheinbare Physikinteraktion.
 - Pausen-/Animation-aus-Knopf und `prefers-reduced-motion`: bei reduziertem Bewegungswunsch statische informative Darstellung von Anfang an. Wenn `document.hidden`, Tab gewechselt oder Bild nicht sichtbar: Animations-Loop stoppen, beim Wiederzeigen sauber wiederaufnehmen ohne Zeitsprung.
 - Maximal **eine** aktive BH-Animationsschleife; kein unlimitierter Timer, keine ständige Neuzeichnung aller Zahlen/Charts bloß wegen Animation. Rendern nur bei sichtbarer Szene / Eingabe / Resize. `requestAnimationFrame` wenn erforderlich, sauber `cancelAnimationFrame`; ResizeObserver auf existierenden Container, DPR und Canvas-Limit gegen Speicherwachstum abgesichert.
 - Keine Performance-Effekte oder Canvas-Neuinitialisierungen bei bloßen Klicks ins Quellen-Glossar, Hilfetext, Sprachwechsel.
@@ -86,7 +90,7 @@ Das Labor soll ein außergewöhnliches, ruhiges und erkennbares **kosmisches Hau
 - Keine zusätzliche Physik-Engine, kein echter 3D-Renderer, keine massenhafte Partikeldynamik in v0.8.5.
 
 **P1 – nur wenn P0 und Tests bereits robust:**
-- Ein kleiner optionaler Perspektivwechsel **als ausdrücklich nur gestalterische Kamera-/Illustrationsansicht**; niemals eine neu berechnete astronomische Eigenschaft vortäuschen.
+- Zusätzliche Perspektiv-Presets oder geschmeidige Übergänge **über den beschlossenen, bereits verpflichtenden optionalen schematischen Blickwinkelregler hinaus**. Keine Relativitäts-/Winkelberechnung behaupten.
 - Feine Sternen-/Ringlichtakzente und wenige organische, glaubwürdige Bewegungsdetails.
 - Eine seltene stille Reaktion des **einen** rot-schwarzen Glitch-Monsters am Rand, das die Messwerte nicht verdeckt.
 
@@ -96,7 +100,7 @@ Das Labor soll ein außergewöhnliches, ruhiges und erkennbares **kosmisches Hau
 
 1. Alle vorhandenen Massen-Presets, Massengrenzen 1–10^41 kg, vier numerischen Outputs und beide vorhandenen Canvas-Diagramme bleiben korrekt und bedienbar. Keine Rechenformeln ohne gesonderte Prüfung ändern; Originalbenchmarks, v0.1-Hashschutz und CI-Suiten unverändert.
 2. Die Illustration zeigt **messbare Werte**, **schematische Effekte** und **optionale Umgebung** inhaltlich sauber getrennt. In normaler Ansicht ist die schematische Einschränkung lesbar; bei deaktivierter Animation ebenso.
-3. Zwei visuelle Modi bleiben bei Massenwechsel, Tabwechsel, Sprachwechsel, Zoom und Mobile stabil. Ein gewählter Modus darf bei den genannten Aktionen nicht verschwinden, sofern technisch einfach erhalten.
+3. Zwei visuelle Modi **und die optionale Blickwinkeleinstellung** bleiben bei Massenwechsel, Tabwechsel, Sprachwechsel, Zoom und Mobile stabil. Die Wahl der Perspektive ist **rein illustrativ** und muss logisch konsistent mit dem gewählten Modus sein. DE/EN-Kennzeichnung und selbstständige Tastaturbedienung des Reglers sind nachzuweisen. Modus-/Winkelwechsel verändert weder `blackHole(m)` noch andere simulierte Zustände.
 4. Keine gezeichnete Lichtlinie als gelöste Geodäte oder bildschirmgenauer Winkel behaupten; Nutzer kann durch „Modell & Quellen“ nachvollziehen, warum die Szene nur qualitativ ist.
 5. Bei leuchtender Scheibe wird klar beschrieben, dass Gas/Plasma **optional** ist und dessen Helligkeit/Temperatur **nicht** aus Hawking-`T` oder dem Massenregler berechnet wurde.
 6. Bei `prefers-reduced-motion: reduce` und Animation-aus ist die statische Darstellung vollständig verständlich. Hidden-Page/Offscreen: kein BH-RAF aktiv. Mehrfachklicks erzeugen nie doppelte Loops. Kein Memory-/CPU-Leak über 100 Tab-/Ansichtswechsel.
@@ -105,12 +109,13 @@ Das Labor soll ein außergewöhnliches, ruhiges und erkennbares **kosmisches Hau
 9. Vergleichsscreenshots von statischem Normal-/Reduced-Motion-Modus auf Handy und Desktop; Verständlichkeitsprüfung „Was ist berechnet, was ist nur Bild?“ mit klarer Frage.
 10. Unabhängiger Codex-Review vor Work-Merge; Nutzer schaut auf Vorschau und genehmigt main/Deployment gesondert. Weiterhin gleiche gültige DE/EN-Quellen- und Wahrheitsansprüche.
 
-## 9. Offene Entscheidungen mit dem Nutzer
+## 9. Ergebnis der Nutzerentscheidung und Umsetzungsregeln
 
-1. **Visualisierungstiefe:** lieber **eine sehr starke Hauptanimation** mit einem optionalen Licht-Overlay (**ultraminimal**) oder **zwei kleine umschaltbare Ansichten** `Umgebung` + `Licht/Horizont` (**Empfehlung**)? Beide sind ein einziger visueller Bereich, kein neuer Haupttab.
-2. **Designstil:** **Rot/Schwarz plus sparsames Orange/Weiß** als heiße Gasfarben (Empfehlung: farblicher Kontrast zum roten Monster), oder nahezu rein monochromes Schwarz/Rot als Marke? Das Monster bleibt rot-skizzenhaft.
-3. **Interaktion:** nur Ansicht wechseln / Animation pausieren oder zusätzlich **eine optionale schematische Blickwinkelwahl**? Empfehlung: Blickwinkel erst P1, nicht beim ersten P0-Release erzwingen.
-4. **Realismusanspruch:** das eindrückliche Bild ausdrücklich „Illustration, keine gerechneten Lichtbahnen“ nennen und keine echte GR-Raytracing-Engine bauen (Empfehlung, passend zu Performance und Wissenschaftsehrlichkeit).
-5. **Scope-Budget:** Priorität `BH-Bild` vor visuellem Feinschliff der bereits vorhandenen Charts; Charts müssen erhalten bleiben. Neue, noch ungetestete Physikformeln nur mit ausdrücklicher Extrafreigabe.
+1. **Zwei umschaltbare Hauptansichten im selben Bildbereich:** `Umgebung` und `Licht/Horizont` – freigegeben.
+2. **Zusätzlicher optionaler schematischer Blickwinkelwechsel** – ausdrücklich gewünscht und **P0**, auch wenn nur eine Projektion in der Umgebungsansicht ändert. Keine unabhängige Physikberechnung und keine neue experimentelle Eingabe.
+3. **Gestaltungsrichtung:** bestehende ruhige dunkle Bühne, sparsame Akzente Orange/Weiß/Rot passend zur roten skizzenhaften Figur. Konkrete Farbtöne gehören zum späteren Designabgleich in Schritt 08, kein drittes Entscheidungsgate für den fachlichen Plan.
+4. **Realismus und Quellen:** Bild und Winkelwechsel klar **`schematische Illustration, keine berechneten Lichtbahnen`**; kein GR-Raytracer, keine Material-/Akkretionsdynamik. Lichtbögen illustrieren Begriffe und dienen nicht als physikalisch ablesbares Messdiagramm.
+5. **Scope:** Schwerpunkt neues BH-Bild, vorhandene Charts/Massen-Presets behalten und wissenschaftlich korrekt, keine neuen unabgenommenen Formeln. Rendererbestand aus `extreme-render.mjs` vor Neubau evaluieren und bei geeigneter Trennung wiederverwenden.
+6. **Tests zusätzlich:** Perspektivwechsel in beiden Modi und in DE/EN/320px/Reduced Motion, Rückkehr nach Tabwechsel, keine automatische Masseänderung, keine Phantomwerte oder Animations-Doppelinstanzen; ausblendbares Bild in statischer Form noch aussagekräftig.
 
-**Nächster Schritt:** Mit dem Nutzer Gestaltung/Interaktions-Tiefe festlegen; dann Schritt 06 als inhaltlich freigegeben markieren. Danach Schritt 07 – Extreme Temperature Lab. **Keine Implementierung und keine Freigabe an Work ohne spätere getrennte Genehmigung der Gesamtspezifikation.**
+**Planungsstatus: SCHRITT 06 INHALTLICH FREIGEGEBEN (09.11.2026).** Nächster gemeinsamer Planungspunkt: Schritt 07 – Extreme Temperature Lab. **Noch keine Implementierung, kein Work-Auftrag, kein Merge/Deployment ohne später gesonderte Freigabe.**
