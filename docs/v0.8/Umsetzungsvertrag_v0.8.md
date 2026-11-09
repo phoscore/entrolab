@@ -1,6 +1,6 @@
 # Verbindlicher Umsetzungsvertrag v0.8
 
-Stand: 09.11.2026. Umsetzung von 01–04 ausdrücklich durch Nutzer beauftragt; ausgehend von `33947cfeccd738512c83d21bab47a696ee57e923`, isoliert auf `feature/v0.8-learning-foundation`. `develop/v0.8` bleibt der geprüfte Planungsstand. `main` bleibt `8b856086877ea21579cf7d74190ad08155d70c7f`; Archiv unverändert.
+Stand: 09.11.2026. Umsetzung von 01–04 ausdrücklich durch Nutzer beauftragt; ausgehend von `33947cfeccd738512c83d21bab47a696ee57e923`, isoliert auf `feature/v0.8-learning-foundation`. `develop/v0.8` war zu Beginn der geprüfte Planungsstand. Während der Umsetzung wurden dort extern zwei reine v0.8.5-Planungscommits bis `0f477a80cab165fd46581331e93e682fc2731a29` ergänzt; sie werden per regulärem Merge ausschließlich im isolierten Featurebranch erhalten, ohne Implementation. Der Planungsbranch selbst wird von dieser Umsetzung nicht verändert. `main` bleibt `8b856086877ea21579cf7d74190ad08155d70c7f`; Archiv unverändert.
 
 ## Schutz und Baseline
 
