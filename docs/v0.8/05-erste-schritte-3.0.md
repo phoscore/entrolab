@@ -1,6 +1,8 @@
 # Schritt 05 – „Erste Schritte 3.0“: freiwillige Entdeckungswege
 
-## Ausführlicher Diskussionsentwurf für v0.8.5 – **NOCH NICHT FREIGEGEBEN**
+## Inhaltlich vom Nutzer freigegeben – Work-/Merge-/Deployment-Freigabe steht aus
+
+**Freigabe vom 09.11.2026:** Der Eigentümer hat den vorgestellten Schritt 05 ausdrücklich mit „great, dann nehmen wir schritt 05 so“ bestätigt. Damit stehen das kompakte Wahlmenü, ein freiwilliger Schnellstart, eine auswählbare kurze Anleitung je Labor/Unterlabor, echtes selbstständiges Bedienen mit optionaler Schritterkennung/Überspringen, Wiederaufnahme des letzten Guide-Schritts innerhalb der laufenden Seite und seltene kleine Monsterkommentare inhaltlich fest. Keine Genehmigung für Work-Implementierung, PR-Merge oder Veröffentlichung.
 
 **Website:** Reincarnated as a Proton. **Phase:** Planung vor der Implementierung; später v0.8.5, Schritt 05 von 08. **Technische Ausgangsbasis:** v0.7 auf main, danach bei Implementierung die **geprüfte v0.8 mit Schritten 01–04**. Der Eigentümer möchte ausdrücklich alle acht Themen **vor** dem Beginn der Work-Implementierung durchsprechen. Dieser Plan darf jetzt auf dem Planungsbranch `develop/v0.8` dokumentiert werden; der spätere Code für 05–08 kommt erst auf einem eigenen, nach Freigabe von v0.8 abgeleiteten Entwicklungsbranch. Keine Änderung an main/öffentlicher Website und keine Work-Ausführung ohne ausdrückliche Baufreigabe.
 
@@ -111,11 +113,11 @@ Temperature  ·  Entropy: Teilchen  ·  Entropy: Wärme
 
 **Abhängigkeit:** Erst nach v0.8-Review/Entscheidung werden die Details auf den tatsächlich implementierten Schritt-02-bis-04-UI-Elementen verbindlich verankert. Der v0.8.5-Plan darf **vorher** komplett ausformuliert werden; **die Realisierung beginnt später**. Keine Implementierung als Nebenwirkung dieser Dokumentation.
 
-## 9. Noch gemeinsame Entscheidungen
+## 9. Vom Nutzer bestätigte Produktentscheidungen
 
-1. **Wahlmenü:** kompakter Schnellstart plus frei wählbare Labor-Miniführungen wie oben? Oder eine einzige zusammenhängende Tour durch alle Labore? **Empfehlung:** Wahlmenü, kein Pflicht-Marathon.
-2. **Automatik:** erkennen, dass man eine echte Handlung korrekt ausgeführt hat; **Überspringen jederzeit**; keine automatische Änderung an Parametern. Ist das so erwünscht?
-3. **Wiederöffnung:** Standardmäßig Guide nach Schließen neu starten oder **letzten angefangenen Weg/Schritt innerhalb der laufenden Sitzung** weiterführen? **Empfehlung:** innerhalb der Seite fortsetzen, explizit „Neu beginnen“ anbieten; keine persistente Profilüberwachung.
-4. **Ton:** 100 % technische Hilfe oder sehr gelegentlich ein humorvoller Monsterkommentar? **Empfehlung:** seltenes Monster am Rand, ein bis zwei Sätze über gesamten Guide, ohne messbaren Wissensverlust beim Abschalten.
+1. **Wahlmenü statt Pflichtmarathon:** kompakter 3-Schritte-Schnellstart oder jederzeit auswählbare Labor-Miniführungen für jede aktive Experimentansicht, mit Wahlfreiheit und Abbruchfunktion.
+2. **Echte Interaktionen:** Nutzende bedienen die vorhandenen Steuerelemente selbst. Ein Schritt kann anhand realer passender Aktionen als erfüllt gelten; **Überspringen und Zurück jederzeit**, keine automatische Simulation oder Modelldatenmutationen.
+3. **Wiederöffnung:** den letzten angefangenen Weg/Schritt während der aktuell laufenden Seite wieder aufrufen und bei Wunsch ausdrücklich **Neu beginnen**. Keine Speicherung über Sitzungen, kein Nutzerprofil und kein Tracking.
+4. **Monster:** sehr gelegentlich eine dezente Randreaktion der einen roten skizzenhaften Figur. Wissenschaftliche Informationen und Guide-Bedienung sind auch ohne Monster vollständig zugänglich.
 
-**Planungsstatus: ENTWURF.** Beim nächsten Gespräch über Schritt 05 entscheiden, dann nach Zustimmung inhaltlich freigeben und zu Schritt 06 gehen. **Keine Work-Implementierung ohne spätere ausdrückliche Freigabe.**
+**Planungsstatus: SCHRITT 05 INHALTLICH FREIGEGEBEN (09.11.2026).** Nach Abschluss der Planung 06–08 zuerst v0.8 implementieren, prüfen und nur nach Merge-/Releasefreigabe die v0.8.5-Implementierung auf eigenem Branch starten. **Keine Work-Implementierung ohne spätere ausdrückliche Freigabe.**
