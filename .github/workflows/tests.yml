@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   correction-evidence:
-    name: v0.8 correction measurements and existing preview audit
+    name: v0.8 existing preview audit
     if: github.ref_name == 'feature/v0.8-learning-foundation' || github.head_ref == 'feature/v0.8-learning-foundation'
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -26,7 +26,10 @@ jobs:
         run: node scripts/audit-v08-preview.mjs
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
+      # The bounded causes study is retained for explicit manual repetition.
+      # Normal pushes still run the complete original rendering comparison below.
       - name: Controlled reviewed/current and exploratory rendering comparisons
+        if: github.event_name == 'workflow_dispatch'
         run: node scripts/measure-v08-causes.mjs
       - uses: actions/upload-artifact@v4
         if: always()

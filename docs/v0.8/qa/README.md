@@ -17,3 +17,10 @@ Einzelne GC-/Heap-Stichproben sind kein allgemeiner Beweis für vollständige Sp
 `v08-creature-native-en.png` ist der tatsächliche Viewport des interaktiv bedienten gemeinsamen Chrome am 10.11.2026, Englisch, Entropy Lab, Monster „Still“. Kein Mockup. Es wurde kein Produktionsserver geöffnet oder verändert.
 
 Der Phase-E-Performancevergleich verwendet nun 180 Warm-up-Frames und CDP-Timeline-Tracing auf beiden Varianten. Er misst stationäres Rendering nach der ersten Reaktion, nicht den Worst Case des Einblendens, alle offenen Lernpanels oder GPU-Endlatenz. Paint-p95 der Gravity-Stichproben ist höher (Mittel +20,04 % / +0,050 ms), die vorgeschlagene 10-%-Paintgrenze deshalb nicht als bestanden ausgewiesen. Fehlende Paint-/Raster-Ereignisse sind keine Dauer von null. Vollständige Einordnung im Qualitätsbericht; ältere, anders instrumentierte Läufe bleiben erhalten.
+
+
+## Nachaudit: Energie, öffentliche Vorschau und Paint-Ursachen
+
+`v08-preview-security.json` und `v08-correction-causes.json` stammen aus dem erfolgreichen Evidenzjob im Run 42915407613 auf Commit 5a4040d3df8e11938c5294e830bc9cc7230e347f, Artefakt 13808644421. Rohe Werte unverändert, nur Herkunftsheader ergänzt. Der gesamte Run war wegen eines neuen Browser-Testaufbaus nicht grün; reguläre/12/6 und der separate Evidenzjob bestanden. Details und Grenzen im [Nachbesserungsbericht](../../CodexReview_v0.8_Nachbesserungen.md).
+
+Die Cloudflare-Vorschau war tatsächlich öffentlich lesbar. Dies ist inzwischen vom Eigentümer akzeptiert; es ersetzt keine Freigabe eines neuen Deployments. Lokale Chrome-Aufnahmen und private GitHub-Artefakte bleiben andere Prüfwege. Keine neue Pages-Veröffentlichung im Nachbesserungsauftrag, ausschließlich Commit-Prefix `[CF-Pages-Skip]`.

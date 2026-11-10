@@ -72,3 +72,8 @@ Der frühere Zwischenstand endete korrekt vor Phase E. Seit der ausdrücklichen 
 ## Sichtfreigabe Phase E · 09.11.2026
 
 Der Nutzer hat auf die gezeigte Original/Hero/Peek/Icon-Montage ausdrücklich mit **„approved!“** geantwortet. Damit ist die Integration dieser drei unveränderten Derivate als eine dekorative Instanz freigegeben. Manifest und `assets/creature-approval.json` halten die konkreten Hashes fest. Frühere Hinweise auf eine noch fehlende Sichtfreigabe beschreiben den vorherigen Zwischenstand. Phase E ist umgesetzt und separat getestet; tatsächliche Nachweise und Grenzen stehen im Qualitätsbericht. Kein Merge, Deployment, Original-/Physikumbau oder Beginn von v0.8.5.
+
+
+## Nachaudit: Vorschaugrenze präzisiert · 10.11.2026
+
+Die bestehende Cloudflare-Featurebranch-Vorschau ist tatsächlich öffentlich lesbar und vom Nutzer unter den ausdrücklich genannten Sicherheitsbedingungen akzeptiert. Die frühere Forderung/Annahme „private Vorschau“ beschreibt nicht den tatsächlichen Cloudflare-Zustand. Private GitHub-Artefakte und lokale Vorschauen bleiben getrennte Prüfwege. Neue Veröffentlichungen sind nicht autorisiert: alle Nachbesserungscommits mit `[CF-Pages-Skip]`, keine Providerkonfiguration, kein Merge/Deployment. Ausschließlich korrekte Energiezuordnungen, Sicherheitsprüfung und begrenzte messbar begründete Performancekorrekturen; alle Schutzregeln für Physik/Master/Original bestehen fort.

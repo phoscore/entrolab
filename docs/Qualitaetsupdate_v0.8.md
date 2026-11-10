@@ -2,7 +2,7 @@
 
 Stand: 10.11.2026. **Prüfstand, keine Releasefreigabe.** [PR #7](https://github.com/phoscore/entrolab/pull/7), Branch `feature/v0.8-learning-foundation`.
 
-**Phasen A–E / Schritte 01–04 sind implementiert.** Die ausdrückliche Sichtfreigabe „approved!“ vom 09.11.2026 gilt für die unveränderten Hero-/Peek-/Icon-Derivate. Phase E ergänzt eine einzige abschaltbare dekorative Figur. Der aktuelle Gesamtnachweis steht in Abschnitt 10; die folgenden A–D-Messungen bleiben als früherer Zwischenstand erhalten. Kein Merge, Deployment, Domain-/Repositorywechsel oder aktives öffentliches Rebranding. v0.8.5 / 05–08 bleibt unimplementiert.
+**Phasen A–E / Schritte 01–04 sind implementiert.** Die ausdrückliche Sichtfreigabe „approved!“ vom 09.11.2026 gilt für die unveränderten Hero-/Peek-/Icon-Derivate. Phase E ergänzt eine einzige abschaltbare dekorative Figur. Der aktuelle Gesamtnachweis steht in Abschnitt 10; die folgenden A–D-Messungen bleiben als früherer Zwischenstand erhalten. Kein Merge, Produktionsdeployment, Domain-/Repositorywechsel oder aktives öffentliches Rebranding. Die bestehende öffentliche Branchvorschau wird in Abschnitt 11 eingeordnet. v0.8.5 / 05–08 bleibt unimplementiert.
 
 ## 1. Ausgangspunkt und Schutz
 
@@ -286,8 +286,20 @@ Paint-p95 einzeln: Basis 0,236 / 0,263 ms, Kandidat 0,259 / 0,340 ms. Der Mittel
 
 **A13-Budget bleibt teilweise offen:** Das vorgeschlagene 10-%-Budget für vergleichbare Paint-p95 ist in dieser Gravity-Stichprobe überschritten. Die geringe absolute Differenz beseitigt diesen Befund nicht. BH-/Raster-Timeline-Ereignisse wurden nicht aufgezeichnet (Anzahl 0, Perzentile `null`); das beweist weder null Renderkosten noch ein bestandenes GPU-/BH-Paintbudget. CDP-Paintdauer ist keine End-to-End-GPU-Latenz. Kein weiterer Umbau des geschützten Renderers zur Schönung dieses Inhaltsupdates. Vor Release längere unabhängige Reihen, Initialreaktion, offene Panels und reale Mobilhardware prüfen.
 
-### Private Vorschau und Freigabegrenzen
+### Vorschau und Freigabegrenzen — nachträglich korrigiert
 
-Die CI archiviert sämtliche versionierten Projektdateien als `entrolab-v08-source.zip` im privaten Screenshot-/Messartefakt. Entpacken und gemäß README lokal mit Python starten; kein Framework-Build erforderlich. Die Originalhistorie ist im vollständigen privaten Git-Klon, nicht im Source-ZIP. Keine öffentliche Preview-URL, kein neuer Hostingstand, keine Änderung an Produktionsidentität, Title/Favicon, Domain oder `main`. PR #7 ist ausschließlich zur unabhängigen Prüfung; keine automatische Freigabe durch grüne Tests.
+Die CI archiviert sämtliche versionierten Projektdateien als `entrolab-v08-source.zip` im privaten Screenshot-/Messartefakt. Entpacken und gemäß README lokal mit Python starten; kein Framework-Build erforderlich. Die Originalhistorie ist im vollständigen privaten Git-Klon, nicht im Source-ZIP. Die damalige Aussage „keine öffentliche Preview-URL“ war falsch: Die vorhandene Cloudflare-Git-Anbindung hat auch diesen Featurebranch automatisch veröffentlicht. Die bestehende Vorschau ist ohne Anmeldung lesbar. Der Nutzer akzeptiert dies im Nachbesserungsauftrag ausdrücklich unter den dort genannten Sicherheitsbedingungen. Das private GitHub-Artefakt ist davon zu unterscheiden. Die Korrekturcommits unterdrücken neue Pages-Builds mit `[CF-Pages-Skip]`; Produktionsidentität, Title/Favicon, Domain und `main` bleiben unverändert. Technische Prüfung und Grenzen: Nachbesserungsbericht in Abschnitt 11. PR #7 ist ausschließlich zur unabhängigen Prüfung; keine automatische Freigabe durch grüne Tests.
 
 Weiter offen bleiben reale Screenreader-/Safari-/Firefox-/Touchhardwareprüfungen, bestätigter nativer Zoom und längerfristige Speicher-/Worst-Case-Renderprofile. Der bestehende Gravity-Tastatur-Platzierungsmangel bleibt dokumentiert und unverändert. v0.8.5 / 05–08 und der spätere QCD-Artikel sind ausschließlich Planung.
+
+
+## 11. Nachbesserungen nach unabhängigem Codex-Audit
+
+Auftrag vom 10.11.2026, geprüfter Ausgangscommit `d4b6bd1b2e6bd0e136b36a555b7df16d3cbe1d9d`. Verbindliche Befunde/Referenzwerte stammen aus dem ausführlichen Nachbesserungsauftrag; im Featurebranch liegt kein gesonderter späterer Codex-Bericht vor. Der frühere Planungs-Audit wird als historischer Bericht unverändert erhalten.
+
+**Arbeitsstand:** Energiezuordnung reproduziert und korrigiert; 186 reguläre Prüfungen lokal bestanden. Neue echte Browserfälle, schreibfreie Sicherheitsprobes der bestehenden Vorschau und reproduzierbare Ursachenmessungen laufen in GitHub Actions. Keine vorweggenommenen Messergebnisse oder Releasefreigabe. Abschlussdaten werden nach den tatsächlichen Läufen ergänzt.
+
+Die frühere pauschale Behauptung einer ausschließlich privaten Vorschau wird hier ausdrücklich zurückgenommen: Cloudflare Pages deployt Featurebranches automatisch. Die bestehenden URLs `https://567f7dd7.entrolab.pages.dev` und `https://feature-v0-8-learning-founda.entrolab.pages.dev` betreffen den geprüften Altstand. Öffentliches Lesen/Benutzen ist nun vom Eigentümer akzeptiert; neue Deployments bleiben verboten. Deshalb beginnen **alle** Korrekturcommits mit `[CF-Pages-Skip]`. Die [offizielle Cloudflare-Dokumentation](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#skipping-a-build-via-a-commit-message) beschreibt diesen Pages-spezifischen Skip; GitHub-CI läuft weiter. Es wird keine Providerkonfiguration geändert und kein Deploy-API-Aufruf ausgeführt.
+
+
+Detaillierter Bericht mit Ursache, korrigierter Formel/Einheit, allen Varianten und Sicherheitsgrenzen: [Codex-Nachbesserungen v0.8](CodexReview_v0.8_Nachbesserungen.md). Rohprotokolle: [Vorschauprüfung](v0.8/qa/v08-preview-security.json), [Ursachenmessung](v0.8/qa/v08-correction-causes.json). Der Evidenzjob des ersten Nachbesserungslaufs war erfolgreich; dessen neuer Browser-Testaufbau hatte einen offengelegten Fehler (geschlossene Instrumenten-Details). Die regulären 186/12/6 waren grün; der Browserfall wird nach Korrektur erneut ausgeführt. Keine Übernahme der zwei untersuchten Renderoptimierungen mangels nachgewiesenem Vorteil. Das 10-%-Paintbudget bleibt eine ausdrücklich offene Eigentümerentscheidung, keine stillschweigend akzeptierte Ausnahme.

@@ -10,6 +10,7 @@ after(async()=>{if(h){await writeFile(resolve(h.output,'v08-knowledge-measuremen
 test('energy browser: gravity help describes the measured mechanics in DE/EN and returns without state changes',async()=>{
  const {p,context}=await h.lab();try{
   await p.locator('.edit-options > summary').click();await p.locator('#velX').fill('42.7500');
+  await p.locator('.instruments > summary').click();
   const before=await physical(p),readout=await p.locator('#systemEnergy').textContent();
   const help=p.locator('#gravity [data-knowledge-term=mechanicalenergy]');
   await help.locator(':scope > summary').press('Enter');await help.locator('.knowledge-advanced > summary').click();
@@ -23,7 +24,9 @@ test('energy browser: gravity help describes the measured mechanics in DE/EN and
   const link=help.locator('[data-model-link]'),origin=await link.getAttribute('id');
   await link.click();assert.equal(await p.evaluate(()=>document.activeElement.id),'model-gravity');
   await p.locator('#guideReturn').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),origin);
+  await p.locator('[data-language=de]').click();
   assert.equal(await p.locator('#systemEnergy').textContent(),readout);assert.deepEqual(await physical(p),before);
+  await p.locator('[data-language=en]').click();
   await p.screenshot({path:resolve(h.output,'v08-energy-mechanics-en.png')});
  }finally{await context.close()}
 });
