@@ -11,7 +11,7 @@ async function ready(p){await p.waitForFunction(()=>window.entrolabCreature)}
 async function mode(p,value){const pref=p.locator('#creaturePreferences');if(!await pref.evaluate(e=>e.open))await pref.locator(':scope > summary').click();await p.locator('#creatureMode').selectOption(value);await pref.locator(':scope > summary').click()}
 async function show(p,dock='.view.active .creature-dock'){await p.locator(dock).scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabCreature.inspect().visible)}
 const animations=p=>p.locator('#creature').evaluate(e=>e.getAnimations({subtree:true}).length);
-async function proof(p,name){const png=await p.screenshot({path:resolve(h.output,name+'.png')});if(process.env.CI)console.log('ENTROLAB_SCREENSHOT '+name+' '+png.toString('base64'))}
+async function proof(p,name){await p.screenshot({path:resolve(h.output,name+'.png')})}
 
 test('creature browser: one observer across all eight contexts preserves every model, RNG and global body IDs',async()=>{
  const {p,context}=await h.lab();try{
@@ -21,6 +21,7 @@ test('creature browser: one observer across all eight contexts preserves every m
    await p.locator('[data-tab='+tab+']').click();await show(p);assert.equal((await inspect(p)).context,expected);assert.equal(await p.locator('#creature').count(),1);assert.equal(await animations(p),0);
   }
   await p.locator('[data-tab=extreme]').click();await p.locator('.thermal-lab h2').click();await show(p);assert.equal((await inspect(p)).context,'temperature');
+  await p.locator('#why-objects > summary').click();await show(p);assert.equal((await inspect(p)).context,'objects');
   await p.locator('[data-tab=entropy]').click();await p.locator('[data-entropy-view=thermal]').click();await show(p);assert.equal((await inspect(p)).context,'thermal');
   await p.locator('#physicsGuide > summary').click();await show(p,'#physicsGuide .creature-dock');assert.equal((await inspect(p)).context,'guide');
   await p.locator('#physicsGuide > summary').click();await show(p);

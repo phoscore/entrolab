@@ -39,7 +39,7 @@ export function initCreature(doc=globalThis.document,{clock,storage}={}){
   if(active==='entropy')context=doc.getElementById('thermalExperiment').hidden?'markers':'thermal';
   else if(active==='extreme'){
    if(target?.closest?.('.thermal-lab,#thermalTransfer,#thermalTransferTarget'))context='temperature';
-   else if(context!=='temperature'||target?.closest?.('[data-tab],[data-kind]'))context='objects';
+   else if(context!=='temperature'||target?.closest?.('#extreme,[data-tab]'))context='objects';
   }else context=active==='science'?'science':active;
   return {dock:docks.get(active),context};
  }
