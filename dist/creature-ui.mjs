@@ -84,7 +84,12 @@ export function initCreature(doc=globalThis.document,{clock,storage}={}){
  listen(win,'resize',()=>{if(activeDock)seen=inViewport(activeDock);reconcile()});
  listen(reduced,'change',()=>{stop();reconcile()});listen(small,'change',()=>reconcile());
  listen(figure,'animationend',()=>{stop();render()});listen(figure,'animationcancel',()=>{machine.finish();render()});
- const bodyObserver=new win.MutationObserver(()=>{stop();reconcile()});bodyObserver.observe(doc.body,{attributes:true,attributeFilter:['class']});
+ // Native details toggle events may be delayed. Observe the actual open
+ // attribute before the next paint so the settings panel hides the figure
+ // immediately, including pointer and keyboard activation.
+ const bodyObserver=new win.MutationObserver(()=>{stop();reconcile()});
+ bodyObserver.observe(doc.body,{attributes:true,attributeFilter:['class']});
+ bodyObserver.observe(preferences,{attributes:true,attributeFilter:['open']});
  const unsubscribe=onLanguageChange(()=>reconcile());
  const controller={inspect:()=>({...machine.inspect(),mounted:!disposed,subscriptions:disposed?0:cleanup.length+1,observers:disposed?0:1+(observed&&observer?1:0),timers:0,figures:disposed?0:1}),dispose(){if(disposed)return;disposed=true;stop();observer?.disconnect();bodyObserver.disconnect();unsubscribe();for(const off of cleanup)off();figure.remove();for(const e of owned)e.remove();instances.delete(doc)}};
  instances.set(doc,controller);reconcile(null,true);return controller;
