@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "approval": "approved-in-user-chat",
+  "source": "docs/v0.8/assets/a3-glitched-entity-master.jpg",
+  "sourceSha256": "5dfb6a91195d7c3925cee9ae202332c26476de257b1a2f5b1469da1c08536ab3",
+  "sourceBytes": 144400,
+  "sourceWidth": 1536,
+  "sourceHeight": 1536,
+  "method": "Only crop + Lanczos resize + opaque WebP encoding; no drawing or generative reinterpretation; black background intentionally retained.",
+  "tool": "Version: ImageMagick 7.1.1-43 Q16 x86_64 22550 https://imagemagick.org",
+  "quality": 94,
+  "alpha": false,
+  "assets": [
+    {
+      "id": "hero",
+      "crop": [
+        0,
+        0,
+        1536,
+        1536
+      ],
+      "width": 512,
+      "height": 512,
+      "purpose": "Complete figure / full original composition",
+      "path": "dist/assets/creature-candidates/hero.webp",
+      "bytes": 23636,
+      "sha256": "119ebfea14cf85b17a72984a6a284e5949b69a6facd2ddee4f3d674a10031032",
+      "decodedChannels": "srgb  3.0",
+      "estimatedRgbaBytes": 1048576
+    },
+    {
+      "id": "peek",
+      "crop": [
+        340,
+        100,
+        960,
+        960
+      ],
+      "width": 256,
+      "height": 256,
+      "purpose": "Upper body / edge peek; deliberate original-image crop",
+      "path": "dist/assets/creature-candidates/peek.webp",
+      "bytes": 13904,
+      "sha256": "3de46c7894fdb612b314d5bba9db9d4b7bbcfd33a9ad64bcbfbfbfef2abd7249",
+      "decodedChannels": "srgb  3.0",
+      "estimatedRgbaBytes": 262144
+    },
+    {
+      "id": "icon",
+      "crop": [
+        520,
+        180,
+        560,
+        560
+      ],
+      "width": 128,
+      "height": 128,
+      "purpose": "Compact mask; preview only, not the active favicon",
+      "path": "dist/assets/creature-candidates/icon.webp",
+      "bytes": 5114,
+      "sha256": "bb62dc2c79240fe45aeb1e6f24f710df7e4db7b60d24adac3d1933b827416588",
+      "decodedChannels": "srgb  3.0",
+      "estimatedRgbaBytes": 65536
+    }
+  ],
+  "approvalDate": "2026-11-09",
+  "approvalEvidence": "User explicitly replied \"approved!\" to the displayed Original/Hero/Peek/Icon comparison for Phase E. No merge, deployment, favicon or production-brand approval."
+}

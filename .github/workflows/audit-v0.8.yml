@@ -1,0 +1,34 @@
+name: v0.8 read-only technical audit
+on:
+  push:
+    branches: [develop/v0.8]
+    paths:
+      - '.github/workflows/audit-v0.8.yml'
+      - 'docs/v0.8/audit/*.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Read-only model probes
+        run: mkdir -p audit-results && node docs/v0.8/audit/model-probes.mjs audit-results/model-probes.json
+      - name: Read-only independent browser and asset measurements
+        run: node docs/v0.8/audit/browser-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v08-independent-audit-evidence
+          path: audit-results/

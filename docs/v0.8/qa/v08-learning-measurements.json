@@ -1,0 +1,83 @@
+{
+  "evidence": {
+    "run": 42693187935,
+    "head": "8b31ae3715edb42449c6e9982482c3068e33f01c",
+    "artifact": 13707379909
+  },
+  "measurements": [
+    {
+      "kind": "learning-mount-dispose-100",
+      "initial": {
+        "documents": 1,
+        "nodes": 4746,
+        "jsEventListeners": 260
+      },
+      "final": {
+        "documents": 1,
+        "nodes": 4746,
+        "jsEventListeners": 260
+      },
+      "heapBefore": {
+        "usedSize": 2828484,
+        "totalSize": 3260416,
+        "embedderHeapUsedSize": 3373888,
+        "backingStorageSize": 376069
+      },
+      "heapAfter": {
+        "usedSize": 3003564,
+        "totalSize": 3522560,
+        "embedderHeapUsedSize": 3391632,
+        "backingStorageSize": 376086
+      }
+    },
+    {
+      "kind": "demo-layout",
+      "width": 320,
+      "dpr": 1,
+      "scroll": 320,
+      "focusVisible": true,
+      "animations": 0
+    },
+    {
+      "kind": "balance-layout",
+      "width": 320,
+      "dpr": 1,
+      "scroll": 320,
+      "focusVisible": true,
+      "animations": 0
+    },
+    {
+      "kind": "demo-layout",
+      "width": 390,
+      "dpr": 2,
+      "scroll": 390,
+      "focusVisible": true,
+      "animations": 0
+    },
+    {
+      "kind": "balance-layout",
+      "width": 390,
+      "dpr": 2,
+      "scroll": 390,
+      "focusVisible": true,
+      "animations": 0
+    },
+    {
+      "kind": "demo-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "scroll": 321,
+      "focusVisible": true,
+      "animations": 0
+    },
+    {
+      "kind": "balance-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "scroll": 321,
+      "focusVisible": true,
+      "animations": 0
+    }
+  ],
+  "errors": []
+}

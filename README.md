@@ -4,12 +4,12 @@ Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisie
 
 ## Entwicklungsstand und Ausprobieren
 
-**v0.7 auf `develop/v0.7` ist ein Prüfstand, keine Produktionsfreigabe.** Grundlage ist die freigegebene v0.6 auf `main` (`4fe3c48295f66750775fa4fe42c596c26c361830`). Änderungen gehen ausschließlich als Pull Request zur unabhängigen Prüfung. Kein automatischer Merge.
+**v0.8 auf `feature/v0.8-learning-foundation` ist ein isolierter Prüfstand.** Grundlage ist die freigegebene v0.7 auf `main` (`8b856086877ea21579cf7d74190ad08155d70c7f`) mit dem genehmigten Planungsstand. Die Assetvarianten wurden am 09.11.2026 ausdrücklich freigegeben; Phase E ist integriert. Schritte 01–04 liegen vollständig zur unabhängigen Prüfung vor. Kein Merge, Produktionsdeployment oder aktives öffentliches Rebranding; die vorhandene öffentliche Cloudflare-Branchvorschau wird gesondert geprüft. v0.8.5 bleibt Planung. [Umsetzungsvertrag](docs/v0.8/Umsetzungsvertrag_v0.8.md) und [Qualitätsbericht](docs/Qualitaetsupdate_v0.8.md).
 
 Die Anwendung ist buildlos: moderner Browser mit ES-Modulen, BigInt und Modul-Workern; Python 3 für einen lokalen HTTP-Server. Keine Paketinstallation und kein Backend zum Benutzen nötig.
 
 ```sh
-git clone --branch develop/v0.7 https://github.com/phoscore/entrolab.git
+git clone --branch feature/v0.8-learning-foundation https://github.com/phoscore/entrolab.git
 cd entrolab
 python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
@@ -26,7 +26,8 @@ Schriftarten von Google Fonts sind optional; Systemschrift funktioniert ohne sie
 - **Entropy Lab · Teilchen & Wahrscheinlichkeit:** standardmäßig zwölf nummerierte, unterscheidbare Marker in zwei gleich großen Kammern. `N` ist auf 1–32 begrenzt. Alle links starten, `k` manuell wählen, einzelne Zufallsschritte, automatisch mischen, pausieren und zurücksetzen. Mikrozustand anzeigen oder bei gleichem `k` neu auslosen. Exakte Multiplizität, Gleichgewichtsverteilung, Datentabelle und dimensionslose Modellentropie vergleichen.
 - **Entropy Lab · Wärme & Entropie:** zwei idealisierte, gemeinsam isolierte Körper mit einstellbaren Anfangstemperaturen (250–600 K), konstanten Wärmekapazitäten und Wärmeleitwert. Analytischer Temperaturverlauf, vorzeichenbehaftete Wärmeleistung/übertragene Energie, Gesamtenergie und thermodynamisches ΔS in J/K. Start/Pause, Zehn-Sekunden-Schritte und Reset; neue Parameter/Beispiele bleiben bis „Übernehmen“ ein Entwurf. Das Extreme Temperature Lab kann ausschließlich zulässige Kelvinwerte für A oder B vormerken. Extreme Werte werden erklärt abgewiesen, niemals angepasst.
 - **Erste Schritte:** vier freiwillige Schritte mit dezent hervorgehobenen echten Bedienelementen. Die Anleitung führt keine Modelländerung selbst aus, bewahrt beim Sprachwechsel den Schritt und lässt sich jederzeit schließen/erneut öffnen.
-- **Kontexthilfe:** „Was bedeutet das?“ öffnet das bestehende Glossar und fokussiert den passenden Begriff; „Zurück zum Labor“ oder Escape führt zum Ausgangslink zurück. Advanced-Infos sind freiwillig aufklappbar. Der Cosmic Field Guide ist nur eine kleine Vorschau.
+- **v0.8-Lernhilfen:** eine geschlossene Hauptfrage und eine freiwillige Prognose pro fachlichem Kontext; „Steuerelement finden“ fokussiert den echten Regler, wendet nichts an. Separate N=4-Demo mit A–D, optionaler Makrozustandsvergleich und Energie-/Entropiebalken lesen bestehende Ergebnisse, ohne die beiden Modelle zu vermischen. Vier Alltagsvertiefungen, vorsichtige Grenzfragen und 29 gemeinsame Fachbegriffe (mechanische und thermische Energie getrennt) in DE/EN.
+- **Kontexthilfe:** „Was bedeutet das?“ öffnet das bestehende Glossar und fokussiert den passenden Begriff; „Zurück zum Labor“ oder Escape führt zum Ausgangslink zurück. Advanced-Infos sind freiwillig aufklappbar. Ein gemeinsames Wissensfundament verbindet kurze Begriffe mit sechs Modellkapiteln, Formeln, Quellen und Rücksprung. Direkte Fachlinks und verschachtelte Glossar-/Quellenwege sind tastaturbedienbar.
 - **Modell & Quellen:** zehn isolierte modellinterne Selbstchecks. Jeder Lauf zeigt einen Ausführungszähler, Ergebnisstatus und eine Screenreader-Meldung. Das ist weder die gesamte CI-Suite noch eine vollständige Physikverifikation.
 
 DE/EN im Kopfbereich; auch dynamische Werte, Diagrammbeschriftungen und Fehler sind lokalisiert. Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt**, etwa `0.1` oder `1e9`. Noch nicht angewendete Entwürfe bleiben beim Sprachwechsel erhalten. Der Browser-Titel bleibt in beiden Sprachen identisch. Fokusmodus in Sandbox/Extreme Objects, Escape zum Verlassen. Reduced Motion startet bestehende Simulationen pausiert und unterdrückt Markerübergänge; automatisches Entropy-Mischen und Wärme-Abspielen beginnen immer erst nach ausdrücklicher Auswahl. Beim Wechsel zu Reduced Motion pausiert das Wärmeexperiment; seine dekorativen Farb-/Flusseffekte werden unterdrückt.
@@ -55,9 +56,8 @@ node scripts/check-benchmarks.mjs
 node scripts/measure-thermal.mjs
 ```
 
-Der reguläre Einstieg enthält **158 Prüfungen**: zehn Original-Selbstchecks und 148 Node-Testfälle. Alle 149 vor dem v0.7-Review vorhandenen Prüfungen bleiben erhalten; neun gezielte Reviewfälle kommen hinzu. DOM-/VM-Adapter bilden die benötigten Schnittstellen ab, ohne bestehende Assertions zu lockern. Für die Originalintegrität und den Vorher/Nachher-Benchmarkvergleich ist ein vollständiger Git-Klon erforderlich. `--working-tree` ist ausschließlich für den historischen Erstsicherungsstand gedacht und soll auf heutigen Entwicklungsständen nicht verwendet werden.
+Der reguläre Einstieg enthält **186 Prüfungen**: zehn Original-Selbstchecks und 176 Node-Fälle. Die vier zusätzlichen Fälle des Nachaudits prüfen mechanische und thermische Energiezuordnung samt unabhängiger SI-Referenz. Alle 159 Prüfungen der Audit-Basis bleiben erhalten; 27 neue Fälle prüfen Assets, Quellen, Erklärungen, unabhängige Zählung, Bilanzprojektionen und den rein dekorativen Monster-Lifecycle. Die zwölf vollständigen numerischen Benchmarks werden unter identischer Laufzeit exakt gegen den genehmigten historischen Stand verglichen; sechs Originalprüfungen verifizieren den archivierten Originalcommit. Quellen, Referenzen und Toleranzen werden nicht gelockert. Ein vollständiger Git-Klon ist für diese beiden historischen Prüfeinstiege erforderlich. `--working-tree` nur beim historischen Erstsicherungsstand verwenden.
 
-Die zwölf vollständigen Benchmarks stimmen im lokalen Node-24.22.1-Lauf exakt mit `docs/numerics-v0.2.json` überein. CI berechnet die genehmigte v0.5-Basis und den Kandidaten unter derselben Node-/V8-/Betriebssystem-Version und vergleicht alle Ergebnisse exakt; Rundungsunterschiede zwischen verschiedenen Laufzeiten werden nicht mit Codeänderungen verwechselt. Die historischen Quellen und die JSON-Referenz müssen zusätzlich bytegleich bleiben. Die Benchmarkreferenz wird nicht neu kalibriert. Integrator, Kräfte, Szenarien und Vorhersagemodell sind in v0.7 unverändert.
 
 Für die zusätzlichen realen Chromium-Tests (nur Entwicklungsabhängigkeit, Playwright exakt per Lockfile):
 
@@ -67,12 +67,21 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browser-Suite umfasst **36 Fälle**: alle 29 vor dem v0.7-Review vorhandenen Fälle sowie sieben neue Reviewfälle zu Grenzwerten/Originalreproduktion, Zeitachsen, Übernahmehinweisen und Kurvenabtastung. JSON-Messwerte und Screenshots entstehen unter `browser-results/` und werden in GitHub Actions als Artefakt aufgehoben. Messungen sind keine FPS-Garantie. CI prüft Physik, Originalintegrität und Chromium; sie ersetzt keine unabhängige Prüfung, echte Touchgeräte-/Safari-Prüfung oder technisch eingerichtete Branch Protection. Details und tatsächliche Laufresultate: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
+Die Browser-Suite enthält **65 Fälle**: alle 38 Fälle der Audit-Basis und 27 neue Chromium-Fälle zu Wissens-/Fokusnavigation, freiwilligen Fragen, Zustandsbewahrung, N=4, Großzahlen, Bilanz, Monster-Modi, Lifecycle und 320/390/fractional-Ansichten. Screenshots und JSON-Messwerte unter `browser-results/` werden in CI als Artefakt aufgehoben. Zusätzlich vergleicht `node scripts/measure-v08-browser.mjs` dieselben Szenen auf derselben Maschine mit der Planungsbasis: acht 30-Sekunden-Stichproben in wechselnder Reihenfolge. Keine Garantie für beliebige Hardware, Safari oder reale Assistenztechnik; tatsächliche Resultate und Grenzen im [Qualitätsbericht v0.8](docs/Qualitaetsupdate_v0.8.md).
+
+Die lokale Asset-Sichtvorschau liegt unter <http://localhost:8000/asset-review.html>. Sie lädt das unveränderte Original und die drei abgeleiteten Kandidaten; die freigegebenen WebP-Ableitungen sind als eine dekorative Figur integriert. „Monster“ im Kopfbereich bietet Dezente Bewegung, Ruhig oder Aus. Reduced Motion bleibt statisch; Fokusmodus, Eingaben und offene Einstellungen unterdrücken die Figur. Sie ist keine physikalische Messanzeige. 
+
+Die CI erstellt außerdem `entrolab-v08-source.zip` im privaten Artefakt `chromium-review-measurements`. Herunterladen, entpacken und denselben Python-Befehl im Ordner `entrolab-v08` ausführen. Das ZIP enthält alle versionierten Projektdateien; historische Git-Prüfungen benötigen weiterhin den vollständigen Klon. Kein Deployment.
 
 ## Projektstruktur
 
 | Datei | Aufgabe |
 | --- | --- |
+| `dist/knowledge.mjs`, `knowledge-text.mjs` | Gemeinsame Inhalte, Quellen-IDs und Schlüssel des bestehenden DE/EN-Systems |
+| `dist/knowledge-ui.mjs`, `guide.mjs` | Begriffe, Modellkapitel, Fachlinks und Fokus-Rückwege |
+| `dist/explanations-ui.mjs` | Sechs freiwillige Laborfragen und Prognosen ohne Modellschreibzugriff |
+| `dist/learning-math.mjs`, `entropy-learning.mjs` | Unabhängige N=4-Demo, Makrovergleich und reine Bilanzprojektion |
+| `dist/creature-ui.mjs`, `creature-policy.mjs`, `creature.css` | Eine dekorative Figur, eigener begrenzter Zustand, DE/EN, Ruhig/Aus/Reduced Motion; kein Physik- oder RNG-Zugriff |
 | `dist/physics.mjs` | Unveränderter Physikkern und Integrator |
 | `dist/experiments.mjs`, `instruments.mjs`, `prediction.mjs` | Szenarien, Diagnostik, begrenzte Vorhersage |
 | `dist/app.mjs` | Sandbox, BH-Rechner und Selbstcheck-Anzeige |
@@ -91,6 +100,8 @@ Die Browser-Suite umfasst **36 Fälle**: alle 29 vor dem v0.7-Review vorhandenen
 ## Original und Freigabe schützen
 
 Original v0.1: Commit `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1`. Die sechs Originaldateien einschließlich historischer Hosting-Konfiguration sind über `docs/v0.1-original.sha256` und `docs/v0.1-original-commit.txt` gebunden. Diese Referenzen niemals auf neuere Versionen umstellen. `verify-original.mjs` liest ausdrücklich den Original-Commit; der v0.7-Auftrag verschiebt weder Archive noch Tags.
+
+Die bestehende Cloudflare-Branchvorschau ist öffentlich lesbar und vom Eigentümer unter den dokumentierten Sicherheitsbedingungen akzeptiert; das private GitHub-Repository und seine CI-Artefakte sind davon getrennt. Featurebranch-Pushes können automatisch Vorschauen deployen. Nachbesserungscommits verwenden deshalb `[CF-Pages-Skip]`; neue Vorschauen/Produktionsdeployment benötigen weiterhin eigene Freigabe.
 
 GitHub ist die zentrale Versionsverwaltung. Größere Änderungen auf Entwicklungsbranches, nachvollziehbare Commits und unabhängiger Review vor Freigabe. `main` nur nach ausdrücklicher Eigentümerfreigabe ändern/mergen. **Cloudflare Pages veröffentlicht `main` automatisch auf der bestehenden Produktionsseite.** Deshalb sind Merge und Produktionsveröffentlichung gesonderte Freigabeschritte; diese Entwicklung führt beides nicht aus. Kein neuer Hosting-Standort, kein Release, kein Force-Push und keine eigenmächtige Sichtbarkeitsänderung. Die historische `.openai/hosting.json` wird nicht als Deployment-Auftrag benutzt.
 

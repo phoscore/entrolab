@@ -1,0 +1,82 @@
+{
+  "evidence": {
+    "run": 42693187935,
+    "head": "8b31ae3715edb42449c6e9982482c3068e33f01c",
+    "artifact": 13707379909
+  },
+  "measurements": [
+    {
+      "width": 320,
+      "context": "gravity",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 320,
+      "context": "blackhole",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 320,
+      "context": "objects",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 320,
+      "context": "temperature",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 320,
+      "context": "markers",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 320,
+      "context": "thermal",
+      "scroll": 320,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "gravity",
+      "scroll": 390,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "blackhole",
+      "scroll": 390,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "objects",
+      "scroll": 390,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "temperature",
+      "scroll": 390,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "markers",
+      "scroll": 390,
+      "focusVisible": true
+    },
+    {
+      "width": 390,
+      "context": "thermal",
+      "scroll": 390,
+      "focusVisible": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-09",
+  "scope": "Phase E integration of the three displayed variants only; no merge/deployment/production-branding approval",
+  "userReply": "approved!",
+  "sourceSha256": "5dfb6a91195d7c3925cee9ae202332c26476de257b1a2f5b1469da1c08536ab3",
+  "assets": {
+    "hero": "119ebfea14cf85b17a72984a6a284e5949b69a6facd2ddee4f3d674a10031032",
+    "peek": "3de46c7894fdb612b314d5bba9db9d4b7bbcfd33a9ad64bcbfbfbfef2abd7249",
+    "icon": "bb62dc2c79240fe45aeb1e6f24f710df7e4db7b60d24adac3d1933b827416588"
+  }
+}

@@ -8,6 +8,36 @@ on:
 permissions:
   contents: read
 jobs:
+  correction-evidence:
+    name: v0.8 existing preview audit
+    if: github.ref_name == 'feature/v0.8-learning-foundation' || github.head_ref == 'feature/v0.8-learning-foundation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Read-only audit of the existing public preview
+        run: node scripts/audit-v08-preview.mjs
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      # The bounded causes study is retained for explicit manual repetition.
+      # Normal pushes still run the complete original rendering comparison below.
+      - name: Controlled reviewed/current and exploratory rendering comparisons
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/measure-v08-causes.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v08-correction-evidence
+          path: browser-results/
+          if-no-files-found: error
+
   physics-and-original:
     name: Physics and v0.1 integrity
     runs-on: ubuntu-latest
@@ -29,9 +59,11 @@ jobs:
   browser-review:
     name: Chromium UX regressions
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -40,6 +72,11 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Real browser sizing, drafts, language, focus and pulsar regressions
         run: npm run test:browser
+      - name: Compare v0.8 and baseline rendering on the same runner
+        run: node scripts/measure-v08-browser.mjs
+      - name: Package private downloadable review source
+        if: always()
+        run: node scripts/package-review.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,561 @@
+{
+  "evidence": {
+    "run": 42917244222,
+    "commit": "725acb2ee1f819969a5be8b96351abff602a639b",
+    "artifact": 13810602091,
+    "note": "All checks green; raw measurements unchanged, provenance header added"
+  },
+  "base": "33947cfeccd738512c83d21bab47a696ee57e923",
+  "current": "725acb2ee1f819969a5be8b96351abff602a639b",
+  "browser": "151.0.7922.34",
+  "viewport": [
+    1360,
+    1000
+  ],
+  "dpr": 1,
+  "font": "system fallback; Google fonts blocked",
+  "drawingFixture": "Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change",
+  "durationPerSampleSeconds": 30,
+  "repetitions": 2,
+  "warmupFrames": 180,
+  "paintTrace": "CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported",
+  "scope": "same GitHub runner/browser, paused gravity and visible existing BH animation; two order-reversed pairs, not a mobile-hardware or universal 10% guarantee",
+  "measurements": [
+    {
+      "repetition": 1,
+      "scene": "gravity-paused",
+      "variant": "baseline",
+      "frames": {
+        "duration": 30015.500000000004,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.700000000000728,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 5.1454130000000005,
+        "ScriptDuration": 1.0339040000000002,
+        "LayoutDuration": 0.413565,
+        "RecalcStyleDuration": 0.060969
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 47988,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 3604,
+            "p50": 0.246,
+            "p95": 0.366,
+            "max": 1.818,
+            "total": 647.4909999999988
+          },
+          "Layout": {
+            "count": 1802,
+            "p50": 0.188,
+            "p95": 0.477,
+            "max": 0.869,
+            "total": 383.05300000000136
+          },
+          "UpdateLayoutTree": {
+            "count": 1802,
+            "p50": 0.029,
+            "p95": 0.079,
+            "max": 0.141,
+            "total": 61.271999999999146
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 312.796875,
+        "y": 200.484375,
+        "width": 704,
+        "height": 600
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 2965,
+        "jsEventListeners": 210
+      },
+      "errors": []
+    },
+    {
+      "repetition": 1,
+      "scene": "gravity-paused",
+      "variant": "current",
+      "frames": {
+        "duration": 30015.4,
+        "frames": 1800,
+        "p50": 16.69999999999891,
+        "p95": 16.799999999999272,
+        "max": 33.400000000001455,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 6.020337,
+        "ScriptDuration": 1.1931440000000002,
+        "LayoutDuration": 0.5287109999999999,
+        "RecalcStyleDuration": 0.079182
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 47984,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 3602,
+            "p50": 0.272,
+            "p95": 0.524,
+            "max": 1.905,
+            "total": 877.7009999999992
+          },
+          "Layout": {
+            "count": 1801,
+            "p50": 0.246,
+            "p95": 0.567,
+            "max": 1.606,
+            "total": 488.911999999999
+          },
+          "UpdateLayoutTree": {
+            "count": 1801,
+            "p50": 0.036,
+            "p95": 0.095,
+            "max": 0.584,
+            "total": 77.81599999999965
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 312.796875,
+        "y": 199.859375,
+        "width": 704,
+        "height": 600
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 5451,
+        "jsEventListeners": 274
+      },
+      "errors": []
+    },
+    {
+      "repetition": 1,
+      "scene": "extreme-visible",
+      "variant": "baseline",
+      "frames": {
+        "duration": 30015.500000000004,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.799999999999272,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 9.449577,
+        "ScriptDuration": 0.733137,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 35825,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "Layout": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "UpdateLayoutTree": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 41.796875,
+        "y": 240.484375,
+        "width": 938.40625,
+        "height": 520
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 2366,
+        "jsEventListeners": 210
+      },
+      "errors": []
+    },
+    {
+      "repetition": 1,
+      "scene": "extreme-visible",
+      "variant": "current",
+      "frames": {
+        "duration": 30015.399999999998,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.700000000004366,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 9.325555,
+        "ScriptDuration": 0.711884,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 35861,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "Layout": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "UpdateLayoutTree": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 41.796875,
+        "y": 239.859375,
+        "width": 938.40625,
+        "height": 520
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 4846,
+        "jsEventListeners": 274
+      },
+      "errors": []
+    },
+    {
+      "repetition": 2,
+      "scene": "gravity-paused",
+      "variant": "current",
+      "frames": {
+        "duration": 30015.399999999998,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.799999999999272,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 5.191134,
+        "ScriptDuration": 1.031964,
+        "LayoutDuration": 0.441322,
+        "RecalcStyleDuration": 0.063739
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 48047,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 3606,
+            "p50": 0.246,
+            "p95": 0.513,
+            "max": 8.717,
+            "total": 988.0840000000009
+          },
+          "Layout": {
+            "count": 1803,
+            "p50": 0.203,
+            "p95": 0.496,
+            "max": 1.365,
+            "total": 407.14500000000066
+          },
+          "UpdateLayoutTree": {
+            "count": 1803,
+            "p50": 0.031,
+            "p95": 0.084,
+            "max": 0.188,
+            "total": 63.22899999999912
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 312.796875,
+        "y": 199.859375,
+        "width": 704,
+        "height": 600
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 5447,
+        "jsEventListeners": 274
+      },
+      "errors": []
+    },
+    {
+      "repetition": 2,
+      "scene": "gravity-paused",
+      "variant": "baseline",
+      "frames": {
+        "duration": 30015.5,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.700000000000728,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 4.870684000000001,
+        "ScriptDuration": 0.9828779999999999,
+        "LayoutDuration": 0.41824,
+        "RecalcStyleDuration": 0.060506
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 48034,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 3604,
+            "p50": 0.217,
+            "p95": 0.46,
+            "max": 7.735,
+            "total": 799.8810000000008
+          },
+          "Layout": {
+            "count": 1802,
+            "p50": 0.193,
+            "p95": 0.465,
+            "max": 1.351,
+            "total": 384.2540000000008
+          },
+          "UpdateLayoutTree": {
+            "count": 1802,
+            "p50": 0.03,
+            "p95": 0.081,
+            "max": 0.143,
+            "total": 61.30699999999936
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 312.796875,
+        "y": 200.484375,
+        "width": 704,
+        "height": 600
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 2939,
+        "jsEventListeners": 210
+      },
+      "errors": []
+    },
+    {
+      "repetition": 2,
+      "scene": "extreme-visible",
+      "variant": "current",
+      "frames": {
+        "duration": 30015.399999999998,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.700000000004366,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 9.059813,
+        "ScriptDuration": 0.682621,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 35769,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "Layout": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "UpdateLayoutTree": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 41.796875,
+        "y": 239.859375,
+        "width": 938.40625,
+        "height": 520
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 4846,
+        "jsEventListeners": 274
+      },
+      "errors": []
+    },
+    {
+      "repetition": 2,
+      "scene": "extreme-visible",
+      "variant": "baseline",
+      "frames": {
+        "duration": 30015.5,
+        "frames": 1801,
+        "p50": 16.69999999999891,
+        "p95": 16.700000000004366,
+        "max": 16.80000000000291,
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 8.897663,
+        "ScriptDuration": 0.6433129999999999,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "paint": {
+        "status": "recorded",
+        "dataLossOccurred": false,
+        "traceEvents": 35745,
+        "units": "ms, duration of recorded Chromium timeline events; not GPU end-to-end frame latency",
+        "stats": {
+          "Paint": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "Layout": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "UpdateLayoutTree": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          },
+          "RasterTask": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null,
+            "total": 0
+          }
+        }
+      },
+      "rect": {
+        "x": 41.796875,
+        "y": 240.484375,
+        "width": 938.40625,
+        "height": 520
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 2366,
+        "jsEventListeners": 210
+      },
+      "errors": []
+    }
+  ]
+}

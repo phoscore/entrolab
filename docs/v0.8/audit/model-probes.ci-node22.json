@@ -1,0 +1,135 @@
+{
+  "runtime": "v22.23.4",
+  "thermal": {
+    "samples": 20000,
+    "minEntropy": 1.4625672222468494e-18,
+    "maxRelativeEnergyError": 4.425782961667732e-16,
+    "maxReferenceTemperatureErrorK": 2.2737367544323206e-13
+  },
+  "blackHoles": [
+    {
+      "mass": 1,
+      "radius": 1.4852320538237331e-27,
+      "temperature": 1.2269006705940173e+23,
+      "power": 3.5616221447784954e+32,
+      "lifetime": 8.411477899702106e-17,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.3333333333333334,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 1000000000,
+      "radius": 1.485232053823733e-18,
+      "temperature": 122690067059401.73,
+      "power": 356162214477849.5,
+      "lifetime": 84114778997.02106,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.33333333333333337,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 5.9722e+24,
+      "radius": 0.0088701028718461,
+      "temperature": 0.020543529530056216,
+      "power": 9.985714765663201e-18,
+      "lifetime": 1.7917414374478308e+58,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.3333333333333334,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 1.98847e+30,
+      "radius": 2953.3393820668784,
+      "temperature": 6.17007382859192e-8,
+      "power": 9.007613778744512e-29,
+      "lifetime": 6.613470759888249e+74,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.3333333333333333,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 8.550421e+36,
+      "radius": 12699359342.887577,
+      "temperature": 1.4349008903702135e-14,
+      "power": 4.871613725659552e-42,
+      "lifetime": 5.25817219706435e+94,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.3333333333333333,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 1.2925054999999999e+40,
+      "radius": 19196705983434.707,
+      "temperature": 9.4924212747568e-18,
+      "power": 2.131979592602252e-48,
+      "lifetime": 1.81622440743431e+104,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.3333333333333334,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    },
+    {
+      "mass": 1e+41,
+      "radius": 148523205382373.28,
+      "temperature": 1.2269006705940172e-18,
+      "power": 3.561622144778495e-50,
+      "lifetime": 8.411477899702105e+106,
+      "finite": true,
+      "powerTimesLifetimeOverMassEnergy": 0.33333333333333337,
+      "doubling": {
+        "radius": 2,
+        "temperature": 0.5,
+        "power": 0.25,
+        "lifetime": 8
+      }
+    }
+  ],
+  "markers": {
+    "centralMultiplicity": "924",
+    "centralProbability": 0.2255859375,
+    "extremeProbability": 0.000244140625,
+    "probabilitySum": 1,
+    "nextStepExpectedLeftFromAllLeft": 9,
+    "equilibriumExpectedLeft": 6
+  },
+  "grazingCollision": {
+    "dtDays": 0.000012812121443840436,
+    "relativeSpeedKms": 1731.4568368055554,
+    "contactRadiusAU": 0.00008517500911194453,
+    "startDistanceAU": 0.00008541414295893624,
+    "midDriftDistanceAU": 0.00008517492083993742,
+    "endDistanceAU": 0.00008541681339993996,
+    "detected": 0,
+    "bodiesAfter": 2,
+    "softeningAU": 1e-7
+  }
+}

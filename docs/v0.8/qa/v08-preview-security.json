@@ -1,0 +1,897 @@
+{
+  "evidence": {
+    "run": 42915407613,
+    "commit": "5a4040d3df8e11938c5294e830bc9cc7230e347f",
+    "artifact": 13808644421,
+    "note": "Raw measurements unchanged; provenance header added. Overall run had one failing NEW browser setup; correction-evidence job itself succeeded."
+  },
+  "date": "2026-11-10T22:32:18.147Z",
+  "commit": "5a4040d3df8e11938c5294e830bc9cc7230e347f",
+  "origin": "https://567f7dd7.entrolab.pages.dev",
+  "branchOrigin": "https://feature-v0-8-learning-founda.entrolab.pages.dev",
+  "scope": "Current local dist + read-only GET/OPTIONS of existing d4b6 preview. No mutations, auth probing or deployment. No access to provider dashboard, secrets vault, other apps or account-wide routes.",
+  "files": 43,
+  "runtime": [
+    {
+      "path": "dist/app.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/checks-worker.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/checks.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/creature-policy.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/creature-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/discovery.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/display.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/entropy-learning.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/entropy-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/entropy.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/experiments.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/explanations-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/extreme-data.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/extreme-render.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/extreme-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/guide.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/i18n.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/instruments.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/knowledge-text.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/knowledge-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/knowledge.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/learning-math.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/physics.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/prediction.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/self-checks.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/thermal-physics.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/thermal-ui.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/thermal-view.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/translations.mjs",
+      "networkWriteOrBackendCandidate": false
+    },
+    {
+      "path": "dist/ux.mjs",
+      "networkWriteOrBackendCandidate": false
+    }
+  ],
+  "serverEntries": [],
+  "root": {
+    "url": "https://567f7dd7.entrolab.pages.dev/",
+    "method": "GET",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "allow": null,
+    "location": null,
+    "bytes": 64351,
+    "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+    "secrets": [],
+    "sameAsRoot": true
+  },
+  "requests": [
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/app.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 22721,
+      "sha256": "8c17a9fdab1fea593b134b50c60c5259a0d799e7afe6ffd953f0aa9222950134",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/asset-review.html",
+      "method": "GET",
+      "status": 308,
+      "type": null,
+      "allow": null,
+      "location": "/asset-review",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/assets/creature-candidates/hero.webp",
+      "method": "GET",
+      "status": 200,
+      "type": "image/webp",
+      "allow": null,
+      "location": null,
+      "bytes": 23636,
+      "sha256": "119ebfea14cf85b17a72984a6a284e5949b69a6facd2ddee4f3d674a10031032",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/assets/creature-candidates/icon.webp",
+      "method": "GET",
+      "status": 200,
+      "type": "image/webp",
+      "allow": null,
+      "location": null,
+      "bytes": 5114,
+      "sha256": "bb62dc2c79240fe45aeb1e6f24f710df7e4db7b60d24adac3d1933b827416588",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/assets/creature-candidates/original-review.jpg",
+      "method": "GET",
+      "status": 200,
+      "type": "image/jpeg",
+      "allow": null,
+      "location": null,
+      "bytes": 144400,
+      "sha256": "5dfb6a91195d7c3925cee9ae202332c26476de257b1a2f5b1469da1c08536ab3",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/assets/creature-candidates/peek.webp",
+      "method": "GET",
+      "status": 200,
+      "type": "image/webp",
+      "allow": null,
+      "location": null,
+      "bytes": 13904,
+      "sha256": "3de46c7894fdb612b314d5bba9db9d4b7bbcfd33a9ad64bcbfbfbfef2abd7249",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/checks-worker.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 222,
+      "sha256": "23a02bb362b99e1886beb49ca286f05e51ac514aec838e75760a1911ee22b65a",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/checks.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1330,
+      "sha256": "baa7bb35d9f22a2552f3626e9a2106b1c106970ba19d436dff7012eaffbd02cf",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/creature-policy.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1770,
+      "sha256": "b68dd684903ec2f984e3d692296b1edfe84d691cddb7d0d92d3654a9618c1cbd",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/creature-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 8594,
+      "sha256": "8262a7bc9f1f2b81968fb0a18256de0c084c09a7022e3b2adbcc9e5606a938f4",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/creature.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 2790,
+      "sha256": "1d75e7fab555737f92b85f4eda4b13a56a8d7266d8252d32dbd234ddd4227fbf",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/discovery.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2806,
+      "sha256": "2fb78644e27f4278ed2d442ccbba132473638b9b5c1fd28306a1511a237c8c50",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/display.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1609,
+      "sha256": "ac2a6a902367e1330b2de6f8736a7dff03803a49ac4d36b1aec05e65fc81dd4c",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/entropy-learning.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 10933,
+      "sha256": "e0acd72c835d32a9f6802d6f8a7e80b80f26648aa25b744e9645bbac60769eb7",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/entropy-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 6471,
+      "sha256": "01232b193b6c9146e05408e2b68516815e7bb22ff7dc3799cd87ead7300297c5",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/entropy.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 4093,
+      "sha256": "84016f067c5326b2ea186527f5da23f809788146c91cb9fdbe5dd3ad522aa103",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/entropy.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2435,
+      "sha256": "4d6ec32486bbdec809194040d622c4dd0dd6cb5974f4525f5865814e4fe93211",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/experiments.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1171,
+      "sha256": "c4681f5cd12a0d014e0910f7be7e5dc62093e158ea6d460172dce6450cba4c7b",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/explanations-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 5406,
+      "sha256": "d9ae2c27ec9f8ceb22846f5acad89c9af27d3ec28b8345fb90ad4336525f092a",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/extreme-data.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2288,
+      "sha256": "ff38f18122d502d5c6af4dac26ec48f572626eb2c5328a119a5cf9216c22ea46",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/extreme-render.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 7053,
+      "sha256": "edfbc8b8e2789f2b1303ea1990cd6d462d8ca94bf3c8d6e3aadf772c36296c5e",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/extreme-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 10192,
+      "sha256": "3452c15d89d7231a569588d17ef0218eb351b2709b8d4daa313cf3b4fc8b5e3c",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/favicon.svg",
+      "method": "GET",
+      "status": 200,
+      "type": "image/svg+xml",
+      "allow": null,
+      "location": null,
+      "bytes": 480,
+      "sha256": "c4a8e24abe412bb436271a6a0637efcbfa789ab2b42a4a30caf55d626c327b83",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/guide.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 6661,
+      "sha256": "ff42bcc0c5f3fe57e53bd2f7df0171180e06e18bc65585a093f9702cd5b0b0f5",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/i18n.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2439,
+      "sha256": "a8e5ade95d2453116e1247712ba026c5625b3ed2529f29b7667f83e5d28777df",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/index.html",
+      "method": "GET",
+      "status": 308,
+      "type": null,
+      "allow": null,
+      "location": "/",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/instruments.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1025,
+      "sha256": "0fe68eaaf9a2ca54dd5d2f6956ab2e29848f92518743b76599fa5563ab0a7e31",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/knowledge-text.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 65203,
+      "sha256": "c80f8dc55fae4c4037e67e6a25078ab07177a8e8b0875a7cd84d2af7e45805fb",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/knowledge-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 7119,
+      "sha256": "cf95368c2d884d55e17ce7c25f13c4c11cee613fc25f38ce9ebd03d0cd91313a",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/knowledge.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 7532,
+      "sha256": "069ea27c02fc729ef29fc7bceb112a70828f67817580fdefebfab0cbe052c159",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/knowledge.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 22885,
+      "sha256": "eb482192745d1c7a3e367bc7b3c47b1c9f33fa9d60a5e5009d5a09a43d172015",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/learning-math.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1827,
+      "sha256": "6364123a4c3bb02c2be4d6e99c63e5b2558f2477a480525bb4e9f924be2ba7e8",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/physics.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 3368,
+      "sha256": "fbb3c1a1f56767221e3e56efffb25605828af4da97081f257968bc99ace84c25",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/prediction.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2609,
+      "sha256": "2075b071bf9a20663db782663236612fcdb05adf768f8f3fc21ba76cd77a801b",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/self-checks.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 1377,
+      "sha256": "809739d3de224421bfead20a12cea9a9bb58306e921f4811cb50067be91bff95",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/style.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 15893,
+      "sha256": "d2bc63ab86fff9253d312e0b409d27e85cf74505452286b165329cfad108f6b3",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/thermal-physics.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2131,
+      "sha256": "b8432b918a9ec8d69ada04cd2d1c5344ecea9736d23140cd44d52b6fa93d6912",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/thermal-ui.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 10156,
+      "sha256": "593273163cda30fef0c1bcb1a825aa8a54024713b6a5fe6c1a87b85055f7cc09",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/thermal-view.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 3331,
+      "sha256": "5cf652554a71b8279be675ad1babb861406c14251ee11d928ccf595bff4782dd",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/thermal.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 3786,
+      "sha256": "bc1a77edf4b67fdfcd139ac52c92b1884d948db680c8cf4f968927139e264a67",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/translations.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 122611,
+      "sha256": "b90fedd124b0016c41fe39a45a2e44d250bb3e9ac4cf214160a753e43243b902",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/ux.css",
+      "method": "GET",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 13486,
+      "sha256": "799d718394400d1b2735c6c19290c4f018acb9689affbc8dc86c1eed48ed4739",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/ux.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "application/javascript",
+      "allow": null,
+      "location": null,
+      "bytes": 2517,
+      "sha256": "60713824fa44c8c145ea014a28cb45736ce0761621d2aede175c5af399b855ea",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/AGENTS.md",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/README.md",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/.git/config",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/.git/HEAD",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/.env",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/.openai/hosting.json",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/docs/Qualitaetsupdate_v0.8.md",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/package-lock.json",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/scripts/package-review.mjs",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/backup.zip",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/_worker.js",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/wrangler.toml",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/api",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/api/deploy",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/api/repository",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/admin",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://feature-v0-8-learning-founda.entrolab.pages.dev/",
+      "method": "GET",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "allow": null,
+      "location": null,
+      "bytes": 64351,
+      "sha256": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "secrets": [],
+      "sameAsRoot": true
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/",
+      "method": "OPTIONS",
+      "status": 405,
+      "type": null,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "secrets": [],
+      "sameAsRoot": false
+    },
+    {
+      "url": "https://567f7dd7.entrolab.pages.dev/api/deploy",
+      "method": "OPTIONS",
+      "status": 405,
+      "type": null,
+      "allow": null,
+      "location": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "secrets": [],
+      "sameAsRoot": false
+    }
+  ],
+  "findings": [],
+  "limitations": "Pattern scan is not proof that all secrets are absent. Repository/server administration and provider-side workers/routes cannot be exhaustively certified without account access. OPTIONS is informational, not proof that every write method is rejected."
+}
