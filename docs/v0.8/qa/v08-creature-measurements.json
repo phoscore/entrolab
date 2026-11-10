@@ -1,0 +1,205 @@
+{
+  "evidence": {
+    "run": 42729560620,
+    "commit": "8ebe83fc0b1ef450c6a9dd9e07c09fe4bcf97cf6",
+    "artifact": 13723619465,
+    "date": "2026-11-10",
+    "note": "Original measurements unchanged; provenance header added"
+  },
+  "browser": "151.0.7922.34",
+  "measurements": [
+    {
+      "kind": "motion-lifecycle",
+      "state": {
+        "context": "gravity",
+        "mode": "subtle",
+        "phase": "idle",
+        "visible": true,
+        "moving": false,
+        "lastReaction": 60000,
+        "reactions": 2,
+        "mounted": true,
+        "subscriptions": 13,
+        "observers": 2,
+        "timers": 0,
+        "figures": 1
+      },
+      "visibility": "controlled document.hidden; actual offscreen and media-query transitions"
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 320,
+      "dpr": 1,
+      "tab": "gravity",
+      "scroll": 320,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 320,
+      "dpr": 1,
+      "tab": "blackhole",
+      "scroll": 320,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 320,
+      "dpr": 1,
+      "tab": "extreme",
+      "scroll": 320,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 320,
+      "dpr": 1,
+      "tab": "entropy",
+      "scroll": 320,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 320,
+      "dpr": 1,
+      "tab": "science",
+      "scroll": 320,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 390,
+      "dpr": 2,
+      "tab": "gravity",
+      "scroll": 390,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 390,
+      "dpr": 2,
+      "tab": "blackhole",
+      "scroll": 390,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 390,
+      "dpr": 2,
+      "tab": "extreme",
+      "scroll": 390,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 390,
+      "dpr": 2,
+      "tab": "entropy",
+      "scroll": 390,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 390,
+      "dpr": 2,
+      "tab": "science",
+      "scroll": 390,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "tab": "gravity",
+      "scroll": 321,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "tab": "blackhole",
+      "scroll": 321,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "tab": "extreme",
+      "scroll": 321,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "tab": "entropy",
+      "scroll": 321,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "mobile-layout",
+      "width": 321,
+      "dpr": 1.25,
+      "tab": "science",
+      "scroll": 321,
+      "variant": "icon",
+      "overlap": []
+    },
+    {
+      "kind": "creature-mount-dispose-100",
+      "initial": {
+        "documents": 1,
+        "nodes": 4801,
+        "jsEventListeners": 272
+      },
+      "final": {
+        "documents": 1,
+        "nodes": 4799,
+        "jsEventListeners": 272
+      },
+      "heapBefore": {
+        "usedSize": 2884580,
+        "totalSize": 3784704,
+        "embedderHeapUsedSize": 3221216,
+        "backingStorageSize": 389113
+      },
+      "heapAfter": {
+        "usedSize": 2971044,
+        "totalSize": 3784704,
+        "embedderHeapUsedSize": 3410616,
+        "backingStorageSize": 389113
+      },
+      "state": {
+        "context": "gravity",
+        "mode": "subtle",
+        "phase": "idle",
+        "visible": true,
+        "moving": false,
+        "lastReaction": null,
+        "reactions": 0,
+        "mounted": true,
+        "subscriptions": 13,
+        "observers": 2,
+        "timers": 0,
+        "figures": 1
+      }
+    }
+  ],
+  "errors": []
+}

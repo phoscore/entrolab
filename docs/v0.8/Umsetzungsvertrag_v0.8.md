@@ -52,7 +52,7 @@ Die Wärmebilanz liest ausschließlich vorhandene Resultate. Energie in J, ΔS i
 | A06 Quiz/Temperaturverhältnis | In 02 nur die freigegebene qualitative Temperatur-vs.-Energiefrage; kein Verdopplung-von-T-Fehlschluss, kein neuer Verhältnisrechner. |
 | A07 Tastaturplatzierung | Bestehende Grenze zunächst dokumentiert. Falls korrigiert: eigener kleiner Accessibility-Commit, keine Änderung an Kraft/Schritt/Kollision. Keine neue Touraufgabe. |
 | A08 Deep-Links | Bestehendes Hilfesystem um beschränkten sicheren Fach-ID-Pfad erweitern; kein Router-/Navigationsumbau. |
-| A09 Monster | Ausschließlich Master-Ableitungen; alte violette/komplexe Anatomieforderungen entfallen. Sichtfreigabe steht aus. `aus` verbirgt und bricht Effekte ab; `ruhig`/Reduced Motion statisch; dezente Bewegung nur sichtbar und nach Freigabe. |
+| A09 Monster | Ausschließlich Master-Ableitungen; alte violette/komplexe Anatomieforderungen entfallen. Sichtfreigabe vom 09.11.2026 erteilt; Phase E integriert. `aus` verbirgt und bricht Effekte ab; `ruhig`/Reduced Motion statisch; dezente Bewegung nur sichtbar und nach Freigabe. |
 | A10 Neue BH-Ansichten | Vollständig Schritt 06/v0.8.5, hier keine neuen Ansichten/Renderer. Bestehende Darstellung, Zustände und Label-Redraws bewahren. |
 | A11 Endpunktkollision | Als numerische Grenze klar dokumentieren, weder CCD noch Integrator ändern; keine garantierte Kontakt-/Kollisionsprognose versprechen. |
 | A12 Originaltag | Nur prüfen und dokumentieren; `archive/v0.1` und sechs Originaldateien schützen. |
@@ -67,8 +67,8 @@ Die Wärmebilanz liest ausschließlich vorhandene Resultate. Energie in J, ΔS i
 4. Neue Komponenten wiederholt initialisieren/entsorgen, DOM-/Listener-/Timerzahlen kontrollieren und Speicherstichproben dokumentieren; keine vollständige Leakfreiheit aus einer einzelnen Stichprobe behaupten. Performancevergleich mit gleichen Szenen/Runnern, Messmethodik und offenen Handtestlücken.
 5. Thematische Commits, Qualitätsbericht, private lokale Vorschau und PR nach main. Separater lesender Codex-Review soweit verfügbar. Kein Selbst-Approve, kein Merge/Deployment.
 
-Die Sichtfreigabe ist aktuell offen. Ohne sie endet ein Zwischenstand ausdrücklich mit „Phase E ausstehend“, statt v0.8 fälschlich als vollständig abgeschlossen zu melden.
+Der frühere Zwischenstand endete korrekt vor Phase E. Seit der ausdrücklichen Sichtfreigabe vom 09.11.2026 ist Phase E ebenfalls autorisiert und integriert; die finale Prüfung ersetzt keine Merge-/Releasefreigabe.
 
 ## Sichtfreigabe Phase E · 09.11.2026
 
-Der Nutzer hat auf die gezeigte Original/Hero/Peek/Icon-Montage ausdrücklich mit **„approved!“** geantwortet. Damit ist die Integration dieser drei unveränderten Derivate als eine dekorative Instanz freigegeben. Manifest und `assets/creature-approval.json` halten die konkreten Hashes fest. Frühere Hinweise auf eine noch fehlende Sichtfreigabe beschreiben den vorherigen Zwischenstand. Phase E wird nun umgesetzt und separat getestet. Kein Merge, Deployment, Original-/Physikumbau oder Beginn von v0.8.5.
+Der Nutzer hat auf die gezeigte Original/Hero/Peek/Icon-Montage ausdrücklich mit **„approved!“** geantwortet. Damit ist die Integration dieser drei unveränderten Derivate als eine dekorative Instanz freigegeben. Manifest und `assets/creature-approval.json` halten die konkreten Hashes fest. Frühere Hinweise auf eine noch fehlende Sichtfreigabe beschreiben den vorherigen Zwischenstand. Phase E ist umgesetzt und separat getestet; tatsächliche Nachweise und Grenzen stehen im Qualitätsbericht. Kein Merge, Deployment, Original-/Physikumbau oder Beginn von v0.8.5.

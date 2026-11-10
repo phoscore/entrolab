@@ -9,3 +9,11 @@ Weitere Screenshots aller getesteten Ansichten sind im CI-Artefakt zugänglich. 
 Einzelne GC-/Heap-Stichproben sind kein allgemeiner Beweis für vollständige Speicherleckfreiheit. Performancevergleiche gelten nur für dokumentierte Szenen/Umgebung. Sie ersetzen weder reale Assistenztechnik noch Mobilhardware oder eine spätere Monsterabnahme.
 
 `v08-performance-repeat.json`: erneuter Lauf 42695465392, Commit23e4084745777cb1953cd783db2e844327cb7360, Artefakt13709022667. Einschließlich höherer gemessener Gravity-Taskmehrarbeit (+11,06 %); keine Auswahl nur des günstigeren Laufs. Beide Rohdatenreihen bleiben erhalten.
+
+## Phase E · 10.11.2026
+
+`v08-creature-measurements.json`, `v08-performance-phase-e.json` sowie die beiden `v08-creature-desktop/mobile.png` stammen aus dem vollständig grünen Lauf [42729560620](https://github.com/phoscore/entrolab/actions/runs/42729560620), Commit `8ebe83fc0b1ef450c6a9dd9e07c09fe4bcf97cf6`, Artefakt `13723619465`. 182 reguläre, 63 Chromium-, zwölf historische und sechs Originalprüfungen bestanden. Die JSON-Messwerte sind unverändert, nur ein Herkunftsheader ergänzt.
+
+`v08-creature-native-en.png` ist der tatsächliche Viewport des interaktiv bedienten gemeinsamen Chrome am 10.11.2026, Englisch, Entropy Lab, Monster „Still“. Kein Mockup. Es wurde kein Produktionsserver geöffnet oder verändert.
+
+Der Phase-E-Performancevergleich verwendet nun 180 Warm-up-Frames und CDP-Timeline-Tracing auf beiden Varianten. Er misst stationäres Rendering nach der ersten Reaktion, nicht den Worst Case des Einblendens, alle offenen Lernpanels oder GPU-Endlatenz. Paint-p95 der Gravity-Stichproben ist höher (Mittel +20,04 % / +0,050 ms), die vorgeschlagene 10-%-Paintgrenze deshalb nicht als bestanden ausgewiesen. Fehlende Paint-/Raster-Ereignisse sind keine Dauer von null. Vollständige Einordnung im Qualitätsbericht; ältere, anders instrumentierte Läufe bleiben erhalten.

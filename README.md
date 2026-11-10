@@ -4,7 +4,7 @@ Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisie
 
 ## Entwicklungsstand und Ausprobieren
 
-**v0.8 auf `feature/v0.8-learning-foundation` ist ein isolierter Prüfstand.** Grundlage ist die freigegebene v0.7 auf `main` (`8b856086877ea21579cf7d74190ad08155d70c7f`) mit dem genehmigten Planungsstand. Asset-Sichtfreigabe und anschließende Monsterintegration (Phase E) stehen aus. Kein Merge, Deployment oder aktives öffentliches Rebranding. v0.8.5 bleibt Planung. [Umsetzungsvertrag](docs/v0.8/Umsetzungsvertrag_v0.8.md) und [Qualitätsbericht](docs/Qualitaetsupdate_v0.8.md).
+**v0.8 auf `feature/v0.8-learning-foundation` ist ein isolierter Prüfstand.** Grundlage ist die freigegebene v0.7 auf `main` (`8b856086877ea21579cf7d74190ad08155d70c7f`) mit dem genehmigten Planungsstand. Die Assetvarianten wurden am 09.11.2026 ausdrücklich freigegeben; Phase E ist integriert. Schritte 01–04 liegen vollständig zur unabhängigen Prüfung vor. Kein Merge, Deployment oder aktives öffentliches Rebranding. v0.8.5 bleibt Planung. [Umsetzungsvertrag](docs/v0.8/Umsetzungsvertrag_v0.8.md) und [Qualitätsbericht](docs/Qualitaetsupdate_v0.8.md).
 
 Die Anwendung ist buildlos: moderner Browser mit ES-Modulen, BigInt und Modul-Workern; Python 3 für einen lokalen HTTP-Server. Keine Paketinstallation und kein Backend zum Benutzen nötig.
 
@@ -56,7 +56,7 @@ node scripts/check-benchmarks.mjs
 node scripts/measure-thermal.mjs
 ```
 
-Der reguläre Einstieg enthält **176 Prüfungen**: zehn Original-Selbstchecks und 166 Node-Fälle. Alle 159 Prüfungen der Audit-Basis bleiben erhalten; 17 neue Fälle prüfen Assets, Quellen, Erklärungen, unabhängige Zählung und Bilanzprojektionen. Die zwölf vollständigen numerischen Benchmarks werden unter identischer Laufzeit exakt gegen den genehmigten historischen Stand verglichen; sechs Originalprüfungen verifizieren den archivierten Originalcommit. Quellen, Referenzen und Toleranzen werden nicht gelockert. Ein vollständiger Git-Klon ist für diese beiden historischen Prüfeinstiege erforderlich. `--working-tree` nur beim historischen Erstsicherungsstand verwenden.
+Der reguläre Einstieg enthält **182 Prüfungen**: zehn Original-Selbstchecks und 172 Node-Fälle. Alle 159 Prüfungen der Audit-Basis bleiben erhalten; 23 neue Fälle prüfen Assets, Quellen, Erklärungen, unabhängige Zählung, Bilanzprojektionen und den rein dekorativen Monster-Lifecycle. Die zwölf vollständigen numerischen Benchmarks werden unter identischer Laufzeit exakt gegen den genehmigten historischen Stand verglichen; sechs Originalprüfungen verifizieren den archivierten Originalcommit. Quellen, Referenzen und Toleranzen werden nicht gelockert. Ein vollständiger Git-Klon ist für diese beiden historischen Prüfeinstiege erforderlich. `--working-tree` nur beim historischen Erstsicherungsstand verwenden.
 
 
 Für die zusätzlichen realen Chromium-Tests (nur Entwicklungsabhängigkeit, Playwright exakt per Lockfile):
@@ -67,9 +67,11 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Die Browser-Suite enthält **55 Fälle**: alle 38 Fälle der Audit-Basis und 17 neue Chromium-Fälle zu Wissens-/Fokusnavigation, freiwilligen Fragen, Zustandsbewahrung, N=4, Großzahlen, Bilanz, Lifecycle und 320/390/fractional-Ansichten. Screenshots und JSON-Messwerte unter `browser-results/` werden in CI als Artefakt aufgehoben. Zusätzlich vergleicht `node scripts/measure-v08-browser.mjs` dieselben Szenen auf derselben Maschine mit der Planungsbasis: acht 30-Sekunden-Stichproben in wechselnder Reihenfolge. Keine Garantie für beliebige Hardware, Safari oder reale Assistenztechnik; tatsächliche Resultate und Grenzen im [Qualitätsbericht v0.8](docs/Qualitaetsupdate_v0.8.md).
+Die Browser-Suite enthält **63 Fälle**: alle 38 Fälle der Audit-Basis und 25 neue Chromium-Fälle zu Wissens-/Fokusnavigation, freiwilligen Fragen, Zustandsbewahrung, N=4, Großzahlen, Bilanz, Monster-Modi, Lifecycle und 320/390/fractional-Ansichten. Screenshots und JSON-Messwerte unter `browser-results/` werden in CI als Artefakt aufgehoben. Zusätzlich vergleicht `node scripts/measure-v08-browser.mjs` dieselben Szenen auf derselben Maschine mit der Planungsbasis: acht 30-Sekunden-Stichproben in wechselnder Reihenfolge. Keine Garantie für beliebige Hardware, Safari oder reale Assistenztechnik; tatsächliche Resultate und Grenzen im [Qualitätsbericht v0.8](docs/Qualitaetsupdate_v0.8.md).
 
-Die lokale Asset-Sichtvorschau liegt unter <http://localhost:8000/asset-review.html>. Sie lädt das unveränderte Original und die drei abgeleiteten Kandidaten; die Anwendung integriert das Monster bis zur ausdrücklichen Sichtfreigabe nicht. 
+Die lokale Asset-Sichtvorschau liegt unter <http://localhost:8000/asset-review.html>. Sie lädt das unveränderte Original und die drei abgeleiteten Kandidaten; die freigegebenen WebP-Ableitungen sind als eine dekorative Figur integriert. „Monster“ im Kopfbereich bietet Dezente Bewegung, Ruhig oder Aus. Reduced Motion bleibt statisch; Fokusmodus, Eingaben und offene Einstellungen unterdrücken die Figur. Sie ist keine physikalische Messanzeige. 
+
+Die CI erstellt außerdem `entrolab-v08-source.zip` im privaten Artefakt `chromium-review-measurements`. Herunterladen, entpacken und denselben Python-Befehl im Ordner `entrolab-v08` ausführen. Das ZIP enthält alle versionierten Projektdateien; historische Git-Prüfungen benötigen weiterhin den vollständigen Klon. Kein Deployment.
 
 ## Projektstruktur
 
@@ -79,6 +81,7 @@ Die lokale Asset-Sichtvorschau liegt unter <http://localhost:8000/asset-review.h
 | `dist/knowledge-ui.mjs`, `guide.mjs` | Begriffe, Modellkapitel, Fachlinks und Fokus-Rückwege |
 | `dist/explanations-ui.mjs` | Sechs freiwillige Laborfragen und Prognosen ohne Modellschreibzugriff |
 | `dist/learning-math.mjs`, `entropy-learning.mjs` | Unabhängige N=4-Demo, Makrovergleich und reine Bilanzprojektion |
+| `dist/creature-ui.mjs`, `creature-policy.mjs`, `creature.css` | Eine dekorative Figur, eigener begrenzter Zustand, DE/EN, Ruhig/Aus/Reduced Motion; kein Physik- oder RNG-Zugriff |
 | `dist/physics.mjs` | Unveränderter Physikkern und Integrator |
 | `dist/experiments.mjs`, `instruments.mjs`, `prediction.mjs` | Szenarien, Diagnostik, begrenzte Vorhersage |
 | `dist/app.mjs` | Sandbox, BH-Rechner und Selbstcheck-Anzeige |

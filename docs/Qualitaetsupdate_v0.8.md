@@ -1,8 +1,8 @@
 # v0.8 – Wissensfundament und Entropie-Lernansichten
 
-Stand: 09.11.2026. **Prüfstand, keine Releasefreigabe.** [Draft-PR #7](https://github.com/phoscore/entrolab/pull/7), Branch `feature/v0.8-learning-foundation`.
+Stand: 10.11.2026. **Prüfstand, keine Releasefreigabe.** [PR #7](https://github.com/phoscore/entrolab/pull/7), Branch `feature/v0.8-learning-foundation`.
 
-**Phase A sowie B–D sind implementiert und geprüft. Phase E ist ausdrücklich ausstehend:** Die drei Monster-Assets benötigen die verlangte Sichtfreigabe des Nutzers. Bis dahin gibt es keine sichtbare Monsterinstanz in der Anwendung, keinen Creature-Manager und keine Monsteranimation. Dieser Zwischenstand ist deshalb nicht die vollständig abgeschlossene v0.8. Kein Merge, Deployment, Domain-/Repositorywechsel oder aktives öffentliches Rebranding. v0.8.5 / 05–08 bleibt unimplementiert.
+**Phasen A–E / Schritte 01–04 sind implementiert.** Die ausdrückliche Sichtfreigabe „approved!“ vom 09.11.2026 gilt für die unveränderten Hero-/Peek-/Icon-Derivate. Phase E ergänzt eine einzige abschaltbare dekorative Figur. Der aktuelle Gesamtnachweis steht in Abschnitt 10; die folgenden A–D-Messungen bleiben als früherer Zwischenstand erhalten. Kein Merge, Deployment, Domain-/Repositorywechsel oder aktives öffentliches Rebranding. v0.8.5 / 05–08 bleibt unimplementiert.
 
 ## 1. Ausgangspunkt und Schutz
 
@@ -27,11 +27,11 @@ Der JPEG-Master (1536², 144.400 Byte) bleibt bytegleich. SHA-256: `5dfb6a91195d
 | Peek | 256 × 256 | 13.904 | Dokumentierter Ausschnitt |
 | Icon | 128 × 128 | 5.114 | Dokumentierter Maskenausschnitt |
 
-Zusammen **42.654 Byte**. Das Original ist opak; der schwarze Hintergrund bleibt auch auf hellen Flächen sichtbar. Keine falsche Freistellungsbehauptung. [Manifest](v0.8/assets/creature-candidates.json), [Originalvergleich](v0.8/assets/comparison-candidates.png), separate lokale Seite `/asset-review.html`. Der unveränderte Original-Review-JPEG wird nur dort geladen, nicht beim Appstart. Varianten bei 16/32/64/128/240 CSS-Pixeln und in echten Chromium-Ansichten geprüft. Die Icon-Lesbarkeit ist Gegenstand der noch offenen Sichtentscheidung.
+Zusammen **42.654 Byte**. Das Original ist opak; der schwarze Hintergrund bleibt auch auf hellen Flächen sichtbar. Keine falsche Freistellungsbehauptung. [Manifest](v0.8/assets/creature-candidates.json), [Originalvergleich](v0.8/assets/comparison-candidates.png), separate lokale Seite `/asset-review.html`. Der unveränderte Original-Review-JPEG wird nur dort geladen, nicht beim Appstart. Varianten bei 16/32/64/128/240 CSS-Pixeln und in echten Chromium-Ansichten geprüft. Die gezeigten Varianten wurden am 09.11.2026 vom Nutzer visuell freigegeben; dies ersetzt keine universelle Erkennbarkeitsstudie.
 
 ### B: Gemeinsames Wissensfundament aus 04
 
-`knowledge.mjs` enthält stabile IDs für **28 Begriffe, sechs Modellkapitel, 18 Quellen, sechs Hauptfragen und fünf optionale Anwendungen/Grenzthemen**. `knowledge-text.mjs` liefert **262 DE/EN-Schlüssel** an das bestehende Übersetzungssystem. Kein Framework, zweiter Übersetzer, CMS oder Onlineabruf beim Appstart. Die Begriffsdefinitionen werden im bestehenden Glossar und an 16 Inline-Ankern wiederverwendet; alte statische Definitionen wurden entfernt. Die sieben bisherigen Glossar-IDs bleiben gültig.
+`knowledge.mjs` enthält stabile IDs für **28 Begriffe, sechs Modellkapitel, 18 Quellen, sechs Hauptfragen und fünf optionale Anwendungen/Grenzthemen**. `knowledge-text.mjs` liefert **262 DE/EN-Schlüssel für A–D, mit Phase E insgesamt 277** an das bestehende Übersetzungssystem. Kein Framework, zweiter Übersetzer, CMS oder Onlineabruf beim Appstart. Die Begriffsdefinitionen werden im bestehenden Glossar und an 16 Inline-Ankern wiederverwendet; alte statische Definitionen wurden entfernt. Die sieben bisherigen Glossar-IDs bleiben gültig.
 
 Alle Modellkapitel erläutern Annahmen, Methode, Einheiten, Formeln, Darstellung, Grenzen, typische Fehlannahmen und Quellen. Quellen besitzen Aussage-/Abschnittszuordnung und Prüftag. Implementationsdateien sind als Codebeleg getrennt von Fachquellen markiert. Fachlinks führen in den vorhandenen Science-Bereich. Der gemeinsame Guide hat sichere bekannte Fragmentziele, Rücksprung, Escape, direkte Navigation und einen begrenzten verschachtelten Glossar-Rückweg.
 
@@ -74,7 +74,7 @@ Wichtige Grenzen bleiben sichtbar: q=1/4 pro Markerschritt; stationäres Histogr
 
 Newton/Softening/Kollisionen bleiben unverändert, einschließlich der bekannten übersehenen Streifkontakte. BH-Leistung und Lebensdauer sind Modellschätzungen, keine direkte Hawking-Messung; reale Akkretion, Greybody-Faktoren und Quanten-Endphase fehlen. Sternbilder bleiben illustrative Ansichten festgelegter Beispiele, keine Zustandsgleichung. Keine angeblich wissenschaftliche Herleitung metaphysischer Aussagen.
 
-## 4. Tatsächlich ausgeführte Prüfungen
+## 4. Tatsächlich ausgeführte Prüfungen des A–D-Zwischenstands
 
 ### Reguläre und historische Prüfungen
 
@@ -118,7 +118,7 @@ Keine reale NVDA-/VoiceOver-/TalkBack-Ausführung, kein Safari/Firefox, kein ech
 
 Keine zusätzlichen behaltenen DOM-Knoten/Listener in diesen Stichproben. Heapänderungen werden nicht als null ausgegeben: JIT-/Engine-/Layout-Caches und Messvarianz sind nicht vollständig getrennt. Ein bounded GC-Sample beweist keine universelle Speicherleckfreiheit. Controller sind idempotent; Entsorgen meldet null eigene Subscriptions/Observer/Timer. Neue Lernmodule besitzen keine eigenen Timer oder RAF-Schleifen.
 
-Die sieben neuen Wissens-/Lernmodule inklusive CSS umfassen zusammen 118929 UTF-8-Byte. Keine zusätzliche Laufzeitabhängigkeit; Playwright bleibt die vorhandene gepinnte Entwicklungsabhängigkeit. Assets werden von der App noch nicht geladen.
+Die sieben neuen Wissens-/Lernmodule inklusive CSS umfassen zusammen 118929 UTF-8-Byte. Keine zusätzliche Laufzeitabhängigkeit; Playwright bleibt die vorhandene gepinnte Entwicklungsabhängigkeit. In diesem A–D-Zwischenstand wurden Assets von der App noch nicht geladen; Phase E lädt nur die gewählte WebP-Variante.
 
 ### Vergleich mit identischer Zeichenfläche
 
@@ -147,7 +147,7 @@ Nach der ersten Tabelle wurde derselbe unveränderte Laufzeitcode auf `23e408474
 
 Auch hier keine beobachteten Long Tasks >50 ms. Die Frameintervalle sind stabil, die CPU-/Taskzeitdifferenz schwankt und liegt für Gravity in dieser Gegenprobe über 10 %. **Das wird nicht als Messfehler wegdefiniert oder durch den günstigeren früheren Lauf ersetzt.** Größere DOM-/Layoutarbeit ist als Ursache möglich; Runner- und Engineeffekte sind nicht hinreichend getrennt. Keine universelle CPU-Mehrarbeitsgarantie und keine nachgewiesene numerische Beschleunigung.
 
-A13 schlägt ein Budget für vergleichbare p95-Zeiten vor, nicht pauschal für kumulierte CPU-Taskzeit. Hier sind Frame-p95 und kumulierte CDP-Arbeit gemessen; eine isolierte Paint-Dauerverteilung wurde **nicht** aufgezeichnet. Deshalb keine vollständige Paint-Budgetabnahme behaupten. Vor endgültiger Freigabe, besonders nach Phase E, bleiben längere Messreihen und gezieltes Paint-/Layoutprofil sinnvoll. Eine Änderung des geschützten bisherigen Idle-Renderers wurde für diesen Inhaltsauftrag bewusst nicht als Nebenprojekt begonnen.
+A13 schlägt ein Budget für vergleichbare p95-Zeiten vor, nicht pauschal für kumulierte CPU-Taskzeit. Hier sind Frame-p95 und kumulierte CDP-Arbeit gemessen; eine isolierte Paint-Dauerverteilung wurde **in diesen A–D-Läufen nicht** aufgezeichnet. Die zusätzliche Phase-E-Instrumentierung und ihre Grenzen stehen in Abschnitt 10. Deshalb keine vollständige Paint-Budgetabnahme behaupten. Vor endgültiger Freigabe, besonders nach Phase E, bleiben längere Messreihen und gezieltes Paint-/Layoutprofil sinnvoll. Eine Änderung des geschützten bisherigen Idle-Renderers wurde für diesen Inhaltsauftrag bewusst nicht als Nebenprojekt begonnen.
 
 ## 6. Gefundene und behobene Probleme
 
@@ -173,7 +173,7 @@ Der separate lesende Review hat Korrekturen erneut mit dem tatsächlichen Guide 
 | A06 Temperatur/Energie | Qualitativ korrekte Frage; keine T-Verdopplung als universelle Energieverdopplung. Kein neuer Rechner. |
 | A07 Tastaturplatzierung | Bekannte bestehende Canvas-Platzierungsgrenze dokumentiert, keine neue Touraufgabe. Nicht stillschweigend am Gravity-Modell geändert; ein künftiger Fix benötigt einen eigenen begrenzten Accessibility-Commit. |
 | A08 Fachlinks | Bekannte sichere IDs, alte Ziele erhalten, kalte Links/History/verschachtelte Rückwege mit Fokusregression. |
-| A09 Monster | Mastergetreue Varianten und Vorschau vorhanden. **Sichtfreigabe und Phase E noch offen**; noch keine Animation-/Instanzabnahme behauptet. |
+| A09 Monster | Mastergetreue Varianten und Vorschau vorhanden. Sichtfreigabe vom 09.11.2026 erteilt, Phase E integriert; einzelne DOM-Instanz, endliche CSS-Reaktionen, Ruhig/Aus/Reduced Motion und Lifecycle separat geprüft (Abschnitt 10). |
 | A10 BH-Rendering | Schritte 06/v0.8.5 unimplementiert; bestehender Renderer, Animation und Zahlen bytegleich. |
 | A11 Kollisionen | Endpunkt-/Streifkontaktgrenze weiter ausdrücklich erklärt; kein CCD-/Integratorumbau und keine garantierte Prognose. |
 | A12 Originaltag | Nur erneut geprüft, fehlend dokumentiert, Archiv/Original/Referenzen unangetastet. |
@@ -194,7 +194,7 @@ Die kanonische Zuordnung steht in `dist/knowledge.mjs`, Texte im bestehenden DE/
 - [Hawkingmodell, JILA](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html)
 - [Statistische Mechanik und ihre Grenzen, SEP](https://plato.stanford.edu/entries/statphys-statmech/)
 
-Weiter offen: ausdrückliche visuelle Assetabnahme und anschließende Phase E; erneuter unabhängiger Gesamt-PR-Review nach deren Integration; reale Assistenztechnik, native Zoom-/Safari-/Touchhardwareprüfungen und längerfristiges Speicherprofil. Keine behauptete didaktische Nutzerstudie, keine Garantie für 16-px-Maskenerkennbarkeit ohne Nutzer-Sichtprüfung. Titel/Favicon/Domain bleiben gesonderte Release-/Brandingentscheidungen.
+Weiter offen: abschließender unabhängiger Gesamt-PR-Review durch den Eigentümer/Codex nach Integration; reale Assistenztechnik, native Zoom-/Safari-/Touchhardwareprüfungen und längerfristiges Speicherprofil. Keine behauptete didaktische Nutzerstudie, keine Garantie für 16-px-Maskenerkennbarkeit ohne Nutzer-Sichtprüfung. Titel/Favicon/Domain bleiben gesonderte Release-/Brandingentscheidungen.
 
 ## 9. Reproduzieren und Freigabe
 
@@ -220,4 +220,74 @@ node scripts/measure-v08-browser.mjs
 
 Die CI führt dieselben relevanten Einträge aus und bewahrt Screenshots/JSON als Artefakt. Ein späterer reiner Dokumentationscommit wird ebenfalls geprüft; der konkrete abschließende Commit-/CI-Link wird im PR vermerkt, damit keine sich selbst referenzierende Commit-ID in diesem Dokument nötig ist.
 
-**Nächster zwingender Schritt:** Nutzer bestätigt die gezeigten Monster-Kandidaten oder benennt eine konkrete visuelle Änderung. Erst danach Phase E implementieren/testen. PR bleibt bis dahin Draft. Es besteht weiterhin keinerlei Erlaubnis für Merge, Produktion oder v0.8.5.
+**Nächster Freigabepunkt:** Der bestehende PR #7 wird nach erfolgreicher finaler CI zur unabhängigen Gesamtprüfung bereitgestellt. Die Asset-Sichtfreigabe ist bereits erteilt. Es besteht weiterhin keinerlei Erlaubnis für Merge, Produktion oder v0.8.5.
+
+
+## 10. Phase E nach ausdrücklicher Sichtfreigabe · 10.11.2026
+
+### Umfang, Lifecycle und Abweichungen
+
+Die Antwort **„approved!“** gibt die drei gezeigten WebP-Varianten zur Integration frei. `docs/v0.8/assets/creature-approval.json` bindet diese Entscheidung an den unveränderten Master und die konkreten Ableitungshashes. Das Generatorskript erhält eine bestehende Freigabe nur bei identischen Hashes; andere Ableitungen benötigen wieder eine Sichtentscheidung. Der Master und sämtliche Bildbytes sind unverändert. Abschließender Git-Blob-Vergleich am Implementierungscommit `6e0c501015573392fbfa91b608d68df439d1ab33`: alle 44 untersuchten bestehenden Test-/Schutzdateien bytegleich zur Planungsbasis. `main`, `archive/v0.1` und `develop/v0.8` weiterhin auf den oben dokumentierten Refs; `refs/tags/v0.1` weiterhin nicht auffindbar und nicht erzeugt.
+
+`creature-policy.mjs`, `creature-ui.mjs` und `creature.css` ergänzen eine einzige verschobene DOM-Figur. Ein kleiner reservierter Platz im normalen Dokumentfluss ersetzt mögliche Canvas-/Control-Overlays. Das kostet vertikalen Platz (100 CSS-px, mobil 84), verhindert dafür Überdeckung und Layoutsprünge bei Eingaben. Science und Guide nutzen dieselbe Figur. Temperatur-/Objektkontext wechseln ausschließlich durch ausdrückliche Interaktionen, nie durch Scrollen. Marker und Wärme behalten ihre vorhandenen Unteransichten.
+
+Die globale native Einstellung „Monster“ bietet **Dezente Bewegung / Ruhig / Aus** in DE/EN und speichert ausschließlich diese Präsentationspräferenz, mit sicherem Fallback bei gesperrtem Storage. Aus lädt nach erneutem Seitenaufruf keine Monsterbilder. Reduced Motion und Ruhig bleiben statisch. Offscreen, Dokument verborgen, Texteingabe, Fokusmodus oder geöffnete Monstereinstellungen unterdrücken die Figur und brechen die eigene Bewegung ab. Es gibt keine nachgeholte Reaktionswarteschlange. Eine endliche CSS-Reaktion dauert höchstens 1,8 s; danach statisch. Unabhängige monotone Uhr begrenzt Reaktionen auf höchstens eine pro 60 s; keine Zufallswahl, kein Timer und keine neue RAF-Schleife. Die Uhr wird in den Cooldown-Prüfungen gezielt kontrolliert, keine behauptete einstündige Belastungsprüfung.
+
+Die Figur und ihr humorvoller Kommentar sind dekorativ (`aria-hidden`, inert, keine Fokusziele); die echte Einstellung ist nativ beschriftet und tastaturbedienbar. „Fiktionaler Beobachter · Kommentar“ trennt sie sichtbar von wissenschaftlichen Ergebnissen. Alle notwendigen wissenschaftlichen Erklärungen bleiben unabhängig davon zugänglich. Keine Physikimporte, kein RNG-/Körper-ID-Verbrauch, keine Eingabe-/Apply-/Reset-Schreibzugriffe. App, Solver, Integratoren, Renderer, Original-CSS und alle historischen Referenzen bleiben unverändert. Zusätzliche Laufzeitabhängigkeiten: **null**. Die drei neuen Laufzeitdateien umfassen zusammen **13.154 UTF-8-Byte**, zusätzlich 15 DE/EN-Schlüssel; insgesamt nun 277 gemeinsame Wissens-/Präsentationsschlüssel.
+
+### Tatsächlich ausgeführte Tests und Review
+
+Der vollständig grüne [CI-Lauf 42729560620](https://github.com/phoscore/entrolab/actions/runs/42729560620) auf `8ebe83fc0b1ef450c6a9dd9e07c09fe4bcf97cf6` enthält:
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Regulär (Node 22 in CI; lokal erneut vollständig) | **182 bestanden = 10 Selbstchecks + 172 Node-Fälle** |
+| Vollständiges echtes Chromium 151.0.7922.34 | **63 bestanden = 38 Audit-Basis + 17 A–D + 8 Phase E** |
+| Historische vollständige Ergebnisobjekte | **12/12 exakt unverändert** |
+| Originalcommit mit vollständiger Git-Historie | **6/6 unverändert** |
+| Separater lesender Review | 182 reguläre erneut bestanden; keine offenen blockierenden P0/P1/P2-Befunde |
+
+Sechs neue reguläre Fälle prüfen Sichtbarkeitspolicy, alle Kontexte, Cooldown bei 80 schnellen Aktionen, Abbruch ohne Queue, statische Modi, ungültige Eingaben und vollständige DE/EN-Texte. Acht neue Chromium-Fälle prüfen eine tatsächliche Einzelinstanz, Modell-/RNG-/ID-Erhalt, Speicherung und gesperrten Storage, ausbleibende Bildrequests bei Aus-Reload, echte CSS-Animation und Media-Query-Wechsel, Offscreen, Fokusmodus/Escape, 25 schnelle Navigationen, Rohentwürfe/native Validität, Sprache, Layout und 100 Mount-/Dispose-Zyklen. Dokument-Hidden wird in Chromium kontrolliert ausgelöst; dies ist **kein** Betriebssystem-Hintergrundtest. Alle früheren Assertions bleiben erhalten; lediglich der neue Asset-Freigabestatus wurde von „pending“ auf die explizit dokumentierte Genehmigung umgestellt.
+
+Schmale Gegenproben: **320 px / DPR 1, 390 px / DPR 2 und 320,5 px / DPR 1,25** in allen fünf Hauptansichten, Systemschrift. In allen 15 Kombinationen keine horizontale Dokumentüberbreite und keine Überdeckung wissenschaftlicher Controls durch die Figur; Einstellungen innerhalb des Viewports. Native interaktive Chrome-Gegenprobe: Einstellung öffnen, Ruhig wählen, Escape, Labwechsel und visuelle Kontrolle des Entropy Labs in EN. [Native Aufnahme](v0.8/qa/v08-creature-native-en.png), [CI Desktop DE](v0.8/qa/v08-creature-desktop.png), [CI mobil DE](v0.8/qa/v08-creature-mobile.png).
+
+Die lokale Playwright-Ausführung wurde erneut versucht und scheiterte weiterhin **vor Seitenstart** an `socket() failed: Operation not permitted` / verweigertem `ptrace`. Deshalb beziehen sich automatische Chromium-Erfolgsaussagen auf CI; die gemeinsame interaktive Chrome-Vorschau ist separat nachgewiesen. Historische Git-Prüfungen benötigen den vollständigen CI-Klon; der lokal aus dem privaten Source-Artefakt wiederhergestellte Prüfstand besitzt keine Git-Objekthistorie.
+
+Der lesende Review hat zusätzlich den tatsächlichen neuen Controller, geschützte Git-Blob-SHAs, Cleanup und Performanceauswertung geprüft. Ein kleiner P3-Kontexthinweis wurde anschließend gezielt repariert: nach Temperaturinteraktion setzen explizite Klicks im Objektabschnitt den Kommentar wieder auf `objects`; Aufrufe ohne Ziel/Scroll ändern den Kontext nicht. Der Review hat diese Pfade mit der tatsächlichen `route()`-Funktion in Node nachgeprüft. Die bestehende erste Chromium-Regression prüft zusätzlich Temperatur→Objektfrage→Objektkontext und unveränderte Modelle. Der konkrete spätere Finalcommit und dessen vollständiger CI-Lauf werden im PR verlinkt. Kein GitHub-Selbst-Approve oder unabhängiger menschlicher Fachreview behauptet.
+
+### Gefundene Fehler und Korrekturen
+
+- Ein Phase-E-Zwischenlauf (`17d08db…`, Run 42702109431) bestand 182/12/6 sowie 62 von 63 Chromium-Fällen. Bei nativen `details` wurde `open` erst nach dem Click-Handler wirksam, während das `toggle`-Event verzögert eintreffen konnte. Dadurch war die Figur beim gerade geöffneten Einstellpanel kurzfristig noch als sichtbar gemeldet. Der bestehende MutationObserver beobachtet jetzt auch dessen `open`-Attribut und gleicht vor dem nächsten Paint ab. Derselbe unveränderte Mobiltest ist danach grün. Kein Abschwächen der Assertion.
+- Der oben genannte P3-Objektkontext ist im separaten Commit korrigiert. Kein Scrolllistener für Kontextwechsel, keine Modelländerung.
+- Ursprünglich zur Wiederherstellung bei ausgefallener Arbeitsumgebung ausgegebene CI-Screenshot-Base64-Zeilen wurden entfernt; normale PNG-/JSON-Artefakte bleiben. Kein unnötiger Bilddatenblock in den finalen Logs.
+
+### Speicher- und Renderstichproben
+
+[Phase-E-Lifecycle-Rohdaten](v0.8/qa/v08-creature-measurements.json), tatsächlicher Chromium-CDP-GC vor/nach 100 Mount-/Dispose-Zyklen:
+
+| Messung | Vorher | Nachher |
+| --- | ---: | ---: |
+| DOM-Knoten | 4801 | 4799 |
+| Native JS-Listener | 272 | 272 |
+| Used JS Heap (Byte) | 2.884.580 | 2.971.044 |
+
+Ein Controller, eine Figur, null eigene Timer; Dispose entfernt eigene Listener, beide Observer und Sprachsubscription. Die Heapzunahme von 86.464 Byte wird nicht als null ausgegeben; Engine-/JIT-Caches bleiben ungetrennt. Diese begrenzte Stichprobe beweist keine generelle Leakfreiheit.
+
+Der [neue vollständige Vergleich](v0.8/qa/v08-performance-phase-e.json) nutzt auf beiden Varianten identisches CDP-Timeline-Tracing, 180 Warm-up-Frames und dieselben acht 30-s-Szenen/Canvasgrößen wie oben. Das ist **stationäres Rendering nach Ende der ersten Monsterreaktion**, bei zentriertem Canvas gegebenenfalls mit bereits offscreen liegender Figur. Keine Worst-Case-Messung des Einblendens oder offener Lernpanels. Tracing verursacht auf beiden Varianten Messaufwand; ältere 60-Frame-Läufe ohne Tracing sind keine direkt austauschbaren Zahlen.
+
+| Szene, Mittel aus zwei 30-s-Stichproben | Basis | v0.8 | Änderung |
+| --- | ---: | ---: | ---: |
+| Gravity TaskDuration | 3,943123 s | 3,4604395 s | −12,24 % |
+| Vorhandene BH-Animation TaskDuration | 5,5684175 s | 5,629504 s | +1,10 % |
+| Gravity: Mittel der beiden Paint-p95 | 0,2495 ms | 0,2995 ms | **+20,04 % / +0,0500 ms** |
+| Gravity: Mittel der beiden Layout-p95 | 0,3845 ms | 0,3670 ms | −4,55 % |
+
+Paint-p95 einzeln: Basis 0,236 / 0,263 ms, Kandidat 0,259 / 0,340 ms. Der Mittelwert der p95-Werte ist **kein gepooltes Gesamt-p95**. Alle acht Frame-p95 bei **16,7–16,8 ms**, jeweils 1801 Intervalle, keine beobachteten Long Tasks >50 ms, keine Seitenfehler. Eine schnellere Physik oder allgemeine Beschleunigung wird daraus nicht abgeleitet; frühere Läufe zeigten andere Taskzeitdifferenzen.
+
+**A13-Budget bleibt teilweise offen:** Das vorgeschlagene 10-%-Budget für vergleichbare Paint-p95 ist in dieser Gravity-Stichprobe überschritten. Die geringe absolute Differenz beseitigt diesen Befund nicht. BH-/Raster-Timeline-Ereignisse wurden nicht aufgezeichnet (Anzahl 0, Perzentile `null`); das beweist weder null Renderkosten noch ein bestandenes GPU-/BH-Paintbudget. CDP-Paintdauer ist keine End-to-End-GPU-Latenz. Kein weiterer Umbau des geschützten Renderers zur Schönung dieses Inhaltsupdates. Vor Release längere unabhängige Reihen, Initialreaktion, offene Panels und reale Mobilhardware prüfen.
+
+### Private Vorschau und Freigabegrenzen
+
+Die CI archiviert sämtliche versionierten Projektdateien als `entrolab-v08-source.zip` im privaten Screenshot-/Messartefakt. Entpacken und gemäß README lokal mit Python starten; kein Framework-Build erforderlich. Die Originalhistorie ist im vollständigen privaten Git-Klon, nicht im Source-ZIP. Keine öffentliche Preview-URL, kein neuer Hostingstand, keine Änderung an Produktionsidentität, Title/Favicon, Domain oder `main`. PR #7 ist ausschließlich zur unabhängigen Prüfung; keine automatische Freigabe durch grüne Tests.
+
+Weiter offen bleiben reale Screenreader-/Safari-/Firefox-/Touchhardwareprüfungen, bestätigter nativer Zoom und längerfristige Speicher-/Worst-Case-Renderprofile. Der bestehende Gravity-Tastatur-Platzierungsmangel bleibt dokumentiert und unverändert. v0.8.5 / 05–08 und der spätere QCD-Artikel sind ausschließlich Planung.
