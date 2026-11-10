@@ -84,7 +84,7 @@ Die beiden einfachen Optimierungsexperimente liefern keinen verlässlichen Paint
 
 ## 4. Regressionen, betroffene Dateien und Schutz
 
-- Laufzeit: nur `dist/knowledge.mjs`, `knowledge-text.mjs`, `knowledge-ui.mjs` für getrennte Energieinhalte und Zuordnung. Jetzt 29 kanonische Begriffe; bestehende Ziele bleiben gültig. Physik, App-Renderer, CSS, Integratoren, Toleranzen und Master unverändert.
+- Laufzeit: `dist/knowledge.mjs`, `knowledge-text.mjs`, `knowledge-ui.mjs` für getrennte Energieinhalte und Zuordnung. Die statische `dist/asset-review.html` korrigiert ausschließlich die falschen Wörter „private“/„unveröffentlicht“; die bestehende Bildervergleichsfunktion bleibt erhalten, ohne Freigabe-/Schreibschnittstelle. Jetzt 29 kanonische Begriffe; bestehende Ziele bleiben gültig. Physik, App-Renderer, CSS, Integratoren, Toleranzen und Master unverändert.
 - Tests: vier neue Fälle in `tests/knowledge-energy.test.mjs`; zwei echte Browserfälle für DE/EN, Fokus-/Modellrückweg, Rohentwürfe, Zustandsisolierung und 320/390-px-Direktlinks. Die bestehende genaue Begriffsanzahl wird fachlich notwendig von 28 auf 29 angepasst, keine Erhaltungs-/Fehlerschranke gelockert. Regulärer Einstieg registriert die neuen Fälle.
 - Diagnose/CI: `scripts/audit-v08-preview.mjs`, `scripts/measure-v08-causes.mjs`, `.github/workflows/tests.yml`. Lange Ursachenstudie nach erster Erfassung nur noch bei ausdrücklicher Workflow-Dispatch-Wiederholung; die vorhandene komplette Browser-/Physik-/Standardvergleichsinfrastruktur bleibt aktiv.
 - Dokumentation: `AGENTS.md`, README, Qualitätsbericht, Umsetzungsvertrag, dieser Nachbesserungsbericht und zwei unveränderte Rohmessdateien mit Herkunftsheader in `docs/v0.8/qa`.
@@ -93,4 +93,17 @@ Tatsächlich lokal: **186 bestanden = 10 Selbstchecks + 176 Node-Fälle**. Separ
 
 Der erste CI-Lauf bestand 186 reguläre, zwölf historische und sechs Originalprüfungen sowie 64/65 Browserfälle. Ein neuer Test versuchte die Energiehilfe zu öffnen, während das vorhandene übergeordnete Instrumenten-Details noch geschlossen war. Der Test öffnet jetzt dieses echte Bedienelement vor der Tastaturaktion. Außerdem vergleicht er formatierte Messwerte erst nach Rückkehr in dieselbe Sprache (DE/EN haben unterschiedliche Dezimalzeichen). Keine Produktkorrektur oder abgeschwächte wissenschaftliche Assertion dafür. Der erfolgreiche Evidenzjob wird nicht mit einem vollständig grünen Gesamtlauf verwechselt.
 
-Die korrigierten vollständigen Funktions-Prüfstufen auf `725acb2ee1f819969a5be8b96351abff602a639b` sind erfolgreich: **186 regulär, 65 echtes Chromium, zwölf historische Benchmarks exakt und sechs Originalintegritätsprüfungen**. [Push-CI 42917244222](https://github.com/phoscore/entrolab/actions/runs/42917244222), [PR-CI 42917254371](https://github.com/phoscore/entrolab/actions/runs/42917254371). Der anschließende 8×30-s-Standardvergleich läuft beim Schreiben dieses Absatzes noch; sein Abschluss und der nachfolgende reine Dokumentations-/Prüfcodecommit werden im PR mit konkretem Hash/CI/Artefakt verknüpft. Keine Behauptung eines bestandenen 10-%-Budgets. Alle bisherigen 182 regulären Prüfungen und 63 Chromium-Fälle bleiben erhalten, vier Node- und zwei Browserfälle kommen hinzu. Kein Merge, kein neues Deployment, keine Änderung an `main`, Originalarchiv oder v0.8.5.
+Die korrigierten vollständigen Funktions-Prüfstufen auf `725acb2ee1f819969a5be8b96351abff602a639b` sind erfolgreich: **186 regulär, 65 echtes Chromium, zwölf historische Benchmarks exakt und sechs Originalintegritätsprüfungen**. [Push-CI 42917244222](https://github.com/phoscore/entrolab/actions/runs/42917244222), [PR-CI 42917254371](https://github.com/phoscore/entrolab/actions/runs/42917254371). Der anschließende 8×30-s-Standardvergleich ist ebenfalls abgeschlossen; der gesamte Lauf ist grün. [Rohartefakt 13810602091](https://github.com/phoscore/entrolab/actions/runs/42917244222/artifacts/13810602091). Der nachfolgende reine Beschriftungs-/Dokumentations-/Prüfcodecommit wird im PR mit konkretem Hash/CI/Artefakt verknüpft. Keine Behauptung eines bestandenen 10-%-Budgets. Alle bisherigen 182 regulären Prüfungen und 63 Chromium-Fälle bleiben erhalten, vier Node- und zwei Browserfälle kommen hinzu. Kein Merge, kein neues Deployment, keine Änderung an `main`, Originalarchiv oder v0.8.5.
+
+
+## 5. Erneuter vollständiger Standardvergleich nach der Energie-Korrektur
+
+725acb2ee1f819969a5be8b96351abff602a639b, gleicher bestehender 8×30-s-Einstieg. Rohwerte: [gespeicherter Standardvergleich](v0.8/qa/v08-correction-standard.json). Das ist ein anderer Runnerlauf als die Ursachenserie; absolute Zeiten sind nicht zwischen den Läufen gleichzusetzen.
+
+| Größe | Basis | korrigierter Stand | Änderung innerhalb dieses Laufs |
+| --- | ---: | ---: | ---: |
+| Gravity, Mittel zweier Paint-p95 | 0,4130 ms | 0,5185 ms | **+25,54 % / +0,1055 ms** |
+| Gravity, TaskDuration pro 30-s-Stichprobe, Mittel | 5,0080485 s | 5,6057355 s | +11,93 % |
+| Vorhandene BH-Animation, TaskDuration, Mittel | 9,173620 s | 9,192684 s | +0,21 % |
+
+Gravity-Paint-p95 einzeln: Basis 0,366/0,460 ms, korrigiert 0,524/0,513 ms. Frame-p95 aller acht Stichproben 16,7–16,8 ms, keine beobachteten Long Tasks >50 ms oder Seitenfehler. BH-/Raster-Paintperzentile weiterhin nicht erfasst (`null`), keine Nullkostenbehauptung. Das vorgeschlagene 10-%-Budget bleibt ausdrücklich überschritten. Es wurde keine Renderingänderung als Optimierung ausgeliefert.

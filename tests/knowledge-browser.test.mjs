@@ -27,7 +27,7 @@ test('energy browser: gravity help describes the measured mechanics in DE/EN and
   await p.locator('[data-language=de]').click();
   assert.equal(await p.locator('#systemEnergy').textContent(),readout);assert.deepEqual(await physical(p),before);
   await p.locator('[data-language=en]').click();
-  await p.screenshot({path:resolve(h.output,'v08-energy-mechanics-en.png')});
+  await p.locator('#systemEnergy').locator('..').screenshot({path:resolve(h.output,'v08-energy-mechanics-en.png')});
  }finally{await context.close()}
 });
 
