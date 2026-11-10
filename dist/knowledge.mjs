@@ -334,6 +334,16 @@ export const terms=freeze([
     "equation": "P = dQ/dt [W]; Q [J]"
   },
   {
+    "id": "mechanicalenergy",
+    "target": "guide-mechanical-energy",
+    "label": "k.term.mechanicalenergy.label",
+    "short": "k.term.mechanicalenergy.short",
+    "long": "k.term.mechanicalenergy.long",
+    "model": "gravity",
+    "sources": ["orbits", "physics-code"],
+    "equation": "E = Σᵢ mᵢ|vᵢ|²/2 − Σᵢ<ⱼ G mᵢmⱼ/√(rᵢⱼ²+ε²) [M☉·AU²/d²]"
+  },
+  {
     "id": "energy",
     "target": "guide-energy",
     "label": "k.term.energy.label",

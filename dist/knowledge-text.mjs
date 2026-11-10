@@ -180,13 +180,25 @@ const messages={
     "Im passiven Zwei-Körper-Modell gilt P_A→B = G_th(T_A−T_B). Positive Leistung bedeutet A→B, negative B→A; bei gleicher Temperatur ist die Nettoleistung null. Wärme ist keine gespeicherte Stoffmenge.",
     "In the passive two-body model P_A→B = G_th(T_A−T_B). Positive power means A→B, negative means B→A; equal temperatures give zero net power. Heat is not a stored substance."
   ],
+  "k.term.mechanicalenergy.label": [
+    "Mechanische Energie",
+    "Mechanical energy"
+  ],
+  "k.term.mechanicalenergy.short": [
+    "Die Sandbox summiert Bewegungsenergie und geglättete gravitative potenzielle Energie aller Körper: E = K + V_ε.",
+    "The sandbox sums the kinetic energy and softened gravitational potential energy of all bodies: E = K + V_ε."
+  ],
+  "k.term.mechanicalenergy.long": [
+    "Die Anzeige verwendet M☉·AU²/Tag², nicht Joule: Massen in Sonnenmassen, Abstände in AU und Geschwindigkeiten in AU/Tag. Jedes Körperpaar wird einmal gezählt, mit ε = 10⁻⁷ AU; V_ε geht bei unendlichem Abstand gegen null. In einem isolierten, kollisionsfreien Modell bleibt E bis auf numerische Fehler konstant. Eingriffe und unelastische Verschmelzungen setzen die Driftreferenz neu. Wärme, innere Energie und Spin werden hier nicht bilanziert. Negative Gesamtenergie garantiert bei mehreren Körpern nicht, dass jeder Körper gebunden bleibt.",
+    "The readout uses M☉·AU²/day², not joules: masses in solar masses, distances in AU and velocities in AU/day. Each body pair is counted once, with ε = 10⁻⁷ AU; V_ε tends to zero at infinite separation. In an isolated, collision-free model E stays constant up to numerical error. Edits and inelastic mergers reset the drift reference. Heat, internal energy and spin are not accounted for here. Negative total energy does not guarantee that every body in a many-body system remains bound."
+  ],
   "k.term.energy.label": [
-    "Energie",
-    "Energy"
+    "Thermische innere Energie (Modell)",
+    "Thermal internal energy (model)"
   ],
   "k.term.energy.short": [
-    "Energie wird übertragen und umgewandelt. Ihre Erhaltung bedeutet nicht, dass sie vollständig als Arbeit verfügbar bleibt.",
-    "Energy is transferred and transformed. Conservation does not imply that it all remains available as work."
+    "Im isolierten Wärme-Paar ist U die thermische innere Modellenergie mit einem fest gewählten Nullpunkt. Sie bleibt beim passiven Austausch erhalten.",
+    "In the isolated heat pair U is thermal internal model energy with a fixed reference. It is conserved during passive exchange."
   ],
   "k.term.energy.long": [
     "U = C_A T_A + C_B T_B ist hier eine festgelegte Modellreferenz mit konstantem C, kein absoluter Materialenergieinhalt. Die Demo berechnet keine entnehmbare Arbeit und keinen Kühlschrank.",

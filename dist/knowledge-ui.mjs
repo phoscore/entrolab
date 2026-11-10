@@ -71,7 +71,7 @@ export function initKnowledge(doc=globalThis.document){
  cleanup.push(()=>{for(const e of originalArticles)grid.insertBefore(e,before)});
 
  const bindings=[
-  ['scenarioHint','orbit'],['selectedType','mass'],['integrationStep','softening'],['systemEnergy','energy'],
+  ['scenarioHint','orbit'],['selectedType','mass'],['integrationStep','softening'],['systemEnergy','mechanicalenergy'],
   ['bhRadius','schwarzschild'],['bhTemp','hawking'],['extremeRadius','stars'],['iscoRadius','isco'],
   ['kelvinInput','kelvin'],['celsiusInput','temperature'],['entropyOmega','multiplicity'],['entropyValue','entropy'],
   ['thermalEntropy','entropy'],['thermalSigma','secondlaw'],['thermalForm','conductance'],['thermalEquilibrium','capacity']

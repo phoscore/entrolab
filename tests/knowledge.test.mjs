@@ -6,8 +6,8 @@ import {terms,models,sources,CONTEXTS,termById,modelById,contentKeys} from '../d
 import {knowledgeDE,knowledgeEN} from '../dist/knowledge-text.mjs';
 import {de,en,setLanguage,t} from '../dist/i18n.mjs';
 
-test('v0.8 knowledge: 28 canonical terms, six contexts and legacy deep-link targets are complete',()=>{
- assert.equal(terms.length,28);assert.equal(models.length,6);
+test('v0.8 knowledge: 29 canonical terms, six contexts and legacy deep-link targets are complete',()=>{
+ assert.equal(terms.length,29);assert.equal(models.length,6);
  assert.deepEqual(Object.keys(CONTEXTS),['gravity','blackhole','objects','temperature','markers','thermal']);
  assert.equal(new Set(terms.map(x=>x.id)).size,terms.length);
  assert.equal(new Set(terms.map(x=>x.target)).size,terms.length);

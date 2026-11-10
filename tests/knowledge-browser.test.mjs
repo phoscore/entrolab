@@ -7,6 +7,42 @@ let h;
 before(async()=>{h=await browserHarness();console.log('v0.8 Chromium',h.browser.version())});
 after(async()=>{if(h){await writeFile(resolve(h.output,'v08-knowledge-measurements.json'),JSON.stringify({browser:h.browser.version(),measurements:h.measurements,errors:h.errors},null,2));await h.close()}});
 
+test('energy browser: gravity help describes the measured mechanics in DE/EN and returns without state changes',async()=>{
+ const {p,context}=await h.lab();try{
+  await p.locator('.edit-options > summary').click();await p.locator('#velX').fill('42.7500');
+  const before=await physical(p),readout=await p.locator('#systemEnergy').textContent();
+  const help=p.locator('#gravity [data-knowledge-term=mechanicalenergy]');
+  await help.locator(':scope > summary').press('Enter');await help.locator('.knowledge-advanced > summary').click();
+  for(const [lang,label]of [['de','Mechanische Energie'],['en','Mechanical energy']]){
+   await p.locator('[data-language='+lang+']').click();assert.match(await help.textContent(),new RegExp(label));
+   assert.match(await help.textContent(),/E = K \+ V_ε/);assert.match(await help.textContent(),/M☉·AU²/);
+   assert.doesNotMatch(await help.textContent(),/C_A T_A|C_B T_B/);
+   assert.equal(await help.locator('[data-model-link]').getAttribute('data-model-link'),'model-gravity');
+   assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.equal(await help.getAttribute('open'),'');
+  }
+  const link=help.locator('[data-model-link]'),origin=await link.getAttribute('id');
+  await link.click();assert.equal(await p.evaluate(()=>document.activeElement.id),'model-gravity');
+  await p.locator('#guideReturn').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),origin);
+  assert.equal(await p.locator('#systemEnergy').textContent(),readout);assert.deepEqual(await physical(p),before);
+  await p.screenshot({path:resolve(h.output,'v08-energy-mechanics-en.png')});
+ }finally{await context.close()}
+});
+
+test('energy browser: mechanical and existing thermal deep links stay distinct on narrow screens',async()=>{
+ for(const width of [320,390]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
+  for(const [target,model,formula]of [['guide-mechanical-energy','model-gravity','E = K + V_ε'],['guide-energy','model-thermal','U = C_A T_A + C_B T_B']]){
+   await p.goto(h.url+'/?energy='+target+'#'+target);await h.ready(p);
+   assert.equal(await p.evaluate(()=>document.activeElement.id),target);
+   const definition=p.locator('#'+target+' + dd');await definition.locator('.knowledge-advanced > summary').click();
+   assert((await definition.textContent()).includes(formula));assert.equal(await definition.locator('[data-model-link]').getAttribute('data-model-link'),model);
+   await p.locator('[data-language=en]').click();assert((await definition.textContent()).includes(formula));
+   assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+   await p.keyboard.press('Escape');assert.notEqual(await p.evaluate(()=>document.activeElement.tagName),'BODY');
+  }
+ }finally{await context.close()}}
+ assert.deepEqual(h.errors,[]);
+});
+
 test('v0.8 browser: canonical glossary preserves legacy focus return and dynamic model back/Escape',async()=>{
  const {p,context}=await h.lab();try{
   await p.locator('[data-tab=entropy]').click();const before=await physical(p);
