@@ -1,0 +1,480 @@
+{
+  "baseline": "ec2c4f1a5957478ab255f286a0ca2a9341cabcbe",
+  "candidate": "0883bb29990563e65dfabff47c23a5f3629b7ffc",
+  "chromium": "151.0.7922.34",
+  "conditions": "Same CI runner, DPR 1, system-font fallback, BH dimensions fixed per profile, 650 ms warm-up. 4x CDP CPU emulation is not real mobile hardware.",
+  "measurements": [
+    {
+      "profile": "desktop",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 0,
+      "taskMs": 832.492,
+      "rect": {
+        "x": 477.5,
+        "y": 302.21875,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4017.100000000006,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.400000000000546,
+      "drawP95": 0.6000000000058208,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 0,
+      "taskMs": 189.36000000000004,
+      "rect": {
+        "x": 477.5,
+        "y": 302.515625,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4003.399999999994,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.6000000000058208,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 1,
+      "taskMs": 172.965,
+      "rect": {
+        "x": 477.5,
+        "y": 302.515625,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4007.5,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.5,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 1,
+      "taskMs": 622.8320000000001,
+      "rect": {
+        "x": 477.5,
+        "y": 302.21875,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4012.2999999999884,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.5,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 2,
+      "taskMs": 617.33,
+      "rect": {
+        "x": 477.5,
+        "y": 302.21875,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4008.6999999999825,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.5,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 2,
+      "taskMs": 169.468,
+      "rect": {
+        "x": 477.5,
+        "y": 302.515625,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 4005.899999999994,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.6000000000058208,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "base",
+      "scene": "static",
+      "repeat": 0,
+      "taskMs": 1.5309999999999768,
+      "rect": {
+        "x": 477.5,
+        "y": 302.21875,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 1800.3999999999942,
+      "draws": 0,
+      "scheduled": false,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "static",
+      "repeat": 0,
+      "taskMs": 1.3930000000000053,
+      "rect": {
+        "x": 477.5,
+        "y": 302.515625,
+        "width": 710,
+        "height": 345
+      },
+      "elapsed": 1800.3000000000175,
+      "draws": 0,
+      "scheduled": false,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "gas",
+      "repeat": 0,
+      "taskMs": 172.57299999999998,
+      "rect": {
+        "x": 65.1875,
+        "y": 304.984375,
+        "width": 1229.625,
+        "height": 340
+      },
+      "elapsed": 4011.1999999999825,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.20000000001164153,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 0,
+      "taskMs": 1818.132,
+      "rect": {
+        "x": 59,
+        "y": 310.15625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4013.7999999999884,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.400000000000546,
+      "drawP95": 2,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 0,
+      "taskMs": 545.576,
+      "rect": {
+        "x": 59,
+        "y": 309.90625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4011.2999999999884,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.400000000000546,
+      "drawP95": 2.6999999999825377,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 1,
+      "taskMs": 736.7069999999999,
+      "rect": {
+        "x": 59,
+        "y": 309.90625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4002.2999999999884,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.400000000000546,
+      "drawP95": 2.8999999999941792,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 1,
+      "taskMs": 1841.5249999999999,
+      "rect": {
+        "x": 59,
+        "y": 310.15625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4017,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 2.1000000000058208,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "base",
+      "scene": "moving",
+      "repeat": 2,
+      "taskMs": 1828.49,
+      "rect": {
+        "x": 59,
+        "y": 310.15625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4014.600000000006,
+      "draws": 121,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 2,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "candidate",
+      "scene": "moving",
+      "repeat": 2,
+      "taskMs": 487.792,
+      "rect": {
+        "x": 59,
+        "y": 309.90625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 4012.7999999999884,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.400000000000546,
+      "drawP95": 2.2000000000116415,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "base",
+      "scene": "static",
+      "repeat": 0,
+      "taskMs": 6.3269999999999715,
+      "rect": {
+        "x": 59,
+        "y": 310.15625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 1801.3999999999942,
+      "draws": 0,
+      "scheduled": false,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "candidate",
+      "scene": "static",
+      "repeat": 0,
+      "taskMs": 4.941000000000029,
+      "rect": {
+        "x": 59,
+        "y": 309.90625,
+        "width": 272,
+        "height": 240
+      },
+      "elapsed": 1801.6000000000058,
+      "draws": 0,
+      "scheduled": false,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "mobile",
+      "variant": "candidate",
+      "scene": "gas",
+      "repeat": 0,
+      "taskMs": 392.93600000000004,
+      "rect": {
+        "x": 30.390625,
+        "y": 344.140625,
+        "width": 329.21875,
+        "height": 172
+      },
+      "elapsed": 4010.4000000000233,
+      "draws": 120,
+      "scheduled": true,
+      "gapP50": 33.30000000000018,
+      "gapP95": 33.40000000000009,
+      "drawP95": 0.8000000000174623,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "base",
+      "scene": "gravity",
+      "repeat": 0,
+      "taskMs": 237.349,
+      "rect": {
+        "x": 312.796875,
+        "y": 174.859375,
+        "width": 704,
+        "height": 600
+      },
+      "elapsed": 1800.1000000000058,
+      "draws": 108,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "variant": "candidate",
+      "scene": "gravity",
+      "repeat": 0,
+      "taskMs": 1.5389999999999988,
+      "rect": {
+        "x": 312.796875,
+        "y": 174.703125,
+        "width": 704,
+        "height": 600
+      },
+      "elapsed": 1800.2000000000116,
+      "draws": 0,
+      "gapP50": null,
+      "gapP95": null,
+      "drawP95": null,
+      "longTasks": [],
+      "errors": []
+    }
+  ],
+  "prototypes": [
+    {
+      "id": "desktop",
+      "samples": [
+        {
+          "cached": false,
+          "p50": 3.5,
+          "p95": 6.099999999976717
+        },
+        {
+          "cached": true,
+          "p50": 0.5,
+          "p95": 0.7000000000116415
+        },
+        {
+          "cached": true,
+          "p50": 0.5,
+          "p95": 0.6000000000058208
+        },
+        {
+          "cached": false,
+          "p50": 3.5,
+          "p95": 5.100000000005821
+        }
+      ],
+      "measurement": "Synchronous Canvas 2D draw submission, not GPU end-to-end"
+    },
+    {
+      "id": "mobile",
+      "samples": [
+        {
+          "cached": false,
+          "p50": 11.60000000000582,
+          "p95": 15.89999999999418
+        },
+        {
+          "cached": true,
+          "p50": 1.400000000023283,
+          "p95": 2
+        },
+        {
+          "cached": true,
+          "p50": 1.1000000000058208,
+          "p95": 2
+        },
+        {
+          "cached": false,
+          "p50": 11,
+          "p95": 12.799999999988358
+        }
+      ],
+      "measurement": "Synchronous Canvas 2D draw submission, not GPU end-to-end"
+    }
+  ]
+}
