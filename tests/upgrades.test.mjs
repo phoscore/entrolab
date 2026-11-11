@@ -37,7 +37,7 @@ test('v085 materials: finite comparison windows reject extrapolation without cha
  assert.equal(materialPhase('water',293.15),'liquid');assert.equal(materialPhase('iron',293.15),'solid');
 });
 test('v085 comparisons: logarithmic ratio remains finite for subnormal and extreme positive values',()=>{
- assert.equal(compareTemperatures(600,300).ratio.value,2);assert.equal(compareTemperatures(0,300).ratio,null);assert.equal(compareTemperatures(300,0).ratio,null);
+ assert.equal(compareTemperatures(600,300).ratio.value,2);assert.equal(compareTemperatures(0,300).ratio.value,0);assert.equal(compareTemperatures(300,0).ratio,null);
  for(const [a,b]of [[1e12,Number.MIN_VALUE],[Number.MIN_VALUE,1e12],[1e-300,1e12],[1e12,1e-300]]){const r=compareTemperatures(a,b);assert(Number.isFinite(r.delta));assert(r.ratio);if(r.ratio.value!==undefined)assert(r.ratio.value>0&&Number.isFinite(r.ratio.value));else{assert(r.ratio.mantissa>=1&&r.ratio.mantissa<10);assert(Number.isInteger(r.ratio.exponent))}}
  assert.equal(scalePosition(0).zero,true);assert.equal(scalePosition(Number.MIN_VALUE).below,true);assert.equal(scalePosition(.001).fraction,0);assert.equal(scalePosition(1e12).fraction,1);
 });

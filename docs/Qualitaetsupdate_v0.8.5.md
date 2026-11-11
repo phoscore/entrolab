@@ -38,3 +38,12 @@ Alle Stoffe sind hypothetische Reinstoffe im Gleichgewicht bei 101325 Pa, ohne c
 Quellen am 11.11.2026 tatsächlich geöffnet: OpenStax University Physics 2 §1.5, NIST WebBook CAS 64-17-5 / Phase change data, PDG2026 Ethanol, RSC Elemente 13/26. Gegenüber dem frühen PDG-Vorschlag wird für Ethanol absichtlich die NIST-Kompilation 351,5 ±0,2 K verwendet; keine vermeintliche exakte Gleichheit zwischen unabhängig gerundeten K-/°C-Spalten. Kelvin ist kanonisch. Übergangsband bedeutet nur „Tabellen-Übergangsbereich / Koexistenz möglich“, nicht einen aus Temperatur bestimmten Phasenanteil oder breites reales Schmelzintervall.
 
 Die Behauptung gültiger Chemie innerhalb dieser Fenster wird ausdrücklich nicht erhoben. Wärmekapazitäten, latente Wärme, Dissoziation, Reaktionszeiten und Druckänderungen werden nicht berechnet. Die bewusst enge Begrenzung ist Teil der wissenschaftlichen Vereinfachung, kein neuer experimentell validierter Stoffdatensatz. Materialdaten werden nie als Parameter an das bestehende Wärmeexperiment übergeben.
+
+
+## Lesender Zwischenreview und korrigierte Grenzfälle
+
+Der unabhängig lesende Review hat zwei eigene neue Inhalte/Bedienfälle beanstandet: negative absolute Temperaturen dürfen nicht pauschal als Nichtgleichgewicht bezeichnet werden (unnötigen Satz entfernt); leere optionale Zahlenfelder sind nativ gültig, obwohl der Temperaturcontroller sie ablehnt. Der Lernpfad prüft jetzt zusätzlich die tatsächliche Laborfehlermeldung und Leertext, bevor er eine Handlung bestätigt. Neue Chromium-Fälle prüfen auch −0 und negative Unterläufe. Physikwerte bleiben unverändert.
+
+Mathematische Präzisierung gegenüber A06 des historischen Audits: Für A=0 und B>0 ist A/B=0, nur B=0 verhindert den Quotienten. Das neue Vergleichsmodul zeigt deshalb den tatsächlichen Nullquotienten; beide Nullrichtungen sind getrennt getestet. Das ist neue Präsentationsmathematik im genehmigten Umfang, keine Änderung des bestehenden Temperaturlabors oder Wärmemodells. Positive extrem kleine Quotienten werden bei Gleitkomma-Unterlauf weiterhin logarithmisch dargestellt, nicht als Null ausgegeben.
+
+Die Celsiusreferenzen werden aus Kelvin abgeleitet und auf die jeweilige publizierte Präzision gerundet (Eisen 1811 K → ungefähr1538 °C, keine scheinexakten1537,850 °C). Der mobile BH-Moduswähler erhält eine volle Zeile, damit seine Namen bei320px lesbar bleiben.

@@ -18,7 +18,7 @@ export function materialPhase(id,k){
 }
 export function compareTemperatures(a,b){
  if(!validTemperature(a)||!validTemperature(b))throw new RangeError('Invalid temperature');
- const delta=a-b;if(a===0||b===0)return {delta,ratio:null};
+ const delta=a-b;if(b===0)return {delta,ratio:null};if(a===0)return {delta,ratio:{value:0}};
  const ratio=a/b;if(Number.isFinite(ratio)&&ratio>0)return {delta,ratio:{value:ratio}};
  const exponentReal=Math.log10(a)-Math.log10(b),exponent=Math.floor(exponentReal);
  return {delta,ratio:{mantissa:10**(exponentReal-exponent),exponent}};
