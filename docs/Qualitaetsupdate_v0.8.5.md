@@ -151,3 +151,63 @@ Die vollständige Langmessung läuft automatisch auf Code-Pushes dieses Branchs 
 - `main` bleibt `25e72c6…`; `archive/v0.1` bleibt `be2502d5…`; kein Tag hinzugefügt. Acht GET-Proben auf der bestehenden Cloudflare-Produktion stimmen mit v0.8 überein. Alle Entwicklungskommitte tragen `[CF-Pages-Skip]`, keine neue Preview, Domainänderung oder Veröffentlichung.
 
 Offen für unabhängige Abnahme: reale Mobilhardware, Safari/Firefox, echte Assistenztechnik, nativer Zoom sowie Langzeit-/GPU-/Akkuprofil. Die fachlichen Grenzen sind in der Oberfläche und oben dokumentiert. Draft-PR ist eine Prüfübergabe, keine Merge- oder Releasefreigabe.
+
+## Nachbesserungen zum Codex-Audit von `7b64f0b7`
+
+Geprüfte Basis: `7b64f0b7d189fb7587814e2136ea23229d424c6a` in Draft-PR [#8](https://github.com/phoscore/entrolab/pull/8). Alle 199 Dateien des Quellarchivs wurden vor der Bearbeitung gegen den Commitbaum geprüft. Grundlage sind die vier Befunde im Korrekturauftrag, die Pläne 05–08, der bisherige Qualitätsbericht und der interne Zwischenreview. Der vollständige externe Auditbericht war in Repository und PR nicht verfügbar.
+
+| Befund | Ursache und Korrektur | Dateien |
+| --- | --- | --- |
+| P2 · Black Hole | Die RAF-Bedingung prüfte Sichtbarkeit, Pause und Modus, aber nicht die Scheibe. Ohne sichtbare Scheibenbewegung endet die Schleife. Statische Bilder werden nur bei geändertem Bildzustand neu gezeichnet, etwa bei Ansichts-, Sprach- oder Größenwechsel. Das Wiedereinschalten respektiert Pause und Reduced Motion. Die belegten BH-Rechenwerte bleiben unabhängig. | `dist/blackhole-view.mjs` |
+| P2 · Temperaturkontext | Der Kontext kannte nur den Kelvinwert. Eine bewusste Presetauswahl liefert jetzt zusätzlich ihre Herkunft. Alle acht Presets haben kurze DE/EN-Texte. Gültige manuelle Änderungen wechseln zur freien Einordnung, ungültige Entwürfe lassen den letzten gültigen Kontext stehen. Sprachwechsel übersetzen die ausgewählte Erklärung. | `dist/extreme-ui.mjs`, `dist/temperature-context.mjs`, `dist/upgrade-text.mjs` |
+| P3 · Science-Lernweg | Der Lernschritt bot Begriffslinks und Advanced-Kapitel an, prüfte aber nur den Gravity-Selektor. Er erkennt jetzt die Öffnung jedes Modell-Advanced-Kapitels und den erfolgreich geöffneten und fokussierten Begriff. Das Aufsuchen des Ziels und das Zuklappen eines Kapitels zählen nicht als Lernhandlung. | `dist/discovery-paths.mjs`, `dist/discovery.mjs`, `dist/upgrade-text.mjs` |
+| P3 · Materialrundung | Unterschiedliche gültige Labordoubles können auf denselben Anzeigewert runden. Die Karte kennzeichnet den Anzeigewert als gerundet und erläutert direkt beim Ergebnis eine mögliche abweichende Einordnung, wenn die Rundung die Klassifikation ändern würde. Der eigentliche Vergleich verwendet weiter den Laborwert und die bestehenden Tabellen, Bänder und Toleranzen. | `dist/temperature-format.mjs`, `dist/temperature-context.mjs`, `dist/upgrade-text.mjs` |
+| Motto | Footer und Science-Monstertext verwenden in DE/EN „No plot armor. Just physics.“ | `dist/index.html`, `dist/translations.mjs`, `dist/knowledge-text.mjs` |
+
+Der CMB-Preset beschreibt die Strahlungstemperatur des von COBE/FIRAS gemessenen Spektrums bei ungefähr 2,725 K. Das Sonnenpreset bleibt 5900 K als grobe Photosphären-Orientierung und nennt die effektive Temperatur von 5772 K. Die Celsius-/Kelvin-Relation bleibt nach NIST exakt. Ultrakalte Werte, Raumtemperatur, heißes Plasma und das Skalenende sind als gewählte Vergleichswerte bzw. Laborgrenzen gekennzeichnet. [NASA COBE/FIRAS](https://lambda.gsfc.nasa.gov/product/cobe/firas_overview.html) · [NASA Sun Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html) · [NIST SI Units – Temperature](https://www.nist.gov/pml/owm/si-units-temperature)
+
+Beispiel für die Rundung: `273.2000000000002 K` und `273.2000000000003 K` ergeben beide die Anzeige 273,2 K. Der erste Wert liegt nach der bestehenden Wasser-Klassifikation im Vergleichsband, der zweite im Flüssigkeitsbereich und erhält den Hinweis. Dies betrifft die numerische Anzeige eines Tabellenvergleichs. Die Stellen sind keine Stoffmessgenauigkeit und es wird kein Phasenanteil berechnet.
+
+### Nachaudit und reproduzierbare Prüfungen
+
+- Black Hole → Illustration → Optionen → Scheibe aus. Bei sichtbarem Bild und laufbereiter Darstellung bleiben nach dem letzten Neuzeichnen `frames` und `time` in `entrolabBlackHoleView.inspect()` konstant, `scheduled` bleibt false. Sprache und Größe aktualisieren das statische Bild, der gespeicherte Winkel wirkt bei wieder zugeschalteter Scheibe. Pause, Hidden Page, Ansicht, Dispose und Reduced Motion weiter prüfen.
+- Extreme Temperature → nacheinander alle acht Presets wählen. 2,725 K als Preset zeigt CMB, derselbe manuell eingegebene Wert erhält eine allgemeine Einordnung. Ein ungültiger Entwurf und Sprachwechsel behalten das letzte gültige Preset.
+- Erste Schritte → Modelle, Begriffe und Quellen → Science → Lernschritt 2. Ein anderes Advanced-Kapitel als Gravity öffnen. Dann Schritt zurück und erneut vor, in offenem Kapitel per Enter einem Begriffslink folgen. Beide Wege schalten Weiter frei. Escape stellt den Linkfokus wieder her.
+- Material Explorer → Wasser → beide oben genannten Zahlen direkt in Kelvin eingeben. Phase, Rundungshinweis und unbearbeitete Eingabe prüfen. Extremwerte `5e-324 K` und `1e12 K` bleiben außerhalb des Materialfensters.
+- Regressionen in `tests/upgrades.test.mjs` und `tests/upgrades-browser.test.mjs`. Zum Wiederholen `node scripts/test.mjs`, `npm run test:browser`, `node scripts/check-benchmarks.mjs` und `node scripts/verify-original.mjs` verwenden. Historien- und Performanceprüfungen benötigen einen vollständigen Git-Klon. Browserinstallation wie im vorhandenen CI-Workflow.
+
+Eine zusätzliche lokale Probe mit dem tatsächlichen BH-Controller und kontrolliertem DOM/RAF zeigte bei je 120 synthetischen 60-Hz-Ticks 59 → 0 weitere Paints nach dem Abschalten der Scheibe. Beide Stände hatten höchstens einen ausstehenden RAF-Callback. Der korrigierte Stand zeichnete bei gleicher Größe nur einmal nach, nahm die Schleife nach dem Einschalten wieder auf und hinterließ nach Dispose keinen Callback. Diese Probe misst keine Browser-CPU-Zeit.
+
+### Ergebnisse und Schutzprüfungen
+
+| Prüfung | Ergebnis am Laufzeitcommit `e59e8adee161ab8cdd7ab6e3e146cc4ff4d4e576` |
+| --- | --- |
+| Regulär | **200 bestanden** (10 Selbstchecks + 190 Node-Fälle), lokal unter Node 24 und in GitHub Actions unter Node 22 |
+| Chromium | **85/85**, einschließlich vier neuer Fälle zu BH-Stillstand/Wiederanlauf, acht Presets in DE/EN, Science-Tastaturweg und Rundung; keine Seitenfehler |
+| Historische Benchmarks | **12/12** vollständige numerische Ergebnisse exakt gleich |
+| Originalintegrität | **6/6** Originaldateien im archivierten Commit stimmen mit den dokumentierten Prüfsummen überein |
+| Browseransicht | Desktop, 320 und 390 CSS-Pixel geprüft, kein horizontaler Dokumentüberlauf; BH-Backing-Store im 390-px-/DPR-2-Fall 400 × 300, Größe über 120 Frames stabil |
+| Produktion | Die bestehenden acht schreibfreien GET-Gegenproben stimmen mit v0.8 überein |
+
+[Test-/Performance-Lauf 43065326032](https://github.com/phoscore/entrolab/actions/runs/43065326032) · [Privates Browserartefakt mit Desktop-/Mobilaufnahmen](https://github.com/phoscore/entrolab/actions/runs/43065326032/artifacts/13874434960)
+
+Kein alter Test wurde entfernt oder gelockert. Die frühere Mount-/Dispose-Regression prüft weiterhin 100 Zyklen auf zusätzliche Listener und DOM-Knoten. Der Vergleich aller versionierten Blobs zeigt Änderungen ausschließlich an den oben genannten Laufzeitdateien, beiden Testdateien, `scripts/measure-v085-browser.mjs` und dessen CI-Aufruf in `.github/workflows/tests.yml`, zuzüglich dieser Dokumentation und Messdaten. Originalarchiv, Monster-Master und seine Derivate, Solver, gemeinsame Zeichenroutine, Materialdaten, Referenzwerte, Toleranzen und Lockfile sind bytegleich zum auditierten Stand. `main` bleibt auf `25e72c639d66677c1629886141e3671a4c696ef6`, `archive/v0.1` auf `be2502d51a449de3e515faaf72ab5954b1a739d4`. Alle Korrekturcommits beginnen mit `[CF-Pages-Skip]`.
+
+Der lokale Chromiumstart wurde vor Seitenaufruf durch eine Betriebssystem-Socketbeschränkung beendet. Die echten Browsernachweise stammen aus GitHub Actions. Die betrachteten Vorher-/Nachher-Aufnahmen zeigen bei 320 px dieselbe bereits vorhandene Kürzung des langen deutschen Modusnamens und der Canvas-Innenbeschriftung. Der vollständige Schemahinweis darunter bleibt lesbar. Das bekannte Layoutdetail liegt außerhalb der vier Korrekturen. Reale Mobilhardware, GPU-/Akkukosten, Safari/Firefox und Assistenztechnik wurden hier nicht vermessen.
+
+### Black-Hole-Performance vor und nach dem Fix
+
+Chromium 151.0.7922.34, geprüfter Stand `7b64f0b7` gegen Laufzeitcommit `e59e8ade` auf demselben CI-Runner. Je Kombination aus Breite, Szene und Version zwei Stichproben in umgekehrter Reihenfolge, insgesamt 16 × 8 s nach 180 Warm-up-Frames. Gleiche sichtbare Canvas-Fläche und identische Einstellungen in jeder Paarung, DPR 1 und Systemschrift. CDP-TaskDuration erfasst Main-Thread-Arbeit der Seite. Der Messcode fragt Start und Ende ab und erzeugt während der Stichprobe keine eigene RAF-Schleife.
+
+| Profil und Szene | Zeichenaufrufe pro 8 s vorher → nachher | TaskDuration pro 8 s vorher → nachher, Mittel | Absolut / relativ |
+| --- | ---: | ---: | ---: |
+| Desktop 1360 px · Scheibe aus | 240 → 0 | 320,090 → 1,423 ms | −318,667 ms / −99,56 % |
+| 390 px · 4× CPU · Scheibe aus | 240–241 → 0 | 957,311 → 4,494 ms | −952,817 ms / −99,53 % |
+| Desktop 1360 px · Scheibe an | 240 → 240 | 910,802 → 934,274 ms | +23,471 ms / +2,58 % |
+| 390 px · 4× CPU · Scheibe an | 241 → 240 | 2811,740 → 2789,188 ms | −22,553 ms / −0,80 % |
+
+Die Einzelwerte bei abgeschalteter Scheibe im gedrosselten Profil lagen vorher bei 691–1224 ms und nachher bei 4,0–5,0 ms. Die Streuung betrifft die Zeitmessung, während das Abstellen der Schleife durch null zusätzliche Zeichenaufrufe und keinen ausstehenden RAF in beiden korrigierten Stichproben belegt ist. Bei aktiver Scheibe schwanken die beiden Zeitmessungen in ähnlicher Größenordnung wie der beobachtete Unterschied. Daraus folgt kein belastbarer Geschwindigkeitsgewinn oder -verlust für die aktive Illustration. In den 16 Stichproben gab es **0 Long Tasks und 0 Seitenfehler**.
+
+Der bestehende Vergleich mit der veröffentlichten v0.8 lief zusätzlich vollständig (24 × 30 s). Gravity-Paint-p95 lag im Mittel der beiden Stichproben bei 0,3955 → 0,3875 ms (−0,0080 ms / −2,02 %). Es gab einen Long Task in einer Gravity-Basisstichprobe und keinen in den korrigierten Stichproben. Der Vergleich der sichtbaren BH-Umgebung mit v0.8 umfasst weiterhin unterschiedliche Zeichenarbeit und ist getrennt vom gleichartigen Auditvergleich zu lesen.
+
+Zum Wiederholen im vollständigen Klon nach Browserinstallation `node scripts/measure-v085-browser.mjs --bh-audit` ausführen. [Audit-Rohdaten](v0.8.5/qa/performance-bh-audit.json) · [Beide Messreihen im CI-Artefakt](https://github.com/phoscore/entrolab/actions/runs/43065326032/artifacts/13876996253)
