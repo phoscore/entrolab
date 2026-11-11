@@ -144,6 +144,62 @@ export const sources=freeze({
     "url": "https://openstax.org/books/physics/pages/12-4-applications-of-thermodynamics-heat-engines-heat-pumps-and-refrigerators",
     "kind": "textbook",
     "checked": "2026-11-09"
+  },
+  "phase-changes": {
+    "publisher": "OpenStax",
+    "title": "University Physics 2 · Phase changes",
+    "url": "https://openstax.org/books/university-physics-volume-2/pages/1-5-phase-changes",
+    "section": "1.5 · normal-pressure references, coexistence and pressure dependence",
+    "kind": "textbook",
+    "checked": "2026-11-11"
+  },
+  "nist-ethanol": {
+    "publisher": "NIST",
+    "title": "Chemistry WebBook · Ethanol",
+    "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Mask=4",
+    "section": "Phase change data · compilation averages and spread",
+    "kind": "reference",
+    "checked": "2026-11-11"
+  },
+  "pdg-ethanol": {
+    "publisher": "Particle Data Group",
+    "title": "Atomic and nuclear properties · Ethanol",
+    "url": "https://pdg.lbl.gov/2026/AtomicNuclearProperties/HTML/ethanol.html",
+    "section": "2026 · melting / normal boiling reference, independently rounded",
+    "kind": "reference",
+    "checked": "2026-11-11"
+  },
+  "rsc-aluminium": {
+    "publisher": "Royal Society of Chemistry",
+    "title": "Aluminium · Element 13",
+    "url": "https://periodic-table.rsc.org/element/13/aluminum",
+    "section": "Fact box · normal melting / boiling references",
+    "kind": "reference",
+    "checked": "2026-11-11"
+  },
+  "rsc-iron": {
+    "publisher": "Royal Society of Chemistry",
+    "title": "Iron · Element 26",
+    "url": "https://periodic-table.rsc.org/element/26/iron",
+    "section": "Fact box · normal melting / boiling references",
+    "kind": "reference",
+    "checked": "2026-11-11"
+  },
+  "cmb-firas": {
+    "publisher": "NASA LAMBDA",
+    "title": "COBE/FIRAS overview",
+    "url": "https://lambda.gsfc.nasa.gov/product/cobe/firas_overview.html",
+    "section": "CMB blackbody radiation temperature, not arbitrary matter",
+    "kind": "institution",
+    "checked": "2026-11-11"
+  },
+  "sun-temperature": {
+    "publisher": "NASA",
+    "title": "Sun fact sheet",
+    "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html",
+    "section": "Solar atmosphere · effective temperature 5772 K",
+    "kind": "institution",
+    "checked": "2026-11-11"
   }
 });
 export const terms=freeze([

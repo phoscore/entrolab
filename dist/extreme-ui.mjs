@@ -3,6 +3,7 @@ import {t,tx,locale,onLanguageChange,translateText} from './i18n.mjs';
 import {length,scientific,number} from './display.mjs';
 import {compactObject,kelvinToCelsius,celsiusToKelvin,logTemperature,temperatureAt,comparisonPosition} from './extreme-data.mjs';
 import {drawObject,drawThermal} from './extreme-render.mjs';
+const temperatureListeners=new Set();
 const $=id=>document.getElementById(id),root=$('extreme');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const state={kind:'blackhole',mass:10*C.sun,k:.1,disk:true,geometry:false,pulsar:false,angle:22,zoom:1,quality:matchMedia('(max-width:600px)').matches?'low':'high',speed:1,paused:reduced.matches};
@@ -16,7 +17,7 @@ function paint(){const paintStart=performance.now();if(!root.classList.contains(
 function active(){return root.classList.contains('active')&&!document.hidden&&(objectSeen||thermalSeen)&&!state.paused}
 function sync(){if(raf!==null){cancelAnimationFrame(raf);raf=null}previous=null;if(active())raf=requestAnimationFrame(tick);root.dataset.animating=String(active())}
 function tick(now){raf=null;if(!active())return;const elapsed=previous===null?0:Math.min(.1,(now-previous)/1000);previous=now;time+=elapsed*state.speed;const interval=state.quality==='high'?1000/60:1000/30;if(now-lastDraw>=interval){lastDraw=now;paint()}raf=requestAnimationFrame(tick)}
-function temperature(k,editing=null,preserveError=false){if(!Number.isFinite(k)||k<0||k>1e12){$('temperatureError').textContent=t('Gültiger Laborbereich: 0 bis 10¹² Kelvin. Eingabe wurde nicht übernommen.');return false}if(!preserveError)$('temperatureError').textContent='';state.k=k;$('temperatureTransferValue').value=String(k);if(editing!=='kelvin'&&editing!=='both')$('kelvinInput').value=k;if(editing!=='celsius'&&editing!=='both')$('celsiusInput').value=Number(kelvinToCelsius(k).toFixed(3));$('kelvinReadout').textContent=scientific(k,'K');$('celsiusReadout').textContent=decimal(kelvinToCelsius(k))+' °C';$('temperatureSlider').value=k===0?-3:Math.max(-3,Math.log10(k));$('zeroNote').textContent=k===0?t('0 K: theoretischer absoluter Nullpunkt, außerhalb der Logskala. Keine Aussage, dass Quantenbewegung aufhört.'):k<.001-sliderMinimumTolerance?t('Unterhalb des Sliderbereichs (0,001 K); direkte Eingabe bleibt gültig.'):t('Logskala 10⁻³ bis 10¹² K; Beispiele sind unterschiedliche physikalische Situationen, keine universelle Stoffskala.');paint();return true}
+function temperature(k,editing=null,preserveError=false){if(!Number.isFinite(k)||k<0||k>1e12){$('temperatureError').textContent=t('Gültiger Laborbereich: 0 bis 10¹² Kelvin. Eingabe wurde nicht übernommen.');return false}if(!preserveError)$('temperatureError').textContent='';state.k=k;$('temperatureTransferValue').value=String(k);if(editing!=='kelvin'&&editing!=='both')$('kelvinInput').value=k;if(editing!=='celsius'&&editing!=='both')$('celsiusInput').value=Number(kelvinToCelsius(k).toFixed(3));$('kelvinReadout').textContent=scientific(k,'K');$('celsiusReadout').textContent=decimal(kelvinToCelsius(k))+' °C';$('temperatureSlider').value=k===0?-3:Math.max(-3,Math.log10(k));$('zeroNote').textContent=k===0?t('0 K: theoretischer absoluter Nullpunkt, außerhalb der Logskala. Keine Aussage, dass Quantenbewegung aufhört.'):k<.001-sliderMinimumTolerance?t('Unterhalb des Sliderbereichs (0,001 K); direkte Eingabe bleibt gültig.'):t('Logskala 10⁻³ bis 10¹² K; Beispiele sind unterschiedliche physikalische Situationen, keine universelle Stoffskala.');paint();for(const fn of temperatureListeners)fn();return true}
 $('pulsarOn').onchange=()=>{state.pulsar=$('pulsarOn').checked;refresh()};$('extremeCenter').onclick=()=>{state.zoom=1;state.angle=22;$('extremeZoom').value=1;$('extremeAngle').value=22;paint()};
 $('extremeObject').onchange=()=>{state.kind=$('extremeObject').value;refresh()};
 function massInput(keep=false){const m=Number($('extremeMass').value);try{compactObject('blackhole',m);state.mass=m;$('massError').textContent='';refresh(keep)}catch{$('massError').textContent=t('Masse muss endlich sein: 1 bis 10⁴¹ kg. Bisheriger Wert bleibt aktiv.')}}
@@ -37,3 +38,6 @@ if(typeof IntersectionObserver==='function'){const observer=new IntersectionObse
 temperature(state.k);refresh();
 
 onLanguageChange(()=>{for(const id of ['massError','temperatureError'])$(id).textContent=translateText($(id).textContent);refresh(true);temperature(state.k,'both',true)});
+
+// Read-only adapter for optional contextual comparisons; never parses rounded labels.
+globalThis.entrolabTemperature={read:()=>state.k,subscribe(fn){temperatureListeners.add(fn);return ()=>temperatureListeners.delete(fn)},inspect:()=>({subscriptions:temperatureListeners.size})};

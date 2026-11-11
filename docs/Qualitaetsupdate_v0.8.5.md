@@ -23,3 +23,18 @@ Vier Ebenen bleiben getrennt: angewandte Physik, unveränderte Rohentwürfe, neu
 ## Ausstehende Prüfungen
 
 Implementierung, neue Regressionen, vollständige 186/65/12/6-Nachprüfung, Quellenverifikation, Produktionshashprobe, Screenshots, Lifecycle-/Performancewerte, unabhängiger lesender Review und Draft-PR werden im Verlauf ergänzt. Keine dieser Prüfungen ist hier bereits als bestanden behauptet.
+
+## Vorab festgelegte Materialkonvention (A05/A06)
+
+Alle Stoffe sind hypothetische Reinstoffe im Gleichgewicht bei 101325 Pa, ohne chemische Reaktionen oder Oxidation. Kein Materialsolver. Die Zustandsaussage ist ein begrenzter Tabellenvergleich, keine Vorhersage eines realen Experiments. Die Fenster sind **bewusst gewählte didaktische Auswertungsgrenzen**, keine gemessenen Zersetzungs-, Ionisations- oder Stabilitätsschwellen. Sie umfassen die beiden normalen Übergänge und einen kleinen angrenzenden Fest-/Dampfbereich; Metallfenster beginnen bei Raumtemperatur, damit kryogene Phasen/Materialdetails nicht behauptet werden. Oberhalb bleibt selbst dann „außerhalb“, wenn ein vereinfachtes Diagramm noch Dampf vermuten ließe. Es wird keine universelle Stoffaussage bei Astro-/Plasmatemperaturen gemacht.
+
+| Stoff | Schmelzen K / Vergleichsband ±K | Sieden K / Band ±K | Darstellungsfenster K | Grundlage |
+| --- | --- | --- | --- | --- |
+| Wasser | 273,15 / 0,05 | 373,15 / 0,05 | 250–400 | OpenStax, didaktische Normaldruckwerte 0/100 °C; Band entspricht Anzeige 0,1 K, keine Messunsicherheit |
+| Ethanol | 159 / 2 | 351,5 / 0,2 | 140–375 | NIST WebBook-Mittelwerte und dort angegebene Streuung; PDG 159,0/351,4 K als gerundete Gegenprobe |
+| Aluminium | 933,473 / 0,0005 | 2792 / 0,5 | 273,15–2850 | RSC; Band halbe letzte publizierte Kelvinstelle, keine behauptete Stofftoleranz |
+| Eisen | 1811 / 0,5 | 3134 / 0,5 | 273,15–3200 | RSC; ebenso nominelle Darstellungsauflösung |
+
+Quellen am 11.11.2026 tatsächlich geöffnet: OpenStax University Physics 2 §1.5, NIST WebBook CAS 64-17-5 / Phase change data, PDG2026 Ethanol, RSC Elemente 13/26. Gegenüber dem frühen PDG-Vorschlag wird für Ethanol absichtlich die NIST-Kompilation 351,5 ±0,2 K verwendet; keine vermeintliche exakte Gleichheit zwischen unabhängig gerundeten K-/°C-Spalten. Kelvin ist kanonisch. Übergangsband bedeutet nur „Tabellen-Übergangsbereich / Koexistenz möglich“, nicht einen aus Temperatur bestimmten Phasenanteil oder breites reales Schmelzintervall.
+
+Die Behauptung gültiger Chemie innerhalb dieser Fenster wird ausdrücklich nicht erhoben. Wärmekapazitäten, latente Wärme, Dissoziation, Reaktionszeiten und Druckänderungen werden nicht berechnet. Die bewusst enge Begrenzung ist Teil der wissenschaftlichen Vereinfachung, kein neuer experimentell validierter Stoffdatensatz. Materialdaten werden nie als Parameter an das bestehende Wärmeexperiment übergeben.
