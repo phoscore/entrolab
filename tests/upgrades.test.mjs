@@ -62,3 +62,8 @@ test('v085 QCD: DE/EN distinguish rest-frame energy, schematic fields and the un
   const text=Object.entries(catalog).filter(([k])=>k.startsWith('v85.qcd.')).map(([,v])=>v).join(' ');for(const re of words)assert.match(text,re);assert.match(text,/938[,.]27 MeV\/c²/);assert.match(text,/M²c⁴ = E² − \|p\|²c²/);
  }
 });
+
+test('v085 new temperature labels: precision distinguishes both sides of the narrowest table band in DE/EN',async()=>{
+ const {comparisonNumber}=await import('../dist/temperature-format.mjs'),{setLanguage}=await import('../dist/i18n.mjs');
+ for(const language of ['de','en']){setLanguage(language);const values=[933.472,933.473,933.474,273.15,273.201].map(comparisonNumber);assert.equal(new Set(values).size,5);assert.equal(values[1],language==='de'?'933,473':'933.473');for(const k of [Number.MIN_VALUE,0,1e-300,1e12])assert(!/Infinity|NaN/.test(comparisonNumber(k)))}setLanguage('de');
+});

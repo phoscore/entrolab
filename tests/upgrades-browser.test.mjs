@@ -99,3 +99,10 @@ test('v085 discovery: rejected empty/negative-underflow temperature never comple
 test('v085 BH keyboard: selecting a mode retains focus on the real select and translates captions',async()=>{const {p,context}=await h.lab();try{
  await bh(p);await p.locator('#bhView').press('End');assert.equal(await p.locator('#bhView').inputValue(),'light');assert.equal(await p.evaluate(()=>document.activeElement.id),'bhView');await p.locator('#bhView').press('Home');assert.equal(await p.locator('#bhView').inputValue(),'environment');assert.equal(await p.evaluate(()=>document.activeElement.id),'bhView');
 }finally{await context.close()}});
+
+test('v085 materials: displayed temperature resolves aluminium band and both water boundary sides in DE/EN',async()=>{const {p,context}=await h.lab();try{
+ await temperature(p);for(const lang of ['de','en']){await p.locator('[data-language='+lang+']').click();await p.locator('#materialA').selectOption('aluminium');const texts=[];
+ for(const [k,phase]of [['933.472','solid'],['933.473','melting'],['933.474','liquid']]){await p.locator('#kelvinInput').fill(k);assert.equal(await p.locator('#materialCardA').getAttribute('data-phase'),phase);const text=await p.locator('#materialCardA > .hint').first().textContent();assert(text.includes(lang==='de'?k.replace('.',','):k));texts.push(text)}assert.equal(new Set(texts).size,3);
+ await p.locator('#materialA').selectOption('water');for(const [k,phase]of [['273.15','melting'],['273.201','liquid']]){await p.locator('#kelvinInput').fill(k);assert.equal(await p.locator('#materialCardA').getAttribute('data-phase'),phase)}
+ }
+}finally{await context.close()}});
