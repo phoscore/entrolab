@@ -22,7 +22,7 @@ test('v085 discovery: a genuine BH change is observed; resume, language and manu
 }finally{await context.close()}});
 test('v085 discovery: 320/390px, Reduced Motion, keyboard and repeated navigation have bounded UI',async()=>{
  for(const width of [320,390]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
-  await begin(p,'temperature');for(let i=0;i<25;i++){await p.locator('[data-tab=extreme]').press('Enter');await p.locator('[data-tab=blackhole]').press('Enter')}
+  await begin(p,'temperature');for(let i=0;i<100;i++){await p.locator('[data-tab=extreme]').press('Enter');await p.locator('[data-tab=blackhole]').press('Enter')}
   await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'extreme');await p.keyboard.press('Enter');await p.locator('#discoverySkip').click();await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'kelvinInput');
   const r=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,highlights:document.querySelectorAll('.discovery-highlight').length,animations:document.getAnimations().filter(a=>a.playState==='running').length}));assert(r.scroll<=width+1,JSON.stringify(r));assert(r.highlights<=1);assert.equal(r.animations,0);h.measurements.push({tour:width,...r});
  }finally{await context.close()}}

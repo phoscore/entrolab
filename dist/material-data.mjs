@@ -10,9 +10,9 @@ export const MATERIALS=freeze({
 export function validTemperature(k){return typeof k==='number'&&Number.isFinite(k)&&k>=0&&!Object.is(k,-0)&&k<=1e12}
 export function materialPhase(id,k){
  const m=MATERIALS[id];if(!m)throw new RangeError('Unknown material');if(!validTemperature(k))throw new RangeError('Invalid temperature');
- if(k<m.window[0]||k>m.window[1])return 'outside';
  // Numerical rounding allowance is separate from the stated table/display band.
  const near=(point,band)=>Math.abs(k-point)<=band+4*Number.EPSILON*Math.max(k,point);
+ if((k<m.window[0]&&!near(m.window[0],0))||(k>m.window[1]&&!near(m.window[1],0)))return 'outside';
  if(near(m.melt,m.meltBand))return 'melting';if(near(m.boil,m.boilBand))return 'boiling';
  return k<m.melt?'solid':k<m.boil?'liquid':'vapor';
 }

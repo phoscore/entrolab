@@ -131,7 +131,7 @@ Auf Windows gegebenenfalls `py` statt `python`. Im Browser `http://localhost:800
 
 - **Erste Schritte:** freiwilligen Schnellstart oder einen der sieben Laborwege wählen. Nur eigene Bedienhandlungen verändern Modelle; Zurück/Überspringen/Schließen jederzeit möglich. Wiederaufnahme während der laufenden Seite.
 - **Black Hole:** vier bestehende Rechenwerte, darunter Umgebung / Licht & Horizont. Blickwinkel unter „Ansicht & Animation“, rein schematisch; Bewegung pausierbar, Reduced Motion statisch.
-- **Extreme Temperature:** neue Kontextkarte; optional zwei Temperaturen vergleichen oder Material Explorer öffnen. Wasser/Ethanol/Aluminium/Eisen beziehen sich auf1atm und begrenzte Tabellenfenster. Keine Kopplung von Materialphasen an den Wärme-Solver.
+- **Extreme Temperature:** neue Kontextkarte; optional zwei Temperaturen vergleichen oder Material Explorer öffnen. Wasser/Ethanol/Aluminium/Eisen beziehen sich auf1 atm und begrenzte Tabellenfenster. Keine Kopplung von Materialphasen an den Wärme-Solver.
 - **Modell & Quellen:** freiwilliger Artikel zur Protonenmasse, QCD und dem getrennten mathematischen Yang–Mills-Problem. Direktlink `/#model-proton`.
 
 ```sh

@@ -34,7 +34,7 @@ test('v085 materials: all transitions just below/at/above declared bands, includ
 test('v085 materials: finite comparison windows reject extrapolation without changing inputs',()=>{
  for(const [id,m]of Object.entries(MATERIALS))for(const k of [0,Number.MIN_VALUE,.001,1,1e9,1e12]){assert.equal(materialPhase(id,k),'outside');assert.equal(k,k)}
  for(const id of Object.keys(MATERIALS)){const m=MATERIALS[id];assert.notEqual(materialPhase(id,m.window[0]),'outside');assert.notEqual(materialPhase(id,m.window[1]),'outside');assert.equal(materialPhase(id,m.window[0]-.01),'outside');assert.equal(materialPhase(id,m.window[1]+.01),'outside')}
- assert.equal(materialPhase('water',293.15),'liquid');assert.equal(materialPhase('iron',293.15),'solid');
+ assert.equal(materialPhase('water',(-23.15)+273.15),materialPhase('water',250));assert.equal(materialPhase('water',249.999),'outside');assert.equal(materialPhase('water',293.15),'liquid');assert.equal(materialPhase('iron',293.15),'solid');
 });
 test('v085 comparisons: logarithmic ratio remains finite for subnormal and extreme positive values',()=>{
  assert.equal(compareTemperatures(600,300).ratio.value,2);assert.equal(compareTemperatures(0,300).ratio.value,0);assert.equal(compareTemperatures(300,0).ratio,null);

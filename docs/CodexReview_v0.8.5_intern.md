@@ -4,10 +4,10 @@
 
 ## Tatsächlich ausgeführt
 
-- Vollständige reguläre Suite eigenständig ausgeführt: **197 bestanden**, zehn Selbstchecks und187Node-Fälle. Log im Arbeitslauf `/tmp/v085-independent-final-node.log`.
+- Vollständige reguläre Suite eigenständig ausgeführt: **197 bestanden**, zehn Selbstchecks und187 Node-Fälle. Log im Arbeitslauf `/tmp/v085-independent-final-node.log`.
 - Tatsächlicher `initGuide`-Controller im kontrollierten Node-DOM: kalter `#model-proton` öffnet jetzt Vorfahren-Details und fokussiert den Artikel.
-- Tatsächlicher Discovery-Controller im kontrollierten DOM: Leertext, −0, negativer Unterlauf und zu hohe Temperatur schließen keinen echten Handlungsschritt ab; akzeptierte320K tun es.
-- Neue Präzisionsformatierung trennt933,472/933,473/933,474K und Wassergrenzen; Nullzähler und Nullnenner getrennt.
+- Tatsächlicher Discovery-Controller im kontrollierten DOM: Leertext, −0, negativer Unterlauf und zu hohe Temperatur schließen keinen echten Handlungsschritt ab; akzeptierte320 K tun es.
+- Neue Präzisionsformatierung trennt933,472 / 933,473 / 933,474 K und Wassergrenzen; Nullzähler und Nullnenner getrennt.
 - Wissenschaftliche Abgrenzungen, Quellen, Integrator-/Archivschutz und Controllerlebenszyklen durch Codeinspektion geprüft. Keine eigenen erfolgreichen Chromium-Läufe oder historischen Git-Prüfungen durch diesen Agenten behauptet.
 
 ## Gefundene und vor Übergabe korrigierte P2
@@ -15,7 +15,7 @@
 1. Negative absolute Temperaturen waren pauschal als Nichtgleichgewichtssysteme bezeichnet. Unnötigen Satz entfernt; keine neue Negativtemperaturfunktion.
 2. Native optionale Zahlenfelder akzeptieren Leertext als formal gültig. Die Tour prüft zusätzlich echte Temperaturfehlermeldung und Rohtext. Keine Modellwerte verändert.
 3. Kalter QCD-Direktlink lag in einem geschlossenen Details-Element. Resolver öffnet dieselben erforderlichen Vorfahren wie der vorhandene interne Linkpfad. Browserfixture erzwingt einen neuen Dokumentaufruf statt bloßer Fragmentnavigation.
-4. Vier signifikante Stellen ließen unterschiedliche Materialzustände scheinbar zur gleichen Temperatur gehören. Neue Vergleichswerte verwenden15signifikante Stellen; bestehende Messanzeigen und Solver bleiben unverändert.
+4. Vier signifikante Stellen ließen unterschiedliche Materialzustände scheinbar zur gleichen Temperatur gehören. Neue Vergleichswerte verwenden15 signifikante Stellen; bestehende Messanzeigen und Solver bleiben unverändert.
 
 Zusätzlich mathematisch präzisiert:0/B=0 bei B>0; nur ein Nullnenner verhindert das Verhältnis. Der gegenteilige Satz im historischen Plan/Audit wird nicht als Mathematik übernommen. Neue Präsentationsmathematik, keine Änderung des etablierten Temperaturlabors.
 

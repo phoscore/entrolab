@@ -8,3 +8,5 @@
 .knowledge-article{grid-column:1/-1;padding:1rem}.knowledge-article>summary{font-size:1.1rem;font-weight:600;color:#e4d9ed}.knowledge-article article{max-width:75ch;margin:auto;line-height:1.7}.knowledge-article figure{margin:1rem 0}.knowledge-article svg{width:100%;height:auto;font-family:system-ui}.knowledge-article h3{margin-top:1.5rem}.knowledge-article .knowledge-sources{font-size:.85rem}
 
 @media(max-width:650px){.bh-illustration .upgrade-controls{display:grid;grid-template-columns:minmax(0,1fr)}.bh-illustration .upgrade-controls select{width:100%;max-width:100%}.bh-illustration .upgrade-controls label{margin:0}}
+/* At most 1200×400 CSS px and DPR 1.25: 750000 backing pixels / ~3 MB RGBA. */
+.bh-image-frame{max-width:1200px;margin-inline:auto}
