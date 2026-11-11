@@ -1112,6 +1112,7 @@ const messages={
     "Die Energie bleibt. Die Unterschiede nicht.",
     "The energy stays. The differences don’t."
   ],
+  "k.creature.comment.matter": ["Null beobachtet.", "Null watches."],
   "k.creature.comment.science": [
     "No plot armor. Just physics.",
     "No plot armor. Just physics."

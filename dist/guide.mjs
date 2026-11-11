@@ -8,6 +8,8 @@ export function initGuide(doc=globalThis.document){
  if(!glossary||!back)return null;
  const originalParent=back.parentNode,originalNext=back.nextSibling,win=doc.defaultView;
  const bound=new WeakSet(),cleanup=[];
+ const modelDestination=target=>doc.getElementById('matter')?.contains(target)?'matter':doc.getElementById('science')?.contains(target)?'science':null;
+ const modelSlot=destination=>doc.getElementById(destination==='matter'?'matterReturnSlot':'knowledgeReturnSlot');
  let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false,coldTerm=false,suspendedTerm=null;
  const listen=(target,event,fn,capture=false)=>{target?.addEventListener(event,fn,capture);cleanup.push(()=>target?.removeEventListener?.(event,fn,capture))};
  function focusVisible(target){
@@ -42,16 +44,16 @@ export function initGuide(doc=globalThis.document){
  function open(link,mode='term'){
   const id=mode==='model'?link.dataset.modelLink:link.dataset.explain,target=doc.getElementById(id);
   if(!target)return false;
-  const science=doc.getElementById('science');
-  if(mode==='model'&&(!id.startsWith('model-')||!science?.contains(target)))return false;
+  const destination=mode==='model'?modelDestination(target):null;
+  if(mode==='model'&&(!id.startsWith('model-')||!destination))return false;
   const from=doc.querySelector?.('[data-tab].active'),hash=win?.location.hash??'';
   const resume=mode==='model'&&glossary.contains(link)&&kind==='term'&&origin?{origin,kind,sourceTab,previousHash,coldTerm}:null;
   close(false);
-  if(mode==='model')activate(doc.querySelector('[data-tab="science"]'));
+  if(destination)activate(doc.querySelector('[data-tab="'+destination+'"]'));
   origin=link;kind=mode;sourceTab=from;previousHash=hash;suspendedTerm=resume;
   if(mode==='model'){
-   const slot=doc.getElementById('knowledgeReturnSlot');if(slot)slot.append(back);
-   for(let p=target.parentElement;p&&p!==science;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
+   modelSlot(destination)?.append(back);
+   for(let p=target.parentElement;p&&p!==doc.getElementById(destination);p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
    changeHash('#'+id);
   }else glossary.open=true;
   back.hidden=false;label();focusVisible(target);return true;
@@ -73,7 +75,7 @@ export function initGuide(doc=globalThis.document){
  listen(glossary,'toggle',()=>{if(kind==='term'&&!glossary.open)close(false)});
  listen(back,'click',()=>close());
  listen(doc,'keydown',e=>{
-  const container=kind==='model'?doc.getElementById('science'):glossary;
+  const container=kind==='model'?doc.getElementById(doc.querySelector('[data-tab].active')?.dataset.tab):glossary;
   if(e.key==='Escape'&&origin&&container?.contains(doc.activeElement)){e.stopImmediatePropagation();close()}
  },true);
  function resolveFragment(){
@@ -81,17 +83,22 @@ export function initGuide(doc=globalThis.document){
   if(origin&&kind==='model'&&win.location.hash===previousHash){close();return true}
   let id;try{id=decodeURIComponent(win.location.hash.slice(1))}catch{return false}
   if(!id||!/^[a-z][a-z0-9-]*$/.test(id))return false;
-  const tabs=['gravity','blackhole','extreme','entropy','science'];
-  const target=doc.getElementById(id),science=doc.getElementById('science');
+  const tabs=['gravity','blackhole','extreme','entropy','matter','science'];
+  const target=doc.getElementById(id);
   if(tabs.includes(id)){
    close(false);activate(doc.querySelector('[data-tab="'+id+'"]'));focusVisible(doc.querySelector('[data-tab="'+id+'"]'));return true;
   }
+  if(id==='temperature'&&target){close(false);activate(doc.querySelector('[data-tab="extreme"]'));return focusVisible(target)}
   if(id.startsWith('guide-')&&target&&glossary.contains(target)){
    close(false);sourceTab=doc.querySelector?.('[data-tab].active');origin=sourceTab??glossary.querySelector?.(':scope > summary');kind='term';coldTerm=true;previousHash=sourceTab?'#'+sourceTab.dataset.tab:'';glossary.open=true;back.hidden=!origin;label();focusVisible(target);return true;
   }
-  if(id.startsWith('model-')&&target&&science?.contains(target)){
-   for(let p=target.parentElement;p&&p!==science;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
-   close(false);activate(doc.querySelector('[data-tab="science"]'));sourceTab=doc.querySelector('[data-tab="science"]');origin=sourceTab;kind='model';previousHash='#science';const slot=doc.getElementById('knowledgeReturnSlot');if(slot)slot.append(back);back.hidden=!origin;label();focusVisible(target);return true;
+  const destination=target&&id.startsWith('model-')&&modelDestination(target);
+  if(destination){
+   for(let p=target.parentElement;p&&p!==doc.getElementById(destination);p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
+   close(false);
+   sourceTab=doc.querySelector('[data-tab="'+destination+'"]');activate(sourceTab);
+   origin=sourceTab;kind='model';previousHash='#'+destination;modelSlot(destination)?.append(back);
+   back.hidden=!origin;label();focusVisible(target);return true;
   }
   return false;
  }

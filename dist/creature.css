@@ -5,9 +5,6 @@
 .creature img{display:block;flex:0 0 88px;width:88px;height:88px;object-fit:contain;background:#000;border-radius:8px;transform-origin:50% 75%}
 .creature figcaption{min-width:0;max-width:38ch;color:#c9bccf;font:400 .8rem/1.55 system-ui,sans-serif;overflow-wrap:anywhere}
 .creature-fiction{display:block;color:#e4a6b0;font-size:.72rem;margin-bottom:.2rem}
-.creature-peek img{animation:creature-peek 1.8s ease-out 1}.creature-react img{animation:creature-react 1.6s ease-in-out 1}
-@keyframes creature-peek{0%{transform:translateY(5px) rotate(-2deg)}65%{transform:translateY(-2px) rotate(1deg)}100%{transform:none}}
-@keyframes creature-react{0%,100%{transform:none}35%{transform:translateY(-2px) rotate(-3deg)}65%{transform:translateX(1px) rotate(1deg)}}
 .creature-preferences{position:relative;font:400 .85rem/1.5 system-ui,sans-serif;letter-spacing:normal;min-width:0}
 .creature-preferences>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:9px 12px;border:1px solid #665575;border-radius:6px;background:#1c1827;color:#e0cff4;list-style:none}
 .creature-preferences>summary::-webkit-details-marker{display:none}.creature-preferences[open]>summary{border-color:#c99bb3}
@@ -16,3 +13,67 @@
 .creature-preferences summary:focus-visible,.creature-preferences select:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
 @media(max-width:600px){.header-tools{gap:6px;flex-wrap:wrap;position:relative}.creature-preferences{position:static;margin-left:auto}.creature-preferences>summary{padding:9px 10px;font-size:.8rem}.creature-dock{min-height:84px;margin:.2rem 0 .7rem}.creature{gap:10px}.creature img{flex-basis:64px;width:64px;height:64px}.creature figcaption{font-size:.75rem}.creature-fiction{font-size:.68rem}}
 @media(prefers-reduced-motion:reduce){.creature img{animation:none!important;transform:none!important}}
+
+/* The seven clipped pieces reuse the approved 512 px hero. No extra atlas or render loop. */
+.creature-dock {min-height:114px}
+.null-art {width:108px;height:108px;flex:0 0 108px;position:relative;overflow:hidden;background:#050407;border-radius:9px;isolation:isolate}
+.null-art img {width:100%;height:100%}
+.null-rig,.null-layer {position:absolute;inset:0;pointer-events:none}
+.null-rig {display:none;transform-origin:50% 76%}
+.null-layer {background:url("assets/creature-candidates/hero.webp") center / 100% 100% no-repeat}
+.null-ring {clip-path:polygon(16% 17%,36% 6%,76% 4%,78% 16%,64% 25%,64% 17%,70% 12%,43% 15%,34% 21%,24% 29%,31% 28%,28% 34%,17% 33%)}
+.null-body {clip-path:polygon(22% 30%,46% 36%,54% 43%,62% 39%,65% 44%,60% 51%,64% 57%,57% 67%,57% 89%,40% 99%,34% 81%,40% 69%,36% 62%,40% 51%,22% 55%)}
+.null-left {clip-path:polygon(35% 46%,43% 50%,38% 61%,33% 71%,39% 82%,17% 84%,17% 63%,27% 56%);transform-origin:38% 50%}
+.null-right {clip-path:polygon(59% 48%,65% 30%,83% 31%,83% 53%,71% 63%,64% 59%);transform-origin:62% 48%}
+.null-head {clip-path:polygon(34% 12%,62% 12%,65% 26%,73% 26%,73% 32%,62% 33%,58% 42%,48% 43%,40% 35%);transform-origin:52% 37%}
+.null-blink {position:absolute;inset:30% 38% auto 45%;height:7%;background:#050407;clip-path:polygon(0 0,44% 50%,100% 0,100% 100%,45% 72%,0 100%);opacity:0}
+.null-fragment-top {clip-path:inset(25% 24% 70% 30%)}
+.null-fragment-mid {clip-path:inset(36% 20% 59% 24%)}
+.null-fragment-low {clip-path:inset(55% 28% 41% 17%)}
+.null-fragment-top,.null-fragment-mid,.null-fragment-low {opacity:0}
+.creature[data-moving=true] .null-art img {visibility:hidden}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-rig {display:block;animation:null-observer 1.9s cubic-bezier(.3,.55,.33,1) both}
+.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) .null-rig {animation-name:null-rift;animation-duration:1.65s}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-head {animation:null-look 1.9s ease-in-out both}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-blink {animation:null-blink 1.9s linear both}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-left {animation:null-reach 1.9s ease-in-out both}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-right {animation:null-wave 1.9s ease-in-out both}
+.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-ring {animation:null-ring 1.9s ease-in-out both}
+.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) :is(.null-head,.null-left,.null-right,.null-ring) {animation-duration:1.65s}
+.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) :is(.null-fragment-top,.null-fragment-mid,.null-fragment-low) {animation:null-fracture 1.65s ease-out both}
+.null-fragment-top {--offset:-18%}.null-fragment-mid {--offset:15%}.null-fragment-low {--offset:-9%}
+.null-previews {display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.null-previews button {min-height:38px;font-size:.78rem;white-space:normal}
+@keyframes null-observer {
+ 0% {transform:translate(-62%,18%) rotate(-13deg) scale(.83);opacity:0}
+ 23% {transform:translate(-10%,5%) rotate(-8deg) scale(.95);opacity:1}
+ 47%,67% {transform:translate(0,0) rotate(0) scale(1);opacity:1}
+ 83% {transform:translate(-11%,3%) rotate(-5deg);opacity:1}
+ 100% {transform:translate(-65%,14%) rotate(-14deg) scale(.85);opacity:0}
+}
+@keyframes null-rift {
+ 0% {transform:translate(17%,20%) skewX(-12deg) scale(.65,.88);opacity:0}
+ 22% {transform:translate(2%,6%) skewX(3deg) scale(.94,1.05);opacity:1}
+ 40%,70% {transform:translate(0,0) skewX(0) scale(1);opacity:1}
+ 100% {transform:translate(21%,12%) skewX(10deg) scale(.77,.92);opacity:0}
+}
+@keyframes null-look {0%,100%{transform:rotate(-3deg)}35%{transform:translate(-2%,2%) rotate(-10deg)}53%,73%{transform:translate(3%,-2%) rotate(7deg)}}
+@keyframes null-blink {0%,43%,55%,100%{opacity:0;transform:translateY(-18%)}49%{opacity:1;transform:translateY(18%)}}
+@keyframes null-reach {0%,100%{transform:none}31%{transform:rotate(14deg)}55%{transform:rotate(-10deg) translateY(-1.8%)}}
+@keyframes null-wave {0%,100%{transform:none}38%{transform:rotate(12deg)}58%{transform:rotate(-20deg) translateY(-3.5%)}76%{transform:rotate(-7deg)}}
+@keyframes null-ring {0%,100%{transform:none}48%{transform:translateY(-4%) rotate(7deg)}}
+@keyframes null-fracture {
+ 0%,100%{transform:translateX(var(--offset));opacity:0}
+ 16%{transform:translateX(var(--offset));opacity:.68}
+ 30%,76%{transform:none;opacity:0}
+ 90%{transform:translateX(var(--offset));opacity:.55}
+}
+@media(max-width:600px) {
+ .creature-dock {min-height:88px}
+ .null-art {width:82px;height:82px;flex-basis:82px}
+}
+@media(prefers-reduced-motion:reduce) {
+ .creature .null-rig,.creature .null-layer,.creature .null-blink {animation:none!important}
+ .creature .null-rig {display:none!important}
+ .creature .null-art img {visibility:visible!important}
+}

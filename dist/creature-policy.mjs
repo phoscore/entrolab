@@ -1,6 +1,6 @@
 // Decorative policy only. No physical state, random source or scheduler.
 export const CREATURE_MODES=Object.freeze(['subtle','still','off']);
-export const CREATURE_CONTEXTS=Object.freeze(['gravity','blackhole','objects','temperature','markers','thermal','science','guide']);
+export const CREATURE_CONTEXTS=Object.freeze(['gravity','blackhole','objects','temperature','markers','thermal','matter','science','guide']);
 export const REACTION_COOLDOWN=60000;
 export function validMode(value){return CREATURE_MODES.includes(value)}
 export function creaturePolicy({mode='subtle',reduced=false,hidden=false,seen=true,editing=false,focus=false}={}){
@@ -18,9 +18,9 @@ export function createCreatureMachine(clock=()=>globalThis.performance.now()){
   if(!visible)phase='hidden';else if(changed||phase==='hidden'||!moving)phase='idle';
   return inspect();
  }
- function react(initial=false){
+ function react(initial=false,manual=false){
   const now=clock();if(!Number.isFinite(now))throw new RangeError('Finite monotonic time required');
-  if(!moving||(lastReaction!==null&&now-lastReaction<REACTION_COOLDOWN))return false;
+  if(!moving||(!manual&&lastReaction!==null&&now-lastReaction<REACTION_COOLDOWN))return false;
   lastReaction=now;reactions++;phase=initial?'peek':'react';return true;
  }
  function finish(){phase=visible?'idle':'hidden'}

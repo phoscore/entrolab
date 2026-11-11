@@ -36,7 +36,7 @@ test('v0.8 assets: approved creature integration retains the original and existi
  const approval=JSON.parse(bytes('docs/v0.8/assets/creature-approval.json'));
  assert.equal(approval.userReply,'approved!');assert.equal(approval.sourceSha256,manifest.sourceSha256);
  for(const a of manifest.assets)assert.equal(approval.assets[a.id],a.sha256);
- assert.match(html,/<title>entrolab - emptiness pro max<\/title>/);
+ assert.match(html,/<title>Reincarnated as a Proton<\/title>/);
  assert.match(html,/rel="icon"[^>]+favicon.svg/);
  assert.match(review,/SICHTFREIGABE ERTEILT/);
  assert.match(review,/kein transparenter Freisteller/);

@@ -1,3 +1,4 @@
+import {routeLegacyTour} from './legacy-tour-fixture.mjs';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
@@ -17,11 +18,12 @@ export async function browserHarness(){
  await new Promise(done=>server.listen(0,'127.0.0.1',done));const url='http://127.0.0.1:'+server.address().port;
  const browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});
  async function ready(p){await p.waitForFunction(()=>window.entrolabKnowledge&&window.entrolabEntropy&&window.entrolabThermal&&window.entrolab&&document.getElementById('checkRunStatus')?.dataset.run==='1');await p.evaluate(()=>document.fonts.ready)}
- async function lab(options={}){
+ async function lab({legacyTour=false,...options}={}){
   const context=await browser.newContext({locale:'de-DE',viewport:{width:1360,height:1000},reducedMotion:'reduce',...options});
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,r=>r.abort());
   await context.addInitScript(()=>{const original=Math.random;window.__presentationRngCalls=0;Math.random=(...a)=>{window.__presentationRngCalls++;return original(...a)}});
-  const p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(url);await ready(p);
+  if(legacyTour)await routeLegacyTour(context);
+  const p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(url+(legacyTour?"/?legacyTour=1":""));await ready(p);
   if(!(await p.evaluate(()=>window.entrolab.inspect().paused)))await p.locator('#play').click();
   return {p,context};
  }

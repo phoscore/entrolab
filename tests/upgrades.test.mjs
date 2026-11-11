@@ -48,7 +48,7 @@ test('v085 comparisons: invalid types, empty values, negatives and infinities ne
 test('v085 visualizations: new BH diagram draws bounded finite geometry without evaluating a model',async()=>{
  const {drawLightDiagram}=await import('../dist/blackhole-view.mjs');let paths=0;const x=new Proxy({setTransform(){},beginPath(){paths++}},{get(o,k){return o[k]??((...args)=>{for(const n of args)if(typeof n==='number')assert(Number.isFinite(n),k)})}});
  for(const width of [240,320,390,1024]){const canvas={width:0,height:0,getBoundingClientRect:()=>({width,height:280}),getContext:()=>x};drawLightDiagram(canvas);assert.equal(canvas.width,width);assert.equal(canvas.height,280)}
- assert(paths>0&&paths<100);const source=readFileSync(new URL('../dist/blackhole-view.mjs',import.meta.url),'utf8');assert(source.includes("import {drawObject,fitCanvas}"));assert(!/Math\.random|blackHole\(|setInterval|setTimeout/.test(source));
+ assert(paths>0&&paths<100);const source=readFileSync(new URL('../dist/blackhole-view.mjs',import.meta.url),'utf8');assert(source.includes("createAccretionRenderer"));assert(!source.includes("extreme-render.mjs"));assert(!/Math\.random|blackHole\(|setInterval|setTimeout/.test(source));
 });
 
 const {articles,sources,models,terms}=await import('../dist/knowledge.mjs');

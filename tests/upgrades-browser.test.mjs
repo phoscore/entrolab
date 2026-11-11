@@ -5,7 +5,7 @@ import {resolve} from 'node:path';
 import {browserHarness,physical} from './v08-browser-harness.mjs';
 let h;before(async()=>{h=await browserHarness()});after(async()=>{if(h){await writeFile(resolve(h.output,'v085-browser.json'),JSON.stringify({measurements:h.measurements,errors:h.errors},null,2));await h.close()}});
 async function begin(p,id,quick=false){await p.locator('#helpToggle').click();await p.locator('#discovery-'+(quick?'quick':'deep')).selectOption(id);await p.locator('#discoveryStart-'+(quick?'quick':'deep')).click()}
-test('v085 discovery: chooser and seven skippable paths preserve physical state and RNG',async()=>{const {p,context}=await h.lab();try{
+test('v085 discovery: chooser and seven skippable paths preserve physical state and RNG',async()=>{const {p,context}=await h.lab({legacyTour:true});try{
  const before=await physical(p);await p.locator('#helpToggle').click();assert(await p.locator('#discoveryChooser').isVisible());
  for(const id of ['gravity','blackhole','objects','temperature','markers','thermal','science']){
   await p.locator('#discovery-deep').selectOption(id);await p.locator('#discoveryStart-deep').click();
@@ -14,14 +14,14 @@ test('v085 discovery: chooser and seven skippable paths preserve physical state 
  }
  assert.deepEqual(await physical(p),before);await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'helpToggle');assert.equal(await p.locator('.discovery-highlight').count(),0);
 }finally{await context.close()}});
-test('v085 discovery: a genuine BH change is observed; resume, language and manual skip preserve drafts',async()=>{const {p,context}=await h.lab();try{
+test('v085 discovery: a genuine BH change is observed; resume, language and manual skip preserve drafts',async()=>{const {p,context}=await h.lab({legacyTour:true});try{
  await begin(p,'blackhole',true);await p.locator('#discoveryLocate').click();await p.keyboard.press('Enter');await p.locator('#discoveryNext').click();assert.equal(await p.locator('#discoveryNext').isEnabled(),false);
  const before=await physical(p);await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'bhMass');await p.locator('#bhMass').fill('2e30');await p.locator('#bhMass').press('Tab');assert(await p.locator('#discoveryNext').isEnabled());
  await p.locator('#helpClose').click();await p.locator('#helpToggle').click();assert.equal(await p.locator('#quickStart').getAttribute('data-step'),'1');await p.locator('[data-language=en]').click();assert.match(await p.locator('#discoveryProgress').textContent(),/Step 2 of 3/);assert.deepEqual(await physical(p),before);
  await p.locator('#discoverySkip').click();await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'why-blackhole-summary');await p.locator('#discoveryNext').click();assert(!(await p.locator('#quickStart').isVisible()));
 }finally{await context.close()}});
 test('v085 discovery: 320/390px, Reduced Motion, keyboard and repeated navigation have bounded UI',async()=>{
- for(const width of [320,390]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
+ for(const width of [320,390]){const {p,context}=await h.lab({legacyTour:true,viewport:{width,height:900}});try{
   await begin(p,'temperature');for(let i=0;i<100;i++){await p.locator('[data-tab=extreme]').press('Enter');await p.locator('[data-tab=blackhole]').press('Enter')}
   await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'extreme');await p.keyboard.press('Enter');await p.locator('#discoverySkip').click();await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'kelvinInput');
   const r=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,highlights:document.querySelectorAll('.discovery-highlight').length,animations:document.getAnimations().filter(a=>a.playState==='running').length}));assert(r.scroll<=width+1,JSON.stringify(r));assert(r.highlights<=1);assert.equal(r.animations,0);h.measurements.push({tour:width,...r});
@@ -81,7 +81,7 @@ test('v085 bounded lifecycle: 100 BH/context dispose-remount cycles retain liste
 
 test('v085 QCD: collapsed article, deep link, DE/EN and logical return preserve model snapshots',async()=>{const {p,context}=await h.lab();try{
  const before=await physical(p);await p.locator('[data-tab=science]').click();assert.equal(await p.locator('.knowledge-article').evaluate(e=>e.open),false);await p.locator('#article-index-proton').click();assert(await p.locator('#model-proton').isVisible());assert.equal(await p.evaluate(()=>document.activeElement.id),'model-proton');assert.match(await p.locator('#model-proton').textContent(),/ungelöst/);await p.locator('[data-language=en]').click();assert.match(await p.locator('#model-proton').textContent(),/without additional quark fields/);assert.match(await p.locator('#model-proton').textContent(),/not a separate substance/);await p.locator('#model-proton').focus();await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'article-index-proton');assert.deepEqual(await physical(p),before);
- await p.goto(h.url+'/?cold-qcd=1#model-proton');await h.ready(p);assert(await p.locator('#model-proton').isVisible());assert.equal(await p.evaluate(()=>document.activeElement.id),'model-proton');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');h.measurements.push({qcdSources:await p.locator('#model-proton [data-source]').count()});
+ await p.goto(h.url+'/?cold-qcd=1#model-proton');await h.ready(p);assert(await p.locator('#model-proton').isVisible());assert.equal(await p.evaluate(()=>document.activeElement.id),'model-proton');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'matter');h.measurements.push({qcdSources:await p.locator('#model-proton [data-source]').count()});
 }finally{await context.close()}});
 test('v085 integration: all five views and six existing questions stay narrow and retain translations, one monster and model state',async()=>{
  for(const width of [320,390,1360]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
@@ -91,7 +91,7 @@ test('v085 integration: all five views and six existing questions stay narrow an
  }finally{await context.close()}}
 });
 
-test('v085 discovery: rejected empty/negative-underflow temperature never completes a real-action step',async()=>{const {p,context}=await h.lab();try{
+test('v085 discovery: rejected empty/negative-underflow temperature never completes a real-action step',async()=>{const {p,context}=await h.lab({legacyTour:true});try{
  await begin(p,'temperature');await p.locator('#discoveryLocate').click();await p.keyboard.press('Enter');await p.locator('#discoveryNext').click();const before=await p.evaluate(()=>window.entrolabTemperature.read());
  for(const raw of ['','-0','-1e-324','1000000000001']){await p.locator('#kelvinInput').fill(raw);assert.equal(await p.locator('#discoveryNext').isEnabled(),false,raw);assert.equal(await p.evaluate(()=>window.entrolabTemperature.read()),before)}
  await p.locator('#kelvinInput').fill('320');assert(await p.locator('#discoveryNext').isEnabled());await p.locator('#discoveryNext').click();await p.locator('#discoveryLocate').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'why-temperature-summary');
@@ -165,7 +165,7 @@ test('v085 audit temperature: all eight presets explain their selection in DE/EN
 
 test('v085 audit science: keyboard expansion of a different model and a glossary link both fulfill the promised action',async()=>{
  for(const lang of ['de','en']){
-  const {p,context}=await h.lab();try{
+  const {p,context}=await h.lab({legacyTour:true});try{
    await p.locator('[data-language='+lang+']').click();const before=await physical(p);
    await begin(p,'science');await p.locator('[data-tab=science]').press('Enter');await p.locator('#discoveryNext').click();
    const next=p.locator('#discoveryNext'),chapter=p.locator('#model-blackhole details > summary');

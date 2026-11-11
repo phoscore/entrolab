@@ -133,7 +133,7 @@ test('v0.8 browser: narrow/fractional DPR knowledge and deep links have no overf
 
 test('v0.8 browser: candidate images decode at recorded sizes on 320/390px and do not change active branding',async()=>{
  for(const width of [320,390]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
-  assert.equal(await p.title(),'entrolab - emptiness pro max');
+  assert.equal(await p.title(),'Reincarnated as a Proton');
   await p.goto(h.url+'/asset-review.html');await p.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth));
   const result=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,images:[...document.querySelectorAll('.comparison img')].map(i=>({w:i.naturalWidth,h:i.naturalHeight}))}));
   assert.deepEqual(result.images.map(i=>i.w),[1536,512,256,128]);assert(result.scroll<=result.width+1);

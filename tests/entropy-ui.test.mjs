@@ -41,5 +41,5 @@ test('context guide: opens existing glossary, focuses the term and returns to or
 });
 test('v0.6 messages: dynamic keys, attributes and placeholder interpolation cover both languages',()=>{
  for(const file of ['entropy-ui.mjs','guide.mjs']){const text=readFileSync(new URL('../dist/'+file,import.meta.url),'utf8');for(const [,key]of text.matchAll(/\bt\('([^'\n]+)'/g)){assert(Object.hasOwn(de,key),key);assert(Object.hasOwn(en,key),key)}}assert.deepEqual([...missingKeys],[]);
- const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert.match(html,/<title>entrolab - emptiness pro max<\/title>/);assert.match(html,/rel="icon"[^>]+favicon.svg/);assert.match(html,/id="checkRunStatus" role="status" aria-live="polite"/);assert.match(html,/id="entropyStatus" role="status" aria-live="polite"/);
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert.match(html,/<title>Reincarnated as a Proton<\/title>/);assert.match(html,/rel="icon"[^>]+favicon.svg/);assert.match(html,/id="checkRunStatus" role="status" aria-live="polite"/);assert.match(html,/id="entropyStatus" role="status" aria-live="polite"/);
 });

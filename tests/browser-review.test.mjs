@@ -49,7 +49,7 @@ test('browser P2: drafts, focus, validity and model survive DE/EN plus subsequen
   for(const [id,value] of Object.entries(drafts))await page.locator('#'+id).fill(value);
   for(const lang of ['en','de','en']){await page.locator('[data-language='+lang+']').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'velY');for(const [id,value] of Object.entries(drafts))assert.equal(await page.locator('#'+id).inputValue(),value);assert.deepEqual(await state(page),before)}
   await page.locator('#mass').fill('');await page.locator('#editForm button[type=submit]').click();assert(await page.locator('#editError').textContent());
-  await page.locator('#velX').focus();await page.locator('[data-language=de]').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'velX');await page.locator('#helpToggle').focus();await frames(page,40);
+  await page.locator('#velX').focus();await page.locator('[data-language=de]').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'velX');await page.locator('.brand').focus();await frames(page,40);
   assert.equal(await page.locator('#mass').inputValue(),'');assert.equal(await page.locator('#velY').inputValue(),drafts.velY);assert.match(await page.locator('#editError').textContent(),/Endliche/);assert.equal(await page.locator('#mass').evaluate(el=>el.validity.valueMissing),true);assert.deepEqual(await state(page),before);
  }finally{await context.close()}
 });
