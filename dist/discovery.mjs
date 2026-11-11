@@ -44,7 +44,7 @@ for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',()=>{i
 const observe=e=>{
  if(box.hidden||menu)return;
  const s=current();if(route==='thermal'&&!quick&&step===3&&e.type==='input'&&e.target.matches('#thermalA,#thermalB'))edited=true;
- if(s.event===e.type){const matching=s.event.startsWith('thermal-')?s.event!=='thermal-applied'||edited:e.target.closest?.(s.target);if(matching&&e.target.checkValidity?.()!==false){done=true}}
+ if(s.event===e.type){const matching=s.event.startsWith('thermal-')?s.event!=='thermal-applied'||edited:e.target.closest?.(s.target);if(matching&&e.target.checkValidity?.()!==false&&!(route==='temperature'&&($('temperatureError').textContent||e.target.value.trim()===''))){done=true}}
  render();
 };
 for(const event of ['input','change','click','thermal-stepped','thermal-applied'])document.addEventListener(event,observe);

@@ -2,10 +2,10 @@
 export const REFERENCE_PRESSURE_PA=101325;
 const freeze=o=>{for(const v of Object.values(o))if(v&&typeof v==='object')freeze(v);return Object.freeze(o)};
 export const MATERIALS=freeze({
- water:{formula:'H₂O',melt:273.15,boil:373.15,meltBand:.05,boilBand:.05,window:[250,400],sources:['phase-changes']},
- ethanol:{formula:'C₂H₅OH',melt:159,boil:351.5,meltBand:2,boilBand:.2,window:[140,375],sources:['nist-ethanol','pdg-ethanol']},
- aluminium:{formula:'Al',melt:933.473,boil:2792,meltBand:.0005,boilBand:.5,window:[273.15,2850],sources:['rsc-aluminium']},
- iron:{formula:'Fe',melt:1811,boil:3134,meltBand:.5,boilBand:.5,window:[273.15,3200],sources:['rsc-iron']}
+ water:{formula:'H₂O',melt:273.15,boil:373.15,meltDigits:2,boilDigits:2,meltBand:.05,boilBand:.05,window:[250,400],sources:['phase-changes']},
+ ethanol:{formula:'C₂H₅OH',melt:159,boil:351.5,meltDigits:0,boilDigits:1,meltBand:2,boilBand:.2,window:[140,375],sources:['nist-ethanol','pdg-ethanol']},
+ aluminium:{formula:'Al',melt:933.473,boil:2792,meltDigits:3,boilDigits:0,meltBand:.0005,boilBand:.5,window:[273.15,2850],sources:['rsc-aluminium']},
+ iron:{formula:'Fe',melt:1811,boil:3134,meltDigits:0,boilDigits:0,meltBand:.5,boilBand:.5,window:[273.15,3200],sources:['rsc-iron']}
 });
 export function validTemperature(k){return typeof k==='number'&&Number.isFinite(k)&&k>=0&&!Object.is(k,-0)&&k<=1e12}
 export function materialPhase(id,k){
