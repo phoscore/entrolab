@@ -59,7 +59,7 @@ Canvas 2D mit Caches für statische Szenenteile blieb nach dem Vergleich zweier 
 
 Automatische Chrome-Prüfungen und Softwaremessungen ersetzen keine Prüfung auf physischem Smartphone, Safari/Firefox, Screenreader-Hardware oder auf Mobil-GPUs. Die 4×-CPU-Emulation erfasst weder GPU, Energieverbrauch noch thermische Drosselung. Der rohe Transfer neu geladener Module und die exakte dekodierte Speicherbelegung wurden nicht mit Netzwerk-/GPU-Profilen gemessen. Ein Browserfall erfasst nach 100 Gas-Mounts/Disposes Listener und Zustandsisolation. Das deckt keine langfristige GPU-Speichermessung ab. Die alte Gravity-Platzierung per Zeigegerät behält ihren bekannten Tastaturmangel. Der Cosmic Explorer bleibt ein separates v0.9.5-Vorhaben.
 
-Der ältere v0.8-Browserprobe-Workflow suchte nach der durch Gas-A/B ersetzten Teilchenfläche. Die Probe verwendet ab v0.9 die neue Bühne, protokolliert den Canvas-Selektor und kennzeichnet die unterschiedlichen Szenen. Die Laufzeiten dieses historischen Stufenvergleichs gelten nicht als direkte Gas-Leistungsverbesserung. Die zwölf numerischen Referenzläufe sind davon unabhängig.
+Der ältere v0.8-Browservergleich lief zusätzlich erfolgreich mit der bisherigen Extreme-Objects-Bühne und pausierter Gravity Sandbox. Er verwendet weiterhin denselben Canvas-Selektor. Die auf Extreme Temperature bezogene Änderung betrifft die getrennte Teilchenanzeige. Die zwölf numerischen Referenzläufe werden separat geprüft.
 
 ## Vorschau und Produktionsnachweis
 
