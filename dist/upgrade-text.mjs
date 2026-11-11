@@ -104,7 +104,7 @@ export const upgradeDE={
   "v85.qcd.gap.text": "Das Millennium-Problem verlangt eine mathematisch strenge Konstruktion einer nichttrivialen reinen Quanten-Yang–Mills-Theorie in vier Raumzeitdimensionen für jede kompakte einfache Eichgruppe sowie eine positive Energielücke Δ über dem Vakuum. Rein bedeutet hier ohne zusätzliche Quarkfelder. Die Masselücke ist kein Prozentanteil der Protonenmasse. QCD mit leichten Quarks ist nicht identisch mit dieser reinen Theorie.",
   "v85.qcd.status": "Stand der Quellenprüfung: 11.11.2026. Clay führt das Problem als ungelöst. Experimentell bestimmte Protonenmassen und erfolgreiche numerische QCD-Ergebnisse sind davon zu unterscheiden; sie warten nicht auf diesen mathematischen Beweis. Ein Konfinement- oder Massenmodell in einer Skizze löst das Problem nicht.",
   "v85.qcd.limit": "Wissensartikel · kein QCD-Solver und keine numerisch berechnete Feldkonfiguration. Die Grafik ist rein schematisch. Physikalische Hadronmassen und das mathematische Yang–Mills-Problem werden getrennt behandelt.",
-  "v85.version": "v0.8.5 · Entwicklung"
+  "v85.version": "v0.8.5"
 };
 export const upgradeEN={
   "v85.tour.title": "First steps · your pace",
@@ -211,5 +211,5 @@ export const upgradeEN={
   "v85.qcd.gap.text": "The Millennium problem asks for a mathematically rigorous construction of a nontrivial pure quantum Yang–Mills theory in four spacetime dimensions for every compact simple gauge group, with a positive energy gap Δ above the vacuum. Pure here means without additional quark fields. The mass gap is not a percentage of proton mass. QCD with light quarks is not identical to this pure theory.",
   "v85.qcd.status": "Source check: 11 November 2026. Clay lists the problem as unsolved. Experimentally determined proton masses and successful numerical QCD results are separate; they do not await that mathematical proof. A confinement or mass diagram does not solve the problem.",
   "v85.qcd.limit": "Knowledge article · no QCD solver or numerically calculated field configuration. The graphic is purely schematic. Physical hadron masses and the mathematical Yang–Mills problem are treated separately.",
-  "v85.version": "v0.8.5 · development"
+  "v85.version": "v0.8.5"
 };
