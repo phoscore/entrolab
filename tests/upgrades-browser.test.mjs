@@ -76,7 +76,7 @@ test('v085 material and comparison: 320/390px keyboard, 50 language switches and
 test('v085 bounded lifecycle: 100 BH/context dispose-remount cycles retain listeners, buffers and physical state',async()=>{const {p,context}=await h.lab();try{
  await bh(p);const before=await physical(p),cdp=await context.newCDPSession(p);await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.collectGarbage');const start=await cdp.send('Memory.getDOMCounters');
  await p.evaluate(async()=>{const {initBlackHoleView}=await import('/blackhole-view.mjs'),{initTemperatureContext}=await import('/temperature-context.mjs');for(let i=0;i<100;i++){initBlackHoleView().dispose();initBlackHoleView();initTemperatureContext().dispose();initTemperatureContext()} });
- await cdp.send('HeapProfiler.collectGarbage');const end=await cdp.send('Memory.getDOMCounters');assert(end.jsEventListeners<=start.jsEventListeners+2,JSON.stringify({start,end}));assert(end.nodes<=start.nodes+5,JSON.stringify({start,end}));assert.deepEqual(await physical(p),before);assert.equal(await p.evaluate(()=>window.entrolabTemperature.inspect().subscriptions),1);assert.equal(await p.locator('#bhIllustration').count(),1);h.measurements.push({lifecycle:{start,end}});
+ await cdp.send('HeapProfiler.collectGarbage');const end=await cdp.send('Memory.getDOMCounters');assert(end.jsEventListeners<=start.jsEventListeners+2,JSON.stringify({start,end}));assert(end.nodes<=start.nodes+5,JSON.stringify({start,end}));assert.deepEqual(await physical(p),before);assert.equal(await p.evaluate(()=>window.entrolabTemperature.inspect().subscriptions),2);assert.equal(await p.locator('#bhIllustration').count(),1);h.measurements.push({lifecycle:{start,end}});
 }finally{await context.close()}});
 
 test('v085 QCD: collapsed article, deep link, DE/EN and logical return preserve model snapshots',async()=>{const {p,context}=await h.lab();try{
@@ -107,7 +107,7 @@ test('v085 materials: displayed temperature resolves aluminium band and both wat
  }
 }finally{await context.close()}});
 
-test('v085 review screenshots: desktop material comparison and compact chooser in DE/EN',async()=>{const {p,context}=await h.lab({viewport:{width:1440,height:1000}});try{
+test('v085 review screenshots: desktop material comparison and compact chooser in DE/EN',async()=>{const {p,context}=await h.lab({legacyTour:true,viewport:{width:1440,height:1000}});try{
  await temperature(p);await p.locator('#kelvinInput').fill('293.15');await p.locator('#materialSecond').check();for(const lang of ['de','en']){await p.locator('[data-language='+lang+']').click();await p.locator('#materialExplorer').screenshot({path:resolve(h.output,`v085-materials-desktop-${lang}.png`)});await p.locator('#materialA').focus();await p.keyboard.press('Shift+Tab');await p.screenshot({path:resolve(h.output,`v085-materials-viewport-${lang}.png`)});}
  await p.locator('#helpToggle').click();await p.locator('#discoveryChooser').screenshot({path:resolve(h.output,'v085-discovery-chooser-en.png')});
 }finally{await context.close()}});
@@ -171,7 +171,7 @@ test('v085 audit science: keyboard expansion of a different model and a glossary
    const next=p.locator('#discoveryNext'),chapter=p.locator('#model-blackhole details > summary');
    assert.match(await p.locator('#discoveryText').textContent(),lang==='de'?/Begriffslink/:/term link/);
    await p.locator('#discoveryLocate').click();assert.equal(await next.isEnabled(),false);
-   await p.locator('.knowledge-article > summary').press('Enter');assert.equal(await next.isEnabled(),false);
+   await p.locator('#article-index-proton').press('Enter');assert.equal(await next.isEnabled(),false);await p.keyboard.press('Escape');
    await chapter.press('Enter');assert.equal(await next.isEnabled(),true);
    assert.equal(await chapter.evaluate(e=>e===document.activeElement),true);
    await p.locator('#discoveryBack').click();await next.click();assert.equal(await next.isEnabled(),false);

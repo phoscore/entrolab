@@ -140,9 +140,12 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: node scripts/measure-v09-browser.mjs
+      - run: node scripts/verify-v09-production.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: v09-performance
-          path: browser-results/v09-performance.json
+          path: |
+            browser-results/v09-performance.json
+            browser-results/v09-production.json
           if-no-files-found: error

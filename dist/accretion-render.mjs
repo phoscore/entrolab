@@ -108,11 +108,12 @@ function movingTexture(x, cx, cy, r, q, time) {
 
 export function createAccretionRenderer(canvas, {cached = true} = {}) {
  const owner = canvas.ownerDocument;
- let back = null, front = null, previous;
+ let back = null, front = null, previous, cacheAvailable = cached;
  function layer(target, w, h, width, height, draw) {
   if (!target) target = owner.createElement('canvas');
   target.width = w; target.height = h;
   const ctx = target.getContext('2d');
+  if(!ctx)return null;
   ctx.setTransform(w / width, 0, 0, h / height, 0, 0);
   draw(ctx);
   return target;
@@ -125,13 +126,16 @@ export function createAccretionRenderer(canvas, {cached = true} = {}) {
    const r = Math.min(w*.135, h*.244), q = .075 + .82 * Math.sin(angle * Math.PI / 180);
    const drawBack = x => backdrop(x,w,h,cx,cy,r,disk,q);
    const drawFront = x => foreground(x,cx,cy,r,disk,q);
-   if (cached) {
+   if (cacheAvailable) {
     const key = [w,h,canvas.width,canvas.height,disk,disk && angle].join('|');
     if (key !== previous) {
      back = layer(back,canvas.width,canvas.height,w,h,drawBack);
      front = layer(front,canvas.width,canvas.height,w,h,drawFront);
-     previous = key;
+     cacheAvailable = Boolean(back && front);
+     previous = cacheAvailable ? key : undefined;
     }
+   }
+   if(cacheAvailable && previous) {
     ctx.drawImage(back,0,0,w,h); ctx.drawImage(front,0,0,w,h);
    } else {
     drawBack(ctx); drawFront(ctx);

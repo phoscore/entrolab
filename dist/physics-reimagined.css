@@ -60,7 +60,16 @@ header nav .tab {white-space:normal;min-width:0}
 .matter-station details,.gas-lab details {border-top:1px solid var(--lab-border);padding-top:.55rem;margin-top:.7rem}
 .qcd-figure {margin:.55rem 0;max-width:420px}
 .qcd-figure svg {max-height:220px;width:100%;display:block;background:#0a1020;border-radius:8px}
-#materialExplorer .material-card {border-color:var(--lab-border)}
+#materialExplorer .material-cards {gap:.65rem}
+#materialExplorer .material-cards > article {border-color:var(--lab-border);background:#111928;padding:.75rem}
+#materialExplorer .material-cards > article h3 {margin:0;font-size:1.04rem}
+#materialExplorer .material-cards > article p {margin:.42rem 0}
+#materialExplorer .material-symbols {height:64px}
+.material-choices {display:flex;align-items:center;flex-wrap:wrap;gap:.55rem .9rem;margin:.65rem 0}
+.material-choices .check,.material-choices .upgrade-controls {margin:0}
+.material-choices select {min-height:44px;margin:0}
+#materialBLabel[hidden] {display:none}
+.lab-jump {display:inline-block;margin:0 0 .65rem .5rem}
 @media(max-width:760px) {
  header nav .tab {flex:1 1 auto}
  .station-grid {grid-template-columns:minmax(0,1fr)}
@@ -75,3 +84,6 @@ header nav .tab {white-space:normal;min-width:0}
  .experiment-controls label:is(.gas-a,.gas-b) {flex:1 1 38%;max-width:none}
  .readout-list {grid-template-columns:minmax(0,1.05fr) minmax(0,1.45fr)}
 }
+#bhStill[data-view=light] [data-still-view=environment],
+#bhStill[data-view=environment] [data-still-view=light],
+#bhStill[data-disk=false] [data-still-disk] {display:none}

@@ -1088,4 +1088,3 @@ export const en=Object.freeze({
   "Ändere eine Anfangstemperatur und bestätige „Übernehmen“. Erst dieser Klick setzt das Experiment neu. Erkunde danach ⓘ oder Advanced nach Wunsch.": "Change one initial temperature and confirm Apply. Only that click resets the experiment. Then explore ⓘ or Advanced if you wish.",
   "Selbst ausprobieren": "Explore on your own"
 });
-

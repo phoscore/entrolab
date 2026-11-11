@@ -70,7 +70,7 @@ export function initGuide(doc=globalThis.document){
  });
  for(const tab of doc.querySelectorAll('[data-tab]'))listen(tab,'click',()=>{
   close(false);
-  if(!routing&&win?.location.hash&&/^(#model-|#guide-|#science$)/.test(win.location.hash))changeHash('#'+tab.dataset.tab,true);
+  if(!routing&&win?.location.hash&&/^(#model-|#guide-|#(?:gravity|blackhole|extreme|entropy|matter|science|temperature)$)/.test(win.location.hash))changeHash('#'+tab.dataset.tab,true);
  },true);
  listen(glossary,'toggle',()=>{if(kind==='term'&&!glossary.open)close(false)});
  listen(back,'click',()=>close());

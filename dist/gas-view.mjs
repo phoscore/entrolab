@@ -4,7 +4,7 @@ import {prepareLabCanvas} from './lab-canvas.mjs';
 
 const instances = new WeakMap();
 const colours = ['#82e2ed', '#c7a8ff'];
-const binCount = 22;
+const binCount = 30;
 const sampleCount = 160;
 const timeScale = 0.0004;
 
@@ -44,7 +44,7 @@ export function initGasView(doc = globalThis.document) {
  const temperatures = [150, 600], invalid = [false, false];
  let statistics = temperatures.map(gasStatistics), seed = 9047, sample = gasSample(seed, sampleCount);
  let paused = motion.matches, seen = false, raf = null, last = null, time = 0, tempo = 1, frames = 0, frameMs = 0;
- let disposed = false, canvasAvailable = true, surface, paintKey = '';
+ let disposed = false, canvasAvailable = true, surface, paintKey = '', boxLabels;
 
  const number = (value, digits = 0) => new Intl.NumberFormat(locale(), {maximumFractionDigits: digits}).format(value);
  const put = (id, value) => { if ($(id).textContent !== value) $(id).textContent = value; };
@@ -59,7 +59,9 @@ export function initGasView(doc = globalThis.document) {
  }
  function labels() {
   if (motion.matches) paused = true;
-  $('gasPause').disabled = motion.matches || !canvasAvailable;
+  const pause=$('gasPause'), disabling=motion.matches || !canvasAvailable;
+  if(disabling && doc.activeElement===pause)fields[0].focus({preventScroll:true});
+  pause.disabled=disabling;
   put('gasPause', t(motion.matches ? 'v09.motionReduced' : paused ? 'v09.resume' : 'v09.pause'));
   const error = t('v09.gas.invalid');
   fields.forEach((field, i) => {
@@ -70,9 +72,10 @@ export function initGasView(doc = globalThis.document) {
   bridge();
  }
  function chart() {
+  boxLabels=temperatures.map((value,i)=>(i?'B':'A')+' · '+number(value,2)+' K');
   const max = Math.ceil(Math.max(...statistics.map(s => s.sigma)) * 4.7 / 100) * 100;
   const samples = statistics.map(s => gasHistogram(sample, s.sigma, max, binCount));
-  const xs = Array.from({length: 91}, (_, i) => i * max / 90);
+  const xs = Array.from({length: 151}, (_, i) => i * max / 150);
   const curves = statistics.map(s => xs.map(x => maxwellDensity(x, s.sigma)));
   const peak = Math.max(...curves.flat(), ...samples.flatMap(s => s.density)) * 1.08;
   const sx = v => 24 + 477 * v / max, sy = v => 148 - 134 * v / peak;
@@ -125,7 +128,7 @@ export function initGasView(doc = globalThis.document) {
    x.fillStyle = i ? '#15132a' : '#0d222d'; x.fillRect(left, top, side, side);
    x.strokeStyle = i ? '#65558b' : '#346477'; x.strokeRect(left, top, side, side);
    x.fillStyle = colours[i]; x.font = '600 12px system-ui';
-   x.fillText((i ? 'B' : 'A') + ' · ' + number(temperatures[i], 2) + ' K', left + 3, top - 7);
+   x.fillText(boxLabels[i], left + 3, top - 7);
    x.beginPath();
    const displacement = statistics[i].sigma * time;
    for (const particle of sample) {

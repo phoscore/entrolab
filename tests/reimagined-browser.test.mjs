@@ -17,6 +17,7 @@ test('v0.9 navigation: product title, retired tour, Matter order and cold temper
   assert.deepEqual(await p.locator('[data-tab]').evaluateAll(els=>els.map(e=>e.dataset.tab)),['gravity','blackhole','extreme','entropy','matter','science']);
   await p.goto(h.url+'/?v09temp=1#temperature');await h.ready(p);
   assert.equal(await p.locator('#extreme').evaluate(e=>e.classList.contains('active')),true);
+  assert.equal(await p.locator('#temperature .lab-jump').count(),0);await select(p,'matter');assert.equal(await p.evaluate(()=>location.hash),'#matter');
   await p.goto(h.url+'/?v09qcd=1#model-proton');await h.ready(p);
   assert.equal(await p.locator('#matter').evaluate(e=>e.classList.contains('active')),true);
   await p.locator('#qcdFields').press('Enter');assert.match(await p.locator('.qcd-figure figcaption').textContent(),/starke Wechselwirkung/);
@@ -47,8 +48,9 @@ test('v0.9 gas: 3D ratio, valid/invalid drafts, sample, resize and motion owners
   await p.waitForFunction(()=>window.entrolabGas.inspect().scheduled);
   await select(p,'matter');assert.equal((await inspect(p,'entrolabGas')).scheduled,false);
   await select(p,'extreme');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
-  await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>!window.entrolabGas.inspect().scheduled);
-  assert.equal(await p.locator('#gasPause').isDisabled(),true);
+  await p.locator('#gasPause').focus();
+  await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>!window.entrolabGas.inspect().scheduled&&document.getElementById('gasPause').disabled);
+  assert.equal(await p.locator('#gasPause').isDisabled(),true);assert.equal(await p.evaluate(()=>document.activeElement.id),'gasA');
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });
@@ -133,5 +135,54 @@ test('v0.9 Black Hole: an actual moving 2.5D scene can be sampled without touchi
   }
   assert.deepEqual(await p.locator('#bhRadius,#bhTemp,#bhPower,#bhLife').allTextContents(),before);
   assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('v0.9 paused Gravity stays idle, redraws once after camera input and resumes',async()=>{
+ const {p,context}=await h.lab();try{
+  const state=()=>p.evaluate(()=>window.entrolab.renderInfo());
+  await p.locator('#universe').scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
+  const base=await state();await p.waitForTimeout(170);assert.deepEqual(await state(),base);
+  await p.locator('#zoomIn').click();await p.waitForFunction(n=>window.entrolab.renderInfo().frame>n,base.frame);
+  const changed=await state();await p.waitForTimeout(170);assert.deepEqual(await state(),changed);
+  await p.locator('#play').click();await p.waitForFunction(n=>window.entrolab.renderInfo().frame>n+2,changed.frame);
+ }finally{await context.close()}
+});
+
+test('v0.9 fallback has an actual visible SVG and calculators stay available when its canvas cannot start',async()=>{
+ const context=await h.browser.newContext({viewport:{width:390,height:900},reducedMotion:'reduce'});
+ try{
+  await context.addInitScript(()=>{
+   const original=HTMLCanvasElement.prototype.getContext;
+   HTMLCanvasElement.prototype.getContext=function(...args){return this.id==='bhIllustration'?null:original.apply(this,args)};
+  });
+  const p=await context.newPage();await p.goto(h.url);await h.ready(p);await select(p,'blackhole');
+  await p.locator('#bhIllustration').scrollIntoViewIfNeeded();
+  await p.locator('#bhStill').waitFor({state:'visible'});
+  assert(await p.locator('#bhRadius').isVisible());
+  assert.equal((await inspect(p,'entrolabBlackHoleView')).scheduled,false);
+  await p.locator('#bhView').selectOption('light');
+  assert.equal(await p.locator('#bhStill').getAttribute('data-view'),'light');
+ }finally{await context.close()}
+});
+
+test('v0.9 gas lifecycle: 100 mounts release observers, pending frames and subscriptions',async()=>{
+ const {p,context}=await h.lab();try{
+  await select(p,'extreme');const before=await physical(p);
+  const cdp=await context.newCDPSession(p);
+  await cdp.send('HeapProfiler.collectGarbage');const a=await cdp.send('Memory.getDOMCounters');
+  await p.evaluate(async()=>{
+   const {initGasView}=await import('/gas-view.mjs');
+   for(let i=0;i<100;i++){
+    const controller=initGasView();if(controller!==initGasView())throw Error('Duplicate gas controller');
+    controller.dispose();controller.dispose();
+    if(controller.inspect().scheduled||window.entrolabTemperature.inspect().subscriptions!==1)throw Error('Gas teardown retained a callback');
+    initGasView();
+   }
+  });
+  await cdp.send('HeapProfiler.collectGarbage');const b=await cdp.send('Memory.getDOMCounters');
+  assert(b.jsEventListeners<=a.jsEventListeners+2,JSON.stringify({a,b}));
+  assert.equal(await p.locator('#gasCanvas').count(),1);assert.deepEqual(await physical(p),before);
  }finally{await context.close()}
 });

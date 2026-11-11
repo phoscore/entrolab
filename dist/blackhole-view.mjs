@@ -46,7 +46,9 @@ export function initBlackHoleView(doc=globalThis.document){
   const start=performance.now();
   const dpr=Math.min(win.devicePixelRatio||1,1.25);
   available=view==='environment'?artwork.draw(state,time,dpr):drawLightDiagram(canvas,$('bhLightImpact').value,dpr);
-  $('bhStill').hidden=available;
+  $('bhStill').toggleAttribute('hidden',available);
+  $('bhStill').dataset.view=view;
+  $('bhStill').dataset.disk=String(disk);
   if(!available){$('bhViewPause').disabled=true;sync();return}
   painted=image;cost=performance.now()-start;frames++;
  }
