@@ -53,6 +53,9 @@ Bisheriger Science-Bereich, Glossar und Kontextlinks sollen **eine konsistente W
 
 ## V0.8.5 – Geführte Benutzung und visuelle Labor-Upgrades
 
+**Aktualisierung 11.11.2026:** v0.8 ist mit PR #7 als `25e72c639d66677c1629886141e3671a4c696ef6` nach `main` gemergt. Der neue Nutzerauftrag gibt 05–08 und den QCD-Artikel zur Implementierung auf `feature/v0.8.5-lab-upgrades` frei. Historische Aussagen unten über fehlende Work-Freigabe beschreiben den alten Planungsstand und werden durch diesen Auftrag ersetzt. Merge, Deployment, neue öffentliche Previews und eine eigenständige Brandingaktivierung bleiben gesperrt. Technischer Vertrag und Nachweise: [v0.8.5-Qualitätsbericht](../Qualitaetsupdate_v0.8.5.md).
+
+
 ### 05 – „Erste Schritte 3.0“ und freiwillige Lernpfade
 **Status: [inhaltlich vom Nutzer freigegeben (09.11.2026)](05-erste-schritte-3.0.md); keine Work-/Merge-/Deployment-Freigabe.** Aus der vierstufigen Entropy-Tour eine kurze, optionale, verständliche Orientierung mit gezielten Minibeispielen auch für Gravity/BH/Extreme/Entropy/Science. Wahlmöglichkeit „schnell“ vs. „etwas mehr verstehen“ statt riesigem Pflicht-Tutorial. Realistische Lernziele, keine ungebetenen Parameteränderungen. Bewahren: Fokus, DE/EN, Escape, Reduced Motion, Simulatorzustände.
 
