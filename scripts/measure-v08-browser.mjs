@@ -47,7 +47,12 @@ try{
    // Normalize drawing pixels in the measurement fixture only: the native
    // responsive grid legitimately grows with its sidebar content.
    await page.addStyleTag({content:'#universe{width:704px!important;height:600px!important;min-height:600px!important;max-height:600px!important;flex:0 0 600px!important}'});
-   const canvas=scene==='gravity-paused'?'#universe':'#extremeCanvas';if(scene==='extreme-visible')await page.locator('[data-tab=extreme]').click();await page.locator(canvas).evaluate(e=>e.scrollIntoView({block:'center',behavior:'auto'}));
+   let canvas='#universe';
+   if(scene==='extreme-visible'){
+    await page.locator('[data-tab=extreme]').click();
+    canvas=await page.locator('#extremeCanvas').count()?'#extremeCanvas':'#gasCanvas';
+   }
+   await page.locator(canvas).evaluate(e=>e.scrollIntoView({block:'center',behavior:'auto'}));
    await page.evaluate(()=>new Promise(done=>{let n=0;function tick(){if(++n===180)done();else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
    const cdp=await context.newCDPSession(page);await cdp.send('Performance.enable');await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.collectGarbage');
    const traceStart=await beginTrace(cdp),before=await cdp.send('Performance.getMetrics');
@@ -55,10 +60,10 @@ try{
    const after=await cdp.send('Performance.getMetrics'),get=(r,k)=>r.metrics.find(m=>m.name===k)?.value;
    const cpu=Object.fromEntries(['TaskDuration','ScriptDuration','LayoutDuration','RecalcStyleDuration'].map(k=>[k,get(after,k)-get(before,k)]));
    const paint=await finishTrace(cdp,traceStart),rect=await page.locator(canvas).boundingBox(),dom=await cdp.send('Memory.getDOMCounters');
-   measurements.push({repetition,scene,variant,frames,cpu,paint,rect,dom,errors});console.log(JSON.stringify(measurements.at(-1)));
+   measurements.push({repetition,scene,variant,canvas,frames,cpu,paint,rect,dom,errors});console.log(JSON.stringify(measurements.at(-1)));
    if(errors.length)throw Error('Page errors: '+errors.join('; '));
   }finally{await context.close()}
  }
- const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),viewport:[1360,1000],dpr:1,font:'system fallback; Google fonts blocked',drawingFixture:'Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change',durationPerSampleSeconds:30,repetitions:2,warmupFrames:180,paintTrace:'CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported',scope:'same GitHub runner/browser, paused gravity and visible existing BH animation; two order-reversed pairs, not a mobile-hardware or universal 10% guarantee',measurements};
+ const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),viewport:[1360,1000],dpr:1,font:'system fallback; Google fonts blocked',drawingFixture:'Gravity 704×600 CSS px on both; Extreme uses the previous canvas or the v0.9 gas stage as recorded in canvas; test-only sizing',durationPerSampleSeconds:30,repetitions:2,warmupFrames:180,paintTrace:'CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported',scope:'same GitHub runner/browser, paused Gravity and visible Extreme stages; different canvas selectors identify different scenes; two order-reversed pairs, not a mobile-hardware or universal 10% guarantee',measurements};
  await writeFile(join(output,'v08-performance.json'),JSON.stringify(report,null,2));
 }finally{await browser?.close();if(server)await new Promise(done=>server.close(done));await rm(scratch,{recursive:true,force:true})}
