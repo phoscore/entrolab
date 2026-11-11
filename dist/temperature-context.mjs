@@ -1,6 +1,6 @@
 import './extreme-ui.mjs';
 const readTemperature=()=>globalThis.entrolabTemperature.read();
-import {MATERIALS,materialPhase,compareTemperatures,scalePosition,validTemperature} from './material-data.mjs';
+import {MATERIALS,materialPhase,compareTemperatures,scalePosition,parseComparisonTemperature} from './material-data.mjs';
 import {sources} from './knowledge.mjs';
 import {t,onLanguageChange,locale} from './i18n.mjs';
 import {scientific,number} from './display.mjs';
@@ -25,7 +25,7 @@ export function initTemperatureContext(doc=globalThis.document){
   const scale=$('temperatureComparisonScale');scale.replaceChildren();scale.append(svgEl('path',{d:'M20 30H380',stroke:'#776a8d','stroke-width':2}));for(const [value,label,y]of [[a,'A',18],[b,'B',57]]){const pos=scalePosition(value),x=20+pos.fraction*360;scale.append(svgEl('circle',{cx:x,cy:30,r:label==='A'?5:3,fill:label==='A'?'#c6afea':'#f1ca92'}));const text=svgEl('text',{x:Math.max(25,Math.min(370,x)),y,fill:label==='A'?'#c6afea':'#f1ca92','text-anchor':'middle'});text.textContent=label+(pos.zero?' · 0 K':pos.below?' < 10⁻³ K':'');scale.append(text)}
   card($('materialA').value,$('materialCardA'),a);$('materialCardB').hidden=!$('materialSecond').checked;$('materialBLabel').hidden=!$('materialSecond').checked;if($('materialSecond').checked)card($('materialB').value,$('materialCardB'),a);
  }
- function edit(){const raw=$('comparisonKelvinB').value,k=Number(raw);invalid=raw.trim()===''||!validTemperature(k);if(!invalid)b=k;render()}
+ function edit(){try{b=parseComparisonTemperature($('comparisonKelvinB').value);invalid=false}catch{invalid=true}render()}
  listen($('comparisonKelvinB'),'input',edit);listen($('comparisonKelvinB'),'change',edit);
  listen($('temperaturePin'),'click',()=>{b=readTemperature();$('comparisonKelvinB').value=String(b);invalid=false;render()});
  listen($('temperatureReferenceB'),'change',()=>{b=Number($('temperatureReferenceB').value);$('comparisonKelvinB').value=String(b);invalid=false;render()});

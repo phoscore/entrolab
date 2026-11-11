@@ -24,3 +24,10 @@ export function compareTemperatures(a,b){
  return {delta,ratio:{mantissa:10**(exponentReal-exponent),exponent}};
 }
 export function scalePosition(k){if(!validTemperature(k))throw new RangeError('Invalid temperature');return k<.001?{fraction:0,below:true,zero:k===0}:{fraction:(Math.log10(k)+3)/15,below:false,zero:false}}
+// Reject decimal drafts that would silently underflow to zero. No input clamping.
+export function parseComparisonTemperature(raw){
+ if(typeof raw!=='string'||!/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[-+]?\d+)?$/i.test(raw.trim()))throw new RangeError('Invalid temperature draft');
+ const k=Number(raw),mantissa=raw.trim().split(/[eE]/)[0];
+ if(!validTemperature(k)||(k===0&&/[1-9]/.test(mantissa)))throw new RangeError('Unrepresentable temperature draft');
+ return k;
+}

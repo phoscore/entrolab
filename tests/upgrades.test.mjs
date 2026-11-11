@@ -67,3 +67,10 @@ test('v085 new temperature labels: precision distinguishes both sides of the nar
  const {comparisonNumber}=await import('../dist/temperature-format.mjs'),{setLanguage}=await import('../dist/i18n.mjs');
  for(const language of ['de','en']){setLanguage(language);const values=[933.472,933.473,933.474,273.15,273.201].map(comparisonNumber);assert.equal(new Set(values).size,5);assert.equal(values[1],language==='de'?'933,473':'933.473');for(const k of [Number.MIN_VALUE,0,1e-300,1e12])assert(!/Infinity|NaN/.test(comparisonNumber(k)))}setLanguage('de');
 });
+
+
+test('v085 comparison drafts: positive underflow is rejected instead of silently becoming zero',async()=>{
+ const {parseComparisonTemperature}=await import('../dist/material-data.mjs');
+ for(const raw of ['',null,[],true,'NaN','Infinity','0x10','1,2','-0','-1e-324','1e-324','2e-324','1e-9999','1000000000001'])assert.throws(()=>parseComparisonTemperature(raw),RangeError,String(raw));
+ for(const [raw,value]of [['0',0],['0e-9999',0],['.001',.001],['1e-300',1e-300],['5e-324',Number.MIN_VALUE],['1e12',1e12]])assert.equal(parseComparisonTemperature(raw),value);
+});
