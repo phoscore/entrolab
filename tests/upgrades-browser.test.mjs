@@ -111,3 +111,97 @@ test('v085 review screenshots: desktop material comparison and compact chooser i
  await temperature(p);await p.locator('#kelvinInput').fill('293.15');await p.locator('#materialSecond').check();for(const lang of ['de','en']){await p.locator('[data-language='+lang+']').click();await p.locator('#materialExplorer').screenshot({path:resolve(h.output,`v085-materials-desktop-${lang}.png`)});await p.locator('#materialA').focus();await p.keyboard.press('Shift+Tab');await p.screenshot({path:resolve(h.output,`v085-materials-viewport-${lang}.png`)});}
  await p.locator('#helpToggle').click();await p.locator('#discoveryChooser').screenshot({path:resolve(h.output,'v085-discovery-chooser-en.png')});
 }finally{await context.close()}});
+
+test('v085 audit BH: disk-off freezes frames until real visual changes and resumes exactly one animation',async()=>{
+ for(const width of [1360,320,390]){
+  const {p,context}=await h.lab({viewport:{width,height:900},reducedMotion:'no-preference'});try{
+   const inspect=()=>p.evaluate(()=>window.entrolabBlackHoleView.inspect());
+   const visible=async()=>{await p.locator('#bhIllustration').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabBlackHoleView.inspect().seen)};
+   await bh(p);const values=await metrics(p),before=await physical(p);
+   await p.locator('.bh-illustration details > summary').click();
+   const disk=p.locator('#bhViewDisk'),angle=p.locator('#bhViewAngle');
+   await disk.uncheck();await visible();const staticView=await inspect();
+   assert.equal(staticView.disk,false);assert.equal(staticView.scheduled,false);
+   await angle.fill('40');await visible();await p.waitForTimeout(300);
+   const idle=await inspect();assert.equal(idle.frames,staticView.frames);assert.equal(idle.time,staticView.time);assert.equal(idle.angle,40);
+   await p.locator('[data-language=en]').click();await visible();
+   assert.equal((await inspect()).frames,idle.frames+1);
+   const translated=await inspect();
+   await p.setViewportSize({width:width===1360?1120:width+10,height:900});
+   await visible();await p.waitForFunction(n=>window.entrolabBlackHoleView.inspect().frames>n,translated.frames);
+   await disk.check();await visible();await p.waitForFunction(()=>window.entrolabBlackHoleView.inspect().scheduled);
+   const resumed=await inspect();await p.waitForFunction(n=>window.entrolabBlackHoleView.inspect().frames>=n+4,resumed.frames);
+   await p.locator('#bhViewPause').click();await disk.uncheck();await disk.check();await visible();
+   const paused=await inspect();assert.equal(paused.scheduled,false);assert.equal(paused.paused,true);
+   await p.locator('#bhView').selectOption('light');await visible();assert.equal((await inspect()).scheduled,false);
+   await p.locator('#bhView').selectOption('environment');await p.locator('#bhViewPause').click();await visible();await p.waitForFunction(()=>window.entrolabBlackHoleView.inspect().scheduled);
+   await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>window.entrolabBlackHoleView.inspect().paused&&!window.entrolabBlackHoleView.inspect().scheduled);
+   await p.locator('[data-language=de]').click();assert.deepEqual(await metrics(p),values);assert.deepEqual(await physical(p),before);
+  }finally{await context.close()}
+ }
+});
+
+test('v085 audit temperature: all eight presets explain their selection in DE/EN and manual input stays generic',async()=>{
+ for(const [width,lang]of [[320,'de'],[390,'en']]){
+  const {p,context}=await h.lab({viewport:{width,height:900}});try{
+   await p.locator('[data-tab=extreme]').click();await p.locator('[data-language='+lang+']').click();
+   const before=await physical(p),meaning=p.locator('#temperatureContextMeaning'),texts=new Set();
+   for(const [preset,de,en]of [['0',/Absoluter Nullpunkt/,/Absolute zero/],['.001',/1 mK/,/1 mK/],['.1',/Zehntel Kelvin/,/one tenth of a kelvin/],['2.725',/Mikrowellenhintergrundstrahlung/,/microwave background/],['293.15',/20 °C/,/20 °C/],['5900',/5772 K/,/5772 K/],['1e9',/Plasma/,/plasma/],['1e12',/nur für diese Laborskala/,/lab scale only/]]){
+    await p.locator('[data-kelvin="'+preset+'"]').press('Enter');const text=await meaning.textContent();
+    assert.match(text,lang==='de'?de:en);texts.add(text);
+   }
+   assert.equal(texts.size,8);
+   await p.locator('[data-kelvin="2.725"]').click();const original=await meaning.textContent();
+   await p.locator('#kelvinInput').fill('-1');assert.equal(await meaning.textContent(),original);
+   const other=lang==='de'?'en':'de';await p.locator('[data-language='+other+']').click();
+   assert.match(await meaning.textContent(),other==='de'?/Mikrowellenhintergrundstrahlung/:/microwave background/);
+   await p.locator('#kelvinInput').fill('2.725');assert.match(await meaning.textContent(),other==='de'?/Gewählter Vergleichswert/:/Selected comparison value/);
+   await p.locator('[data-kelvin="5900"]').click();await p.locator('#celsiusInput').fill('20');assert.match(await meaning.textContent(),other==='de'?/Gewählter Vergleichswert/:/Selected comparison value/);
+   await p.locator('[data-kelvin="5900"]').click();await p.locator('#temperatureSlider').press('ArrowLeft');assert.match(await meaning.textContent(),other==='de'?/Gewählter Vergleichswert/:/Selected comparison value/);
+   assert((await p.evaluate(()=>document.documentElement.scrollWidth))<=width+1);assert.deepEqual(await physical(p),before);
+  }finally{await context.close()}
+ }
+});
+
+test('v085 audit science: keyboard expansion of a different model and a glossary link both fulfill the promised action',async()=>{
+ for(const lang of ['de','en']){
+  const {p,context}=await h.lab();try{
+   await p.locator('[data-language='+lang+']').click();const before=await physical(p);
+   await begin(p,'science');await p.locator('[data-tab=science]').press('Enter');await p.locator('#discoveryNext').click();
+   const next=p.locator('#discoveryNext'),chapter=p.locator('#model-blackhole details > summary');
+   assert.match(await p.locator('#discoveryText').textContent(),lang==='de'?/Begriffslink/:/term link/);
+   await p.locator('#discoveryLocate').click();assert.equal(await next.isEnabled(),false);
+   await p.locator('.knowledge-article > summary').press('Enter');assert.equal(await next.isEnabled(),false);
+   await chapter.press('Enter');assert.equal(await next.isEnabled(),true);
+   assert.equal(await chapter.evaluate(e=>e===document.activeElement),true);
+   await p.locator('#discoveryBack').click();await next.click();assert.equal(await next.isEnabled(),false);
+   await chapter.press('Enter');assert.equal(await next.isEnabled(),false);
+   await chapter.press('Enter');await p.locator('#discoveryBack').click();await next.click();
+   const link=p.locator('#model-blackhole .knowledge-term-links a').first(),id=await link.getAttribute('data-explain');
+   assert.equal(await next.isEnabled(),false);await link.press('Enter');assert.equal(await next.isEnabled(),true);
+   assert.equal(await p.evaluate(()=>document.activeElement.id),id);
+   await p.keyboard.press('Escape');assert.equal(await link.evaluate(e=>e===document.activeElement),true);
+   await p.locator('#discoverySkip').click();await p.locator('#helpClose').click();
+   assert.equal(await p.evaluate(()=>document.activeElement.id),'helpToggle');
+   assert.deepEqual(await physical(p),before);
+  }finally{await context.close()}
+ }
+});
+
+test('v085 audit material: identical rounded labels with different phases show a boundary note only when needed',async()=>{
+ const {p,context}=await h.lab({viewport:{width:390,height:900}});try{
+  await temperature(p);const input=p.locator('#kelvinInput'),card=p.locator('#materialCardA');
+  for(const lang of ['de','en']){
+   await p.locator('[data-language='+lang+']').click();
+   await input.fill('273.2000000000002');const first=await card.locator('.hint').first().textContent();
+   assert.equal(await card.getAttribute('data-phase'),'melting');assert.equal(await card.locator('.material-rounding').count(),0);
+   await input.fill('273.2000000000003');
+   assert.equal(await card.locator('.hint').first().textContent(),first);assert.equal(await card.getAttribute('data-phase'),'liquid');
+   assert.match(await card.locator('.material-rounding').textContent(),lang==='de'?/vor der Anzeigerundung/:/before display rounding/);
+   assert.equal(await input.inputValue(),'273.2000000000003');
+   await input.fill('5e-324');assert.equal(await card.getAttribute('data-phase'),'outside');
+   await input.fill('1e12');assert.equal(await card.getAttribute('data-phase'),'outside');
+   assert.equal(await card.locator('.material-rounding').count(),0);
+  }
+ }finally{await context.close()}
+});

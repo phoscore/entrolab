@@ -1,6 +1,6 @@
 // Reuse the existing artwork kernel, never its private Extreme Objects state.
 import {drawObject,fitCanvas} from './extreme-render.mjs';
-import {t,onLanguageChange} from './i18n.mjs';
+import {t,language,onLanguageChange} from './i18n.mjs';
 const instances=new WeakMap();
 export function drawLightDiagram(canvas){
  const f=fitCanvas(canvas,'low');if(!f)return;const {ctx:x,w,h}=f,cx=w/2,cy=h/2,R=Math.min(w*.13,h*.22);
@@ -20,11 +20,21 @@ export function initBlackHoleView(doc=globalThis.document){
  if(instances.has(doc))return instances.get(doc);const root=doc.getElementById('blackhole'),canvas=doc.getElementById('bhIllustration');if(!root||!canvas)return null;
  const $=id=>doc.getElementById(id),win=doc.defaultView,reduced=win.matchMedia('(prefers-reduced-motion: reduce)'),cleanup=[];
  const state={kind:'blackhole',quality:'low',zoom:1,geometry:false,disk:true,angle:22};
- let paused=reduced.matches,seen=false,raf=null,previous=null,last=0,time=0,frames=0,cost=0,disposed=false;
+ let paused=reduced.matches,seen=false,raf=null,previous=null,last=0,time=0,frames=0,cost=0,disposed=false,painted;
  const listen=(el,event,fn)=>{el.addEventListener(event,fn);cleanup.push(()=>el.removeEventListener(event,fn))};
  const visible=()=>!disposed&&root.classList.contains('active')&&!doc.hidden&&seen;
- const active=()=>visible()&&!paused&&!reduced.matches&&$('bhView').value==='environment';
- function paint(){if(!visible())return;const start=performance.now();if($('bhView').value==='environment')drawObject(canvas,state,time);else drawLightDiagram(canvas);cost=performance.now()-start;frames++}
+ const active=()=>visible()&&!paused&&!reduced.matches&&state.disk&&$('bhView').value==='environment';
+ function paint(){
+  if(!visible())return;
+  const {width,height}=canvas.getBoundingClientRect();
+  if(width<1||height<1)return;
+  const view=$('bhView').value,disk=view==='environment'&&state.disk;
+  const image=[view,width,height,Math.min(win.devicePixelRatio||1,1.25),language(),disk,disk&&state.angle,disk&&time];
+  if(painted&&image.every((value,index)=>value===painted[index]))return;
+  const start=performance.now();
+  if(view==='environment')drawObject(canvas,state,time);else drawLightDiagram(canvas);
+  painted=image;cost=performance.now()-start;frames++;
+ }
  function tick(now){raf=null;
   // Reconcile before the active guard: Chromium can update matches before it
   // delivers a change event after visibility emulation/background transitions.
@@ -33,12 +43,19 @@ export function initBlackHoleView(doc=globalThis.document){
   // Timestamp bins avoid dropping to ~22 fps when 33.3 ms is rounded below 1/30 s.
   const slot=Math.floor(now*30/1000);if(slot!==last){last=slot;paint()}raf=win.requestAnimationFrame(tick)
  }
- function sync(){if(raf!==null){win.cancelAnimationFrame(raf);raf=null}previous=null;if(active())raf=win.requestAnimationFrame(tick)}
+ function sync(){
+  if(active()){
+   if(raf===null)raf=win.requestAnimationFrame(tick);
+  }else{
+   if(raf!==null)win.cancelAnimationFrame(raf);
+   raf=null;previous=null;
+  }
+ }
  function labels(){if(reduced.matches)paused=true;const env=$('bhView').value==='environment',focused=doc.activeElement,needsFocus=focused===$('bhViewPause')&&(reduced.matches||!env)||!env&&(focused===$('bhViewAngle')||focused===$('bhViewDisk'));$('bhViewAngle').disabled=!env;$('bhViewDisk').disabled=!env;$('bhViewPause').disabled=reduced.matches||!env;$('bhViewPause').textContent=t(paused?'v85.bh.play':'v85.bh.pause');$('bhViewMotion').textContent=t(reduced.matches?'v85.bh.reduced':env?'v85.bh.angleNote':'v85.bh.static');$('bhViewMeaning').textContent=t(env?'v85.bh.diskNote':'v85.bh.lightNote');paint();sync();if(needsFocus&&!doc.hidden&&root.classList.contains('active'))$('bhView').focus({preventScroll:true})}
- listen($('bhView'),'change',labels);listen($('bhViewDisk'),'change',()=>{state.disk=$('bhViewDisk').checked;paint()});listen($('bhViewAngle'),'input',()=>{state.angle=Number($('bhViewAngle').value);$('bhAngleValue').textContent=state.angle+'°';paint()});listen($('bhViewPause'),'click',()=>{paused=!paused;labels()});
+ listen($('bhView'),'change',labels);listen($('bhViewDisk'),'change',()=>{state.disk=$('bhViewDisk').checked;sync();paint()});listen($('bhViewAngle'),'input',()=>{state.angle=Number($('bhViewAngle').value);$('bhAngleValue').textContent=state.angle+'°';paint()});listen($('bhViewPause'),'click',()=>{paused=!paused;labels()});
  for(const b of doc.querySelectorAll('[data-tab]'))listen(b,'click',labels);listen(doc,'visibilitychange',labels);listen(reduced,'change',()=>{if(reduced.matches)paused=true;labels()});
  const intersection=new win.IntersectionObserver(entries=>{seen=entries[0].isIntersecting;labels()});intersection.observe(canvas);
- const resize=new win.ResizeObserver(()=>paint());resize.observe(canvas.parentElement);
+ const resize=new win.ResizeObserver(paint);resize.observe(canvas);listen(win,'resize',paint);
  const off=onLanguageChange(labels);labels();
  const controller={inspect:()=>({view:$('bhView').value,angle:state.angle,disk:state.disk,paused,reduced:reduced.matches,seen,scheduled:raf!==null,time,frames,paintMs:cost,backing:[canvas.width,canvas.height],subscriptions:disposed?0:cleanup.length+1,observers:disposed?0:2}),dispose(){if(disposed)return;disposed=true;sync();intersection.disconnect();resize.disconnect();for(const fn of cleanup)fn();off();instances.delete(doc)}};
  instances.set(doc,controller);return controller;

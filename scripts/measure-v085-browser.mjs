@@ -5,7 +5,9 @@ import {tmpdir} from 'node:os';
 import {join,resolve,extname} from 'node:path';
 import {createServer} from 'node:http';
 const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
-const base='25e72c639d66677c1629886141e3671a4c696ef6',scratch=await mkdtemp(join(tmpdir(),'entrolab-v08-perf-'));
+const bhAudit=process.argv.includes('--bh-audit');
+const base=bhAudit?'7b64f0b7d189fb7587814e2136ea23229d424c6a':'25e72c639d66677c1629886141e3671a4c696ef6';
+const scratch=await mkdtemp(join(tmpdir(),'entrolab-v08-perf-'));
 const output=resolve('browser-results');await mkdir(output,{recursive:true});
 let browser,server;
 async function beginTrace(cdp){
@@ -38,7 +40,8 @@ try{
  browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});
  const measurements=[];
  // Two order-reversed samples; existing scenes plus explicit new-work costs.
- const profiles=[{id:'desktop',width:1360,height:1000,rate:1,scenes:['gravity-paused','extreme-visible','bh-environment','bh-light']},{id:'mobile-emulated',width:390,height:844,rate:4,scenes:['extreme-visible','bh-environment']}];
+ const bhScenes=['bh-disk-off','bh-environment'];
+ const profiles=[{id:'desktop',width:1360,height:1000,rate:1,scenes:bhAudit?bhScenes:['gravity-paused','extreme-visible','bh-environment','bh-light']},{id:'mobile-emulated',width:390,height:844,rate:4,scenes:bhAudit?bhScenes:['extreme-visible','bh-environment']}];
  for(const profile of profiles)for(const repetition of [1,2])for(const scene of profile.scenes)for(const variant of repetition===1?['baseline','current']:['current','baseline']){
   const context=await browser.newContext({viewport:{width:profile.width,height:profile.height},deviceScaleFactor:1,locale:'de-DE',reducedMotion:'no-preference'});
   try{
@@ -49,13 +52,43 @@ try{
    // responsive grid legitimately grows with its sidebar content.
    await page.addStyleTag({content:'#universe{width:704px!important;height:600px!important;min-height:600px!important;max-height:600px!important;flex:0 0 600px!important}'});
    const newBH=scene.startsWith('bh-');
-   const canvas=scene==='gravity-paused'?'#universe':newBH?(variant==='current'?'#bhIllustration':'#sizes'):'#extremeCanvas';
+   const illustratedBH=newBH&&(bhAudit||variant==='current');
+   const canvas=scene==='gravity-paused'?'#universe':newBH?(illustratedBH?'#bhIllustration':'#sizes'):'#extremeCanvas';
    if(scene==='extreme-visible')await page.locator('[data-tab=extreme]').click();
-   if(newBH){await page.locator('[data-tab=blackhole]').click();if(variant==='current')await page.locator('#bhView').selectOption(scene==='bh-light'?'light':'environment')}
+   if(newBH){
+    await page.locator('[data-tab=blackhole]').click();
+    if(illustratedBH)await page.locator('#bhView').selectOption(scene==='bh-light'?'light':'environment');
+    if(scene==='bh-disk-off'){
+     await page.locator('.bh-illustration details > summary').click();
+     await page.locator('#bhViewDisk').uncheck();
+    }
+   }
    await page.locator(canvas).evaluate(e=>e.scrollIntoView({block:'center',behavior:'auto'}));
    const cdp=await context.newCDPSession(page);await cdp.send('Emulation.setCPUThrottlingRate',{rate:profile.rate});
    await page.evaluate(()=>new Promise(done=>{let n=0;function tick(){if(++n===180)done();else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
    await cdp.send('Performance.enable');await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.collectGarbage');
+   if(bhAudit){
+    const before=await cdp.send('Performance.getMetrics');
+    // No observer RAF: a static page should be able to stay idle during the sample.
+    const idle=await page.evaluate(async()=>{
+     const tasks=[],observer=new PerformanceObserver(list=>tasks.push(...list.getEntries().map(e=>e.duration)));
+     observer.observe({type:'longtask'});
+     const before=window.entrolabBlackHoleView.inspect(),start=performance.now();
+     await new Promise(done=>setTimeout(done,8000));
+     const duration=performance.now()-start,after=window.entrolabBlackHoleView.inspect();
+     tasks.push(...observer.takeRecords().map(e=>e.duration));observer.disconnect();
+     return {duration,draws:after.frames-before.frames,before,after,longTasks:tasks};
+    });
+    const after=await cdp.send('Performance.getMetrics'),get=(r,k)=>r.metrics.find(m=>m.name===k)?.value;
+    const cpu=Object.fromEntries(['TaskDuration','ScriptDuration','LayoutDuration','RecalcStyleDuration'].map(k=>[k,get(after,k)-get(before,k)]));
+    const rect=await page.locator(canvas).boundingBox();
+    measurements.push({profile:profile.id,cpuThrottle:profile.rate,repetition,scene,variant,idle,cpu,rect,errors});
+    console.log(JSON.stringify(measurements.at(-1)));
+    if(errors.length||!idle.before.seen||!idle.after.seen)throw Error('Invalid BH sample: '+JSON.stringify(measurements.at(-1)));
+    if(variant==='current'&&scene==='bh-disk-off'&&(idle.draws||idle.before.scheduled||idle.after.scheduled))throw Error('Static BH rendered after warm-up');
+    if(scene==='bh-environment'&&(idle.draws<1||!idle.after.scheduled))throw Error('Animated BH did not run');
+    continue;
+   }
    const traceStart=await beginTrace(cdp),before=await cdp.send('Performance.getMetrics');
    const frames=await page.evaluate(()=>new Promise(done=>{const intervals=[],longTasks=[],drawCosts=[];let last,start,seenDraw=-1; const observer=new PerformanceObserver(list=>{for(const e of list.getEntries())longTasks.push(e.duration)});observer.observe({type:'longtask'});function tick(now){if(start===undefined)start=now;if(last!==undefined)intervals.push(now-last);last=now;const view=window.entrolabBlackHoleView?.inspect();if(view&&view.frames!==seenDraw){seenDraw=view.frames;drawCosts.push(view.paintMs)}if(now-start>=30000){observer.disconnect();intervals.sort((a,b)=>a-b);done({duration:now-start,frames:intervals.length,p50:intervals[Math.floor(intervals.length*.5)],p95:intervals[Math.floor(intervals.length*.95)],max:intervals.at(-1),longTasks,drawCosts})}else requestAnimationFrame(tick)}requestAnimationFrame(tick)}));
    const after=await cdp.send('Performance.getMetrics'),get=(r,k)=>r.metrics.find(m=>m.name===k)?.value;
@@ -65,6 +98,14 @@ try{
    if(errors.length)throw Error('Page errors: '+errors.join('; '));
   }finally{await context.close()}
  }
- const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),profiles,dpr:1,font:'system fallback; Google fonts blocked',drawingFixture:'Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change',durationPerSampleSeconds:30,repetitions:2,warmupFrames:180,paintTrace:'CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported',scope:'Same runner/browser; two order-reversed 30s samples. Existing scenes compare released v0.8. New BH scenes compare old static calculator with new illustration, NOT equivalent rendering work. 4x CPU is emulation, not real mobile hardware. No inherited A13 exception or universal 10% guarantee',measurements};
- await writeFile(join(output,'v085-performance.json'),JSON.stringify(report,null,2));
+ const report={base,current:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),browser:browser.version(),profiles,dpr:1,font:'system fallback; Google fonts blocked',durationPerSampleSeconds:bhAudit?8:30,repetitions:2,warmupFrames:180,measurements};
+ Object.assign(report,bhAudit?{
+  drawingFixture:'Same canvas and controls on reviewed and corrected builds; centre-aligned scroll',
+  scope:'Two order-reversed samples on the same runner. CDP Main Thread metrics without tracing or measurement RAF. 4x CPU is emulation.'
+ }:{
+  drawingFixture:'Gravity704x600 CSS px on both; existing Extreme canvas unchanged; centre-aligned scroll; test-only CSS, no production sizing change',
+  paintTrace:'CDP devtools.timeline on both variants; tracing adds measurement overhead; missing traces explicitly reported',
+  scope:'Same runner/browser; two order-reversed 30s samples. Existing scenes compare released v0.8. New BH scenes compare old static calculator with new illustration, NOT equivalent rendering work. 4x CPU is emulation, not real mobile hardware. No inherited A13 exception or universal 10% guarantee'
+ });
+ await writeFile(join(output,bhAudit?'v085-bh-audit-performance.json':'v085-performance.json'),JSON.stringify(report,null,2));
 }finally{await browser?.close();if(server)await new Promise(done=>server.close(done));await rm(scratch,{recursive:true,force:true})}

@@ -1,5 +1,5 @@
 import {t,onLanguageChange} from './i18n.mjs';
-import {pathIds,pathSteps} from './discovery-paths.mjs';
+import {pathIds,pathSteps,scienceActions} from './discovery-paths.mjs';
 const $=id=>document.getElementById(id),box=$('quickStart');
 let route=null,quick=false,step=0,done=false,edited=false,highlight=null,menu=true;
 // Mount once. Changing language updates text, never replaces fields or focus.
@@ -42,10 +42,18 @@ $('discoveryLocate').onclick=()=>{const el=target();if(!el)return;for(let p=el.p
 $('discoveryNext').onclick=()=>{if(done)move(1)};
 $('discoveryRestart').onclick=()=>{if(route)begin(route,quick)};
 for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',()=>{if(id==='helpToggle'&&route)menu=false;render()});
+function scienceAction(e){
+ const chapter=e.target.closest?.(scienceActions.chapter);
+ // Native click opens the disclosure after dispatch. Closing it is not the task.
+ if(visible(chapter))return !e.defaultPrevented&&!chapter.parentElement.open;
+ const term=e.target.closest?.(scienceActions.term);
+ // guide.mjs handles the click first and focuses the actual definition.
+ return visible(term)&&e.defaultPrevented&&$('physicsGuide').open&&document.activeElement===$(term.dataset.explain);
+}
 const observe=e=>{
  if(box.hidden||menu)return;
  const s=current();if(route==='thermal'&&!quick&&step===3&&e.type==='input'&&e.target.matches('#thermalA,#thermalB'))edited=true;
- if(s.event===e.type){const matching=s.event.startsWith('thermal-')?s.event!=='thermal-applied'||edited:e.target.closest?.(s.target);if(matching&&e.target.checkValidity?.()!==false&&!(route==='temperature'&&($('temperatureError').textContent||e.target.value.trim()===''))){done=true}}
+ if(s.event===e.type){const matching=route==='science'?scienceAction(e):s.event.startsWith('thermal-')?s.event!=='thermal-applied'||edited:e.target.closest?.(s.target);if(matching&&e.target.checkValidity?.()!==false&&!(route==='temperature'&&($('temperatureError').textContent||e.target.value.trim()===''))){done=true}}
  render();
 };
 for(const event of ['input','change','click','thermal-stepped','thermal-applied'])document.addEventListener(event,observe);

@@ -109,6 +109,8 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
+      - name: Black-hole audit comparison against reviewed v0.8.5
+        run: node scripts/measure-v085-browser.mjs --bh-audit
       - name: Released v0.8 comparison, new scenes and 4x CPU mobile emulation
         run: node scripts/measure-v085-browser.mjs
       - uses: actions/upload-artifact@v4

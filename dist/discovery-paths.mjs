@@ -1,5 +1,9 @@
 // Presentation-only route definitions; existing controls are observed, never applied.
 const config={gravity:['gravity','#scenario','change'],blackhole:['blackhole','#bhMass','change'],objects:['extreme','#comparisonMode','change'],temperature:['extreme','#kelvinInput','input'],markers:['entropy','#entropyStep','click'],science:['science','#model-gravity summary','click']};
+export const scienceActions=Object.freeze({
+ chapter:'#science .knowledge-model > .knowledge-advanced > summary',
+ term:'#science .knowledge-term-links [data-explain]'
+});
 export const pathIds=Object.freeze(['gravity','blackhole','objects','temperature','markers','thermal','science']);
 export function pathSteps(id,quick=false){
  if(!pathIds.includes(id))throw new RangeError('Unknown discovery path');

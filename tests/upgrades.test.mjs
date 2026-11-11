@@ -74,3 +74,40 @@ test('v085 comparison drafts: positive underflow is rejected instead of silently
  for(const raw of ['',null,[],true,'NaN','Infinity','0x10','1,2','-0','-1e-324','1e-324','2e-324','1e-9999','1000000000001'])assert.throws(()=>parseComparisonTemperature(raw),RangeError,String(raw));
  for(const [raw,value]of [['0',0],['0e-9999',0],['.001',.001],['1e-300',1e-300],['5e-324',Number.MIN_VALUE],['1e12',1e12]])assert.equal(parseComparisonTemperature(raw),value);
 });
+
+test('v085 audit: every unchanged temperature preset has its own bilingual scientific context',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ const values=[...html.matchAll(/data-kelvin="([^"]+)"/g)].map(match=>match[1]);
+ assert.deepEqual(values,['0','.001','.1','2.725','293.15','5900','1e9','1e12']);
+ for(const catalog of [upgradeDE,upgradeEN]){
+  const contexts=values.map(value=>catalog['v85.temp.context.'+value]);
+  assert(contexts.every(Boolean));assert.equal(new Set(contexts).size,8);
+  assert.match(contexts[1],/1 mK/);assert.match(contexts[3],/COBE\/FIRAS/);
+  assert.match(contexts[4],/20 °C/);assert.match(contexts[5],/5772 K/);
+  assert.match(contexts[6],/Plasma|plasma/);assert.match(contexts[7],/10¹² K/);
+ }
+ for(const file of ['index.html','translations.mjs','knowledge-text.mjs']){
+  const active=readFileSync(new URL('../dist/'+file,import.meta.url),'utf8');
+  assert.match(active,/No plot armor\. Just physics\./);
+  assert.doesNotMatch(active,/No magic\.|Kein Zauber\.|Keine Magie\./);
+ }
+});
+
+test('v085 audit: machine-neighbor temperatures can display identically across an unchanged material boundary',async()=>{
+ const {comparisonDisplayValue,comparisonNumber}=await import('../dist/temperature-format.mjs');
+ for(const [id,a,b,phaseA,phaseB,display]of [
+  ['water',273.2000000000002,273.2000000000003,'melting','liquid',273.2],
+  ['water',249.99999999999977,249.9999999999998,'outside','solid',250],
+  ['aluminium',933.4724999999991,933.4724999999992,'solid','melting',933.472499999999]
+ ]){
+  assert.notEqual(a,b);
+  assert.equal(comparisonNumber(a),comparisonNumber(b));
+  assert.equal(comparisonDisplayValue(a),display);assert.equal(comparisonDisplayValue(b),display);
+  assert.equal(materialPhase(id,a),phaseA);assert.equal(materialPhase(id,b),phaseB);
+  assert([phaseA,phaseB].includes(materialPhase(id,display)));
+ }
+ for(const k of [0,Number.MIN_VALUE,1e-300,.001,1e12]){
+  assert.equal(comparisonDisplayValue(k),k);
+  assert.equal(materialPhase('iron',k),'outside');
+ }
+});
