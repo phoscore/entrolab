@@ -26,18 +26,19 @@ function target(){const s=current();if(!s)return null;
  return s.navigation?navigationTarget(s):document.querySelector(s.target);
 }
 function visible(el){return el?.isConnected&&el.getClientRects().length&&!el.disabled}
+const put=(id,value)=>{const el=$(id);if(el.textContent!==value)el.textContent=value};
 function render(){
  highlight?.classList.remove('discovery-highlight');highlight=null;
  chooser.hidden=!menu;for(const id of ['discoveryProgress','discoveryText','discoveryDone','discoveryLocate','discoveryNext','discoveryBack','discoverySkip','discoveryMenu','discoveryRestart'])$(id).hidden=menu;
- title.textContent=t('v85.tour.title');if(menu||box.hidden)return;
+ if(title.textContent!==t('v85.tour.title'))title.textContent=t('v85.tour.title');if(menu||box.hidden)return;
  const list=steps(),s=current();if(s.navigation){const nav=document.querySelector('[data-tab="'+s.navigation+'"]');if(nav?.classList.contains('active')&&(!s.view||$('thermalExperiment').hidden===(s.view!=='thermal')))done=true}
  if(s.reading)done=true;
- $('discoveryProgress').textContent=t('v85.tour.progress',{step:step+1,total:list.length});$('discoveryText').textContent=t(s.text);$('discoveryDone').textContent=t(s.reading?'v85.tour.read':done?'v85.tour.done':'v85.tour.pending');
- $('discoveryNext').disabled=!done;$('discoveryNext').textContent=t(step===list.length-1?'v85.tour.finish':'Weiter');$('discoveryBack').disabled=step===0;
- $('discoveryLocate').textContent=t('v85.tour.locate');highlight=target();if(visible(highlight))highlight.classList.add('discovery-highlight');box.dataset.step=String(step);box.dataset.done=String(done);box.dataset.route=route;
+ put('discoveryProgress',t('v85.tour.progress',{step:step+1,total:list.length}));put('discoveryText',t(s.text));put('discoveryDone',t(s.reading?'v85.tour.read':done?'v85.tour.done':'v85.tour.pending'));
+ $('discoveryNext').disabled=!done;put('discoveryNext',t(step===list.length-1?'v85.tour.finish':'Weiter'));$('discoveryBack').disabled=step===0;
+ put('discoveryLocate',t('v85.tour.locate'));highlight=target();if(visible(highlight))highlight.classList.add('discovery-highlight');box.dataset.step=String(step);box.dataset.done=String(done);box.dataset.route=route;
 }
 function move(delta){if(delta>0&&step===steps().length-1){$('helpClose').click();return}step=Math.max(0,Math.min(steps().length-1,step+delta));done=false;edited=false;render();$('discoveryLocate').focus()}
-$('discoveryLocate').onclick=()=>{const el=target();if(!el)return;for(let p=el.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;if(visible(el)){el.focus();el.scrollIntoView({block:'center',behavior:'auto'})}};
+$('discoveryLocate').onclick=()=>{const el=target();if(!el)return;for(let p=el.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS'&&!(el.tagName==='SUMMARY'&&p===el.parentElement))p.open=true;if(visible(el)){el.focus();el.scrollIntoView({block:'center',behavior:'auto'})}};
 $('discoveryNext').onclick=()=>{if(done)move(1)};
 $('discoveryRestart').onclick=()=>{if(route)begin(route,quick)};
 for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',()=>{if(id==='helpToggle'&&route)menu=false;render()});

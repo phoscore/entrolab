@@ -115,3 +115,33 @@ Korrekte Modelle und dokumentierte Grenzen haben Vorrang. Künstlerische Effekte
 - [NASA/JPL: astronomische Einheit](https://ssd.jpl.nasa.gov/glossary/au.html), [NASA: Sternreste/Pulsare](https://science.nasa.gov/exoplanets/stars/), [NASA: BH-Geometrie](https://science.nasa.gov/universe/black-holes/anatomy/).
 - [NIST: Konstanten](https://physics.nist.gov/cuu/Constants/), [Universität Zürich: Hawking-Strahlung](https://www.physik.uzh.ch/groups/jetzer/notes/PHY529_ART_III.pdf), [JILA: Hawking-Strahlung](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html).
 - Historische Qualitätsberichte: [v0.2](docs/Qualitaetsupdate_v0.2.md), [Review-Abschluss v0.2](docs/Reviewabschluss_v0.2.md), [v0.3](docs/Qualitaetsupdate_v0.3.md), [v0.4](docs/Qualitaetsupdate_v0.4.md), [v0.5](docs/Qualitaetsupdate_v0.5.md), [Codex-Review v0.5](docs/CodexReview_v0.5.md), [v0.6 samt Reviewkorrekturen](docs/Qualitaetsupdate_v0.6.md). Ihre damaligen Testzahlen/Entwicklungsstände sind keine aktuellen Versionsangaben.
+
+
+## v0.8.5 unabhängig ausprobieren (Entwicklungsstand)
+
+Basis: freigegebene v0.8 (`25e72c639d66677c1629886141e3671a4c696ef6`). Neuer Branch: `feature/v0.8.5-lab-upgrades`. Kein Produktionsdeployment; alle Entwicklungskommitte unterdrücken Pages-Builds.
+
+```sh
+git clone --branch feature/v0.8.5-lab-upgrades https://github.com/phoscore/entrolab.git
+cd entrolab
+python -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+Auf Windows gegebenenfalls `py` statt `python`. Im Browser `http://localhost:8000` öffnen. App benötigt weder Paketinstallation noch Build. Source-ZIP aus dem privaten CI-Artefakt `chromium-review-measurements` entpacken und im enthaltenen Projektordner denselben Python-Befehl ausführen; historische Git-Prüfungen benötigen den vollständigen Klon.
+
+- **Erste Schritte:** freiwilligen Schnellstart oder einen der sieben Laborwege wählen. Nur eigene Bedienhandlungen verändern Modelle; Zurück/Überspringen/Schließen jederzeit möglich. Wiederaufnahme während der laufenden Seite.
+- **Black Hole:** vier bestehende Rechenwerte, darunter Umgebung / Licht & Horizont. Blickwinkel unter „Ansicht & Animation“, rein schematisch; Bewegung pausierbar, Reduced Motion statisch.
+- **Extreme Temperature:** neue Kontextkarte; optional zwei Temperaturen vergleichen oder Material Explorer öffnen. Wasser/Ethanol/Aluminium/Eisen beziehen sich auf1atm und begrenzte Tabellenfenster. Keine Kopplung von Materialphasen an den Wärme-Solver.
+- **Modell & Quellen:** freiwilliger Artikel zur Protonenmasse, QCD und dem getrennten mathematischen Yang–Mills-Problem. Direktlink `/#model-proton`.
+
+```sh
+node scripts/test.mjs
+node scripts/check-benchmarks.mjs
+node scripts/verify-original.mjs
+npm ci --ignore-scripts --no-audit --no-fund
+npx playwright install --with-deps chromium
+npm run test:browser
+node scripts/measure-v085-browser.mjs
+```
+
+[Qualitätsbericht mit Quellen, tatsächlich ausgeführten Prüfungen und Grenzen](docs/Qualitaetsupdate_v0.8.5.md). Keine Merge-/Releasefreigabe aus dieser Anleitung ableiten. Originalarchiv und Monster-Master bleiben unverändert.

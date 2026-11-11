@@ -50,3 +50,6 @@ Die Celsiusreferenzen werden aus Kelvin abgeleitet und auf die jeweilige publizi
 
 
 Ein weiterer Zwischenlauf auf89cece fand einen von uns verursachten mobilen Headerüberlauf: der lange Zusatz „development“ im Versionsbadge vergrößerte das nicht umbrechende Markenfeld um10px über320px. Der Badge wird auf die kurze Versionsnummer begrenzt; keine alte Overflow-Assertion wurde gelockert. Die Entwicklungseigenschaft steht in Branch/PR/Qualitätsbericht, nicht als lange Headerdekoration. Alle bisherigen Layoutregressionen werden erneut ausgeführt.
+
+
+Echte Chromium-Lifecycle-Gegenprobe: nach synthetischem Hidden→Visible meldete die MediaQuery bereits `matches=true`, während ihr Change-Callback noch nicht den privaten Pausenstatus gesetzt hatte (Renderer war bereits gestoppt). Der eigene BH-Controller gleicht Reduced Motion jetzt vor dem RAF-Aktivitätsguard ab und synchronisiert Beschriftungen auch bei Sichtbarkeits-/Kontextwechsel. Keine neue Polling-Schleife. Die strenge Regression behält denselben kombinierten Ablauf bei. Die30-fps-Dekorationskadenz verwendet Zeitraster statt eines anfälligen33,333-ms-Schwellwertvergleichs; das betrifft ausschließlich Bildbewegung, keine physikalische Schrittweite/Toleranz.

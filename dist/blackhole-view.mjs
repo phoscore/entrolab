@@ -25,12 +25,19 @@ export function initBlackHoleView(doc=globalThis.document){
  const visible=()=>!disposed&&root.classList.contains('active')&&!doc.hidden&&seen;
  const active=()=>visible()&&!paused&&!reduced.matches&&$('bhView').value==='environment';
  function paint(){if(!visible())return;const start=performance.now();if($('bhView').value==='environment')drawObject(canvas,state,time);else drawLightDiagram(canvas);cost=performance.now()-start;frames++}
- function tick(now){raf=null;if(!active())return;const elapsed=previous===null?0:Math.min(.1,(now-previous)/1000);previous=now;time+=elapsed;if(now-last>=1000/30){last=now;paint()}raf=win.requestAnimationFrame(tick)}
+ function tick(now){raf=null;
+  // Reconcile before the active guard: Chromium can update matches before it
+  // delivers a change event after visibility emulation/background transitions.
+  if(reduced.matches){if(!paused){paused=true;labels()}return}
+  if(!active())return;const elapsed=previous===null?0:Math.min(.1,(now-previous)/1000);previous=now;time+=elapsed;
+  // Timestamp bins avoid dropping to ~22 fps when 33.3 ms is rounded below 1/30 s.
+  const slot=Math.floor(now*30/1000);if(slot!==last){last=slot;paint()}raf=win.requestAnimationFrame(tick)
+ }
  function sync(){if(raf!==null){win.cancelAnimationFrame(raf);raf=null}previous=null;if(active())raf=win.requestAnimationFrame(tick)}
- function labels(){const env=$('bhView').value==='environment';$('bhViewAngle').disabled=!env;$('bhViewDisk').disabled=!env;$('bhViewPause').disabled=reduced.matches||!env;$('bhViewPause').textContent=t(paused?'v85.bh.play':'v85.bh.pause');$('bhViewMotion').textContent=t(reduced.matches?'v85.bh.reduced':env?'v85.bh.angleNote':'v85.bh.static');$('bhViewMeaning').textContent=t(env?'v85.bh.diskNote':'v85.bh.lightNote');paint();sync()}
+ function labels(){if(reduced.matches)paused=true;const env=$('bhView').value==='environment';$('bhViewAngle').disabled=!env;$('bhViewDisk').disabled=!env;$('bhViewPause').disabled=reduced.matches||!env;$('bhViewPause').textContent=t(paused?'v85.bh.play':'v85.bh.pause');$('bhViewMotion').textContent=t(reduced.matches?'v85.bh.reduced':env?'v85.bh.angleNote':'v85.bh.static');$('bhViewMeaning').textContent=t(env?'v85.bh.diskNote':'v85.bh.lightNote');paint();sync()}
  listen($('bhView'),'change',labels);listen($('bhViewDisk'),'change',()=>{state.disk=$('bhViewDisk').checked;paint()});listen($('bhViewAngle'),'input',()=>{state.angle=Number($('bhViewAngle').value);$('bhAngleValue').textContent=state.angle+'°';paint()});listen($('bhViewPause'),'click',()=>{paused=!paused;labels()});
- for(const b of doc.querySelectorAll('[data-tab]'))listen(b,'click',()=>{paint();sync()});listen(doc,'visibilitychange',()=>{paint();sync()});listen(reduced,'change',()=>{if(reduced.matches)paused=true;labels()});
- const intersection=new win.IntersectionObserver(entries=>{seen=entries[0].isIntersecting;paint();sync()});intersection.observe(canvas);
+ for(const b of doc.querySelectorAll('[data-tab]'))listen(b,'click',labels);listen(doc,'visibilitychange',labels);listen(reduced,'change',()=>{if(reduced.matches)paused=true;labels()});
+ const intersection=new win.IntersectionObserver(entries=>{seen=entries[0].isIntersecting;labels()});intersection.observe(canvas);
  const resize=new win.ResizeObserver(()=>paint());resize.observe(canvas.parentElement);
  const off=onLanguageChange(labels);labels();
  const controller={inspect:()=>({view:$('bhView').value,angle:state.angle,disk:state.disk,paused,reduced:reduced.matches,seen,scheduled:raf!==null,time,frames,paintMs:cost,backing:[canvas.width,canvas.height],subscriptions:disposed?0:cleanup.length+1,observers:disposed?0:2}),dispose(){if(disposed)return;disposed=true;sync();intersection.disconnect();resize.disconnect();for(const fn of cleanup)fn();off();instances.delete(doc)}};
