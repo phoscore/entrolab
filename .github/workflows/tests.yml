@@ -75,6 +75,7 @@ jobs:
       - name: Verify existing v0.8 production bytes (read-only)
         run: node scripts/verify-v085-production.mjs
       - name: Compare v0.8 and baseline rendering on the same runner
+        if: github.ref_name != 'feature/v0.8.5-lab-upgrades' && github.head_ref != 'feature/v0.8.5-lab-upgrades'
         run: node scripts/measure-v08-browser.mjs
       - name: Package private downloadable review source
         if: always()
@@ -85,3 +86,28 @@ jobs:
           name: chromium-review-measurements
           path: browser-results/
           if-no-files-found: ignore
+
+  v085-performance:
+    name: v0.8.5 released-baseline performance
+    if: github.ref_name == 'feature/v0.8.5-lab-upgrades' || github.head_ref == 'feature/v0.8.5-lab-upgrades'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Released v0.8 comparison, new scenes and 4x CPU mobile emulation
+        run: node scripts/measure-v085-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v085-performance
+          path: browser-results/
+          if-no-files-found: error

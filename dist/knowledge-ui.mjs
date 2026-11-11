@@ -1,4 +1,4 @@
-import {terms,models,sources,termById,modelById} from './knowledge.mjs';
+import {terms,models,sources,termById,modelById,articles} from './knowledge.mjs';
 import {t,onLanguageChange} from './i18n.mjs';
 import {initGuide} from './guide.mjs';
 
@@ -66,6 +66,23 @@ export function initKnowledge(doc=globalThis.document){
   const termLinks=node('div',null,'knowledge-term-links');
   for(const term of terms.filter(t=>t.model===model.id)){const a=node('a',term.label);a.href='#'+term.target;a.dataset.explain=term.target;a.id='model-term-'+model.id+'-'+term.id;termLinks.append(a)}
   advanced.append(termLinks,node('h3','k.ui.sources'),sourceList(model.sources));article.append(advanced);chapters.push(article);grid.insertBefore(article,before);owned.push(article);
+ }
+ // Articles reuse the same source renderer, translations and guide lifecycle.
+ for(const item of articles){
+  const shell=detail(item.title,'panel lab-upgrade knowledge-article'),article=node('article');article.id=item.target;article.tabIndex=-1;article.append(node('h2',item.title),node('p',item.intro),node('p',item.limit,'knowledge-limit'));
+  if(item.id==='proton'){
+   const figure=node('figure'),ns='http://www.w3.org/2000/svg',svg=doc.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 600 180');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
+   const shape=(tag,attrs)=>{const e=doc.createElementNS(ns,tag);for(const [key,v]of Object.entries(attrs))e.setAttribute(key,String(v));svg.append(e);return e};
+   for(const [x,y,label]of [[80,54,'u'],[160,54,'u'],[120,112,'d']]){shape('circle',{cx:x,cy:y,r:17,fill:'#bf9de6'});const e=shape('text',{x,y:y+5,'text-anchor':'middle',fill:'#120d18'});e.textContent=label}
+   shape('ellipse',{cx:430,cy:80,rx:115,ry:66,fill:'#6e3b6d30',stroke:'#ad7da2'});
+   shape('path',{d:'M345 72Q435 0 500 105T360 105Q470 140 480 40T390 48Q345 140 510 70',stroke:'#d1a2b6',fill:'none','stroke-width':2});
+   for(const [x,y,label]of [[392,52,'u'],[468,62,'u'],[425,111,'d']]){shape('circle',{cx:x,cy:y,r:12,fill:'#beaad9'});const e=shape('text',{x,y:y+4,'text-anchor':'middle',fill:'#120d18'});e.textContent=label}
+   for(const [x,key]of [[120,'v85.qcd.valence.label'],[430,'v85.qcd.dynamic.label']]){const e=shape('text',{x,y:165,'text-anchor':'middle',fill:'#d0c4dc','font-size':12});e.dataset.i18n=key;e.textContent=t(key)}
+   figure.append(svg,node('figcaption','v85.qcd.diagram','hint'));article.append(figure);
+  }
+  for(const section of item.sections){article.append(node('h3',section.title));for(const key of section.text)article.append(node('p',key));article.append(sourceList(section.sources))}
+  shell.append(article);grid.insertBefore(shell,before);owned.push(shell);
+  const link=node('a',item.title);link.href='#'+item.target;link.dataset.modelLink=item.target;link.id='article-index-'+item.id;index.append(link);
  }
  for(const e of originalArticles)e.remove();
  cleanup.push(()=>{for(const e of originalArticles)grid.insertBefore(e,before)});

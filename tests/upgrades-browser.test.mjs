@@ -78,3 +78,15 @@ test('v085 bounded lifecycle: 100 BH/context dispose-remount cycles retain liste
  await p.evaluate(async()=>{const {initBlackHoleView}=await import('/blackhole-view.mjs'),{initTemperatureContext}=await import('/temperature-context.mjs');for(let i=0;i<100;i++){initBlackHoleView().dispose();initBlackHoleView();initTemperatureContext().dispose();initTemperatureContext()} });
  await cdp.send('HeapProfiler.collectGarbage');const end=await cdp.send('Memory.getDOMCounters');assert(end.jsEventListeners<=start.jsEventListeners+2,JSON.stringify({start,end}));assert(end.nodes<=start.nodes+5,JSON.stringify({start,end}));assert.deepEqual(await physical(p),before);assert.equal(await p.evaluate(()=>window.entrolabTemperature.inspect().subscriptions),1);assert.equal(await p.locator('#bhIllustration').count(),1);h.measurements.push({lifecycle:{start,end}});
 }finally{await context.close()}});
+
+test('v085 QCD: collapsed article, deep link, DE/EN and logical return preserve model snapshots',async()=>{const {p,context}=await h.lab();try{
+ const before=await physical(p);await p.locator('[data-tab=science]').click();assert.equal(await p.locator('.knowledge-article').evaluate(e=>e.open),false);await p.locator('#article-index-proton').click();assert(await p.locator('#model-proton').isVisible());assert.equal(await p.evaluate(()=>document.activeElement.id),'model-proton');assert.match(await p.locator('#model-proton').textContent(),/ungelöst/);await p.locator('[data-language=en]').click();assert.match(await p.locator('#model-proton').textContent(),/without additional quark fields/);assert.match(await p.locator('#model-proton').textContent(),/not a separate substance/);await p.locator('#model-proton').focus();await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'article-index-proton');assert.deepEqual(await physical(p),before);
+ await p.goto(h.url+'/#model-proton');await h.ready(p);assert(await p.locator('#model-proton').isVisible());assert.equal(await p.evaluate(()=>document.activeElement.id),'model-proton');await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');h.measurements.push({qcdSources:await p.locator('#model-proton [data-source]').count()});
+}finally{await context.close()}});
+test('v085 integration: all five views and six existing questions stay narrow and retain translations, one monster and model state',async()=>{
+ for(const width of [320,390,1360]){const {p,context}=await h.lab({viewport:{width,height:900}});try{
+  const before=await physical(p);for(const tab of ['gravity','blackhole','extreme','entropy','science']){await p.locator('[data-tab='+tab+']').click();await p.locator('[data-language=en]').click();assert((await p.evaluate(()=>document.documentElement.scrollWidth))<=width+1);}
+  assert.equal(await p.locator('.learning-question').count(),6);assert.equal(await p.locator('#creature').count(),1);assert.deepEqual(await physical(p),before);
+  const missing=await p.evaluate(async()=>[...(await import('/i18n.mjs')).missingKeys]);assert.deepEqual(missing,[]);assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}}
+});

@@ -50,3 +50,15 @@ test('v085 visualizations: new BH diagram draws bounded finite geometry without 
  for(const width of [240,320,390,1024]){const canvas={width:0,height:0,getBoundingClientRect:()=>({width,height:280}),getContext:()=>x};drawLightDiagram(canvas);assert.equal(canvas.width,width);assert.equal(canvas.height,280)}
  assert(paths>0&&paths<100);const source=readFileSync(new URL('../dist/blackhole-view.mjs',import.meta.url),'utf8');assert(source.includes("import {drawObject,fitCanvas}"));assert(!/Math\.random|blackHole\(|setInterval|setTimeout/.test(source));
 });
+
+const {articles,sources,models,terms}=await import('../dist/knowledge.mjs');
+test('v085 QCD: optional article reuses source registry without adding a model or glossary fork',()=>{
+ assert.equal(models.length,6);assert.equal(terms.length,29);assert.equal(articles.length,1);assert.equal(articles[0].target,'model-proton');
+ for(const s of articles[0].sections)for(const id of s.sources){assert(sources[id]);assert.equal(sources[id].checked,'2026-11-11');assert(sources[id].url.startsWith('https://'))}
+ assert.equal(new Set(articles[0].sections.flatMap(s=>s.sources)).size,7);
+});
+test('v085 QCD: DE/EN distinguish rest-frame energy, schematic fields and the unsolved pure Yang–Mills gap',()=>{
+ for(const [catalog,words]of [[de,[/Ruhesystem/,/didaktische Größenordnung/,/keine universell eindeutige Zerlegung/,/ohne zusätzliche Quarkfelder/,/ungelöst/]], [en,[/rest frame/,/teaching-level order of magnitude/,/not a universally unique division/,/without additional quark fields/,/unsolved/]]]){
+  const text=Object.entries(catalog).filter(([k])=>k.startsWith('v85.qcd.')).map(([,v])=>v).join(' ');for(const re of words)assert.match(text,re);assert.match(text,/938[,.]27 MeV\/c²/);assert.match(text,/M²c⁴ = E² − \|p\|²c²/);
+ }
+});

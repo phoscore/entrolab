@@ -200,6 +200,62 @@ export const sources=freeze({
     "section": "Solar atmosphere · effective temperature 5772 K",
     "kind": "institution",
     "checked": "2026-11-11"
+  },
+  "cern-mass": {
+    "publisher": "CERN",
+    "title": "The other 99%",
+    "url": "https://home.cern/other-99/",
+    "section": "2025-02-05 · didactic mass comparison, not a universal decomposition",
+    "kind": "institution",
+    "checked": "2026-11-11"
+  },
+  "cms-partons": {
+    "publisher": "CMS Collaboration",
+    "title": "How are the quarks moving?",
+    "url": "https://cms.cern/news/how-are-quarks-moving",
+    "section": "2022-06-13 · valence excess and partonic description",
+    "kind": "research",
+    "checked": "2026-11-11"
+  },
+  "qcd-decomposition": {
+    "publisher": "Yang et al.",
+    "title": "Proton Mass Decomposition from the QCD Energy Momentum Tensor",
+    "url": "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.212001",
+    "section": "PRL 121, 212001 (2018) · rest energy, scheme and scale",
+    "kind": "research",
+    "checked": "2026-11-11"
+  },
+  "clay-gap": {
+    "publisher": "Clay Mathematics Institute",
+    "title": "Yang–Mills & the Mass Gap",
+    "url": "https://www.claymath.org/millennium/yang-mills-the-maths-gap/",
+    "section": "Current official status: Unsolved",
+    "kind": "institution",
+    "checked": "2026-11-11"
+  },
+  "clay-definition": {
+    "publisher": "Jaffe & Witten / Clay",
+    "title": "Quantum Yang–Mills Theory",
+    "url": "https://www.claymath.org/wp-content/uploads/2022/06/yangmills.pdf",
+    "section": "Official problem description §4, page 6 · existence and positive gap",
+    "kind": "research",
+    "checked": "2026-11-11"
+  },
+  "proton-mass": {
+    "publisher": "Particle Data Group",
+    "title": "Proton mass · pdgLive",
+    "url": "https://pdgprod.lbl.gov/pdgprod/pdgLive/DataBlock.action?home=sumtabB&node=S016M",
+    "section": "Mass evaluation · 2022 CODATA, quoted only as 938.27 MeV/c²",
+    "kind": "reference",
+    "checked": "2026-11-11"
+  },
+  "higgs-quarks": {
+    "publisher": "CMS Collaboration",
+    "title": "Higgs boson",
+    "url": "https://cms.cern/news/higgs-boson",
+    "section": "Elementary particle masses, distinct from composite rest energy",
+    "kind": "institution",
+    "checked": "2026-11-11"
   }
 });
 export const terms=freeze([
@@ -695,7 +751,7 @@ export const models=freeze([
 export const termById=freeze(Object.fromEntries(terms.map(t=>[t.id,t])));
 export const modelById=freeze(Object.fromEntries(models.map(m=>[m.id,m])));
 export const CONTEXTS=freeze({gravity:{tab:"gravity",model:"gravity"},blackhole:{tab:"blackhole",model:"blackhole"},objects:{tab:"extreme",model:"objects"},temperature:{tab:"extreme",model:"temperature"},markers:{tab:"entropy",view:"particles",model:"markers"},thermal:{tab:"entropy",view:"thermal",model:"thermal"}});
-export function contentKeys(){return [...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception]),...applications.flatMap(a=>[a.title,a.text]),...explanations.flatMap(q=>[q.question,q.observe,q.cause,q.use,q.limit,q.quiz,q.answer,q.try,...q.options.map(o=>o.label)])]}
+export function contentKeys(){return [...articles.flatMap(a=>[a.title,a.intro,a.limit,...a.sections.flatMap(s=>[s.title,...s.text])]),...terms.flatMap(t=>[t.label,t.short,t.long]),...models.flatMap(m=>[m.title,m.overview,m.method,m.units,m.limits,m.illustration,m.misconception]),...applications.flatMap(a=>[a.title,a.text]),...explanations.flatMap(q=>[q.question,q.observe,q.cause,q.use,q.limit,q.quiz,q.answer,q.try,...q.options.map(o=>o.label)])]}
 
 export const explanations=freeze([
   {
@@ -849,3 +905,10 @@ export const explanations=freeze([
 ]);
 
 export const applications=freeze([{"id": "tea", "title": "k.learning.extras.tea.title", "text": "k.learning.extras.tea.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "thermos", "title": "k.learning.extras.thermos.title", "text": "k.learning.extras.thermos.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "fridge", "title": "k.learning.extras.fridge.title", "text": "k.learning.extras.fridge.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "engine", "title": "k.learning.extras.engine.title", "text": "k.learning.extras.engine.text", "model": "thermal", "sources": ["openstax-applications", "thermodynamics"]}, {"id": "boundary", "title": "k.learning.extras.boundary.title", "text": "k.learning.extras.boundary.text", "model": "markers", "sources": ["foundations", "statmech"]}]);
+
+// Voluntary science article, deliberately not a seventh numerical model.
+export const articles=freeze([{id:'proton',target:'model-proton',title:'v85.qcd.title',intro:'v85.qcd.intro',limit:'v85.qcd.limit',sections:[
+ {title:'v85.qcd.valence.title',text:['v85.qcd.valence.text'],sources:['cms-partons']},
+ {title:'v85.qcd.mass.title',text:['v85.qcd.mass.text','v85.qcd.reference','v85.qcd.percent','v85.qcd.higgs'],sources:['proton-mass','cern-mass','qcd-decomposition','higgs-quarks']},
+ {title:'v85.qcd.gap.title',text:['v85.qcd.gap.text','v85.qcd.status'],sources:['clay-gap','clay-definition']}
+]}]);
