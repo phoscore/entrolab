@@ -11,7 +11,7 @@ export function initUX(doc=globalThis.document){
  $('helpClose').addEventListener('click',()=>{$('quickStart').hidden=true;$('helpToggle').setAttribute('aria-expanded','false');$('helpToggle').focus()});
  let pendingEditor=null;
  for(const b of doc.querySelectorAll('[data-language]')){
-  b.addEventListener('pointerdown',()=>{const active=doc.activeElement;pendingEditor=(active?.closest?.('#editForm')||active?.closest?.('#entropy'))&&/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName)?active:null});
+  b.addEventListener('pointerdown',()=>{const active=doc.activeElement;pendingEditor=(active?.closest?.('#editForm')||active?.closest?.('#entropy')||active?.closest?.('#temperatureContext')||active?.closest?.('.bh-illustration'))&&/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName)?active:null});
   b.addEventListener('pointercancel',()=>{pendingEditor=null});b.addEventListener('keydown',()=>{pendingEditor=null});
   b.addEventListener('click',()=>{const editor=pendingEditor;pendingEditor=null;setLanguage(b.dataset.language);editor?.focus({preventScroll:true})});
  }
