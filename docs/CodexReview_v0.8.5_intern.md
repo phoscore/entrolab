@@ -19,8 +19,11 @@
 
 Zusätzlich mathematisch präzisiert:0/B=0 bei B>0; nur ein Nullnenner verhindert das Verhältnis. Der gegenteilige Satz im historischen Plan/Audit wird nicht als Mathematik übernommen. Neue Präsentationsmathematik, keine Änderung des etablierten Temperaturlabors.
 
-Nach der lesenden Nachprüfung dieser Korrekturen **keine weiteren offenen P0/P1/P2-Befunde erkannt**. Der Auftraggeber führt derzeit noch echte Chromium-/Render-Gegenproben und Dokumentationsabschluss durch; deren Ergebnis wird hier nicht vorweggenommen.
+Nach der lesenden Nachprüfung dieser Korrekturen **keine weiteren offenen P0/P1/P2-Befunde erkannt**. Die vollständigen Chromium-/Render-Gegenproben stehen getrennt im [Qualitätsbericht](Qualitaetsupdate_v0.8.5.md).
 
 ## Fachliche Grenzen
 
 Materialfenster sind ausdrücklich didaktische Auswertungsgrenzen, keine chemisch validierten Stabilitätsfenster. Das Materialbild ist kein Solver. Protonenmasse/QCD-Dynamik sind von der mathematischen reinen Yang–Mills-Frage getrennt;1%/99% bleibt eine Größenordnung. Maßgebliche Quellen sind CERN/CMS, quantitative Gitter-QCD-Forschung, PDG/NIST sowie Clay und dessen offizielle Problemdefinition. Quellenstatus vor einer späteren Veröffentlichung erneut prüfen.
+
+
+Nachkontrolle des BH-Controllers im kontrollierten Node-DOM: 60 Paints in 2 s bei synthetischem 60-Hz-RAF, maximal ein RAF; Reduced Motion auch ohne sofortiges MQL-Event, Hidden/Visible, manuelles Fortsetzen und Dispose geprüft. Identische Tour-Livetexte werden nicht neu geschrieben, und SUMMARY-Fokus öffnet die eigene Disclosure nicht vorzeitig. Neue Sprachfokusbereiche bleiben Präsentationsfelder. Die anschließenden reinen Fokus- und Unterlauf-Grenzfälle sind in der echten Chromium-Suite nachgewiesen; diese lesende Prüfung behauptet keine eigene Browser- oder Performancefreigabe.

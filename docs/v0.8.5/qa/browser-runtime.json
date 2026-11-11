@@ -1,0 +1,196 @@
+{
+  "measurements": [
+    {
+      "tour": 320,
+      "width": 320,
+      "scroll": 320,
+      "highlights": 1,
+      "animations": 0
+    },
+    {
+      "tour": 390,
+      "width": 390,
+      "scroll": 390,
+      "highlights": 1,
+      "animations": 0
+    },
+    {
+      "bhLifecycle": {
+        "moving": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 0.35,
+          "frames": 13,
+          "paintMs": 0.20000000001164153,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "paused": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": true,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0.39999999999999997,
+          "frames": 15,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "off": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": false,
+          "scheduled": false,
+          "time": 0.4332999999999999,
+          "frames": 18,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "hidden": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0.4332999999999999,
+          "frames": 20,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "reduced": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": true,
+          "reduced": true,
+          "seen": true,
+          "scheduled": false,
+          "time": 0.4333120000000001,
+          "frames": 23,
+          "paintMs": 0.39999999999417923,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        }
+      }
+    },
+    {
+      "bhSize": {
+        "width": 1360,
+        "dpr": 1,
+        "a": {
+          "x": 365.1875,
+          "y": 224.21875,
+          "width": 934.625,
+          "height": 400
+        },
+        "b": {
+          "x": 365.1875,
+          "y": 224.21875,
+          "width": 934.625,
+          "height": 400
+        },
+        "backing": [
+          935,
+          400
+        ]
+      }
+    },
+    {
+      "bhSize": {
+        "width": 320,
+        "dpr": 1,
+        "a": {
+          "x": 32.1875,
+          "y": 149.984375,
+          "width": 255.625,
+          "height": 240
+        },
+        "b": {
+          "x": 32.1875,
+          "y": 149.984375,
+          "width": 255.625,
+          "height": 240
+        },
+        "backing": [
+          256,
+          240
+        ]
+      }
+    },
+    {
+      "bhSize": {
+        "width": 390,
+        "dpr": 2,
+        "a": {
+          "x": 34.984375,
+          "y": 211.8125,
+          "width": 320.03125,
+          "height": 240
+        },
+        "b": {
+          "x": 34.984375,
+          "y": 211.8125,
+          "width": 320.03125,
+          "height": 240
+        },
+        "backing": [
+          400,
+          300
+        ]
+      }
+    },
+    {
+      "lifecycle": {
+        "start": {
+          "documents": 1,
+          "nodes": 5344,
+          "jsEventListeners": 289
+        },
+        "end": {
+          "documents": 1,
+          "nodes": 5344,
+          "jsEventListeners": 289
+        }
+      }
+    },
+    {
+      "qcdSources": 7
+    }
+  ],
+  "errors": []
+}

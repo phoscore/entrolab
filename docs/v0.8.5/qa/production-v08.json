@@ -1,0 +1,70 @@
+{
+  "base": "25e72c639d66677c1629886141e3671a4c696ef6",
+  "method": "GET only, unauthenticated existing production endpoints",
+  "entries": [
+    {
+      "host": "https://entrolab.pages.dev",
+      "path": "index.html",
+      "status": 200,
+      "expected": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "actual": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "matches": true
+    },
+    {
+      "host": "https://entrolab.pages.dev",
+      "path": "knowledge-ui.mjs",
+      "status": 200,
+      "expected": "4f9d4198c1daaded1aeabc7151b8b2fc19a0c2e404e865b67f266c5de7e9224b",
+      "actual": "4f9d4198c1daaded1aeabc7151b8b2fc19a0c2e404e865b67f266c5de7e9224b",
+      "matches": true
+    },
+    {
+      "host": "https://entrolab.pages.dev",
+      "path": "knowledge-text.mjs",
+      "status": 200,
+      "expected": "c36b27e371a335bd244a7b5a968fa36f74485eb5aff531ac57d786dcc979fd91",
+      "actual": "c36b27e371a335bd244a7b5a968fa36f74485eb5aff531ac57d786dcc979fd91",
+      "matches": true
+    },
+    {
+      "host": "https://entrolab.pages.dev",
+      "path": "creature-ui.mjs",
+      "status": 200,
+      "expected": "8262a7bc9f1f2b81968fb0a18256de0c084c09a7022e3b2adbcc9e5606a938f4",
+      "actual": "8262a7bc9f1f2b81968fb0a18256de0c084c09a7022e3b2adbcc9e5606a938f4",
+      "matches": true
+    },
+    {
+      "host": "https://cddbdb79.entrolab.pages.dev",
+      "path": "index.html",
+      "status": 200,
+      "expected": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "actual": "866af2b2f364006b201655eefd938e45792511a4b350e7d24f47007a8b57e339",
+      "matches": true
+    },
+    {
+      "host": "https://cddbdb79.entrolab.pages.dev",
+      "path": "knowledge-ui.mjs",
+      "status": 200,
+      "expected": "4f9d4198c1daaded1aeabc7151b8b2fc19a0c2e404e865b67f266c5de7e9224b",
+      "actual": "4f9d4198c1daaded1aeabc7151b8b2fc19a0c2e404e865b67f266c5de7e9224b",
+      "matches": true
+    },
+    {
+      "host": "https://cddbdb79.entrolab.pages.dev",
+      "path": "knowledge-text.mjs",
+      "status": 200,
+      "expected": "c36b27e371a335bd244a7b5a968fa36f74485eb5aff531ac57d786dcc979fd91",
+      "actual": "c36b27e371a335bd244a7b5a968fa36f74485eb5aff531ac57d786dcc979fd91",
+      "matches": true
+    },
+    {
+      "host": "https://cddbdb79.entrolab.pages.dev",
+      "path": "creature-ui.mjs",
+      "status": 200,
+      "expected": "8262a7bc9f1f2b81968fb0a18256de0c084c09a7022e3b2adbcc9e5606a938f4",
+      "actual": "8262a7bc9f1f2b81968fb0a18256de0c084c09a7022e3b2adbcc9e5606a938f4",
+      "matches": true
+    }
+  ]
+}

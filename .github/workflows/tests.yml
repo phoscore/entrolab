@@ -73,6 +73,7 @@ jobs:
       - name: Real browser sizing, drafts, language, focus and pulsar regressions
         run: npm run test:browser
       - name: Verify existing v0.8 production bytes (read-only)
+        if: github.ref_name == 'feature/v0.8.5-lab-upgrades' || github.head_ref == 'feature/v0.8.5-lab-upgrades'
         run: node scripts/verify-v085-production.mjs
       - name: Compare v0.8 and baseline rendering on the same runner
         if: github.ref_name != 'feature/v0.8.5-lab-upgrades' && github.head_ref != 'feature/v0.8.5-lab-upgrades'
@@ -89,7 +90,12 @@ jobs:
 
   v085-performance:
     name: v0.8.5 released-baseline performance
-    if: github.ref_name == 'feature/v0.8.5-lab-upgrades' || github.head_ref == 'feature/v0.8.5-lab-upgrades'
+    # Record a full comparison on code pushes, without duplicating it for
+    # evidence-only docs or pull_request jobs. Manual repetition is available.
+    if: >-
+      github.ref_name == 'feature/v0.8.5-lab-upgrades' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && !startsWith(github.event.head_commit.message, '[CF-Pages-Skip] docs(')))
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
