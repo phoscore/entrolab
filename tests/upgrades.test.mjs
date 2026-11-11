@@ -1,0 +1,113 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {pathIds,pathSteps} from '../dist/discovery-paths.mjs';
+import {upgradeDE,upgradeEN} from '../dist/upgrade-text.mjs';
+import {de,en} from '../dist/i18n.mjs';
+import {readFileSync} from 'node:fs';
+test('v0.8.5 discovery: seven bounded paths and three short routes use existing controls',()=>{
+ assert.equal(pathIds.length,7);assert.equal(new Set(pathIds).size,7);
+ for(const id of pathIds){const steps=pathSteps(id);assert(steps.length>=3&&steps.length<=5);for(const s of steps)assert(s.text&&(s.target||s.navigation))}
+ for(const id of ['gravity','blackhole','markers'])assert.equal(pathSteps(id,true).length,3);
+ assert.equal(pathSteps('thermal')[2].event,'thermal-stepped');assert.throws(()=>pathSteps('missing'),RangeError);
+ const code=readFileSync(new URL('../dist/discovery.mjs',import.meta.url),'utf8');assert(!/Math\.random|setInterval|setTimeout|dispatchEvent|\.value\s*=/.test(code.replace('option.value=id','')));assert(!/\.click\(\)/.test(code.replace("$('helpClose').click()",'')));
+});
+test('v0.8.5 translations: every new route and dynamic message has DE/EN and exact placeholders',()=>{
+ assert.deepEqual(Object.keys(upgradeDE).sort(),Object.keys(upgradeEN).sort());
+ for(const [key,value]of Object.entries(upgradeDE)){assert.equal(de[key],value);assert.equal(en[key],upgradeEN[key]);assert(en[key].trim());assert.deepEqual((value.match(/\{\w+\}/g)??[]).sort(),(en[key].match(/\{\w+\}/g)??[]).sort())}
+ for(const id of pathIds)for(const s of pathSteps(id))assert(de[s.text]&&en[s.text],s.text);
+});
+
+const {MATERIALS,REFERENCE_PRESSURE_PA,materialPhase,validTemperature,compareTemperatures,scalePosition}=await import('../dist/material-data.mjs');
+test('v085 materials: eight independent normal-pressure reference values and immutable metadata',()=>{
+ assert.equal(REFERENCE_PRESSURE_PA,101325);
+ for(const [id,melt,boil]of [['water',273.15,373.15],['ethanol',159,351.5],['aluminium',933.473,2792],['iron',1811,3134]]){
+  assert.equal(MATERIALS[id].melt,melt);assert.equal(MATERIALS[id].boil,boil);assert(MATERIALS[id].sources.length);
+ }
+ assert.throws(()=>MATERIALS.water.window[1]=1e12,TypeError);
+});
+test('v085 materials: all transitions just below/at/above declared bands, including equivalent Celsius',()=>{
+ for(const [id,m]of Object.entries(MATERIALS))for(const [point,band,below,at,above]of [[m.melt,m.meltBand,'solid','melting','liquid'],[m.boil,m.boilBand,'liquid','boiling','vapor']]){
+  assert.equal(materialPhase(id,point-band-.001),below,id);assert.equal(materialPhase(id,point-band),at,id);assert.equal(materialPhase(id,point),at,id);assert.equal(materialPhase(id,point+band),at,id);assert.equal(materialPhase(id,point+band+.001),above,id);
+  assert.equal(materialPhase(id,(point-273.15)+273.15),at,id);
+ }
+});
+test('v085 materials: finite comparison windows reject extrapolation without changing inputs',()=>{
+ for(const [id,m]of Object.entries(MATERIALS))for(const k of [0,Number.MIN_VALUE,.001,1,1e9,1e12]){assert.equal(materialPhase(id,k),'outside');assert.equal(k,k)}
+ for(const id of Object.keys(MATERIALS)){const m=MATERIALS[id];assert.notEqual(materialPhase(id,m.window[0]),'outside');assert.notEqual(materialPhase(id,m.window[1]),'outside');assert.equal(materialPhase(id,m.window[0]-.01),'outside');assert.equal(materialPhase(id,m.window[1]+.01),'outside')}
+ assert.equal(materialPhase('water',(-23.15)+273.15),materialPhase('water',250));assert.equal(materialPhase('water',249.999),'outside');assert.equal(materialPhase('water',293.15),'liquid');assert.equal(materialPhase('iron',293.15),'solid');
+});
+test('v085 comparisons: logarithmic ratio remains finite for subnormal and extreme positive values',()=>{
+ assert.equal(compareTemperatures(600,300).ratio.value,2);assert.equal(compareTemperatures(0,300).ratio.value,0);assert.equal(compareTemperatures(300,0).ratio,null);
+ for(const [a,b]of [[1e12,Number.MIN_VALUE],[Number.MIN_VALUE,1e12],[1e-300,1e12],[1e12,1e-300]]){const r=compareTemperatures(a,b);assert(Number.isFinite(r.delta));assert(r.ratio);if(r.ratio.value!==undefined)assert(r.ratio.value>0&&Number.isFinite(r.ratio.value));else{assert(r.ratio.mantissa>=1&&r.ratio.mantissa<10);assert(Number.isInteger(r.ratio.exponent))}}
+ assert.equal(scalePosition(0).zero,true);assert.equal(scalePosition(Number.MIN_VALUE).below,true);assert.equal(scalePosition(.001).fraction,0);assert.equal(scalePosition(1e12).fraction,1);
+});
+test('v085 comparisons: invalid types, empty values, negatives and infinities never produce scientific output',()=>{
+ for(const value of ['',null,undefined,true,[],{},NaN,Infinity,-Infinity,-1,-0,1e12+1]){assert.equal(validTemperature(value),false);assert.throws(()=>materialPhase('water',value),RangeError);assert.throws(()=>compareTemperatures(value,300),RangeError);assert.throws(()=>compareTemperatures(300,value),RangeError);assert.throws(()=>scalePosition(value),RangeError)}
+ assert.throws(()=>materialPhase('unknown',300),RangeError);
+});
+test('v085 visualizations: new BH diagram draws bounded finite geometry without evaluating a model',async()=>{
+ const {drawLightDiagram}=await import('../dist/blackhole-view.mjs');let paths=0;const x=new Proxy({setTransform(){},beginPath(){paths++}},{get(o,k){return o[k]??((...args)=>{for(const n of args)if(typeof n==='number')assert(Number.isFinite(n),k)})}});
+ for(const width of [240,320,390,1024]){const canvas={width:0,height:0,getBoundingClientRect:()=>({width,height:280}),getContext:()=>x};drawLightDiagram(canvas);assert.equal(canvas.width,width);assert.equal(canvas.height,280)}
+ assert(paths>0&&paths<100);const source=readFileSync(new URL('../dist/blackhole-view.mjs',import.meta.url),'utf8');assert(source.includes("import {drawObject,fitCanvas}"));assert(!/Math\.random|blackHole\(|setInterval|setTimeout/.test(source));
+});
+
+const {articles,sources,models,terms}=await import('../dist/knowledge.mjs');
+test('v085 QCD: optional article reuses source registry without adding a model or glossary fork',()=>{
+ assert.equal(models.length,6);assert.equal(terms.length,29);assert.equal(articles.length,1);assert.equal(articles[0].target,'model-proton');
+ for(const s of articles[0].sections)for(const id of s.sources){assert(sources[id]);assert.equal(sources[id].checked,'2026-11-11');assert(sources[id].url.startsWith('https://'))}
+ assert.equal(new Set(articles[0].sections.flatMap(s=>s.sources)).size,7);
+});
+test('v085 QCD: DE/EN distinguish rest-frame energy, schematic fields and the unsolved pure Yang–Mills gap',()=>{
+ for(const [catalog,words]of [[de,[/Ruhesystem/,/didaktische Größenordnung/,/keine universell eindeutige Zerlegung/,/ohne zusätzliche Quarkfelder/,/ungelöst/]], [en,[/rest frame/,/teaching-level order of magnitude/,/not a universally unique division/,/without additional quark fields/,/unsolved/]]]){
+  const text=Object.entries(catalog).filter(([k])=>k.startsWith('v85.qcd.')).map(([,v])=>v).join(' ');for(const re of words)assert.match(text,re);assert.match(text,/938[,.]27 MeV\/c²/);assert.match(text,/M²c⁴ = E² − \|p\|²c²/);
+ }
+});
+
+test('v085 new temperature labels: precision distinguishes both sides of the narrowest table band in DE/EN',async()=>{
+ const {comparisonNumber}=await import('../dist/temperature-format.mjs'),{setLanguage}=await import('../dist/i18n.mjs');
+ for(const language of ['de','en']){setLanguage(language);const values=[933.472,933.473,933.474,273.15,273.201].map(comparisonNumber);assert.equal(new Set(values).size,5);assert.equal(values[1],language==='de'?'933,473':'933.473');for(const k of [Number.MIN_VALUE,0,1e-300,1e12])assert(!/Infinity|NaN/.test(comparisonNumber(k)))}setLanguage('de');
+});
+
+
+test('v085 comparison drafts: positive underflow is rejected instead of silently becoming zero',async()=>{
+ const {parseComparisonTemperature}=await import('../dist/material-data.mjs');
+ for(const raw of ['',null,[],true,'NaN','Infinity','0x10','1,2','-0','-1e-324','1e-324','2e-324','1e-9999','1000000000001'])assert.throws(()=>parseComparisonTemperature(raw),RangeError,String(raw));
+ for(const [raw,value]of [['0',0],['0e-9999',0],['.001',.001],['1e-300',1e-300],['5e-324',Number.MIN_VALUE],['1e12',1e12]])assert.equal(parseComparisonTemperature(raw),value);
+});
+
+test('v085 audit: every unchanged temperature preset has its own bilingual scientific context',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ const values=[...html.matchAll(/data-kelvin="([^"]+)"/g)].map(match=>match[1]);
+ assert.deepEqual(values,['0','.001','.1','2.725','293.15','5900','1e9','1e12']);
+ for(const catalog of [upgradeDE,upgradeEN]){
+  const contexts=values.map(value=>catalog['v85.temp.context.'+value]);
+  assert(contexts.every(Boolean));assert.equal(new Set(contexts).size,8);
+  assert.match(contexts[1],/1 mK/);assert.match(contexts[3],/COBE\/FIRAS/);
+  assert.match(contexts[4],/20 °C/);assert.match(contexts[5],/5772 K/);
+  assert.match(contexts[6],/Plasma|plasma/);assert.match(contexts[7],/10¹² K/);
+ }
+ for(const file of ['index.html','translations.mjs','knowledge-text.mjs']){
+  const active=readFileSync(new URL('../dist/'+file,import.meta.url),'utf8');
+  assert.match(active,/No plot armor\. Just physics\./);
+  assert.doesNotMatch(active,/No magic\.|Kein Zauber\.|Keine Magie\./);
+ }
+});
+
+test('v085 audit: machine-neighbor temperatures can display identically across an unchanged material boundary',async()=>{
+ const {comparisonDisplayValue,comparisonNumber}=await import('../dist/temperature-format.mjs');
+ for(const [id,a,b,phaseA,phaseB,display]of [
+  ['water',273.2000000000002,273.2000000000003,'melting','liquid',273.2],
+  ['water',249.99999999999977,249.9999999999998,'outside','solid',250],
+  ['aluminium',933.4724999999991,933.4724999999992,'solid','melting',933.472499999999]
+ ]){
+  assert.notEqual(a,b);
+  assert.equal(comparisonNumber(a),comparisonNumber(b));
+  assert.equal(comparisonDisplayValue(a),display);assert.equal(comparisonDisplayValue(b),display);
+  assert.equal(materialPhase(id,a),phaseA);assert.equal(materialPhase(id,b),phaseB);
+  assert([phaseA,phaseB].includes(materialPhase(id,display)));
+ }
+ for(const k of [0,Number.MIN_VALUE,1e-300,.001,1e12]){
+  assert.equal(comparisonDisplayValue(k),k);
+  assert.equal(materialPhase('iron',k),'outside');
+ }
+});

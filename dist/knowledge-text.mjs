@@ -1113,8 +1113,8 @@ const messages={
     "The energy stays. The differences don’t."
   ],
   "k.creature.comment.science": [
-    "Keine Magie. Auch im Kleingedruckten nicht.",
-    "No magic. Not even in the small print."
+    "No plot armor. Just physics.",
+    "No plot armor. Just physics."
   ],
   "k.creature.comment.guide": [
     "Ich lese auch die Modellgrenzen. Unheimlich, oder?",

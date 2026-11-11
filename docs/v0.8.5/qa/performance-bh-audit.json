@@ -1,0 +1,1012 @@
+{
+  "base": "7b64f0b7d189fb7587814e2136ea23229d424c6a",
+  "current": "e59e8adee161ab8cdd7ab6e3e146cc4ff4d4e576",
+  "browser": "151.0.7922.34",
+  "profiles": [
+    {
+      "id": "desktop",
+      "width": 1360,
+      "height": 1000,
+      "rate": 1,
+      "scenes": [
+        "bh-disk-off",
+        "bh-environment"
+      ]
+    },
+    {
+      "id": "mobile-emulated",
+      "width": 390,
+      "height": 844,
+      "rate": 4,
+      "scenes": [
+        "bh-disk-off",
+        "bh-environment"
+      ]
+    }
+  ],
+  "dpr": 1,
+  "font": "system fallback; Google fonts blocked",
+  "durationPerSampleSeconds": 8,
+  "repetitions": 2,
+  "warmupFrames": 180,
+  "measurements": [
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 1,
+      "scene": "bh-disk-off",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.100000000006,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.0498999999999965,
+          "frames": 94,
+          "paintMs": 0.3000000000174623,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.04949999999999,
+          "frames": 334,
+          "paintMs": 0.20000000001164153,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.30662500000000004,
+        "ScriptDuration": 0.056381999999999995,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 1,
+      "scene": "bh-disk-off",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.399999999994,
+        "draws": 0,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.3000000000174623,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.3000000000174623,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.0014470000000000004,
+        "ScriptDuration": 0.000007,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 1,
+      "scene": "bh-environment",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.100000000006,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.9831999999999974,
+          "frames": 92,
+          "paintMs": 0.39999999999417923,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 10.982799999999996,
+          "frames": 332,
+          "paintMs": 0.29999999998835847,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.91886,
+        "ScriptDuration": 0.101347,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 1,
+      "scene": "bh-environment",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.1999999999825,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.983199999999996,
+          "frames": 90,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 10.982899999999985,
+          "frames": 330,
+          "paintMs": 0.39999999999417923,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.917195,
+        "ScriptDuration": 0.102083,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 2,
+      "scene": "bh-disk-off",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.200000000012,
+        "draws": 0,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.29999999998835847,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.29999999998835847,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.001399000000000001,
+        "ScriptDuration": 0.000007,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 2,
+      "scene": "bh-disk-off",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.099999999977,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.049999999999996,
+          "frames": 94,
+          "paintMs": 0.20000000001164153,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.049599999999984,
+          "frames": 334,
+          "paintMs": 0.1999999999825377,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.333554,
+        "ScriptDuration": 0.065389,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 2,
+      "scene": "bh-environment",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.200000000012,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.983199999999996,
+          "frames": 90,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 10.98289999999999,
+          "frames": 330,
+          "paintMs": 0.3000000000174623,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.951352,
+        "ScriptDuration": 0.112826,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "desktop",
+      "cpuThrottle": 1,
+      "repetition": 2,
+      "scene": "bh-environment",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.200000000012,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.9998679999999953,
+          "frames": 92,
+          "paintMs": 0.3000000000174623,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 10.999567999999991,
+          "frames": 332,
+          "paintMs": 0.5,
+          "backing": [
+            935,
+            400
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.9027440000000001,
+        "ScriptDuration": 0.096234,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 365.1875,
+        "y": 300.21875,
+        "width": 934.625,
+        "height": 400
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 1,
+      "scene": "bh-disk-off",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8003.899999999994,
+        "draws": 241,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.083299999999996,
+          "frames": 95,
+          "paintMs": 0.1999999999825377,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.099599999999993,
+          "frames": 336,
+          "paintMs": 1,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 1.2238749999999998,
+        "ScriptDuration": 0.271578,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 1,
+      "scene": "bh-disk-off",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.399999999994,
+        "draws": 0,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.10000000000582077,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.10000000000582077,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.0050079999999999986,
+        "ScriptDuration": 0.000007,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 1,
+      "scene": "bh-environment",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.399999999994,
+        "draws": 241,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.9998999999999962,
+          "frames": 92,
+          "paintMs": 2.3999999999941792,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.082899999999988,
+          "frames": 333,
+          "paintMs": 0.39999999999417923,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 2.782381,
+        "ScriptDuration": 0.406803,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 1,
+      "scene": "bh-environment",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.199999999953,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.0497999999999963,
+          "frames": 92,
+          "paintMs": 3.199999999953434,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.066099999999995,
+          "frames": 332,
+          "paintMs": 1.7999999999883585,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 2.851082,
+        "ScriptDuration": 0.444712,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 2,
+      "scene": "bh-disk-off",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.200000000012,
+        "draws": 0,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.09999999997671694,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": false,
+          "time": 0,
+          "frames": 2,
+          "paintMs": 0.09999999997671694,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.003980999999999998,
+        "ScriptDuration": 0.000007,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 2,
+      "scene": "bh-disk-off",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.399999999965,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.066499999999997,
+          "frames": 95,
+          "paintMs": 0.20000000001164153,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": false,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.066199999999995,
+          "frames": 335,
+          "paintMs": 0.6999999999534339,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 0.690748,
+        "ScriptDuration": 0.17808200000000002,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 2,
+      "scene": "bh-environment",
+      "variant": "current",
+      "idle": {
+        "duration": 8000.599999999977,
+        "draws": 240,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 3.049899999999995,
+          "frames": 91,
+          "paintMs": 3.3999999999650754,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.066199999999997,
+          "frames": 331,
+          "paintMs": 1.3000000000465661,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 13,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 2.727293,
+        "ScriptDuration": 0.41332199999999997,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    },
+    {
+      "profile": "mobile-emulated",
+      "cpuThrottle": 4,
+      "repetition": 2,
+      "scene": "bh-environment",
+      "variant": "baseline",
+      "idle": {
+        "duration": 8000.199999999953,
+        "draws": 241,
+        "before": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 2.9998999999999962,
+          "frames": 92,
+          "paintMs": 2.2999999999883585,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "after": {
+          "view": "environment",
+          "angle": 22,
+          "disk": true,
+          "paused": false,
+          "reduced": false,
+          "seen": true,
+          "scheduled": true,
+          "time": 11.066199999999993,
+          "frames": 333,
+          "paintMs": 1.6999999999534339,
+          "backing": [
+            320,
+            240
+          ],
+          "subscriptions": 12,
+          "observers": 2
+        },
+        "longTasks": []
+      },
+      "cpu": {
+        "TaskDuration": 2.8411,
+        "ScriptDuration": 0.408152,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0
+      },
+      "rect": {
+        "x": 34.984375,
+        "y": 302.15625,
+        "width": 320.03125,
+        "height": 240
+      },
+      "errors": []
+    }
+  ],
+  "drawingFixture": "Same canvas and controls on reviewed and corrected builds; centre-aligned scroll",
+  "scope": "Two order-reversed samples on the same runner. CDP Main Thread metrics without tracing or measurement RAF. 4x CPU is emulation."
+}

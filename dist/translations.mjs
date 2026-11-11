@@ -1,7 +1,9 @@
+import {upgradeDE,upgradeEN} from './upgrade-text.mjs';
 import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
   ...knowledgeDE,
+  ...upgradeDE,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.",
   "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.",
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.",
@@ -255,7 +257,7 @@ export const de=Object.freeze({
   "ESA · Weiße Zwerge: typische Größenordnung": "ESA · Weiße Zwerge: typische Größenordnung",
   "NASA NTRS · Neutronenstern-Radien": "NASA NTRS · Neutronenstern-Radien",
   "/ A PLAYGROUND FOR COSMIC CURIOSITY": "/ EIN SPIELPLATZ FÜR KOSMISCHE NEUGIER",
-  "Kein Zauber. Leider. Nur ziemlich seltsame Physik. ✧": "Kein Zauber. Leider. Nur ziemlich seltsame Physik. ✧",
+  "No plot armor. Just physics.": "No plot armor. Just physics.",
   "Leerer Raum": "Leerer Raum",
   "PLANET": "PLANET",
   "STERN": "STERN",
@@ -543,6 +545,7 @@ export const de=Object.freeze({
 });
 export const en=Object.freeze({
   ...knowledgeEN,
+  ...upgradeEN,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Originally entered: {original} {unit}. After rounding, the temperature field shows {display} {unit}; validation uses the original entry.",
   "Nur Umrechnungsrundung am Rand berücksichtigt; Quellfelder bleiben unverändert.": "Only conversion roundoff at the boundary was accounted for; source fields are unchanged.",
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Conversion roundoff at the boundary: draft {temp} K. Source fields stay unchanged; only Apply changes the initial state.",
@@ -796,7 +799,7 @@ export const en=Object.freeze({
   "ESA · Weiße Zwerge: typische Größenordnung": "ESA · White dwarfs: typical scales",
   "NASA NTRS · Neutronenstern-Radien": "NASA NTRS · Neutron star radii",
   "/ A PLAYGROUND FOR COSMIC CURIOSITY": "/ A PLAYGROUND FOR COSMIC CURIOSITY",
-  "Kein Zauber. Leider. Nur ziemlich seltsame Physik. ✧": "No magic. Sadly. Just some rather strange physics. ✧",
+  "No plot armor. Just physics.": "No plot armor. Just physics.",
   "Leerer Raum": "Empty space",
   "PLANET": "PLANET",
   "STERN": "STAR",
