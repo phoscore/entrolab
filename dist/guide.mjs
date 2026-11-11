@@ -90,6 +90,7 @@ export function initGuide(doc=globalThis.document){
    close(false);sourceTab=doc.querySelector?.('[data-tab].active');origin=sourceTab??glossary.querySelector?.(':scope > summary');kind='term';coldTerm=true;previousHash=sourceTab?'#'+sourceTab.dataset.tab:'';glossary.open=true;back.hidden=!origin;label();focusVisible(target);return true;
   }
   if(id.startsWith('model-')&&target&&science?.contains(target)){
+   for(let p=target.parentElement;p&&p!==science;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;
    close(false);activate(doc.querySelector('[data-tab="science"]'));sourceTab=doc.querySelector('[data-tab="science"]');origin=sourceTab;kind='model';previousHash='#science';const slot=doc.getElementById('knowledgeReturnSlot');if(slot)slot.append(back);back.hidden=!origin;label();focusVisible(target);return true;
   }
   return false;
