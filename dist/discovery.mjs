@@ -1,13 +1,53 @@
 import {t,onLanguageChange} from './i18n.mjs';
-const $=id=>document.getElementById(id),box=$('quickStart');let step=0,done=false,edited=false,highlight=null;
-const texts=['Wähle oben „Entropy Lab“. Die anderen Labore bleiben unabhängig nutzbar.','Wähle „Wärme & Entropie“. Vergleiche die Starttemperaturen 350 K und 290 K.','Drücke „＋ 10 Modellsekunden“. Beobachte: A kühlt, B erwärmt sich, U bleibt erhalten. Bei eigenen Startwerten gilt die entsprechende Flussrichtung.','Ändere eine Anfangstemperatur und bestätige „Übernehmen“. Erst dieser Klick setzt das Experiment neu. Erkunde danach ⓘ oder Advanced nach Wunsch.'];
-function target(){if(step===0||!$('entropy').classList.contains('active'))return document.querySelector('[data-tab=entropy]');if(step===1||$('thermalExperiment').hidden)return document.querySelector('[data-entropy-view=thermal]');return $(step===2?'thermalStep':'thermalA')}
-function render(){highlight?.classList.remove('discovery-highlight');highlight=null;if(box.hidden)return;if(step===0&&$('entropy').classList.contains('active'))done=true;if(step===1&&!$('thermalExperiment').hidden&&$('entropy').classList.contains('active'))done=true;$('discoveryProgress').textContent=t('Schritt {step} von 4',{step:step+1});$('discoveryText').textContent=t(texts[step]);$('discoveryDone').textContent=t(done?'Erledigt. Du kannst weitergehen oder noch ausprobieren.':'Führe die beschriebene Handlung aus. Schließen ist jederzeit möglich.');$('discoveryNext').disabled=!done;$('discoveryNext').textContent=t(step===3?'Selbst ausprobieren':'Weiter');highlight=target();if(highlight.getClientRects().length)highlight.classList.add('discovery-highlight');box.dataset.step=String(step);box.dataset.done=String(done)}
-$('discoveryLocate').onclick=()=>{const el=target();if(el.isConnected&&el.getClientRects().length){el.focus();el.scrollIntoView({block:'center'})}};
-$('discoveryNext').onclick=()=>{if(!done)return;if(step===3){$('helpClose').click();render();return}step++;done=false;edited=false;render();$('discoveryLocate').focus()};
-$('discoveryRestart').onclick=()=>{step=0;done=false;edited=false;render();$('discoveryLocate').focus()};
-for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',render);
-for(const b of document.querySelectorAll('[data-tab], [data-entropy-view]'))b.addEventListener('click',render);
-for(const id of ['thermalA','thermalB'])$(id).addEventListener('input',()=>{if(!box.hidden&&step===3)edited=true});
-document.addEventListener('thermal-stepped',()=>{if(!box.hidden&&step===2){done=true;render()}});document.addEventListener('thermal-applied',()=>{if(!box.hidden&&step===3&&edited){done=true;render()}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')render()});onLanguageChange(render);render();
+import {pathIds,pathSteps} from './discovery-paths.mjs';
+const $=id=>document.getElementById(id),box=$('quickStart');
+let route=null,quick=false,step=0,done=false,edited=false,highlight=null,menu=true;
+// Mount once. Changing language updates text, never replaces fields or focus.
+const node=(tag,id,key)=>{const e=document.createElement(tag);if(id)e.id=id;if(key){e.dataset.i18n=key;e.textContent=t(key)}return e};
+const chooser=node('div','discoveryChooser'),heading=node('h3',null,'v85.tour.menu');chooser.append(heading);
+for(const [mode,ids,key]of [['quick',['gravity','blackhole','markers'],'v85.tour.quick'],['deep',pathIds,'v85.tour.deep']]){
+ const row=node('div',null);row.className='discovery-choice';const label=node('label',null,key);label.htmlFor='discovery-'+mode;
+ const select=node('select','discovery-'+mode);for(const id of ids){const option=node('option',null,'v85.tour.'+id);option.value=id;select.append(option)}
+ const start=node('button','discoveryStart-'+mode,'v85.tour.start');start.className='secondary';start.type='button';start.onclick=()=>begin(select.value,mode==='quick');row.append(label,select,start);chooser.append(row);
+}
+$('discoveryProgress').before(chooser);
+for(const [id,key,fn]of [['discoveryBack','v85.tour.back',()=>move(-1)],['discoverySkip','v85.tour.skip',()=>move(1)],['discoveryMenu','v85.tour.menuButton',()=>{menu=true;render();$('discovery-deep').focus()}]]){
+ const b=node('button',id,key);b.type='button';b.className='secondary';b.onclick=fn;$('discoveryNext').after(b);
+}
+const title=box.querySelector('h2');title.dataset.i18n='v85.tour.title';
+function begin(id,isQuick=false){route=id;quick=isQuick;step=0;done=false;edited=false;menu=false;render();$('discoveryLocate').focus()}
+function steps(){return route?pathSteps(route,quick):[]}
+function current(){return steps()[step]}
+function navigationTarget(s){const nav=document.querySelector('[data-tab="'+s.navigation+'"]');if(!nav?.classList.contains('active'))return nav;if(s.view&&$('thermalExperiment').hidden!==(s.view!=='thermal'))return document.querySelector('[data-entropy-view="'+s.view+'"]');return s.view?document.querySelector('[data-entropy-view="'+s.view+'"]'):nav}
+function target(){const s=current();if(!s)return null;
+ const nav=route==='objects'||route==='temperature'?'extreme':route==='markers'||route==='thermal'?'entropy':route;
+ if(!$(nav)?.classList.contains('active'))return document.querySelector('[data-tab="'+nav+'"]');
+ if((route==='markers'||route==='thermal')&&$('thermalExperiment').hidden!==(route!=='thermal'))return document.querySelector('[data-entropy-view="'+(route==='thermal'?'thermal':'particles')+'"]');
+ return s.navigation?navigationTarget(s):document.querySelector(s.target);
+}
+function visible(el){return el?.isConnected&&el.getClientRects().length&&!el.disabled}
+function render(){
+ highlight?.classList.remove('discovery-highlight');highlight=null;
+ chooser.hidden=!menu;for(const id of ['discoveryProgress','discoveryText','discoveryDone','discoveryLocate','discoveryNext','discoveryBack','discoverySkip','discoveryMenu','discoveryRestart'])$(id).hidden=menu;
+ title.textContent=t('v85.tour.title');if(menu||box.hidden)return;
+ const list=steps(),s=current();if(s.navigation){const nav=document.querySelector('[data-tab="'+s.navigation+'"]');if(nav?.classList.contains('active')&&(!s.view||$('thermalExperiment').hidden===(s.view!=='thermal')))done=true}
+ if(s.reading)done=true;
+ $('discoveryProgress').textContent=t('v85.tour.progress',{step:step+1,total:list.length});$('discoveryText').textContent=t(s.text);$('discoveryDone').textContent=t(s.reading?'v85.tour.read':done?'v85.tour.done':'v85.tour.pending');
+ $('discoveryNext').disabled=!done;$('discoveryNext').textContent=t(step===list.length-1?'v85.tour.finish':'Weiter');$('discoveryBack').disabled=step===0;
+ $('discoveryLocate').textContent=t('v85.tour.locate');highlight=target();if(visible(highlight))highlight.classList.add('discovery-highlight');box.dataset.step=String(step);box.dataset.done=String(done);box.dataset.route=route;
+}
+function move(delta){if(delta>0&&step===steps().length-1){$('helpClose').click();return}step=Math.max(0,Math.min(steps().length-1,step+delta));done=false;edited=false;render();$('discoveryLocate').focus()}
+$('discoveryLocate').onclick=()=>{const el=target();if(!el)return;for(let p=el.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;if(visible(el)){el.focus();el.scrollIntoView({block:'center',behavior:'auto'})}};
+$('discoveryNext').onclick=()=>{if(done)move(1)};
+$('discoveryRestart').onclick=()=>{if(route)begin(route,quick)};
+for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',()=>{if(id==='helpToggle'&&route)menu=false;render()});
+const observe=e=>{
+ if(box.hidden||menu)return;
+ const s=current();if(route==='thermal'&&!quick&&step===3&&e.type==='input'&&e.target.matches('#thermalA,#thermalB'))edited=true;
+ if(s.event===e.type){const matching=s.event.startsWith('thermal-')?s.event!=='thermal-applied'||edited:e.target.closest?.(s.target);if(matching&&e.target.checkValidity?.()!==false){done=true}}
+ render();
+};
+for(const event of ['input','change','click','thermal-stepped','thermal-applied'])document.addEventListener(event,observe);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')render()});
+new MutationObserver(()=>render()).observe(box,{attributes:true,attributeFilter:['hidden']});onLanguageChange(render);render();
+globalThis.entrolabDiscovery={inspect:()=>({route,quick,step,done,menu,timers:0}),};
