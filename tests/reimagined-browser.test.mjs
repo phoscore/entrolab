@@ -372,15 +372,24 @@ test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paus
   assert(desktop.width>mobile.width*2);
   assert.equal(desktop.dpr,2);
   assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),snapshot);
+  await p.locator('#extreme h1').scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:1,mobile:false});
   const standard=await gasGeometry(p);
   assert.equal(standard.width,desktop.width);
   assert.notDeepEqual(standard.bitmap,desktop.bitmap);
   assert.equal(standard.dpr,1);
+  // A DPR-only CDP override need not emit a real browser resize event.
+  // Exercise that event path explicitly with the canvas still visible.
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:2,mobile:false});
+  await p.evaluate(()=>window.dispatchEvent(new Event('resize')));
+  assert.deepEqual(await gasGeometry(p),desktop);
   assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),snapshot);
   await p.locator('#gasPause').evaluate(e=>e.click());
   await p.waitForFunction(time=>window.entrolabGas.inspect().time>time,snapshot.time);
-  assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),{...snapshot,paused:false,time:(await inspect(p,'entrolabGas')).time});
+  const resumed=gasModel(await inspect(p,'entrolabGas'));
+  assert(resumed.time>snapshot.time);
+  assert.deepEqual(resumed,{...snapshot,paused:false,time:resumed.time});
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });

@@ -186,6 +186,7 @@ export function initGasView(doc = globalThis.document) {
  cleanup.push(onLanguageChange(() => { labels(); chart(); paint(); }));
  listen(motion, 'change', () => { labels(); schedule(); });
  listen(doc, 'visibilitychange', refresh);
+ listen(win, 'resize', refresh);
  for(const tab of doc.querySelectorAll('[data-tab]')) listen(tab, 'click', refresh);
  const intersection = new win.IntersectionObserver(([entry]) => {
   if(disposed)return;
