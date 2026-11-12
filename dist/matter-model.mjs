@@ -2,9 +2,14 @@ export const CODATA_2022 = Object.freeze({
  proton: 938.27208943, neutron: 939.56542194, deuteron: 1875.61294500
 }); // Rest-energy equivalents in MeV; 2022 CODATA.
 
+export const PHOTON_MIN_MEV = .01;
+export const PHOTON_MAX_MEV = 1000;
+export const photonEnergyValid = energy =>
+ Number.isFinite(energy) && energy >= PHOTON_MIN_MEV && energy <= PHOTON_MAX_MEV;
+
 export function photonSystem(energyA, energyB, degrees) {
- if (![energyA, energyB, degrees].every(Number.isFinite) ||
-     energyA <= 0 || energyA > 1000 || energyB <= 0 || energyB > 1000 || degrees < 0 || degrees > 180) {
+ if (!photonEnergyValid(energyA) || !photonEnergyValid(energyB) ||
+     !Number.isFinite(degrees) || degrees < 0 || degrees > 180) {
   throw new RangeError('Invalid two-photon parameters');
  }
  const angle = degrees * Math.PI / 180;

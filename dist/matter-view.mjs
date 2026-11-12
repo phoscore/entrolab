@@ -1,5 +1,5 @@
 import {t, locale, localizeTree, onLanguageChange} from './i18n.mjs';
-import {photonSystem, deuteronBinding} from './matter-model.mjs';
+import {photonSystem, deuteronBinding, PHOTON_MIN_MEV, PHOTON_MAX_MEV, photonEnergyValid} from './matter-model.mjs';
 
 const instances = new WeakMap();
 
@@ -13,8 +13,8 @@ export function initMatterView(doc = globalThis.document) {
    <div class="station-grid">
     <svg id="photonVectors" class="matter-figure" viewBox="0 0 410 270" role="img" data-i18n-aria-label="v09.photon.svg"></svg>
     <div class="station-readout"><div class="experiment-controls">
-     <label class="gas-a"><span data-i18n="v09.photon.energyA"></span><input id="photonA" type="number" min=".01" max="1000" step="any" value="1" required aria-describedby="photonError"></label>
-     <label class="gas-b"><span data-i18n="v09.photon.energyB"></span><input id="photonB" type="number" min=".01" max="1000" step="any" value="1" required aria-describedby="photonError"></label>
+     <label class="gas-a"><span data-i18n="v09.photon.energyA"></span><input id="photonA" type="number" min="${PHOTON_MIN_MEV}" max="${PHOTON_MAX_MEV}" step="any" value="1" required aria-describedby="photonError"></label>
+     <label class="gas-b"><span data-i18n="v09.photon.energyB"></span><input id="photonB" type="number" min="${PHOTON_MIN_MEV}" max="${PHOTON_MAX_MEV}" step="any" value="1" required aria-describedby="photonError"></label>
      <label class="photon-angle"><span data-i18n="v09.photon.angle"></span> <output id="photonAngleValue" for="photonAngle">90°</output><input id="photonAngle" type="range" min="0" max="180" step="1" value="90"></label>
      <button type="button" class="secondary" id="photonParallel" data-i18n="v09.photon.parallel"></button>
      <button type="button" class="secondary" id="photonOpposed" data-i18n="v09.photon.opposed"></button>
@@ -100,7 +100,7 @@ export function initMatterView(doc = globalThis.document) {
  }
  fields.forEach((field, i) => listen(field, 'input', () => {
   const value = field.valueAsNumber;
-  invalid[i] = !Number.isFinite(value) || value < .01 || value > 1000;
+  invalid[i] = !photonEnergyValid(value);
   if (!invalid[i]) energies[i] = value;
   photons();
  }));

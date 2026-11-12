@@ -101,10 +101,13 @@ export function initGasView(doc = globalThis.document) {
  const visible = () => !disposed && seen && !doc.hidden && view.classList.contains('active');
  const running = () => visible() && !motion.matches && !paused && canvasAvailable && !!surface;
  function measure() {
-  if (!visible()) return;
+  const rect = canvas.getBoundingClientRect();
   const dpr = Math.min(win.devicePixelRatio || 1, 1.25);
-  surface = prepareLabCanvas(canvas, dpr);
-  if (!surface && canvas.getClientRects().length) {
+  if (surface?.width === rect.width && surface.height === rect.height &&
+      canvas.width === Math.round(rect.width * dpr) && canvas.height === Math.round(rect.height * dpr)) return;
+  surface = prepareLabCanvas(canvas, dpr, rect);
+  paintKey = '';
+  if (!surface && rect.width >= 1 && rect.height >= 1) {
    canvasAvailable = false;
    canvas.parentElement.hidden = true;
    const note = doc.createElement('p');
@@ -113,7 +116,13 @@ export function initGasView(doc = globalThis.document) {
    canvas.parentElement.after(note);
    labels();
   }
-  paintKey = '';
+ }
+ function refresh() {
+  if (visible() && canvasAvailable) {
+   measure();
+   paint();
+  }
+  schedule();
  }
  function paint() {
   if (!visible() || !surface) return;
@@ -176,16 +185,25 @@ export function initGasView(doc = globalThis.document) {
  cleanup.push(globalThis.entrolabTemperature?.subscribe(bridge) ?? (()=>{}));
  cleanup.push(onLanguageChange(() => { labels(); chart(); paint(); }));
  listen(motion, 'change', () => { labels(); schedule(); });
- listen(doc, 'visibilitychange', () => { if(visible()&&!surface)measure(); paint(); schedule(); });
- for(const tab of doc.querySelectorAll('[data-tab]')) listen(tab, 'click', () => { paint(); schedule(); });
+ listen(doc, 'visibilitychange', refresh);
+ for(const tab of doc.querySelectorAll('[data-tab]')) listen(tab, 'click', refresh);
  const intersection = new win.IntersectionObserver(([entry]) => {
   if(disposed)return;
   seen = entry.isIntersecting;
-  if(visible() && !surface && canvasAvailable) measure();
-  paint(); schedule();
+  refresh();
  });
  intersection.observe(canvas);
- const resize = new win.ResizeObserver(() => { if(!disposed && canvasAvailable) { measure(); paint(); schedule(); } });
+ const resize = new win.ResizeObserver(refresh);
+ // A DPR-only change can leave the observed CSS box size unchanged.
+ let resolution;
+ function watchResolution() {
+  resolution?.removeEventListener('change', watchResolution);
+  resolution = win.matchMedia(`(resolution: ${win.devicePixelRatio || 1}dppx)`);
+  resolution.addEventListener('change', watchResolution);
+  refresh();
+ }
+ watchResolution();
+ cleanup.push(() => resolution.removeEventListener('change', watchResolution));
  resize.observe(canvas.parentElement);
  localizeTree(root); labels(); chart();
  const controller = {

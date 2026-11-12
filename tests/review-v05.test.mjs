@@ -9,10 +9,10 @@ import {initUX} from '../dist/ux.mjs';
 test('review P2: all unsubmitted editor drafts and visible validation survive language and later frames',()=>{
  const a=harness();try{a.el('play').onclick();const before=JSON.stringify(a.window.entrolab.inspect());
  const drafts={mass:'0.00000400',posX:'1.2500',posY:'-2.500',velX:'42.7500',velY:'-6.1250'};
- for(const [id,v] of Object.entries(drafts))a.el(id).value=v;a.el('editForm').fire('input');
+ for(const [id,v] of Object.entries(drafts))a.edit(id,v);
  a.doc.activeElement=a.el('en');a.language('en');for(let i=0;i<32;i++)a.tick();
  for(const [id,v] of Object.entries(drafts))assert.equal(a.el(id).value,v,id);assert.equal(JSON.stringify(a.window.entrolab.inspect()),before);
- a.el('mass').value='';a.el('editForm').onsubmit({preventDefault(){}});a.language('de');for(let i=0;i<32;i++)a.tick();
+ a.edit('mass','');a.el('editForm').onsubmit({preventDefault(){}});a.language('de');for(let i=0;i<32;i++)a.tick();
  assert.equal(a.el('mass').value,'');assert.match(a.el('editError').textContent,/Endliche/);assert.equal(a.el('velX').value,drafts.velX);assert.equal(JSON.stringify(a.window.entrolab.inspect()),before);
  }finally{a.dispose()}
 });

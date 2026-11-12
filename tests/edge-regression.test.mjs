@@ -18,13 +18,15 @@ function app(){
  const elements=new Map(),frames=[];let gradients=0;
  const context=new Proxy({createRadialGradient(...args){assert(args.every(Number.isFinite),'non-finite Canvas gradient');gradients++;return {addColorStop(){}}}}, {get:(o,k)=>k in o?o[k]:()=>{}});
  class Element{
-  constructor(){this.value='';this.checked=false;this.dataset={};this.style={};this.children=[];this.classList={toggle(){}}}
+  constructor(id){this.id=id;this.value='';this.handlers={};this.checked=false;this.dataset={};this.style={};this.children=[];this.classList={toggle(){}}}
   replaceChildren(...children){this.children=children;this.value=children[0]?.value??''}
   getBoundingClientRect(){return {width:600,height:500,left:0,top:0}}
   getContext(){return context}
-  addEventListener(){} setAttribute(){} closest(){return null}
+  get valueAsNumber(){return this.value===''?NaN:Number(this.value)}
+  addEventListener(type,handler){this.handlers[type]=handler}
+  setAttribute(){} closest(){return null}
  }
- const el=id=>{if(!elements.has(id))elements.set(id,new Element());return elements.get(id)};
+ const el=id=>{if(!elements.has(id))elements.set(id,new Element(id));return elements.get(id)};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;
  const window={addEventListener(){}};
  const scope=vm.createContext({...i18n,...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
@@ -35,7 +37,7 @@ function app(){
  new vm.Script(source,{filename:'dist/app.mjs'}).runInContext(scope);
  let now=100;
  return {el,window,get gradients(){return gradients},tick(){assert.equal(frames.length,1,'exactly one pending frame');frames.shift()(now);now+=16},
-  edit(index,x){el('objectList').value=window.entrolab.getBodies()[index].id;el('objectList').onchange();el('posX').value=x;el('editForm').onsubmit({preventDefault(){}})}};
+  edit(index,x){el('objectList').value=window.entrolab.getBodies()[index].id;el('objectList').onchange();el('posX').value=String(x);el('editForm').handlers.input({target:el('posX')});el('editForm').onsubmit({preventDefault(){}})}};
 }
 
 test('animation: extreme coordinates stop safely and reset + play resumes without reload',()=>{
