@@ -1,7 +1,10 @@
+import {reimagined} from './reimagined-text.mjs';
 import {upgradeDE,upgradeEN} from './upgrade-text.mjs';
 import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  ...Object.fromEntries(Object.entries(reimagined).map(([key,values])=>[key,values[0]])),
+
   ...knowledgeDE,
   ...upgradeDE,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.",
@@ -9,10 +12,9 @@ export const de=Object.freeze({
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.",
 
   "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMISCHES LEHRMODELL",
-  "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
+  "Reincarnated as a Proton — Physics playground": "Reincarnated as a Proton — Physics playground",
   "Zum Labor springen": "Zum Labor springen",
-  "ENTROLAB": "ENTROLAB",
-  "v0.5": "v0.5",
+    "v0.5": "v0.5",
   "Gravity Sandbox": "Gravitationssandbox",
   "Black Hole Lab": "Schwarzes-Loch-Labor",
   "Extreme Objects": "Extreme Objekte",
@@ -544,6 +546,8 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  ...Object.fromEntries(Object.entries(reimagined).map(([key,values])=>[key,values[1]])),
+
   ...knowledgeEN,
   ...upgradeEN,
   "Ursprünglich eingegeben: {original} {unit}. Das Temperaturfeld zeigt nach Rundung {display} {unit}; geprüft wird die ursprüngliche Eingabe.": "Originally entered: {original} {unit}. After rounding, the temperature field shows {display} {unit}; validation uses the original entry.",
@@ -551,10 +555,9 @@ export const en=Object.freeze({
   "Umrechnungsrundung am Rand: Übernahme als {temp} K. Quellfelder bleiben unverändert; erst Übernehmen ändert den Modellstart.": "Conversion roundoff at the boundary: draft {temp} K. Source fields stay unchanged; only Apply changes the initial state.",
 
   "THERMODYNAMISCHES LEHRMODELL": "THERMODYNAMIC TEACHING MODEL",
-  "ENTROLAB — Physics playground": "ENTROLAB — Physics playground",
+  "Reincarnated as a Proton — Physics playground": "Reincarnated as a Proton — Physics playground",
   "Zum Labor springen": "Skip to the lab",
-  "ENTROLAB": "ENTROLAB",
-  "v0.5": "v0.5",
+    "v0.5": "v0.5",
   "Gravity Sandbox": "Gravity Sandbox",
   "Black Hole Lab": "Black Hole Lab",
   "Extreme Objects": "Extreme Objects",

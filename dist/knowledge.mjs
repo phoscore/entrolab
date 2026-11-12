@@ -114,7 +114,7 @@ export const sources=freeze({
     "checked": "2026-11-09"
   },
   "physics-code": {
-    "publisher": "ENTROLAB",
+    "publisher": "Reincarnated as a Proton",
     "title": "physics.mjs",
     "url": "physics.mjs",
     "section": "Implementation / not an independent scientific source",
@@ -122,7 +122,7 @@ export const sources=freeze({
     "checked": "2026-11-09"
   },
   "marker-code": {
-    "publisher": "ENTROLAB",
+    "publisher": "Reincarnated as a Proton",
     "title": "entropy.mjs",
     "url": "entropy.mjs",
     "section": "Implementation of exact counting and q=1/4",
@@ -130,7 +130,7 @@ export const sources=freeze({
     "checked": "2026-11-09"
   },
   "thermal-code": {
-    "publisher": "ENTROLAB",
+    "publisher": "Reincarnated as a Proton",
     "title": "thermal-physics.mjs",
     "url": "thermal-physics.mjs",
     "section": "Implemented model and strict domains",

@@ -2,8 +2,8 @@
 
 ## Autorisierung und Umfang
 
-- Aktuell autorisiert (11.11.2026): v0.8.5, Schritte 05–08 plus QCD-/Protonenmasse-Wissensartikel gemäß ausdrücklichem Nutzerauftrag. Basis ist der bestätigte v0.8-Merge `25e72c639d66677c1629886141e3671a4c696ef6` auf `main`; ausschließlich `feature/v0.8.5-lab-upgrades`. Baseline: 186 reguläre Prüfungen, 65 Chromium-Fälle, zwölf historische Benchmarks, sechs Originalprüfungen. Alte Planungssperren sind für diesen Umfang überholt; keine Freigabe für weitere Features oder physikalische Modelländerungen.
-- Cloudflare baut Featurebranches automatisch: **jeder Commit beginnt mit `[CF-Pages-Skip]`**. Schon der erste vorbereitende Commit hat den v0.8-Merge als Elterncommit; der neue Ref wird erst auf diesem Skip-Commit angelegt. GitHub-CI bleibt aktiv. Keine neue öffentliche Vorschau, kein Merge, Deployment oder Domainwechsel.
+- Autorisiert am 12.11.2026: v0.9 Physics Reimagined auf `feature/v0.9-physics-reimagined` ab v0.8.5-Merge `ec2c4f1a5957478ab255f286a0ca2a9341cabcbe`. Genehmigte v0.9-Pläne aus PR #9 als Referenz. v0.9.5 bleibt gesondert.
+- Alle Branch-Commits beginnen mit `[CF-Pages-Skip]`. Den neuen Ref direkt auf dem ersten Skip-Commit anlegen. GitHub-CI bleibt aktiv.
 - GitHub-Repository `phoscore/entrolab` bleibt zentrale Versionsverwaltung. Abschluss als Draft-PR, unabhängig lesender Review; keine eigene Releasefreigabe.
 - Nach der Erstsicherung `main` nur mit ausdrücklicher Freigabe des Eigentümers verändern oder zusammenführen. Ein Prüfauftrag, erfolgreiche CI oder ein fertiger Branch sind keine Merge-Freigabe.
 - Keine Veröffentlichung, Releases, Deployment, GitHub Pages oder automatische Produktionsaktualisierung ohne ausdrückliche Zustimmung. Repository-Sichtbarkeit nicht eigenmächtig ändern.
@@ -29,7 +29,7 @@
 - Zwischen etabliertem Modell, numerischer Näherung und reiner Visualisierung deutlich unterscheiden.
 - Wissenschaftliche Änderungen an unabhängigen Referenzwerten und sinnvollen Erhaltungs-/Konvergenzprüfungen prüfen. Kleine Energiedrift allein ist kein Genauigkeitsbeweis.
 - Sci-Fi ist erlaubt, muss sichtbar als fiktiv/spekulativ gekennzeichnet und vom wissenschaftlichen Modus getrennt sein. Keine erfundenen Gesetzmäßigkeiten als reale Ergebnisse ausgeben.
-- Leitbild: ungefähr 90 % wissenschaftlich fundiert, verbleibender kreativer Spielraum für klar markierte Sci-Fi-Ideen. Keine pauschale 90-%-Genauigkeitsbehauptung.
+- Leitbild: „No plot armor. Just physics.“ Wissenschaft, Illustration und Fiktion sind erkennbar getrennt. Die frühere 90/10-Zahl war eine Stilbeschreibung.
 - Ungeklärte oder bekannte Grenzen offen benennen; vorhandene Rechentests sind keine unabhängige Zertifizierung.
 
 ## Prüfungen
@@ -43,12 +43,12 @@
 
 
 
-## v0.8 Zustands- und Inhaltsvertrag
+## Zustands- und Inhaltsvertrag
 
 - Vier Ebenen trennen: angewandtes Physikmodell, Eingabeentwürfe, Präsentation und abbrechbare Hintergrundberechnung. Hilfe/Quiz/Assets schreiben nicht in Physik oder RNG. Laufende Modellzeit und bisherige Sichtbarkeitspausen bleiben bestehen; reguläre Tabwechsel dürfen wie bisher Vorhersagen abbrechen.
-- Sechs fachliche Kontexte in fünf Hauptbereichen: gravity, blackhole, objects, temperature, markers, thermal. Extreme Objects und Temperature dürfen je eine geschlossene Frage im vorhandenen eigenen Abschnitt zeigen; keine automatische Kontextumschaltung beim Scrollen.
+- Sechs bestehende Laborkontexte plus Materie & Felder. Die Wissenschaftsseite behält ihre Quellenfunktion. Extreme Objects und Temperature dürfen je eine geschlossene Frage im vorhandenen eigenen Abschnitt zeigen; keine automatische Kontextumschaltung beim Scrollen.
 - N=4-Mikrozustandsdemo ist eigene, klar bezeichnete Präsentation ohne Zugriff auf Live-Marker, deren RNG oder N.
-- Eine gemeinsame Begriffs-/Quellenstruktur mit bestehendem DE/EN-System; keine neue unabhängige Wissensdatenbank, kein Framework und kein neuer Solver.
+- Eine gemeinsame Begriffs-/Quellenstruktur mit bestehendem DE/EN-System; eine gemeinsame Inhaltsquelle und native Module. Neue Berechnungen nur im genehmigten Laborumfang.
 - Monsterzustände: aus verbirgt und bricht Effekte ab; ruhig/Reduced Motion statisch; dezente Bewegung nur sichtbar und nach Sichtfreigabe. Höchstens eine sichtbare Instanz. Masterhash unverändert.
 - Physik und Integratoren sowie etablierte numerische Toleranzen nur nach zusätzlicher ausdrücklicher Freigabe ändern. Tastatur-Platzierung gegebenenfalls als separaten begrenzten Accessibility-Commit behandeln.
 - Für den ausdrücklich verlangten unabhängigen Abschlussreview darf ein separater Review-Agent ausschließlich lesend eingesetzt werden. Ein solcher Review ist keine formale externe Zertifizierung.

@@ -78,10 +78,23 @@ export function initKnowledge(doc=globalThis.document){
    shape('path',{d:'M345 72Q435 0 500 105T360 105Q470 140 480 40T390 48Q345 140 510 70',stroke:'#d1a2b6',fill:'none','stroke-width':2});
    for(const [x,y,label]of [[392,52,'u'],[468,62,'u'],[425,111,'d']]){shape('circle',{cx:x,cy:y,r:12,fill:'#beaad9'});const e=shape('text',{x,y:y+4,'text-anchor':'middle',fill:'#120d18'});e.textContent=label}
    for(const [x,key]of [[120,'v85.qcd.valence.label'],[430,'v85.qcd.dynamic.label']]){const e=shape('text',{x,y:165,'text-anchor':'middle',fill:'#d0c4dc','font-size':12});e.dataset.i18n=key;e.textContent=t(key)}
-   figure.append(svg,node('figcaption','v85.qcd.diagram','hint'));article.append(figure);
+   const controls=node('div',null,'experiment-controls'),caption=node('figcaption',null,'hint');
+   controls.setAttribute('role','group');controls.setAttribute('aria-label',t('v09.qcd.compare'));
+   const a=node('button','v09.qcd.valence','secondary'),b=node('button','v09.qcd.fields','secondary');
+   a.type=b.type='button';a.id='qcdValence';b.id='qcdFields';
+   const limit=node('p','v85.qcd.diagram','hint');let fields=false;
+   function compare(){
+    svg.setAttribute('viewBox',fields?'280 0 320 180':'0 0 250 180');
+    a.setAttribute('aria-pressed',String(!fields));b.setAttribute('aria-pressed',String(fields));
+    controls.setAttribute('aria-label',t('v09.qcd.compare'));
+    caption.textContent=t(fields?'v09.qcd.fieldsNote':'v09.qcd.valenceNote');
+   }
+   a.onclick=()=>{fields=false;compare()};b.onclick=()=>{fields=true;compare()};
+   cleanup.push(onLanguageChange(compare));compare();
+   figure.classList.add('qcd-figure');figure.append(svg,caption);controls.append(a,b);article.append(controls,figure,limit);
   }
   for(const section of item.sections){article.append(node('h3',section.title));for(const key of section.text)article.append(node('p',key));article.append(sourceList(section.sources))}
-  shell.append(article);grid.insertBefore(shell,before);owned.push(shell);
+  shell.append(article);const slot=doc.getElementById('matterKnowledge');if(slot)slot.append(shell);else grid.insertBefore(shell,before);owned.push(shell);
   const link=node('a',item.title);link.href='#'+item.target;link.dataset.modelLink=item.target;link.id='article-index-'+item.id;index.append(link);
  }
  for(const e of originalArticles)e.remove();

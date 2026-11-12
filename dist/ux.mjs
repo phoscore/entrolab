@@ -6,12 +6,12 @@ export function initUX(doc=globalThis.document){
  function exit(restore=true){if(!focus)return;doc.getElementById(focus).classList.remove('focus-view');doc.body.classList.remove('has-focus');focus=null;labels();if(restore)returnTo?.focus();doc.defaultView?.dispatchEvent(new Event('resize'))}
  for(const b of focusButtons)b.addEventListener('click',()=>{if(focus===b.dataset.focus){exit();return}exit(false);focus=b.dataset.focus;returnTo=b;$(focus).classList.add('focus-view');doc.body.classList.add('has-focus');labels();b.focus();doc.defaultView?.dispatchEvent(new Event('resize'))});
  for(const b of doc.querySelectorAll('[data-tab]'))b.addEventListener('click',()=>{exit(false);b.focus()});
- doc.addEventListener('keydown',e=>{if(e.key==='Escape'){exit();if(!$('quickStart').hidden){$('quickStart').hidden=true;$('helpToggle').setAttribute('aria-expanded','false');$('helpToggle').focus()}}});
- $('helpToggle').addEventListener('click',()=>{const open=$('quickStart').hidden;$('quickStart').hidden=!open;$('helpToggle').setAttribute('aria-expanded',String(open));if(open)$('helpClose').focus()});
- $('helpClose').addEventListener('click',()=>{$('quickStart').hidden=true;$('helpToggle').setAttribute('aria-expanded','false');$('helpToggle').focus()});
+ doc.addEventListener('keydown',e=>{if(e.key==='Escape'){exit();if($('quickStart')&&!$('quickStart').hidden){$('quickStart').hidden=true;$('helpToggle').setAttribute('aria-expanded','false');$('helpToggle').focus()}}});
+ $('helpToggle')?.addEventListener('click',()=>{const open=$('quickStart').hidden;$('quickStart').hidden=!open;$('helpToggle').setAttribute('aria-expanded',String(open));if(open)$('helpClose').focus()});
+ $('helpClose')?.addEventListener('click',()=>{$('quickStart').hidden=true;$('helpToggle').setAttribute('aria-expanded','false');$('helpToggle').focus()});
  let pendingEditor=null;
  for(const b of doc.querySelectorAll('[data-language]')){
-  b.addEventListener('pointerdown',()=>{const active=doc.activeElement;pendingEditor=(active?.closest?.('#editForm')||active?.closest?.('#entropy')||active?.closest?.('#temperatureContext')||active?.closest?.('.bh-illustration'))&&/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName)?active:null});
+  b.addEventListener('pointerdown',()=>{const active=doc.activeElement;pendingEditor=(active?.closest?.('#editForm')||active?.closest?.('#entropy')||active?.closest?.('#temperatureContext')||active?.closest?.('.bh-illustration')||active?.closest?.('#gasExperiment')||active?.closest?.('#matterExperiments'))&&/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName)?active:null});
   b.addEventListener('pointercancel',()=>{pendingEditor=null});b.addEventListener('keydown',()=>{pendingEditor=null});
   b.addEventListener('click',()=>{const editor=pendingEditor;pendingEditor=null;setLanguage(b.dataset.language);editor?.focus({preventScroll:true})});
  }
