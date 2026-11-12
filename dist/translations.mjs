@@ -1,9 +1,10 @@
+import {phaseA} from './phase-a-text.mjs';
 import {reimagined} from './reimagined-text.mjs';
 import {upgradeDE,upgradeEN} from './upgrade-text.mjs';
 import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
-  ...Object.fromEntries(Object.entries(reimagined).map(([key,values])=>[key,values[0]])),
+  ...Object.fromEntries(Object.entries({...reimagined,...phaseA}).map(([key,values])=>[key,values[0]])),
 
   ...knowledgeDE,
   ...upgradeDE,
@@ -546,7 +547,7 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
-  ...Object.fromEntries(Object.entries(reimagined).map(([key,values])=>[key,values[1]])),
+  ...Object.fromEntries(Object.entries({...reimagined,...phaseA}).map(([key,values])=>[key,values[1]])),
 
   ...knowledgeEN,
   ...upgradeEN,

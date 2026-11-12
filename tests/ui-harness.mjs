@@ -4,6 +4,7 @@ import * as i18n from '../dist/i18n.mjs';
 import * as physics from '../dist/physics.mjs';
 import * as display from '../dist/display.mjs';
 import * as data from '../dist/extreme-data.mjs';
+import * as stellar from '../dist/stellar-examples.mjs';
 import {experiment,experimentInfo} from '../dist/experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from '../dist/instruments.mjs';
 import {predict} from '../dist/prediction.mjs';
@@ -27,9 +28,9 @@ export function harness(module='app',reduce=false,startLanguage='de'){
  const motion={matches:reduce,addEventListener(k,f){this.change=f}};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;el('gravity').classes.add('active');el('comparisonMode').value='log';
  const window={addEventListener(){}};
- const scope=vm.createContext({...physics,...display,...data,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
+ const scope=vm.createContext({...physics,...display,...data,...stellar,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
   matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false,addEventListener(){}},Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},ResizeObserver:class{observe(){}},IntersectionObserver:class{constructor(fn){observers.push(fn)}observe(){}},
-  drawObject(){draws++},drawThermal(){draws++},requestAnimationFrame:f=>{frames.set(++id,f);return id},cancelAnimationFrame:i=>frames.delete(i),setTimeout:f=>timeouts.push(f)});
+  drawObject(){draws++},drawStellarExample(){draws++},drawThermal(){draws++},requestAnimationFrame:f=>{frames.set(++id,f);return id},cancelAnimationFrame:i=>frames.delete(i),setTimeout:f=>timeouts.push(f)});
  const source=readFileSync(new URL('../dist/'+(module==='app'?'app.mjs':'extreme-ui.mjs'),import.meta.url),'utf8').replace(/^import .*;\n/gm,'');new vm.Script(source).runInContext(scope);
  return {el,doc,frames,motion,labels,window,edit(id,value){const field=el(id);field.value=value;el('editForm').fire('input',field)},intersect(entries){for(const observer of observers)observer(entries)},get draws(){return draws},language:i18n.setLanguage,dispose(){subscriptions.forEach(f=>f());i18n.setLanguage('de')},
   tick(){const pending=[...frames.values()];frames.clear();for(const f of pending)f(now);now+=16},
