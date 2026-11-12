@@ -65,6 +65,7 @@ test('v0.9.25: sorted size comparison spans seven objects and labels the two sca
   assert.equal(log[0].percent,0);
   assert.equal(log.at(-1).kind,'supergiant');assert.equal(log.at(-1).percent,100);
   assert.match(await p.locator('#comparisonNote').textContent(),/Radiusverhältnisse/);
+  assert.match(await p.locator('#objectComparison [data-kind=blackhole] p').first().textContent(),/Horizont \(rₛ\)/);
   await p.locator('#comparisonMode').selectOption('linear');
   const linear=await read();
   assert(linear.every(row=>Math.abs(row.percent-100*row.radius/linear.at(-1).radius)<.0005));
@@ -109,6 +110,15 @@ test('v0.9.25: each new object paints its own moving scene and respects pause, o
   const offscreen=await rendered(p);
   await p.waitForTimeout(150);assert.equal(await rendered(p),offscreen);
   await canvas.scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
+  await p.evaluate(()=>{
+   Object.defineProperty(document,'hidden',{configurable:true,value:true});
+   document.dispatchEvent(new Event('visibilitychange'));
+  });
+  assert.equal(await p.locator('#extreme').getAttribute('data-animating'),'false');
+  const hidden=await rendered(p);
+  await p.waitForTimeout(150);assert.equal(await rendered(p),hidden);
+  await p.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
   await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
   await p.emulateMedia({reducedMotion:'reduce'});
   await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='false');

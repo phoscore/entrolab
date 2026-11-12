@@ -6,6 +6,9 @@ import { join,resolve,sep,extname } from 'node:path';
 
 const baseline='a64a174980023a06f673761f7d632240f2d9c21b';
 const types={'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.jpg':'image/jpeg'};
+const rounds=3;
+const sampleMs=1000;
+const warmupMs=250;
 const metrics=async session=>Object.fromEntries((await session.send('Performance.getMetrics')).metrics.map(m=>[m.name,m.value]));
 
 async function profile(h,baselineDir,{width,height,cpu},version,scenes){
@@ -28,37 +31,46 @@ async function profile(h,baselineDir,{width,height,cpu},version,scenes){
   await session.send('Performance.enable');
   if(cpu!==1)await session.send('Emulation.setCPUThrottlingRate',{rate:cpu});
   const rows=[];
-  for(const scene of scenes){
-   let pauseRule;
-   if(scene==='background-still')pauseRule=await p.addStyleTag({content:'#cosmicBackground::before{animation-play-state:paused!important}'});
-   const object=scene.startsWith('object:')?scene.split(':')[1]:null;
-   if(object){
-    if(!await p.locator('#extreme').evaluate(e=>e.classList.contains('active')))await p.locator('[data-tab=extreme]').click();
-    await p.locator('#extremeObject').selectOption(object);
-    await p.locator('#extremeCanvas').scrollIntoViewIfNeeded();
-    await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
+  for(let round=0;round<rounds;round++){
+   const ordered=round%2===0?scenes:[...scenes].reverse();
+   for(const [scene,sky] of ordered){
+    let pauseRule;
+    if(sky==='paused')pauseRule=await p.addStyleTag({content:'#cosmicBackground::before{animation-play-state:paused!important}'});
+    const object=scene.startsWith('object:')?scene.split(':')[1]:null;
+    if(scene==='background'){
+     if(!await p.locator('#gravity').evaluate(e=>e.classList.contains('active')))await p.locator('[data-tab=gravity]').click();
+     await p.evaluate(()=>window.scrollTo(0,0));
+    }
+    if(object){
+     if(!await p.locator('#extreme').evaluate(e=>e.classList.contains('active')))await p.locator('[data-tab=extreme]').click();
+     await p.locator('#extremeObject').selectOption(object);
+     await p.locator('#extremeCanvas').scrollIntoViewIfNeeded();
+     await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
+    }
+    await p.waitForTimeout(warmupMs);
+    const before=await metrics(session);
+    const sample=await p.evaluate(async ({object,sampleMs})=>{
+     const extreme=document.getElementById('extreme'),sky=document.getElementById('cosmicBackground');
+     const frames=()=>object?Number(extreme.dataset.rendered):window.entrolab.renderInfo().frame;
+     const started=performance.now(),initial=frames(),longTasks=[];
+     const observer=new PerformanceObserver(list=>longTasks.push(...list.getEntries().map(e=>e.duration)));
+     observer.observe({type:'longtask'});
+     await new Promise(done=>setTimeout(done,sampleMs));
+     longTasks.push(...observer.takeRecords().map(e=>e.duration));
+     observer.disconnect();
+     const canvas=document.getElementById(object?'extremeCanvas':'universe');
+     const {width,height}=canvas.getBoundingClientRect();
+     return {elapsed:performance.now()-started,draws:frames()-initial,canvas:[width,height],longTasks,
+      atmosphere:sky?getComputedStyle(sky,'::before').animationPlayState:'absent'};
+    },{object,sampleMs});
+    const after=await metrics(session);
+    const ms=key=>Number(((after[key]-before[key])*1000).toFixed(3));
+    rows.push({version,width,height,cpu,round:round+1,scene,...sample,taskMs:ms('TaskDuration'),scriptMs:ms('ScriptDuration')});
+    assert.equal(sample.atmosphere,sky,`${version} ${scene}`);
+    if(object)assert(sample.draws>0,scene);
+    else assert.equal(sample.draws,0,scene);
+    await pauseRule?.evaluate(e=>e.remove());
    }
-   await p.waitForTimeout(350);
-   const before=await metrics(session);
-   const sample=await p.evaluate(async object=>{
-    const extreme=document.getElementById('extreme'),sky=document.getElementById('cosmicBackground');
-    const frames=()=>object?Number(extreme.dataset.rendered):window.entrolab.renderInfo().frame;
-    const started=performance.now(),initial=frames(),longTasks=[];
-    const observer=new PerformanceObserver(list=>longTasks.push(...list.getEntries().map(e=>e.duration)));
-    observer.observe({type:'longtask'});
-    await new Promise(done=>setTimeout(done,1500));
-    observer.disconnect();
-    const canvas=document.getElementById(object?'extremeCanvas':'universe');
-    const {width,height}=canvas.getBoundingClientRect();
-    return {elapsed:performance.now()-started,draws:frames()-initial,canvas:[width,height],longTasks,
-     atmosphere:sky?getComputedStyle(sky,'::before').animationPlayState:'absent'};
-   },object);
-   const after=await metrics(session);
-   const ms=key=>Number(((after[key]-before[key])*1000).toFixed(3));
-   rows.push({version,width,height,cpu,scene,...sample,taskMs:ms('TaskDuration'),scriptMs:ms('ScriptDuration')});
-   if(object)assert(sample.draws>0,scene);
-   else assert.equal(sample.draws,0,scene);
-   await pauseRule?.evaluate(e=>e.remove());
   }
   assert.deepEqual(errors,[]);
   return rows;
@@ -76,13 +88,19 @@ export async function measurePhaseA(h,t){
  const scratch=await mkdtemp(join(tmpdir(),'entrolab-v0925-'));
  try{
   execFileSync('tar',['-xf','-','-C',scratch],{input:archive});
-  const measurements=[],old=['background','object:neutron'],current=['background','background-still','object:neutron',
-   'object:brown','object:supergiant','object:magnetar','object:wolf'];
+  const measurements=[];
+  const shared=['background','object:neutron'];
+  const old=shared.map(scene=>[scene,'absent']);
+  const current=[
+   ...shared.flatMap(scene=>[[scene,'running'],[scene,'paused']]),
+   ...['brown','supergiant','magnetar','wolf'].map(kind=>['object:'+kind,'running']),
+  ];
   for(const [index,setting] of [{width:1360,height:900,cpu:1},{width:390,height:900,cpu:4}].entries()){
    const versions=index===0?[['v0.9',old],['v0.9.25',current]]:[['v0.9.25',current],['v0.9',old]];
    for(const [version,scenes] of versions)measurements.push(...await profile(h,join(scratch,'dist'),setting,version,scenes));
   }
-  const report={baseline,browser:h.browser.version(),dpr:1,method:'One 1.5 s observation per scene, 350 ms warm-up, same runner/browser, CDP TaskDuration for the entire tab',measurements};
+  const report={baseline,browser:h.browser.version(),dpr:1,rounds,sampleMs,warmupMs,
+   method:'CDP TaskDuration and ScriptDuration for the whole tab, paired live and paused atmosphere in Phase A',measurements};
   await writeFile(join(h.output,'v0925-performance.json'),JSON.stringify(report,null,2)+'\n');
   console.log('v0.9.25 measurements '+JSON.stringify(report));
  }finally{await rm(scratch,{recursive:true,force:true})}

@@ -27,8 +27,9 @@ function comparison(){
   if(b.kind===state.kind)a.setAttribute('aria-current','true');
   const title=document.createElement('h3');title.textContent=t(b.name);
   const values=document.createElement('p');
-  values.textContent=tx`${scientific(b.mass/C.sun,'M☉')} · Radius ${length(b.radius)}`;
-  if(b.kind==='wolf')values.textContent+=' · '+t('v0925.wolf.shortRadius');
+  const radiusLabel=b.kind==='blackhole'?t('v0925.horizonRadius'):
+   b.kind==='wolf'?t('v0925.wolf.shortRadius'):'Radius';
+  values.textContent=`${scientific(b.mass/C.sun,'M☉')} · ${radiusLabel} ${length(b.radius)}`;
   const density=document.createElement('p');density.className='hint';
   density.textContent=b.kind==='wolf'?t('v0925.wolf.density'):b.density===null?
    t('Keine Materialdichte: Horizont ist keine feste Oberfläche.'):

@@ -27,9 +27,9 @@ test('Stellar references use published values and clearly defined radius convent
  const brown=extremeExample('brown'), red=extremeExample('supergiant'), wr=extremeExample('wolf');
  close(brown.mass,5.580e28,1e25);
  assert.equal(brown.radius,71492000);
- assert.equal(brown.temperature,1350);
+ assert.equal(brown.temperature,1280);
  close(brown.density,36456,120);
- close(brown.luminosity,3.1601e-5,1e-9);
+ close(brown.luminosity,2.55391e-5,1e-9);
  close(red.radius,5.315148e11,1);
  close(red.luminosity,88321,125);
  assert.equal(red.temperature,3600);
@@ -49,6 +49,7 @@ test('Log radius comparison remains ordered across the entire black-hole mass ra
  for(const mass of [1,10*C.sun,1e41]){
   const radii=extremeKinds.map(kind=>extremeExample(kind,mass).radius).sort((a,b)=>a-b);
   const lo=radii[0],hi=radii.at(-1);
+  close(comparisonPosition(Math.sqrt(lo*hi),'log',hi,lo),0.5,1e-12);
   for(const mode of ['log','linear']){
    const points=radii.map(r=>comparisonPosition(r,mode,hi,lo));
    assert(points.every((p,i)=>p>=0&&p<=1&&(i===0||p>=points[i-1])));

@@ -19,10 +19,10 @@ function sphereExample(example) {
 const examples = Object.freeze({
  brown: sphereExample({
   name:'v0925.brown', reference:'Luhman 16B', mass:29.4*jupiterMass, radius:jupiterRadius,
-  temperature:1350, color:'#c99179', assumption:'v0925.brown.model',
+  temperature:1280, color:'#c99179', assumption:'v0925.brown.model',
   sources:Object.freeze([
-   ['de Regt et al. (2025)', 'https://doi.org/10.1051/0004-6361/202453190'],
-   ['Tannock et al. (2025)', 'https://doi.org/10.1093/mnras/staf487'],
+   ['Bedin et al. (2024), NASA Exoplanet Archive', 'https://exoplanetarchive.ipac.caltech.edu/overview/Luhman-16'],
+   ['Faherty et al. (2014)', 'https://doi.org/10.1088/0004-637X/790/2/90'],
    ['Spiegel et al. (2011)', 'https://doi.org/10.1088/0004-637X/727/1/57'],
   ].map(Object.freeze)),
  }),
