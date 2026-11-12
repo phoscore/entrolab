@@ -186,3 +186,201 @@ test('v0.9 gas lifecycle: 100 mounts release observers, pending frames and subsc
   assert.equal(await p.locator('#gasCanvas').count(),1);assert.deepEqual(await physical(p),before);
  }finally{await context.close()}
 });
+
+const days = value => new Intl.NumberFormat('de-DE',{maximumSignificantDigits:5}).format(value)+' Tage';
+const formValue = value => String(Number(value.toPrecision(9)));
+const gravityState = p => p.evaluate(()=>window.entrolab.inspect());
+const gravityRender = p => p.evaluate(()=>window.entrolab.renderInfo());
+const selectedBody = ({bodies,selected}) => bodies.find(body=>body.id===selected);
+
+async function startGravity(p){
+ await p.locator('#universe').scrollIntoViewIfNeeded();
+ await p.evaluate(()=>document.getElementById('play').click());
+ await p.waitForFunction(()=>!window.entrolab.inspect().paused&&window.entrolab.renderInfo().scheduled);
+}
+
+async function pauseBetweenDiagnostics(p){
+ return p.evaluate(()=>new Promise(resolve=>{
+  const first=window.entrolab.renderInfo().frame;
+  function pause(){
+   const {frame}=window.entrolab.renderInfo();
+   if(frame>=first+5&&frame%15>=4&&frame%15<=12){
+    document.getElementById('play').click();
+    resolve(frame);
+   }else requestAnimationFrame(pause);
+  }
+  requestAnimationFrame(pause);
+ }));
+}
+
+test('v0.9 audit V09-01: pause synchronizes model diagnostics and a mass edit preserves exact phase space',async()=>{
+ const {p,context}=await h.lab({reducedMotion:'no-preference'});
+ try{
+  await p.locator('#speed').fill('2');
+  await startGravity(p);
+  const stoppedAt=await pauseBetweenDiagnostics(p);
+  await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
+  const stopped=await gravityState(p);
+  const before=selectedBody(stopped);
+  assert(stopped.paused&&stopped.elapsed>0);
+  assert(stoppedAt%15>=4&&stoppedAt%15<=12);
+  assert.equal(await p.locator('#time').textContent(),days(stopped.elapsed));
+  assert.equal(await p.locator('#posX').inputValue(),formValue(before.x));
+  assert.equal(await p.locator('#posY').inputValue(),formValue(before.y));
+  const factor=await p.evaluate(async()=>{
+   const {C}=await import('/physics.mjs');
+   return C.AU/C.day/1000;
+  });
+  assert.equal(await p.locator('#velX').inputValue(),formValue(before.vx*factor));
+  assert.equal(await p.locator('#velY').inputValue(),formValue(before.vy*factor));
+  await p.locator('.edit-options > summary').click();
+  await p.locator('#mass').fill('0.000004');
+  await p.locator('#editForm button[type=submit]').click();
+  const edited=await gravityState(p);
+  assert.deepEqual(selectedBody(edited),{...before,m:.000004,trail:[]});
+  assert.equal(edited.elapsed,stopped.elapsed);
+  await startGravity(p);
+  await p.waitForFunction(elapsed=>window.entrolab.inspect().elapsed>elapsed,stopped.elapsed);
+  assert.equal(selectedBody(await gravityState(p)).m,.000004);
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('v0.9 audit V09-01: pending fields and invalid drafts survive both manual and Reduced Motion pause',async()=>{
+ const {p,context}=await h.lab({reducedMotion:'no-preference'});
+ try{
+  await p.locator('.edit-options > summary').click();
+  await p.locator('#velX').fill('42.7500');
+  await p.locator('#mass').fill('');
+  const pristine=await p.locator('#posX').inputValue();
+  await startGravity(p);
+  await pauseBetweenDiagnostics(p);
+  assert.equal(await p.locator('#velX').inputValue(),'42.7500');
+  assert.equal(await p.locator('#mass').inputValue(),'');
+  const after=selectedBody(await gravityState(p));
+  assert.notEqual(formValue(after.x),pristine);
+  assert.equal(await p.locator('#posX').inputValue(),formValue(after.x));
+  await startGravity(p);
+  // Focus the draft without scrolling the stage offscreen.
+  await p.locator('#velX').evaluate(e=>e.focus({preventScroll:true}));
+  await p.waitForFunction(x=>window.entrolab.inspect().bodies.find(b=>b.id===x.id).x!==x.x,after);
+  await p.emulateMedia({reducedMotion:'reduce'});
+  await p.waitForFunction(()=>window.entrolab.inspect().paused&&!window.entrolab.renderInfo().scheduled);
+  const reduced=await gravityState(p);
+  assert.equal(await p.locator('#time').textContent(),days(reduced.elapsed));
+  assert.equal(await p.locator('#posX').inputValue(),formValue(selectedBody(reduced).x));
+  assert.equal(await p.locator('#velX').inputValue(),'42.7500');
+  assert.equal(await p.locator('#mass').inputValue(),'');
+  assert.equal(await p.evaluate(()=>document.activeElement.id),'velX');
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('v0.9 audit V09-01: paused speed label and display switches update without an idle loop',async()=>{
+ const {p,context}=await h.lab({reducedMotion:'no-preference'});
+ try{
+  await startGravity(p);
+  await pauseBetweenDiagnostics(p);
+  await p.locator('details.display-options > summary').click();
+  await p.locator('#universe').scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
+  const canvas=()=>p.locator('#universe').evaluate(e=>e.toDataURL());
+  const settled=await gravityRender(p), stopped=await gravityState(p);
+  await p.locator('#speed').fill('2');
+  assert.equal(await p.locator('#speedLabel').textContent(),'100 Tage/s');
+  assert.deepEqual(await gravityRender(p),settled);
+  for(const id of ['labels','grid','trails']){
+   const before=await canvas(), {frame}=await gravityRender(p);
+   // Keep the canvas in view independently of the control's location.
+   await p.locator('#'+id).evaluate(e=>e.click());
+   await p.waitForFunction(n=>window.entrolab.renderInfo().frame>n,frame,{timeout:2500});
+   assert.notEqual(await canvas(),before,id+' should change painted pixels');
+   assert.deepEqual(await gravityRender(p),{...settled,frame:frame+1});
+  }
+  const painted=await gravityRender(p);
+  await p.waitForTimeout(250);
+  assert.deepEqual(await gravityRender(p),painted);
+  assert.deepEqual(await gravityState(p),stopped);
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+const gasModel = ({temperatures,statistics,seed,paused,time}) => ({temperatures,statistics,seed,paused,time});
+async function gasGeometry(p){
+ const canvas=p.locator('#gasCanvas');
+ await canvas.scrollIntoViewIfNeeded();
+ await p.waitForFunction(()=>{
+  const e=document.getElementById('gasCanvas'), r=e.getBoundingClientRect();
+  const dpr=Math.min(devicePixelRatio,1.25);
+  return window.entrolabGas.inspect().seen&&e.width===Math.round(r.width*dpr)&&e.height===Math.round(r.height*dpr);
+ },null,{timeout:3000});
+ const geometry=await canvas.evaluate(e=>{
+  const {width,height}=e.getBoundingClientRect(), {a,d}=e.getContext('2d').getTransform();
+  return {width,height,bitmap:[e.width,e.height],pixelScale:[a,d],dpr:devicePixelRatio};
+ });
+ const [w,h]=geometry.bitmap;
+ // Mapping back from the backing store must produce one CSS pixel on both axes.
+ assert(Math.abs(geometry.pixelScale[0]*geometry.width/w-1)<1e-6);
+ assert(Math.abs(geometry.pixelScale[1]*geometry.height/h-1)<1e-6);
+ return geometry;
+}
+
+test('v0.9 audit V09-02: hidden tab resizes desktop to 390 px and back without changing the gas model',async()=>{
+ const {p,context}=await h.lab({viewport:{width:1360,height:900}});
+ try{
+  await select(p,'extreme');
+  const desktop=await gasGeometry(p);
+  await p.locator('#gasA').fill('250');
+  await p.locator('#gasResample').click();
+  const model=gasModel(await inspect(p,'entrolabGas'));
+  const chart=await p.locator('#gasChart').innerHTML();
+  const snapshot=await physical(p);
+  for(const width of [390,1360]){
+   await select(p,'matter');
+   await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
+   await p.setViewportSize({width,height:900});
+   await select(p,'extreme');
+   const resized=await gasGeometry(p);
+   if(width===390)assert(resized.width<desktop.width/2);
+   else assert.deepEqual(resized,desktop);
+   assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),model);
+   assert.equal(await p.locator('#gasChart').innerHTML(),chart);
+   const painted=await inspect(p,'entrolabGas');
+   await p.waitForTimeout(220);
+   assert.deepEqual(await inspect(p,'entrolabGas'),painted);
+  }
+  assert.deepEqual(await physical(p),snapshot);
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paused and active gas state',async()=>{
+ const {p,context}=await h.lab({viewport:{width:390,height:900},reducedMotion:'no-preference'});
+ try{
+  await select(p,'extreme');
+  const mobile=await gasGeometry(p);
+  await p.waitForFunction(()=>window.entrolabGas.inspect().time>0);
+  await p.locator('#gasPause').evaluate(e=>e.click());
+  const snapshot=gasModel(await inspect(p,'entrolabGas'));
+  const cdp=await context.newCDPSession(p);
+  await p.locator('#extreme h1').scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
+  const before=await inspect(p,'entrolabGas');
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:2,mobile:false});
+  assert.equal((await inspect(p,'entrolabGas')).frames,before.frames);
+  const desktop=await gasGeometry(p);
+  assert(desktop.width>mobile.width*2);
+  assert.equal(desktop.dpr,2);
+  assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),snapshot);
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:1,mobile:false});
+  const standard=await gasGeometry(p);
+  assert.equal(standard.width,desktop.width);
+  assert.notDeepEqual(standard.bitmap,desktop.bitmap);
+  assert.equal(standard.dpr,1);
+  assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),snapshot);
+  await p.locator('#gasPause').evaluate(e=>e.click());
+  await p.waitForFunction(time=>window.entrolabGas.inspect().time>time,snapshot.time);
+  assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),{...snapshot,paused:false,time:(await inspect(p,'entrolabGas')).time});
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});

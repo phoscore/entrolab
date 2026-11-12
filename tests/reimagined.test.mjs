@@ -62,3 +62,13 @@ test('Published navigation retires Discovery and places the new lab between Entr
  assert.match(html,/<title>Reincarnated as a Proton<\/title>/);
  assert(de['v09.gas.chart']&&en['v09.qcd.fields']);
 });
+
+test('Photon system explicitly rejects energies below its 0.01 MeV domain',()=>{
+ for(const energy of [Number.MIN_VALUE,1e-200,1e-160,.009999999999999998]){
+  assert.throws(()=>photonSystem(energy,1,180),RangeError);
+  assert.throws(()=>photonSystem(1,energy,180),RangeError);
+ }
+ assert.equal(photonSystem(.01,.01,180).restEnergy,.02);
+ assert.equal(photonSystem(1000,1000,180).restEnergy,2000);
+ assert(Math.abs(photonSystem(.01,1000,180).restEnergy-6.324555320336759)<1e-14);
+});
