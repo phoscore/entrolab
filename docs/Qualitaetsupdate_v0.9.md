@@ -72,3 +72,42 @@ python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
 Unter Windows funktioniert auch `py` anstelle von `python`. Dann [localhost:8000](http://localhost:8000/) öffnen. Für die App sind keine npm-Abhängigkeiten nötig. Historische Git-Prüfungen benötigen einen vollständigen Git-Klon. Der private Draft dient der unabhängigen Prüfung vor der Releaseentscheidung.
+
+## Nachbesserungen zum unabhängigen Codex-Audit
+
+Geprüfter Ausgangsstand `b94f8f086020c326a39c9f71ba0ce630be863ddb`. Die Gegenprobe mit zusätzlichen Tests und identischem Anwendungscode liegt auf `f4760e0f3dfb68679eb2c1bb5e6bf799b09196db`. Erste Funktionskorrektur `db239e238f85bea1361d702e4e6bf56d68473052`. Vollständiger korrigierter Anwendungsstand `c1a73fa11bde4d6a6f9ae7d48c697de5dc904d3c`. [Vollständiger Audit in PR #10](https://github.com/phoscore/entrolab/pull/10#issuecomment-6818124043) · [Gegenprobe vor der Korrektur](https://github.com/phoscore/entrolab/actions/runs/43236613321)
+
+| Befund | Ursache und Korrektur | Abdeckung |
+| --- | --- | --- |
+| V09-01 · Gravity | Beim Wechsel in Pause konnte die letzte Diagnose vor dem aktuellen Integrationsschritt liegen. Ein gemeinsamer Pausepfad aktualisiert Messwerte und nicht bearbeitete Formularfelder sofort, auch wenn Reduced Motion bei fokussiertem Editor aktiviert wird. Die Eingaben werden pro Feld als Entwurf geführt. Anwenden übernimmt ausschließlich bearbeitete Felder und liest keine gerundeten Positions-/Geschwindigkeitsanzeigen zurück. Der bestehende Baseline- und Spurreset nach einer tatsächlichen Änderung bleibt erhalten. Der Zeitregler aktualisiert sein Label direkt. Beschriftungen, Raster und Spuren lösen im pausierten Zustand je eine bedarfsgesteuerte Neuzeichnung aus. | Drei Chromium-Fälle für Pause zwischen Diagnose-Frames, exakten Körperzustand nach reiner Massenänderung, Wiederanlauf, leere und gültige Entwürfe, Reduced Motion mit Fokus, sofortiges Zeitlabel, Pixelvergleich der drei Schalter und Stillstand danach. [App-Steuerung](../dist/app.mjs) |
+| V09-02 · Gas | Beim verdeckten Resize wurde die zuletzt gemessene Surface behalten und bei Rückkehr nur bei fehlender Surface geprüft. Sichtbarkeits-, Resize- und DPR-Ereignisse prüfen jetzt gemeinsam CSS-Abmessungen und DPR-gedeckelten Backing Store. Bei tatsächlicher Größenänderung wird die Canvas-Transformation neu gesetzt. Die laufenden Frames erhalten keinen Layout-Read. Seed, Temperatur, Stichprobe, Histogramm und Modellzeit bleiben beim Resize erhalten. | Zwei Chromium-Fälle für Tabwechsel 1360 → 390 → 1360 px, Resize außerhalb des Viewports, DPR-Wechsel bei konstanter CSS-Größe und verdecktem Canvas, sichtbares Resize-Ereignis nach CDP-Override, Canvas-Transformation, Stillstand und Wiederanlauf. [Gas-Controller](../dist/gas-view.mjs) · [Canvas-Helfer](../dist/lab-canvas.mjs) |
+| V09-03 · Photonen | Sehr kleine positive API-Energien konnten vor der Wurzel im Produkt unterlaufen. Modell und Formular verwenden dieselbe inklusive Energiedomäne von 0,01 bis 1.000 MeV. Direkte Aufrufe unter der Untergrenze liefern einen `RangeError`. Die Halbwinkelformel ist unverändert. | Ein neuer Node-Fall prüft die Unterlaufbeispiele für beide Photonen, einen Wert unmittelbar unter der Grenze und zulässige Referenzen. Zusätzlich stimmten 14.823 vollständige Ergebnisse im direkten Vorher-nachher-Vergleich exakt überein. [Modell](../dist/matter-model.mjs) · [Eingabe](../dist/matter-view.mjs) |
+
+Der unveränderte Anwendungscode scheiterte im CI-Gegenlauf genau an den fünf neuen Browserfällen. Gemessen wurden unter anderem **12,356 statt 17,356 Tage**, eine veraltete uneditierte x-Position von **−0,801143616 statt −0,884388761 AU** und **30,2 statt 100 Tage/s**. Beide Gasfälle warteten nach verdecktem Resize vergeblich auf die korrekte Bitmap. Der neue Node-Grenztest schlug auf dem Altstand ebenfalls fehl. Der [gemeinsame DOM-Adapter](../tests/ui-harness.mjs) und die Fixtures der [Randfall-](../tests/edge-regression.test.mjs), [Lokalisierungs-](../tests/localized-ui.test.mjs) und [Entwurfsprüfungen](../tests/review-v05.test.mjs) bilden jetzt das Eingabeereignis mit seinem Feld als Ziel und `valueAsNumber` ab. Die bisherigen fachlichen Assertions und historischen Toleranzen sind unverändert.
+
+### Prüfergebnisse
+
+| Prüfung | Ergebnis am korrigierten Anwendungsstand |
+| --- | ---: |
+| Regulär, lokal und CI | **206 bestanden** (196 Node-Fälle und zehn Anwendungsselbstchecks) |
+| Chromium in CI | **99 bestanden** (94 bestehende und fünf gezielte Regressionen) |
+| Historische numerische Benchmarks in CI | **12 vollständige Ergebnisse exakt gleich** |
+| Originalintegrität in CI | **6 Prüfsummen bestanden** |
+
+Der erste Korrekturlauf bestand 98 von 99 Chromium-Fällen. Der verbliebene Fall betraf den DPR-Wechsel mit unveränderter CSS-Größe. Der finale Test prüft den Wechsel mit unveränderter CSS-Größe bei verdecktem Canvas sowie die sichtbare Aktualisierung nach einem Resize-Ereignis. Die lokale Chromium-Installation konnte wegen einer Socket-Beschränkung nicht gestartet werden. Die Browserfälle liefen in GitHub Actions. [Funktionscommit und CI](https://github.com/phoscore/entrolab/actions/runs/43238217220)
+
+Gegen den auditierten Commit wurden nur die fünf genannten Laufzeitmodule, die beschriebenen Testdateien und dieser Bericht geändert. Die Gravity- und Gas-Solver, die archivierte v0.1, die historischen Referenzwerte und der Monster-Master blieben unverändert.
+
+### Kurzer Performancevergleich
+
+Der vorhandene v0.9-Messeinstieg lief auf dem unveränderten Anwendungscode und dem Funktionsfix mit Chromium 151.0.7922.34, DPR 1, Systemschrift und 650 ms Warm-up. Die Tabelle vergleicht die Kandidatenszenen aus zwei separaten GitHub-Runs. Die Zahlen sind Einzelproben der gesamten CDP-Tab-TaskDuration, keine belastbare Prozent- oder GPU-Messung.
+
+| Szene | TaskDuration vor → nach | Zeichnungen vor → nach |
+| --- | ---: | ---: |
+| Gravity pausiert, Desktop, 1,8 s | 1,630 → 2,252 ms | **0 → 0** |
+| Gas aktiv, Desktop, 4 s | 149,025 → 138,555 ms | 120 → 121 |
+| Gas aktiv, 390 px / 4× CPU, 4 s | 436,018 → 384,986 ms | 121 → 120 |
+
+Gas-Zeichenabstände blieben bei **33,4 ms P95**, ohne beobachteten Long Task in diesen Proben. Der Gravity-Browserfall prüft zusätzlich, dass der Zeitregler keinen Frame einplant, jeder der drei Anzeigeschalter genau einen Frame auslöst und der pausierte Scheduler anschließend ruht. In den Gas-Browserfällen endet die Arbeit nach der Wiedervermessung, solange das Experiment pausiert ist. [Messlauf davor](https://github.com/phoscore/entrolab/actions/runs/43236613321/job/131245549155) · [Messlauf danach](https://github.com/phoscore/entrolab/actions/runs/43238217220/job/131251228317)
+
+DPR-Änderungen wurden per Chromium-Emulation geprüft. Bei einem reinen CDP-DPR-Override ohne Größenänderung aktualisierte Chromium im ersten Korrekturlauf das Canvas ohne zusätzliches Resize-Signal nicht. Der sichtbare Resize-Ereignispfad wird deshalb mit ausdrücklich ausgelöstem Fensterereignis geprüft. Die verdeckte Gegenprobe verlangt die korrekte Bitmap auch ohne dieses Ereignis. Nativer Browser-Zoom, echte Mobilgeräte und mobile GPU-Last wurden für diese Nachbesserung nicht geprüft. Die Releaseentscheidung liegt beim Eigentümer. [Browserregressionen](../tests/reimagined-browser.test.mjs) · [Node-Grenztest](../tests/reimagined.test.mjs)
