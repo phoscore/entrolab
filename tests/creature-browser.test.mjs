@@ -15,6 +15,7 @@ const frames=p=>art(p).evaluate(e=>e.getAnimations({subtree:true}).map(a=>a.anim
 const sky=p=>p.locator('#cosmicBackground').evaluate(e=>getComputedStyle(e,'::before').animationPlayState);
 
 async function controlled(p,roll=.85){
+ await reset(p);
  await p.evaluate(async roll=>{
   const {initCreature}=await import('/creature-ui.mjs');
   initCreature().dispose();
@@ -36,10 +37,10 @@ async function controlled(p,roll=.85){
   };
   window.nullAudit.mount();
  },roll);
- await p.waitForFunction(()=>window.nullAudit.pending()===1);
+ await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});
 }
 const advance=p=>p.evaluate(()=>window.nullAudit.tick());
-const reset=p=>p.evaluate(()=>window.scrollTo(0,0));
+const reset=p=>p.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,behavior:'instant'});});
 
 test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief use independent joints',async()=>{
  const {p,context}=await h.lab({reducedMotion:'no-preference'});
@@ -165,7 +166,9 @@ test('Null: mobile and desktop art neither shifts the lab nor intersects guide t
    await controlled(p);
    const placement=()=>p.evaluate(()=>{
     const section=document.querySelector('.view.active').getBoundingClientRect(),slot=document.querySelector('.null-slot').getBoundingClientRect();
-    const text=document.querySelector('#physicsGuide > summary > span:first-child').getBoundingClientRect();
+    const range=document.createRange();
+    range.selectNodeContents(document.querySelector('#physicsGuide > summary > span:first-child'));
+    const text=range.getBoundingClientRect();
     const hint=document.querySelector('.input-convention').getBoundingClientRect();
     return {section:[section.x,section.y,section.width],safe:text.right<slot.left&&slot.bottom<=hint.top,
      overflow:document.documentElement.scrollWidth>innerWidth+1,hit:!!document.elementFromPoint(slot.left+slot.width/2,slot.top+slot.height/2)?.closest('.null-slot')};

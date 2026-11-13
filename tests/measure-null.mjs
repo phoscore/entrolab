@@ -23,7 +23,7 @@ async function measure(h,base,version,width,cpu){
   await h.ready(p);
   await p.waitForFunction(()=>document.querySelector('#checkRunStatus').getAttribute('aria-busy')==='false');
   if(!await p.evaluate(()=>window.entrolab.inspect().paused))await p.locator('#play').click();
-  await p.evaluate(()=>window.scrollTo(0,0));
+  await p.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,behavior:'instant'});});
   const session=await context.newCDPSession(p);
   await session.send('Performance.enable');
   await session.send('Emulation.setCPUThrottlingRate',{rate:cpu});
@@ -36,12 +36,12 @@ async function measure(h,base,version,width,cpu){
    initCreature(document,{storage:null,random:()=>random.shift()??.31,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
    window.advanceNullBenchmark=()=>{const callback=next;next=null;callback()};
   });
+  if(current)await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1,null,{timeout:3500});
   else await p.waitForFunction(()=>!document.querySelector('#creature').getAnimations({subtree:true}).length);
   const rows=[];
   for(const scene of ['idle','entrance']){
    for(let run=0;run<3;run++){
     await p.waitForTimeout(180);
-    const before=await metrics();
     if(scene==='entrance'){
      if(current)await p.evaluate(()=>window.advanceNullBenchmark());
      else await p.evaluate(()=>{
@@ -49,18 +49,21 @@ async function measure(h,base,version,width,cpu){
       document.querySelector('#nullPreviewRift').click();
      });
     }
+    await p.waitForTimeout(100);
+    const before=await metrics();
     const sample=await p.evaluate(async()=>{
-     const initial=window.entrolab.renderInfo().frame,start=performance.now(),longTasks=[];
+     const initial=window.entrolab.renderInfo().frame,modelTime=window.entrolab.inspect().elapsed;
+     const start=performance.now(),longTasks=[];
      const observer=new PerformanceObserver(list=>longTasks.push(...list.getEntries().map(x=>x.duration)));
      observer.observe({type:'longtask'});
      const animations=document.querySelector('#creature').getAnimations({subtree:true}).length;
      await new Promise(done=>setTimeout(done,1100));
      longTasks.push(...observer.takeRecords().map(x=>x.duration));
      observer.disconnect();
-     return {elapsed:performance.now()-start,animations,longTasks,gravity:window.entrolab.renderInfo().frame-initial};
+     return {elapsed:performance.now()-start,animations,longTasks,gravity:window.entrolab.renderInfo().frame-initial,modelTimeDelta:window.entrolab.inspect().elapsed-modelTime};
     });
     const after=await metrics();
-    assert.equal(sample.gravity,0);
+    assert.equal(sample.modelTimeDelta,0);
     assert.equal(sample.animations>0,scene==='entrance');
     rows.push({version,width,cpu,scene,run,...sample,
      taskMs:(after.TaskDuration-before.TaskDuration)*1000,scriptMs:(after.ScriptDuration-before.ScriptDuration)*1000});

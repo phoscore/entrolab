@@ -49,6 +49,7 @@ export async function checkRealVisibility(h,t){
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
   await site.goto(h.url);
   await h.ready(site);
+  await site.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,behavior:'instant'});});
   const browserSession=await browser.newBrowserCDPSession(),pageSession=await context.newCDPSession(site);
   const {targetInfo}=await pageSession.send('Target.getTargetInfo');
   const {targetId:other}=await browserSession.send('Target.createTarget',{url:'about:blank',newWindow:false,background:true});

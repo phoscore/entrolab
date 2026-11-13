@@ -47,7 +47,11 @@ export function initCreature(doc=globalThis.document,options={}){
  };
  const measure=()=>{
   const r=slot.getBoundingClientRect();
-  if(label&&label.getBoundingClientRect().right>=r.left)return false;
+  if(label){
+   const textRange=doc.createRange();
+   textRange.selectNodeContents(label);
+   if(textRange.getBoundingClientRect().right>=r.left)return false;
+  }
   return r.width>0&&r.height>0&&r.top>=0&&r.bottom<=win.innerHeight&&r.left>=0&&r.right<=win.innerWidth;
  };
  const eligible=()=>creaturePolicy({
@@ -123,9 +127,9 @@ export function initCreature(doc=globalThis.document,options={}){
  stateObserver.observe(doc.body,{attributes:true,attributeFilter:['class']});
  stateObserver.observe(guide,{attributes:true,attributeFilter:['open']});
  const observer=typeof win.IntersectionObserver==='function'?new win.IntersectionObserver(entries=>{
-  seen=entries.at(-1)?.intersectionRatio>=.98;
+  seen=entries.at(-1)?.isIntersecting??false;
   reconcile();
- },{threshold:.98}):null;
+ },{threshold:[0,.98,1]}):null;
  if(observer)observer.observe(slot);
  else listen(win,'scroll',()=>{seen=measure();reconcile();},{passive:true});
  seen=measure();
