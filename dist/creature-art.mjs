@@ -7,6 +7,7 @@ export const creatureArt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0
   <radialGradient id="null-glow"><stop stop-color="#fb3159" stop-opacity=".38"/><stop offset="1" stop-color="#dd275b" stop-opacity="0"/></radialGradient>
   <clipPath id="null-eye"><path d="M75 97q21 4 41 17-28 0-41-17Zm67 16q7-17 25-26-5 17-25 26Z"/></clipPath>
  </defs>
+ <g class="null-pose">
  <g class="null-mass">
   <g class="null-orbit">
    <path d="M45 86c-47 9-38-17 10-41 49-24 121-45 151-31 18 8-1 24-26 39" fill="none" stroke="url(#null-ring)" stroke-width="4" stroke-linecap="round"/>
@@ -57,6 +58,7 @@ export const creatureArt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0
     <path d="M173 80h14m-12 6h8m7 5h8" fill="none" stroke="#ec3556" stroke-width="2"/>
    </g>
   </g>
+ </g>
  </g>
  <g class="null-shard null-shard-top" fill="#ff6773"><path d="M91 65h40l-7 4H91Zm71-9h18v3h-18ZM74 75h13v3H74Zm102 23h19v3h-19Z"/></g>
  <g class="null-shard null-shard-mid" fill="#ee4064"><path d="M63 125h35l-6 4H63Zm88 17h33l-5 4h-28Zm50-21h13v3h-13Z"/></g>

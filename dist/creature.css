@@ -7,6 +7,9 @@
 #creature {position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
 #creature[hidden],#physicsGuide[open] .null-slot {display:none}
 #creature svg {display:block;width:100%;height:100%;overflow:hidden}
+/* Give the wide poses room inside the existing clip without changing their joint motion. */
+#creature[data-sequence="curiosity"] .null-pose {transform:translate(6px,11px) scale(.93)}
+#creature[data-sequence="mischief"] .null-pose {transform:translate(4px,8px) scale(.93)}
 .null-mass {transform-origin:122px 149px}
 .null-head {transform-origin:126px 123px}
 .null-torso {transform-origin:126px 158px}
@@ -106,6 +109,7 @@
 body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-state:paused}
 @media(max-width:600px) {
  .null-slot {top:0;width:54px;height:55px}
+ #creature[data-sequence="mischief"] .null-pose {transform:translate(4px,8px) scale(.88)}
 }
 @media(prefers-reduced-motion:reduce) {
  #creature[data-sequence] * {animation:none!important}

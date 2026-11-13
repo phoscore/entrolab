@@ -2,7 +2,7 @@ import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
 import {browserHarness,physical} from './v08-browser-harness.mjs';
-import {measureNull} from './measure-null.mjs';
+import {measureNull,measureNullAudit} from './measure-null.mjs';
 import {checkRealVisibility} from './null-real-visibility.mjs';
 
 let h;
@@ -14,13 +14,26 @@ const art=p=>p.locator('#creature');
 const frames=p=>art(p).evaluate(e=>e.getAnimations({subtree:true}).map(a=>a.animationName));
 const sky=p=>p.locator('#cosmicBackground').evaluate(e=>getComputedStyle(e,'::before').animationPlayState);
 
-async function controlled(p,roll=.85){
+async function seekPose(p,elapsedMs){
+ const times=await art(p).evaluate(async (e,elapsedMs)=>{
+  const animations=e.getAnimations({subtree:true});
+  for(const animation of animations)animation.pause();
+  await Promise.all(animations.map(animation=>animation.ready));
+  // currentTime includes each CSS animation's own delay and iteration phase.
+  for(const animation of animations)animation.currentTime=elapsedMs;
+  return animations.map(animation=>animation.currentTime);
+ },elapsedMs);
+ assert(times.length>0);
+ assert(times.every(time=>time===elapsedMs),JSON.stringify(times));
+}
+
+async function controlled(p,roll=.85,durationRoll=.5){
  await reset(p);
- await p.evaluate(async roll=>{
+ await p.evaluate(async ({roll,durationRoll})=>{
   const {initCreature}=await import('/creature-ui.mjs');
   initCreature().dispose();
   const timers=new Map();
-  let now=0,serial=0,rolls=[.5,roll,.5];
+  let now=0,serial=0,rolls=[.5,roll,durationRoll];
   window.nullAudit={
    mount(){return initCreature(document,{
     clock:()=>now,random:()=>rolls.shift()??roll,storage:null,
@@ -36,7 +49,7 @@ async function controlled(p,roll=.85){
    pending:()=>timers.size,
   };
   window.nullAudit.mount();
- },roll);
+ },{roll,durationRoll});
  try{await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});}
  catch(error){
   const state=await p.evaluate(()=>{
@@ -63,26 +76,15 @@ test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief
    const animations=await frames(p);
    for(const expected of [key,'null-breath','null-blink','null-gaze','null-tail'])assert(animations.includes(expected),expected);
    assert.equal(await p.locator('#creature:visible').count(),1);
-   const matrices=await art(p).evaluate(e=>{
-    const changes=[];
-    for(const time of [0.10,0.52]){
-     for(const a of e.getAnimations({subtree:true})){
-      a.pause();
-      a.currentTime=Number(a.effect.getTiming().duration)*time;
-     }
-     changes.push(['.null-head','.null-left-hand','.null-right-hand','.null-gaze'].map(s=>getComputedStyle(e.querySelector(s)).transform));
-    }
-    return changes;
-   });
+   const matrices=[];
+   for(const elapsedMs of [640,3328]){
+    await seekPose(p,elapsedMs);
+    matrices.push(await art(p).evaluate(e=>
+     ['.null-head','.null-left-hand','.null-right-hand','.null-gaze'].map(s=>getComputedStyle(e.querySelector(s)).transform)
+    ));
+   }
    assert(matrices[0].every((m,i)=>m!==matrices[1][i]),name);
-   if(name==='glitch')await art(p).evaluate(e=>{
-    for(const a of e.getAnimations({subtree:true})){
-     a.currentTime=Number(a.effect.getTiming().duration)*(a.animationName==='null-assemble'?.31:.095);
-    }
-   });
-   if(name==='observer')await art(p).evaluate(e=>{
-    for(const a of e.getAnimations({subtree:true}))a.currentTime=Number(a.effect.getTiming().duration)*.42;
-   });
+   await seekPose(p,{observer:2688,glitch:360,curiosity:2500,mischief:3100}[name]);
    if(name==='glitch'||name==='observer'){
     await p.screenshot({path:join(h.output,'null-'+name+'-desktop.png')});
    }
@@ -98,6 +100,60 @@ test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief
   assert.deepEqual(await physical(p),baseline);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
+});
+
+test('Null: synchronized central Mischief and Curiosity contours fit both clips',async()=>{
+ for(const width of [320,390,601,1440]){
+  const {p,context}=await h.lab({viewport:{width,height:900},deviceScaleFactor:2,reducedMotion:'no-preference'});
+  try{
+   for(const [name,roll] of [['mischief',.19],['curiosity',.48]]){
+    for(const [duration,durationRoll] of [[4900,0],[6400,.5],[7900,.9999]]){
+     await controlled(p,roll,durationRoll);
+     await advance(p);
+     assert.equal((await inspect(p)).sequence,name);
+     const proofTime=name==='mischief'?3100:2500;
+     const samples=[.3,.34,.4,.46,.48,.52,.57,.59,.62,.7].map(fraction=>Math.round(duration*fraction));
+     if(duration===6400)samples.push(proofTime);
+     for(const elapsedMs of samples){
+      await seekPose(p,elapsedMs);
+      const bounds=await art(p).evaluate(e=>{
+       const svg=e.querySelector('svg'),slot=e.closest('.null-slot');
+       const inner=svg.getBoundingClientRect(),outer=slot.getBoundingClientRect();
+       const clip={
+        left:Math.max(inner.left,outer.left),right:Math.min(inner.right,outer.right),
+        top:Math.max(inner.top,outer.top),bottom:Math.min(inner.bottom,outer.bottom),
+       };
+       // A group bounding rectangle includes empty space when rotated.
+       // Sample the painted path contours in screen coordinates instead.
+       return ['.null-orbit','.null-right-hand','.null-left-hand','.null-tip'].map(selector=>{
+        const group=svg.querySelector(selector);
+        const paths=group.matches('path')?[group]:[...group.querySelectorAll('path')];
+        let margin=Infinity;
+        for(const path of paths){
+         const matrix=path.getScreenCTM(),length=path.getTotalLength();
+         const style=getComputedStyle(path),radius=style.stroke==='none'?0:parseFloat(style.strokeWidth)/2;
+         const padX=radius*Math.hypot(matrix.a,matrix.c),padY=radius*Math.hypot(matrix.b,matrix.d);
+         const count=Math.ceil(length);
+         for(let i=0;i<=count;i++){
+          const point=path.getPointAtLength(length*i/count).matrixTransform(matrix);
+          margin=Math.min(margin,point.x-clip.left-padX,clip.right-point.x-padX,
+           point.y-clip.top-padY,clip.bottom-point.y-padY);
+         }
+        }
+        return [selector,margin];
+       });
+      });
+      for(const [part,margin] of bounds)assert(margin>=.25,`${name} ${width}px ${elapsedMs}/${duration}ms ${part} margin=${margin}`);
+     }
+     if(duration===6400&&(width===390||width===1440)){
+      await seekPose(p,proofTime);
+      await p.locator('.null-slot').screenshot({path:join(h.output,`null-${name}-${width}.png`)});
+     }
+    }
+   }
+  }finally{await context.close()}
+ }
+ assert.deepEqual(h.errors,[]);
 });
 
 test('Null: hidden page, offscreen, editors, guide and focus cancel animation and timers',async()=>{
@@ -214,7 +270,7 @@ test('Null: mobile and desktop art neither shifts the lab nor intersects guide t
    assert.equal(await p.locator('.null-slot').getAttribute('aria-hidden'),'true');
    assert.equal(await art(p).locator('img').count(),0);
    if(width===390){
-    await art(p).evaluate(e=>{for(const a of e.getAnimations({subtree:true})){a.pause();a.currentTime=Number(a.effect.getTiming().duration)*.45}});
+    await seekPose(p,2880);
     await p.screenshot({path:join(h.output,'null-observer-390.png')});
    }
   }finally{await context.close()}
@@ -299,3 +355,4 @@ test('Null: both favicon eyes remain distinct in real Chromium at 16 and 32 pixe
 test('Null: genuine Chromium tab activation suspends the rig and resumes with a new rest',async t=>checkRealVisibility(h,t));
 
 test('Null: comparative Chromium cost against released Phase A',async t=>measureNull(h,t));
+test('Null: central poses compared with audited Phase B',async t=>measureNullAudit(h,t));
