@@ -51,7 +51,7 @@
     },
     {
       "file": "CREDITS.md",
-      "sha256": "e3a08f4c75baa06d448e9faab50968c30c913ff2a0c79ac98f34f54e2f096735"
+      "sha256": "4c6994fe72f45cd0e06b741a17a154eccf6c454abe00720b1d6f4b23055d62f2"
     },
     {
       "file": "gaia.csv",
@@ -197,8 +197,8 @@
       "sha256": "b9fec6ed30ee24abfcc1b8b98b2a533e332b3ddadb1c41611253e79f887ee786"
     },
     "CREDITS.md": {
-      "bytes": 2883,
-      "sha256": "e3a08f4c75baa06d448e9faab50968c30c913ff2a0c79ac98f34f54e2f096735"
+      "bytes": 3775,
+      "sha256": "4c6994fe72f45cd0e06b741a17a154eccf6c454abe00720b1d6f4b23055d62f2"
     },
     "objects.json": {
       "bytes": 78677,

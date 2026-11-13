@@ -15,7 +15,7 @@ Die neue Node-Suite prüft Manifest/Digests, Eingabekonflikte, nichtnumerische o
 
 ## Gemessene Paketgrößen
 
-Windows x64, Node 24.22.1, Gzip Stufe 6. Größen in Byte bzw. binären Einheiten. Die echte Probe enthält 22 Objekte mit 19 Himmelsrichtungen und zwölf Objekten ohne Distanz. Beide Winkeltiles benötigen zusammen 336 B roh bzw. 276 B gzip. Manifest 14.644 B roh bzw. 4.951 B gzip. Ein zusammengefasster Offline-Objektdump belegt 78.677 B roh bzw. 5.212 B gzip. Die einzelnen Inspector-Antworten belegen zusammen 16.183 B gzip, alle Suchshards 3.158 B gzip. Das ist der konkrete Zuschlag des kleinen Pakets. Bei vielen Objekten werden Details gebündelt und Abrufe separat gemessen.
+Windows x64, Node 24.22.1, Gzip Stufe 6. Größen in Byte bzw. binären Einheiten. Die echte Probe enthält 22 Objekte mit 19 Himmelsrichtungen und zwölf Objekten ohne Distanz. Beide Winkeltiles benötigen zusammen 336 B roh bzw. 276 B gzip. Manifest 14.644 B roh bzw. 4.953 B gzip. Ein zusammengefasster Offline-Objektdump belegt 78.677 B roh bzw. 5.212 B gzip. Die einzelnen Inspector-Antworten belegen zusammen 16.183 B gzip, alle Suchshards 3.158 B gzip. Das ist der konkrete Zuschlag des kleinen Pakets. Bei vielen Objekten werden Details gebündelt und Abrufe separat gemessen.
 
 ### Synthetische Lastmessung
 
