@@ -1,0 +1,130 @@
+[
+  {
+    "file": "systems/51 Peg.xml",
+    "blob": "442932a7ec7f4d09522b8e8341b22cb6584e6f40",
+    "host": "51 Peg",
+    "name": "51 Peg b",
+    "aliases": [
+      "Bellerophon",
+      "TYC 1717-2193-1 b",
+      "Helvetios b",
+      "GJ 882 b",
+      "Gaia DR2 2835207319109249920 b",
+      "HIP 113357 b",
+      "HD 217014 b"
+    ],
+    "elements": {
+      "period": {
+        "value": 4.231,
+        "minus": null,
+        "plus": null
+      },
+      "semimajoraxis": {
+        "value": 0.052,
+        "minus": null,
+        "plus": null
+      },
+      "eccentricity": {
+        "value": 0,
+        "minus": null,
+        "plus": null
+      },
+      "inclination": {
+        "value": 80,
+        "minus": "19",
+        "plus": "10"
+      },
+      "periastron": {
+        "value": 0,
+        "minus": null,
+        "plus": null
+      }
+    },
+    "phase": {
+      "kind": "periastron",
+      "value": 2456021.256,
+      "system": "BJD"
+    }
+  },
+  {
+    "file": "systems/TRAPPIST-1.xml",
+    "blob": "3c73bdeca3b237ab8411a406d1b5c70429b372d0",
+    "host": "TRAPPIST-1",
+    "name": "TRAPPIST-1 b",
+    "aliases": [
+      "2MASS J23062928-0502285 b",
+      "K2-112 b",
+      "EPIC 246199087 b",
+      "Gaia DR2 2635476908753563008 b"
+    ],
+    "elements": {
+      "period": {
+        "value": 1.5108739,
+        "minus": "0.0000075",
+        "plus": "0.0000075"
+      },
+      "semimajoraxis": {
+        "value": 0.01154775,
+        "minus": "0.000000057",
+        "plus": "0.000000057"
+      },
+      "eccentricity": {
+        "value": 0.00622,
+        "minus": "0.00304",
+        "plus": "0.00304"
+      },
+      "inclination": {
+        "value": 89.65,
+        "minus": "0.27",
+        "plus": "0.22"
+      },
+      "periastron": {
+        "value": 336.86,
+        "minus": "34.24",
+        "plus": "34.24"
+      }
+    },
+    "phase": {
+      "kind": "transit",
+      "value": 2457606.56117,
+      "system": null,
+      "minus": "0.00058",
+      "plus": "0.00058"
+    }
+  },
+  {
+    "file": "systems/HR 8799.xml",
+    "blob": "3f6378b7d0763e1c4a1296ef726658c7eb194751",
+    "host": "HR 8799",
+    "name": "HR 8799 b",
+    "aliases": [
+      "HD 218396 b",
+      "Gaia DR2 2832463659640297472 b",
+      "TYC 1718-2350-1 b",
+      "HIP 114189 b"
+    ],
+    "elements": {
+      "period": {
+        "value": 166510,
+        "minus": "9022",
+        "plus": "9022"
+      },
+      "semimajoraxis": {
+        "value": 67.96,
+        "minus": "1.85",
+        "plus": "1.85"
+      },
+      "eccentricity": {
+        "value": 0,
+        "minus": null,
+        "plus": null
+      },
+      "inclination": {
+        "value": 30.27,
+        "minus": "4.95",
+        "plus": "4.95"
+      }
+    },
+    "phase": null
+  }
+]

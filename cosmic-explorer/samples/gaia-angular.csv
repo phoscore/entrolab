@@ -1,0 +1,4 @@
+source_id,ra,dec,parallax,parallax_error,ruwe,astrometric_params_solved,r_med_geo,r_lo_geo,r_hi_geo,r_med_photogeo,r_lo_photogeo,r_hi_photogeo
+2512556873600,45.07492471994457,0.1108820420939314,,,,3,,,,,,
+2821794351744,45.124152453120615,0.13677852527701542,,,,3,,,,,,
+3680787975936,45.01912373732518,0.1632369297191619,,,,3,,,,,,

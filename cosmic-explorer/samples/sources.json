@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "release": "v0.9.5-sample.1",
+  "acquiredDate": "2026-11-13",
+  "distribution": "cleared-sample",
+  "sources": {
+    "gaia": {
+      "release": "Gaia DR3 / gaia.dr3lite",
+      "access": "https://dc.g-vo.org/tap/sync",
+      "license": "ESA Gaia open use with credit",
+      "terms": "https://gea.esac.esa.int/archive/documentation/GDR3/Miscellaneous/sec_credit_and_citation_instructions/",
+      "reference": "https://doi.org/10.1051/0004-6361/202243940"
+    },
+    "gaia-nearby": {
+      "release": "Nearby-star comparison",
+      "access": "https://www.cosmos.esa.int/web/gaia/iow_20250513",
+      "license": "classification evidence only; no table copied"
+    },
+    "bailer-jones": {
+      "release": "Gaia EDR3 distances / I/352 / gedr3dist.main",
+      "access": "https://dc.g-vo.org/tap/sync",
+      "license": "CC-BY-4.0",
+      "terms": "https://dc.g-vo.org/gedr3dist/q/cone/info",
+      "reference": "https://doi.org/10.3847/1538-3881/abd806"
+    },
+    "desi": {
+      "release": "DR1 iron zpix v1 / desi_dr1.zpix",
+      "access": "https://datalab.noirlab.edu/query/query",
+      "license": "CC-BY-4.0",
+      "terms": "https://data.desi.lbl.gov/doc/acknowledgments/",
+      "reference": "https://data.desi.lbl.gov/doc/releases/dr1/"
+    },
+    "oec": {
+      "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+      "access": "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/tree/4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+      "license": "OEC MIT-style database license (OEC-LICENSE.txt)",
+      "reference": "https://arxiv.org/abs/1211.7121"
+    }
+  },
+  "inputs": [
+    {
+      "file": "gaia.csv",
+      "type": "gaia",
+      "maxRows": 14,
+      "expectedRows": 6,
+      "query": "SELECT TOP 14 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id IN (5853498713190525696,4472832130942575872,4295806720,34361129088,38655544960,2067082282304626432,762815470562110464) OR g.source_id BETWEEN 1 AND 90000000000 ORDER BY g.source_id"
+    },
+    {
+      "file": "gaia-weak.csv",
+      "type": "gaia",
+      "maxRows": 4,
+      "expectedRows": 4,
+      "query": "SELECT TOP 4 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id BETWEEN 1 AND 3000000000000 AND (g.parallax < 0 OR g.parallax IS NULL) ORDER BY g.source_id"
+    },
+    {
+      "file": "gaia-angular.csv",
+      "type": "gaia",
+      "maxRows": 3,
+      "expectedRows": 3,
+      "query": "SELECT TOP 3 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id BETWEEN 1 AND 6000000000000 AND g.parallax IS NULL ORDER BY g.source_id"
+    },
+    {
+      "file": "desi.csv",
+      "type": "desi",
+      "maxRows": 12,
+      "expectedRows": 6,
+      "query": "SELECT targetid,desiname,mean_fiber_ra,mean_fiber_dec,mean_mjd,z,zerr,zwarn,deltachi2,healpix,survey,program,spectype,zcat_primary FROM desi_dr1.zpix WHERE targetid BETWEEN 39628379988689570 AND 39628379988689900 AND survey='main' AND program='bright' AND spectype='GALAXY' AND zcat_primary=true AND zwarn=0 ORDER BY targetid LIMIT 12"
+    },
+    {
+      "file": "oec.json",
+      "type": "oec",
+      "maxRows": 3,
+      "expectedRows": 3,
+      "query": "Project the first confirmed planet from each pinned systems/51 Peg.xml, systems/HR 8799.xml and systems/TRAPPIST-1.xml into numeric orbit elements, source paths and aliases; omit prose and images."
+    }
+  ]
+}
