@@ -1,79 +1,116 @@
-/* A single decorative observer occupies reserved normal flow; never an overlay. */
-.creature-dock{min-height:100px;margin:-.25rem 0 .75rem;max-width:76ch;min-width:0;display:flex;align-items:center}
-.creature-dock[hidden],.creature[hidden]{display:none!important}
-.creature{display:flex;align-items:center;gap:14px;margin:0;max-width:100%;min-width:0;pointer-events:none;user-select:none}
-.creature img{display:block;flex:0 0 88px;width:88px;height:88px;object-fit:contain;background:#000;border-radius:8px;transform-origin:50% 75%}
-.creature figcaption{min-width:0;max-width:38ch;color:#c9bccf;font:400 .8rem/1.55 system-ui,sans-serif;overflow-wrap:anywhere}
-.creature-fiction{display:block;color:#e4a6b0;font-size:.72rem;margin-bottom:.2rem}
-.creature-preferences{position:relative;font:400 .85rem/1.5 system-ui,sans-serif;letter-spacing:normal;min-width:0}
-.creature-preferences>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;padding:9px 12px;border:1px solid #665575;border-radius:6px;background:#1c1827;color:#e0cff4;list-style:none}
-.creature-preferences>summary::-webkit-details-marker{display:none}.creature-preferences[open]>summary{border-color:#c99bb3}
-.creature-preference-body{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:260px;max-width:calc(100vw - 28px);padding:16px;background:#17121e;border:1px solid #665575;border-radius:8px;box-shadow:0 12px 30px #0008}
-.creature-preference-body label{display:block;font:500 .85rem/1.5 system-ui,sans-serif;letter-spacing:normal;text-transform:none;margin:0 0 .5rem}.creature-preference-body select{width:100%;min-height:44px}.creature-preference-body p{font-size:.8rem;line-height:1.6;white-space:normal;overflow-wrap:anywhere;margin:.75rem 0 0;color:#c8bccf}
-.creature-preferences summary:focus-visible,.creature-preferences select:focus-visible{outline:3px solid #e7cdff;outline-offset:3px}
-@media(max-width:600px){.header-tools{gap:6px;flex-wrap:wrap;position:relative}.creature-preferences{position:static;margin-left:auto}.creature-preferences>summary{padding:9px 10px;font-size:.8rem}.creature-dock{min-height:84px;margin:.2rem 0 .7rem}.creature{gap:10px}.creature img{flex-basis:64px;width:64px;height:64px}.creature figcaption{font-size:.75rem}.creature-fiction{font-size:.68rem}}
-@media(prefers-reduced-motion:reduce){.creature img{animation:none!important;transform:none!important}}
+/* Anchor the art to the unused end of the closed guide band. */
+#physicsGuide > summary {position:relative}
+.null-slot {
+ position:absolute;inset-inline-end:0;top:-4px;width:84px;height:76px;
+ pointer-events:none;overflow:hidden;contain:layout paint style;
+}
+#creature {position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+#creature[hidden],#physicsGuide[open] .null-slot {display:none}
+#creature svg {display:block;width:100%;height:100%;overflow:hidden}
+/* Give the wide poses room inside the existing clip without changing their joint motion. */
+#creature[data-sequence="curiosity"] .null-pose {transform:translate(6px,11px) scale(.93)}
+#creature[data-sequence="mischief"] .null-pose {transform:translate(4px,8px) scale(.93)}
+.null-mass {transform-origin:122px 149px}
+.null-head {transform-origin:126px 123px}
+.null-torso {transform-origin:126px 158px}
+.null-left {transform-origin:88px 137px}
+.null-left-hand {transform-origin:55px 174px}
+.null-right {transform-origin:156px 136px}
+.null-right-hand {transform-origin:196px 132px}
+.null-tail {transform-origin:124px 164px}
+.null-tip {transform-origin:84px 226px}
+.null-orbit {transform-origin:120px 53px}
+.null-eyes {transform-origin:124px 105px}
+.null-grin {transform-origin:131px 118px}
+.null-shard {opacity:0}
 
-/* The seven clipped pieces reuse the approved 512 px hero. No extra atlas or render loop. */
-.creature-dock {min-height:114px}
-.null-art {width:108px;height:108px;flex:0 0 108px;position:relative;overflow:hidden;background:#050407;border-radius:9px;isolation:isolate}
-.null-art img {width:100%;height:100%}
-.null-rig,.null-layer {position:absolute;inset:0;pointer-events:none}
-.null-rig {display:none;transform-origin:50% 76%}
-.null-layer {background:url("assets/creature-candidates/hero.webp") center / 100% 100% no-repeat}
-.null-ring {clip-path:polygon(16% 17%,36% 6%,76% 4%,78% 16%,64% 25%,64% 17%,70% 12%,43% 15%,34% 21%,24% 29%,31% 28%,28% 34%,17% 33%)}
-.null-body {clip-path:polygon(22% 30%,46% 36%,54% 43%,62% 39%,65% 44%,60% 51%,64% 57%,57% 67%,57% 89%,40% 99%,34% 81%,40% 69%,36% 62%,40% 51%,22% 55%)}
-.null-left {clip-path:polygon(35% 46%,43% 50%,38% 61%,33% 71%,39% 82%,17% 84%,17% 63%,27% 56%);transform-origin:38% 50%}
-.null-right {clip-path:polygon(59% 48%,65% 30%,83% 31%,83% 53%,71% 63%,64% 59%);transform-origin:62% 48%}
-.null-head {clip-path:polygon(34% 12%,62% 12%,65% 26%,73% 26%,73% 32%,62% 33%,58% 42%,48% 43%,40% 35%);transform-origin:52% 37%}
-.null-blink {position:absolute;inset:30% 38% auto 45%;height:7%;background:#050407;clip-path:polygon(0 0,44% 50%,100% 0,100% 100%,45% 72%,0 100%);opacity:0}
-.null-fragment-top {clip-path:inset(25% 24% 70% 30%)}
-.null-fragment-mid {clip-path:inset(36% 20% 59% 24%)}
-.null-fragment-low {clip-path:inset(55% 28% 41% 17%)}
-.null-fragment-top,.null-fragment-mid,.null-fragment-low {opacity:0}
-.creature[data-moving=true] .null-art img {visibility:hidden}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-rig {display:block;animation:null-observer 1.9s cubic-bezier(.3,.55,.33,1) both}
-.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) .null-rig {animation-name:null-rift;animation-duration:1.65s}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-head {animation:null-look 1.9s ease-in-out both}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-blink {animation:null-blink 1.9s linear both}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-left {animation:null-reach 1.9s ease-in-out both}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-right {animation:null-wave 1.9s ease-in-out both}
-.creature[data-moving=true]:is([data-phase=peek],[data-phase=react]) .null-ring {animation:null-ring 1.9s ease-in-out both}
-.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) :is(.null-head,.null-left,.null-right,.null-ring) {animation-duration:1.65s}
-.creature[data-moving=true][data-sequence=rift]:is([data-phase=peek],[data-phase=react]) :is(.null-fragment-top,.null-fragment-mid,.null-fragment-low) {animation:null-fracture 1.65s ease-out both}
-.null-fragment-top {--offset:-18%}.null-fragment-mid {--offset:15%}.null-fragment-low {--offset:-9%}
-.null-previews {display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.null-previews button {min-height:38px;font-size:.78rem;white-space:normal}
+#creature[data-sequence="still"] .null-mass {transform:translate(6px,-1px) rotate(2deg) scale(.92)}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-mass {animation:null-observer var(--null-visit) ease-in-out both}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-torso {animation:null-breath 2.9s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-tail {animation:null-tail 3.1s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-tip {animation:null-tip 3.1s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-orbit {animation:null-orbit 4s ease-in-out 2}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-head {animation:null-head var(--null-visit) ease-in-out both}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-left {animation:null-left 2.75s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-left-hand {animation:null-wrist 2.75s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-right {animation:null-right 3.2s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-right-hand {animation:null-wave var(--null-visit) ease-in-out both}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-core {animation:null-core 2.9s ease-in-out 3}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-eyes {animation:null-blink var(--null-visit) ease-in-out both}
+#creature:where([data-sequence]:not([data-sequence="still"])) .null-gaze {animation:null-gaze var(--null-visit) ease-in-out both}
+#creature[data-sequence="glitch"] .null-mass {animation-name:null-arrive}
+#creature[data-sequence="glitch"] .null-shard {animation:null-assemble .88s cubic-bezier(.23,.79,.37,1) both}
+.null-shard-top {--shard-x:30px;--shard-y:-7px}
+#creature[data-sequence="glitch"] .null-shard-mid {--shard-x:-27px;--shard-y:2px;animation-delay:65ms}
+#creature[data-sequence="glitch"] .null-shard-low {--shard-x:19px;--shard-y:12px;animation-delay:110ms}
+#creature[data-sequence="curiosity"] .null-mass {animation-name:null-curious}
+#creature[data-sequence="curiosity"] .null-head {animation-name:null-listen}
+#creature[data-sequence="curiosity"] .null-right-hand {animation-name:null-reach}
+#creature[data-sequence="mischief"] .null-mass {animation-name:null-slip}
+#creature[data-sequence="mischief"] .null-left {animation:null-catch-left var(--null-visit) ease-in-out both}
+#creature[data-sequence="mischief"] .null-right {animation:null-catch-right var(--null-visit) ease-in-out both}
+#creature[data-sequence="mischief"] .null-grin {animation:null-grin var(--null-visit) ease-in-out both}
+
 @keyframes null-observer {
- 0% {transform:translate(-62%,18%) rotate(-13deg) scale(.83);opacity:0}
- 23% {transform:translate(-10%,5%) rotate(-8deg) scale(.95);opacity:1}
- 47%,67% {transform:translate(0,0) rotate(0) scale(1);opacity:1}
- 83% {transform:translate(-11%,3%) rotate(-5deg);opacity:1}
- 100% {transform:translate(-65%,14%) rotate(-14deg) scale(.85);opacity:0}
+ 0% {transform:translate(150px,13px) rotate(15deg) scale(.88);opacity:0}
+ 12% {opacity:.92}
+ 20% {transform:translate(30px,3px) rotate(8deg) scale(.94)}
+ 34%,72% {transform:translate(6px,-4px) rotate(2deg) scale(.96);opacity:1}
+ 86% {transform:translate(30px,2px) rotate(8deg) scale(.92);opacity:.94}
+ 100% {transform:translate(150px,12px) rotate(14deg) scale(.86);opacity:0}
 }
-@keyframes null-rift {
- 0% {transform:translate(17%,20%) skewX(-12deg) scale(.65,.88);opacity:0}
- 22% {transform:translate(2%,6%) skewX(3deg) scale(.94,1.05);opacity:1}
- 40%,70% {transform:translate(0,0) skewX(0) scale(1);opacity:1}
- 100% {transform:translate(21%,12%) skewX(10deg) scale(.77,.92);opacity:0}
+@keyframes null-arrive {
+ 0% {transform:translate(13px,19px) rotate(9deg) scale(.84,.72);opacity:0}
+ 8% {transform:translate(-9px,6px) rotate(-4deg) scale(.92,.88);opacity:.40}
+ 17% {transform:translate(4px,-6px) rotate(2deg) scale(1);opacity:1}
+ 32%,76% {transform:translate(7px,-2px) rotate(0) scale(.97);opacity:1}
+ 100% {transform:translate(106px,7px) rotate(8deg) scale(.85);opacity:0}
 }
-@keyframes null-look {0%,100%{transform:rotate(-3deg)}35%{transform:translate(-2%,2%) rotate(-10deg)}53%,73%{transform:translate(3%,-2%) rotate(7deg)}}
-@keyframes null-blink {0%,43%,55%,100%{opacity:0;transform:translateY(-18%)}49%{opacity:1;transform:translateY(18%)}}
-@keyframes null-reach {0%,100%{transform:none}31%{transform:rotate(14deg)}55%{transform:rotate(-10deg) translateY(-1.8%)}}
-@keyframes null-wave {0%,100%{transform:none}38%{transform:rotate(12deg)}58%{transform:rotate(-20deg) translateY(-3.5%)}76%{transform:rotate(-7deg)}}
-@keyframes null-ring {0%,100%{transform:none}48%{transform:translateY(-4%) rotate(7deg)}}
-@keyframes null-fracture {
- 0%,100%{transform:translateX(var(--offset));opacity:0}
- 16%{transform:translateX(var(--offset));opacity:.68}
- 30%,76%{transform:none;opacity:0}
- 90%{transform:translateX(var(--offset));opacity:.55}
+@keyframes null-curious {
+ 0% {transform:translate(95px,10px) rotate(7deg) scale(.88);opacity:0}
+ 18%,77% {transform:translate(8px,2px) rotate(2deg) scale(.97);opacity:1}
+ 34%,59% {transform:translate(-5px,-6px) rotate(-6deg) scale(1.02);opacity:1}
+ 100% {transform:translate(115px,10px) rotate(9deg) scale(.88);opacity:0}
 }
+@keyframes null-slip {
+ 0% {transform:translate(122px,5px) rotate(9deg) scale(.93);opacity:0}
+ 17%,36% {transform:translate(3px,0) rotate(-2deg) scale(.96);opacity:1}
+ 41% {transform:translate(-9px,-7px) rotate(-7deg) scale(.97)}
+ 48% {transform:translate(15px,18px) rotate(15deg) scale(1,.88)}
+ 57% {transform:translate(-5px,-4px) rotate(-6deg) scale(.96,1.01)}
+ 68%,79% {transform:translate(6px,0) rotate(2deg) scale(.97);opacity:1}
+ 100% {transform:translate(103px,9px) rotate(9deg) scale(.88);opacity:0}
+}
+@keyframes null-breath {0%,100%{transform:scale(1)}50%{transform:translateY(-1.8px) scale(1.021,1.019)}}
+@keyframes null-tail {0%,100%{transform:rotate(-5deg)}48%{transform:rotate(7deg)}}
+@keyframes null-tip {0%,100%{transform:rotate(9deg)}63%{transform:rotate(-12deg)}}
+@keyframes null-orbit {0%,100%{transform:translateY(2px) rotate(-3deg);opacity:.69}49%{transform:translateY(-2px) rotate(4deg);opacity:1}}
+@keyframes null-core {0%,100%{opacity:.76}50%{opacity:1}}
+@keyframes null-head {0%,100%{transform:rotate(7deg)}29%,47%{transform:rotate(-7deg) translate(-3px,-1px)}68%,82%{transform:rotate(3deg) translate(2px,0)}}
+@keyframes null-listen {0%,100%{transform:rotate(6deg)}28%,50%{transform:rotate(-13deg) translate(-3px,0)}66%,78%{transform:rotate(4deg) translate(2px,0)}}
+@keyframes null-left {0%,100%{transform:rotate(2deg)}52%{transform:rotate(-8deg)}}
+@keyframes null-wrist {0%,100%{transform:rotate(-3deg)}57%{transform:rotate(9deg)}}
+@keyframes null-right {0%,100%{transform:rotate(5deg)}57%{transform:rotate(-7deg)}}
+@keyframes null-wave {0%,17%,68%,100%{transform:rotate(0)}33%{transform:rotate(-18deg)}43%{transform:rotate(11deg)}54%{transform:rotate(-7deg)}}
+@keyframes null-reach {0%,19%,85%,100%{transform:rotate(0)}37%,56%{transform:rotate(-24deg) translate(-1px,-1px)}}
+@keyframes null-catch-left {0%,35%,76%,100%{transform:rotate(0)}49%{transform:rotate(-31deg)}60%{transform:rotate(9deg)}}
+@keyframes null-catch-right {0%,35%,76%,100%{transform:rotate(2deg)}48%{transform:rotate(30deg)}62%{transform:rotate(-10deg)}}
+@keyframes null-grin {0%,36%,68%,100%{transform:scale(1)}48%{transform:translate(2px,3px) scale(.76,.57)}}
+@keyframes null-blink {0%,31%,36%,64%,69%,100%{transform:scaleY(1)}33%,66%{transform:scaleY(.08)}}
+@keyframes null-gaze {0%,17%,86%,100%{transform:translate(0)}27%,46%{transform:translate(-5px,1px)}60%,77%{transform:translate(4px,-1px)}}
+@keyframes null-assemble {0%{transform:translate(var(--shard-x),var(--shard-y));opacity:0}25%{opacity:.86}72%{transform:translate(0);opacity:.38}100%{transform:translate(0);opacity:0}}
+
+#decorativeMotion {
+ appearance:none;border:0;border-radius:4px;padding:6px 8px;margin:0 0 12px;
+ background:transparent;color:#bdafcc;font:inherit;font-size:.85rem;text-decoration:underline;
+ text-underline-offset:3px;cursor:pointer;
+}
+#decorativeMotion[aria-pressed="false"] {color:#aa9bb9}
+body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-state:paused}
 @media(max-width:600px) {
- .creature-dock {min-height:88px}
- .null-art {width:82px;height:82px;flex-basis:82px}
+ .null-slot {top:0;width:54px;height:55px}
+ #creature[data-sequence="mischief"] .null-pose {transform:translate(4px,8px) scale(.88)}
 }
 @media(prefers-reduced-motion:reduce) {
- .creature .null-rig,.creature .null-layer,.creature .null-blink {animation:none!important}
- .creature .null-rig {display:none!important}
- .creature .null-art img {visibility:visible!important}
+ #creature[data-sequence] * {animation:none!important}
 }

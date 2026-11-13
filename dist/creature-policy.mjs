@@ -1,29 +1,31 @@
-// Decorative policy only. No physical state, random source or scheduler.
 export const CREATURE_MODES=Object.freeze(['subtle','still','off']);
-export const CREATURE_CONTEXTS=Object.freeze(['gravity','blackhole','objects','temperature','markers','thermal','matter','science','guide']);
-export const REACTION_COOLDOWN=60000;
-export function validMode(value){return CREATURE_MODES.includes(value)}
-export function creaturePolicy({mode='subtle',reduced=false,hidden=false,seen=true,editing=false,focus=false}={}){
- if(!validMode(mode))throw new RangeError('Invalid creature mode');
- const visible=mode!=='off'&&!hidden&&seen&&!editing&&!focus;
- return {visible,moving:visible&&mode==='subtle'&&!reduced};
+export const validMode=value=>CREATURE_MODES.includes(value);
+
+export function creaturePolicy({mode='subtle',reduced=false,hidden=false,seen=true,editing=false,focus=false,guide=false}={}){
+ const available=mode!=='off'&&!hidden&&seen&&!editing&&!focus&&!guide;
+ const moving=available&&mode==='subtle'&&!reduced;
+ return {moving,still:available&&!moving};
 }
-export function createCreatureMachine(clock=()=>globalThis.performance.now()){
- let context='gravity',mode='subtle',phase='hidden',visible=false,moving=false,lastReaction=null,reactions=0;
- function synchronize(next){
-  next={mode,...next};
-  if(!CREATURE_CONTEXTS.includes(next.context))throw new RangeError('Invalid creature context');
-  const policy=creaturePolicy(next),changed=next.context!==context;
-  context=next.context;mode=next.mode;visible=policy.visible;moving=policy.moving;
-  if(!visible)phase='hidden';else if(changed||phase==='hidden'||!moving)phase='idle';
-  return inspect();
- }
- function react(initial=false,manual=false){
-  const now=clock();if(!Number.isFinite(now))throw new RangeError('Finite monotonic time required');
-  if(!moving||(!manual&&lastReaction!==null&&now-lastReaction<REACTION_COOLDOWN))return false;
-  lastReaction=now;reactions++;phase=initial?'peek':'react';return true;
- }
- function finish(){phase=visible?'idle':'hidden'}
- function inspect(){return {context,mode,phase,visible,moving,lastReaction,reactions}}
- return {synchronize,react,finish,inspect};
+
+// Private state. The creature never consumes the simulation's random source.
+export function creatureRandom(seed){
+ let state=(seed>>>0)||0x91e10da5;
+ return ()=>{
+  state^=state<<13;
+  state^=state>>>17;
+  state^=state<<5;
+  return (state>>>0)/0x100000000;
+ };
+}
+
+export function restDelay(random,first=false){
+ return Math.round(first?6000+random()*6000:22000+random()*36000);
+}
+
+export function planAppearance(random,contextChanged=false){
+ const roll=random();
+ if(roll<.16)return null;
+ const curiosityLimit=contextChanged ? .72 : .54;
+ const sequence=roll<.23?'mischief':roll<.39?'glitch':roll<curiosityLimit?'curiosity':'observer';
+ return {sequence,duration:Math.round(4900+random()*3000)};
 }

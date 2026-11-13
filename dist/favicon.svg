@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><title>Reincarnated as a Proton — black hole :)</title><circle cx="8" cy="8" r="7.25" fill="#090810" stroke="#cfb4ff" stroke-width="1.5"/><path d="M1 10.5 15 5.5" stroke="#cfb4ff" stroke-width="1.25"/><circle cx="8" cy="8" r="4.5" fill="#090810"/><g fill="#fff"><circle cx="6" cy="6.5" r=".8"/><circle cx="6" cy="9.5" r=".8"/></g><path d="M9 5.5q3 2.5 0 5" fill="none" stroke="#fff" stroke-width="1.25" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+ <title>Reincarnated as a Proton</title>
+ <circle cx="16" cy="16" r="14.4" fill="#090810" stroke="#cfb4ff" stroke-width="2.8"/>
+ <path d="m2 21 28-10" stroke="#cfb4ff" stroke-width="2.1"/>
+ <circle cx="16" cy="16" r="11" fill="#090810"/>
+ <path d="m7.7 10.6 6.3 6.3m0-6.3-6.3 6.3" fill="none" stroke="#fff2ee" stroke-width="2.2" stroke-linecap="round"/>
+ <path d="M20.7 11.8c-3.5-4.6-9 1.2 0 6.9 9-5.7 3.5-11.5 0-6.9Z" fill="#fff2ee"/>
+ <path d="M12 21c2.3 3 5.7 3.2 8 .1" fill="none" stroke="#fff2ee" stroke-width="1.9" stroke-linecap="round"/>
+</svg>
