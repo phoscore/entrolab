@@ -1,7 +1,7 @@
 /* Anchor the art to the unused end of the closed guide band. */
 #physicsGuide > summary {position:relative}
 .null-slot {
- position:absolute;inset-inline-end:0;top:0;width:76px;height:72px;
+ position:absolute;inset-inline-end:0;top:-4px;width:84px;height:76px;
  pointer-events:none;overflow:hidden;contain:layout paint style;
 }
 #creature {position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
@@ -57,11 +57,11 @@
  100% {transform:translate(150px,12px) rotate(14deg) scale(.86);opacity:0}
 }
 @keyframes null-arrive {
- 0% {transform:translate(13px,19px) rotate(9deg) scale(.84);clip-path:inset(41% 10% 51% 7%);opacity:0}
- 8% {transform:translate(-9px,6px) rotate(-4deg) scale(.92);clip-path:inset(15% 0 22% 0);opacity:.68}
- 17% {transform:translate(4px,-6px) rotate(2deg) scale(1);clip-path:inset(0);opacity:1}
- 32%,76% {transform:translate(7px,-2px) rotate(0) scale(.97);clip-path:inset(0);opacity:1}
- 100% {transform:translate(106px,7px) rotate(8deg) scale(.85);clip-path:inset(0);opacity:0}
+ 0% {transform:translate(13px,19px) rotate(9deg) scale(.84,.72);opacity:0}
+ 8% {transform:translate(-9px,6px) rotate(-4deg) scale(.92,.88);opacity:.40}
+ 17% {transform:translate(4px,-6px) rotate(2deg) scale(1);opacity:1}
+ 32%,76% {transform:translate(7px,-2px) rotate(0) scale(.97);opacity:1}
+ 100% {transform:translate(106px,7px) rotate(8deg) scale(.85);opacity:0}
 }
 @keyframes null-curious {
  0% {transform:translate(95px,10px) rotate(7deg) scale(.88);opacity:0}
@@ -105,7 +105,7 @@
 #decorativeMotion[aria-pressed="false"] {color:#aa9bb9}
 body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-state:paused}
 @media(max-width:600px) {
- .null-slot {width:54px;height:55px}
+ .null-slot {top:0;width:54px;height:55px}
 }
 @media(prefers-reduced-motion:reduce) {
  #creature[data-sequence] * {animation:none!important}

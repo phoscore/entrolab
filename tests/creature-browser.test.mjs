@@ -37,7 +37,16 @@ async function controlled(p,roll=.85){
   };
   window.nullAudit.mount();
  },roll);
- await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});
+ try{await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});}
+ catch(error){
+  const state=await p.evaluate(()=>{
+   const rect=s=>{const e=document.querySelector(s);return e?.getBoundingClientRect().toJSON()};
+   return {creature:window.entrolabCreature.inspect(),slot:rect('.null-slot'),guide:rect('#physicsGuide'),
+    active:document.activeElement?.id,open:document.querySelector('#physicsGuide').open,
+    hidden:document.hidden,reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,scrollY};
+  });
+  throw Error('Null timer did not arm: '+JSON.stringify(state),{cause:error});
+ }
 }
 const advance=p=>p.evaluate(()=>window.nullAudit.tick());
 const reset=p=>p.evaluate(()=>{document.activeElement?.blur();window.scrollTo({top:0,behavior:'instant'});});
@@ -56,7 +65,7 @@ test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief
    assert.equal(await p.locator('#creature:visible').count(),1);
    const matrices=await art(p).evaluate(e=>{
     const changes=[];
-    for(const time of [0.34,0.53]){
+    for(const time of [0.10,0.52]){
      for(const a of e.getAnimations({subtree:true})){
       a.pause();
       a.currentTime=Number(a.effect.getTiming().duration)*time;
@@ -70,6 +79,9 @@ test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief
     for(const a of e.getAnimations({subtree:true})){
      a.currentTime=Number(a.effect.getTiming().duration)*(a.animationName==='null-assemble'?.31:.095);
     }
+   });
+   if(name==='observer')await art(p).evaluate(e=>{
+    for(const a of e.getAnimations({subtree:true}))a.currentTime=Number(a.effect.getTiming().duration)*.42;
    });
    if(name==='glitch'||name==='observer'){
     await p.screenshot({path:join(h.output,'null-'+name+'-desktop.png')});
@@ -120,6 +132,7 @@ test('Null: hidden page, offscreen, editors, guide and focus cancel animation an
   assert.equal((await inspect(p)).timers,0);
   await p.locator('#physicsGuide > summary').click();
   await p.locator('#extremeFocus').click();
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===0);
   assert.equal((await inspect(p)).visible,false);
   assert.equal((await inspect(p)).timers,0);
   await p.keyboard.press('Escape');
@@ -129,6 +142,25 @@ test('Null: hidden page, offscreen, editors, guide and focus cancel animation an
   assert.deepEqual(await frames(p),[]);
   assert.equal((await inspect(p)).timers,0);
   assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('Null: a legacy still preference and blocked local storage remain safe',async()=>{
+ const {p,context}=await h.lab({reducedMotion:'no-preference'});
+ try{
+  await reset(p);
+  await p.evaluate(async()=>{
+   const {initCreature}=await import('/creature-ui.mjs');
+   initCreature().dispose();
+   initCreature(document,{storage:{getItem:key=>key==='entrolab-creature-mode'?'still':null,setItem(){throw Error('blocked')}}});
+  });
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().sequence==='still');
+  assert.deepEqual(await frames(p),[]);
+  assert.equal(await sky(p),'running');
+  await p.locator('#physicsGuide > summary').click();
+  await p.locator('#decorativeMotion').click();
+  assert.equal((await inspect(p)).mode,'off');
+  assert.equal(await sky(p),'paused');
  }finally{await context.close()}
 });
 
@@ -194,6 +226,7 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
  try{
   await controlled(p);
   const before=await physical(p);
+  const firstId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('sentinel','planet',1e-6,0,0,0,0,'#fff').id});
   const cd=await context.newCDPSession(p);
   await cd.send('HeapProfiler.collectGarbage');
   const counters=await cd.send('Memory.getDOMCounters');
@@ -223,6 +256,8 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
   assert.equal(after.documents,counters.documents);
   assert(after.jsEventListeners<=counters.jsEventListeners+5,JSON.stringify({counters,after}));
   assert(after.nodes<=counters.nodes+35,JSON.stringify({counters,after}));
+  const nextId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('sentinel','planet',1e-6,0,0,0,0,'#fff').id});
+  assert.equal(nextId,firstId+1);
   assert.deepEqual(await physical(p),before);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}

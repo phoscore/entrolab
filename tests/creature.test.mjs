@@ -34,11 +34,22 @@ test('creature: seeded visits reproduce, select four sequences and skip opportun
  assert.equal(seen.size,5);
 });
 
-test('creature: bounded first and later waits and bilingual general preference',()=>{
+test('creature: a skipped opportunity consumes only the choice roll',()=>{
+ const values=[.1,.77,.25];
+ const random=()=>values.shift();
+ assert.equal(planAppearance(random),null);
+ assert.deepEqual(planAppearance(random),{sequence:'observer',duration:5650});
+ assert.deepEqual(values,[]);
+});
+
+test('creature: bounded first and later waits',()=>{
  assert.equal(restDelay(fixed(0),true),6000);
  assert.equal(restDelay(fixed(.99999),true),12000);
  assert.equal(restDelay(fixed(0)),22000);
  assert.equal(restDelay(fixed(.99999)),58000);
+});
+
+test('creature: general preference has a DE and EN label',()=>{
  assert.equal(de['v0925.decorativeMotion'],'Dekorative Bewegung');
  assert.equal(en['v0925.decorativeMotion'],'Decorative motion');
 });
