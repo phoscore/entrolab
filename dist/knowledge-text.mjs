@@ -1060,67 +1060,6 @@ const messages={
     "Entropie ist nicht einfach sichtbares Chaos. Leben kann als offenes System lokal Struktur aufbauen und Energie sowie Entropie mit seiner Umgebung austauschen. Zeitpfeil und kosmologische Anfangsbedingungen verlangen weitere Annahmen. Expansion, Gravitation und Horizonte machen das Universum komplexer als zwei Kammern oder zwei Körper. Diese Demos beweisen weder Evolution noch ein bestimmtes Universumsende.",
     "Entropy is not simply visible chaos. As an open system, life can build local structure while exchanging energy and entropy with its surroundings. The arrow of time and cosmological initial conditions require further assumptions. Expansion, gravity and horizons make the universe more complex than two chambers or bodies. These demos prove neither evolution nor a particular fate of the universe."
   ],
-  "k.creature.settings": [
-    "Monster",
-    "Monster"
-  ],
-  "k.creature.mode": [
-    "Dekorativer Beobachter",
-    "Decorative observer"
-  ],
-  "k.creature.subtle": [
-    "Dezent",
-    "Subtle"
-  ],
-  "k.creature.still": [
-    "Ruhig · ohne Bewegung",
-    "Still · no motion"
-  ],
-  "k.creature.off": [
-    "Aus",
-    "Off"
-  ],
-  "k.creature.note": [
-    "Reine Fiktion. Keine Wirkung auf Rechenwerte. „Dezent“ reagiert selten; „Ruhig“ und Reduced Motion bleiben statisch. Die Wahl wird nur lokal gespeichert.",
-    "Pure fiction. No effect on calculated values. Subtle reacts occasionally; Still and Reduced Motion remain static. Your choice is saved locally only."
-  ],
-  "k.creature.fiction": [
-    "Fiktionaler Beobachter · Kommentar",
-    "Fictional observer · comment"
-  ],
-  "k.creature.comment.gravity": [
-    "Ich beobachte nur. Die Gleichungen machen die Arbeit.",
-    "I only watch. The equations do the work."
-  ],
-  "k.creature.comment.blackhole": [
-    "Die Mathematik ist düsterer als meine Laune.",
-    "The mathematics is darker than my mood."
-  ],
-  "k.creature.comment.objects": [
-    "Klein aussehen ist noch keine Zustandsgleichung.",
-    "Looking small is not an equation of state."
-  ],
-  "k.creature.comment.temperature": [
-    "Die Farbskala hat keine Gefühle. Ich auch fast nicht.",
-    "The colour scale has no feelings. I almost don’t either."
-  ],
-  "k.creature.comment.markers": [
-    "Deine Lieblingsanordnung bekommt keinen VIP-Zugang.",
-    "Your favourite arrangement gets no VIP access."
-  ],
-  "k.creature.comment.thermal": [
-    "Die Energie bleibt. Die Unterschiede nicht.",
-    "The energy stays. The differences don’t."
-  ],
-  "k.creature.comment.matter": ["Null beobachtet.", "Null watches."],
-  "k.creature.comment.science": [
-    "No plot armor. Just physics.",
-    "No plot armor. Just physics."
-  ],
-  "k.creature.comment.guide": [
-    "Ich lese auch die Modellgrenzen. Unheimlich, oder?",
-    "I read the model limits too. Terrifying, isn’t it?"
-  ]
 };
 export const knowledgeDE=Object.freeze(Object.fromEntries(Object.entries(messages).map(([k,v])=>[k,v[0]])));
 export const knowledgeEN=Object.freeze(Object.fromEntries(Object.entries(messages).map(([k,v])=>[k,v[1]])));

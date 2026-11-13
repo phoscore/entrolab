@@ -99,30 +99,6 @@ test('v0.9 observation and station layouts at 320/390/1440 with private screensh
  }
 });
 
-test('v0.9 Null: one figure, independent sequences, reduced motion and sampled frames',async()=>{
- const {p,context}=await h.lab({viewport:{width:1440,height:900},reducedMotion:'no-preference'});try{
-  const before=await physical(p);const caption=p.locator('#creature .creature-fiction');
-  for(const [label,id] of [['observer','nullPreviewObserver'],['rift','nullPreviewRift']]){
-   await p.locator('#creaturePreferencesSummary').click();await p.locator('#'+id).click();
-   await p.waitForFunction(kind=>{
-    const f=document.getElementById('creature');
-    return f.dataset.sequence===kind&&f.getAnimations({subtree:true}).length>=4;
-   },label);
-   await p.locator('#creature').evaluate(e=>{for(const a of e.getAnimations({subtree:true}))a.pause()});
-   for(let i=0;i<11;i++){
-    await p.locator('#creature').evaluate((e,progress)=>{for(const a of e.getAnimations({subtree:true}))a.currentTime=Number(a.effect.getTiming().duration)*progress},i/11);
-    await p.locator('.null-art').screenshot({path:resolve(h.output,`v09-null-${label}-${String(i).padStart(2,'0')}.png`)});
-   }
-   assert.equal(await p.locator('#creature').count(),1);
-   assert.match(await caption.textContent(),/Null/);
-  }
-  await p.emulateMedia({reducedMotion:'reduce'});
-  await p.waitForFunction(()=>!window.entrolabCreature.inspect().moving);
-  assert.equal(await p.locator('#creature').evaluate(e=>e.getAnimations({subtree:true}).length),0);
-  assert.deepEqual(await physical(p),before);assert.deepEqual(h.errors,[]);
- }finally{await context.close()}
-});
-
 test('v0.9 Black Hole: an actual moving 2.5D scene can be sampled without touching mass',async()=>{
  const {p,context}=await h.lab({reducedMotion:'no-preference',viewport:{width:1360,height:900}});try{
   await select(p,'blackhole');await p.locator('#bhIllustration').scrollIntoViewIfNeeded();
