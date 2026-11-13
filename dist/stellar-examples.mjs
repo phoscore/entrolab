@@ -17,11 +17,12 @@ function sphereExample(example) {
 }
 
 const examples = Object.freeze({
+ // Faherty et al. inferred this temperature using 0.9 Jupiter radii. The demo uses 1.
  brown: sphereExample({
   name:'v0925.brown', reference:'Luhman 16B', mass:29.4*jupiterMass, radius:jupiterRadius,
   temperature:1280, color:'#c99179', assumption:'v0925.brown.model',
   sources:Object.freeze([
-   ['Bedin et al. (2024), NASA Exoplanet Archive', 'https://exoplanetarchive.ipac.caltech.edu/overview/Luhman-16'],
+   ['Bedin et al. (2024)', 'https://arxiv.org/abs/2403.08865'],
    ['Faherty et al. (2014)', 'https://doi.org/10.1088/0004-637X/790/2/90'],
    ['Spiegel et al. (2011)', 'https://doi.org/10.1088/0004-637X/727/1/57'],
   ].map(Object.freeze)),

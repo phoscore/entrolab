@@ -45,6 +45,15 @@ test('Stellar references use published values and clearly defined radius convent
  }
 });
 
+test('Luhman 16B distinguishes the literature temperature derivation from the demo in DE and EN',()=>{
+ const brown=extremeExample('brown');
+ assert(brown.sources.some(([name,url])=>name==='Bedin et al. (2024)'&&url==='https://arxiv.org/abs/2403.08865'));
+ assert.match(de[brown.assumption],/1\.280 ± 75 K aus der bolometrischen Leuchtkraft ab.*0,9 Jupiterradien/);
+ assert.match(de[brown.assumption],/Demo setzt separat 1 Jupiterradius.*Literaturtemperatur eine illustrative Leuchtkraft/);
+ assert.match(en[brown.assumption],/1,280 ± 75 K from the bolometric luminosity.*0\.9 Jupiter radii/);
+ assert.match(en[brown.assumption],/demo separately adopts 1 Jupiter radius.*published temperature to calculate an illustrative luminosity/);
+});
+
 test('Log radius comparison remains ordered across the entire black-hole mass range',()=>{
  for(const mass of [1,10*C.sun,1e41]){
   const radii=extremeKinds.map(kind=>extremeExample(kind,mass).radius).sort((a,b)=>a-b);

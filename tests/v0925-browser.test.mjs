@@ -27,6 +27,10 @@ test('v0.9.25: all seven object descriptions update in both languages, including
    de:[/Akkretionsumgebung/,/Weißen Zwerg/,/Neutronenstern/,/Infrarotemission/,/Konvektion/,/Dipolgeometrie/,/Sternwind/],
    en:[/accretion environment/,/white dwarf/,/neutron star/,/thermal infrared/,/convection/,/dipole geometry/,/stellar wind/],
   };
+  const brownSources={
+   de:[/bolometrischen Leuchtkraft ab.*0,9 Jupiterradien/,/separat 1 Jupiterradius.*illustrative Leuchtkraft/],
+   en:[/bolometric luminosity.*0\.9 Jupiter radii/,/separately adopts 1 Jupiter radius.*illustrative luminosity/],
+  };
   for(const lang of ['de','en','de']){
    await p.locator(`[data-language=${lang}]`).click();
    for(const [index,kind] of extremeKinds.entries()){
@@ -38,6 +42,11 @@ test('v0.9.25: all seven object descriptions update in both languages, including
     assert.equal(await p.locator('#magnetarLegend').isVisible(),kind==='magnetar');
     assert.equal(await p.locator('#objectFacts').isVisible(),index>=3);
     assert.equal(await p.locator('#objectSources a').count()>0,index>=3);
+    if(kind==='brown'){
+     const assumption=await p.locator('#objectAssumption').textContent();
+     for(const expected of brownSources[lang])assert.match(assumption,expected);
+     assert.equal(await p.getByRole('link',{name:'Bedin et al. (2024)'}).getAttribute('href'),'https://arxiv.org/abs/2403.08865');
+    }
    }
   }
   await choose(p,'blackhole');
