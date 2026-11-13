@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {join} from 'node:path';
 import {browserHarness,physical} from './v08-browser-harness.mjs';
 import {measureNull} from './measure-null.mjs';
+import {checkRealVisibility} from './null-real-visibility.mjs';
 
 let h;
 before(async()=>{h=await browserHarness()});
@@ -69,7 +70,13 @@ test('Null: autonomous, finite Observer, Glitch Entrance, Curiosity and Mischief
      a.currentTime=Number(a.effect.getTiming().duration)*(a.animationName==='null-assemble'?.31:.095);
     }
    });
-   if(name==='glitch'||name==='observer')await p.screenshot({path:join(h.output,'null-'+name+'-desktop.png')});
+   if(name==='glitch'||name==='observer'){
+    await p.screenshot({path:join(h.output,'null-'+name+'-desktop.png')});
+   }
+   if(process.env.GITHUB_ACTIONS==='true'){
+    const preview=await p.locator('.null-slot').screenshot({scale:'css'});
+    console.log('Null visual '+name+' '+preview.toString('base64'));
+   }
    await advance(p);
    assert.equal((await inspect(p)).visible,false);
    assert.equal((await inspect(p)).timers,1);
@@ -235,7 +242,22 @@ test('Null: both favicon eyes remain distinct in real Chromium at 16 and 32 pixe
    });
   });
   for(const x of results){assert(x.url.endsWith('/favicon.svg'));assert(x.left>=3&&x.right>=3,JSON.stringify(x));}
+  await p.evaluate(()=>{
+   const strip=document.createElement('div');
+   strip.id='null-icon-review';
+   strip.style.cssText='position:fixed;top:0;left:0;z-index:99999;display:flex;gap:10px;align-items:center;padding:8px;background:#171522';
+   for(const size of [16,32]){
+    const image=new Image(size,size);
+    image.src=document.querySelector('link[rel=icon]').href;
+    strip.append(image);
+   }
+   document.body.append(strip);
+  });
+  const preview=await p.locator('#null-icon-review').screenshot({scale:'css'});
+  if(process.env.GITHUB_ACTIONS==='true')console.log('Null visual favicon '+preview.toString('base64'));
  }finally{await context.close()}
 });
+
+test('Null: genuine Chromium tab activation suspends the rig and resumes with a new rest',async t=>checkRealVisibility(h,t));
 
 test('Null: comparative Chromium cost against released Phase A',async t=>measureNull(h,t));

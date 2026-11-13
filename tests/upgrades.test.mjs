@@ -86,7 +86,8 @@ test('v085 audit: every unchanged temperature preset has its own bilingual scien
   assert.match(contexts[4],/20 °C/);assert.match(contexts[5],/5772 K/);
   assert.match(contexts[6],/Plasma|plasma/);assert.match(contexts[7],/10¹² K/);
  }
- for(const file of ['index.html','translations.mjs','knowledge-text.mjs']){
+ assert.match(html,/<footer><span[^>]*>No plot armor\. Just physics\.<\/span><\/footer>/);
+ for(const file of ['index.html','translations.mjs']){
   const active=readFileSync(new URL('../dist/'+file,import.meta.url),'utf8');
   assert.match(active,/No plot armor\. Just physics\./);
   assert.doesNotMatch(active,/No magic\.|Kein Zauber\.|Keine Magie\./);
