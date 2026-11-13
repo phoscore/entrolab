@@ -355,4 +355,7 @@ test('Null: both favicon eyes remain distinct in real Chromium at 16 and 32 pixe
 test('Null: genuine Chromium tab activation suspends the rig and resumes with a new rest',async t=>checkRealVisibility(h,t));
 
 test('Null: comparative Chromium cost against released Phase A',async t=>measureNull(h,t));
-test('Null: central poses compared with audited Phase B',async t=>measureNullAudit(h,t));
+// Run this comparison on demand so it does not compete with the regular browser suite.
+if(process.env.ENTROLAB_NULL_AUDIT_PERF==='1'){
+ test('Null: central poses compared with audited Phase B',async t=>measureNullAudit(h,t));
+}
