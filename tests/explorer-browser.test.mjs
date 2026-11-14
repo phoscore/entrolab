@@ -59,9 +59,13 @@ test('Explorer browser: lazy loading, real source selection, aliases and unchang
     await p.locator('#exList button').click();
     assert.equal(await p.locator('#exCenter').isDisabled(),false);
     assert.match(await p.locator('#exInspector').innerText(),/1,3019114/);
-    await p.waitForFunction(()=>{const s=window.entrolabExplorer.inspect();return s.groups.some(g=>g.ids.length===1&&g.ids[0]===s.selected);});
-    const state=await inspect(p);const marker=state.groups.find(g=>g.ids.includes(state.selected));
-    const bounds=await p.locator('#exCanvas').boundingBox();assert.ok(Math.abs(marker.x-bounds.width/2)<1);
+    await p.waitForFunction(()=>{
+      const state=window.entrolabExplorer.inspect();
+      const marker=state.groups.find(group=>group.ids.length===1&&group.ids[0]===state.selected);
+      const {width,height}=document.getElementById('exCanvas').getBoundingClientRect();
+      return marker&&Math.abs(marker.x-width/2)<1&&Math.abs(marker.y-height/2)<1;
+    });
+    const state=await inspect(p);
     await p.locator('[data-language=en]').click();assert.match(await p.locator('#exInspector').innerText(),/Distance estimates/i);
     const after=await p.evaluate(()=>({g:window.entrolab.inspect().bodies,t:window.entrolabThermal.inspect(),e:window.entrolabEntropy.inspect()}));
     assert.deepEqual(after,before);assert.deepEqual(errors,[]);
