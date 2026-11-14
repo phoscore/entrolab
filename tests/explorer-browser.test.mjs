@@ -48,12 +48,14 @@ test('Explorer browser: lazy loading, real source selection, aliases and unchang
     const coldOpenMs=Date.now()-started;
     const resources=await p.evaluate(()=>performance.getEntriesByType('resource').filter(r=>/\/explorer(?:\/|\.css$)/.test(r.name)).map(r=>({path:new URL(r.name).pathname,bytes:r.decodedBodySize})));
     assert.ok(resources.some(r=>r.path.endsWith('/objects.json')));
+    await p.locator('#explorer').screenshot({path:join(output,'explorer-overview.png')});
     assert.equal(await p.locator('#exList button').count(),22);
     await p.locator('#exSearch').fill('Bellerophon');await p.waitForFunction(()=>document.querySelectorAll('#exList button').length===1);
     await p.locator('#exList button').press('Enter');
     assert.match(await p.locator('#exInspector').innerText(),/51 Peg b/);
     assert.equal(await p.locator('#exCenter').isDisabled(),true);
-    await p.locator('#exSearch').fill('5853498713190525696');await p.waitForFunction(()=>document.querySelectorAll('#exList button').length===1);
+    await p.locator('#exSearch').fill('5853498713190525696');
+    await p.locator('#exList button').filter({hasText:'5853498713190525696'}).waitFor();
     await p.locator('#exList button').click();
     assert.equal(await p.locator('#exCenter').isDisabled(),false);
     assert.match(await p.locator('#exInspector').innerText(),/1,3019114/);
@@ -103,6 +105,7 @@ test('Explorer browser: mobile pinch works on first contact, with no horizontal 
     const canvas=p.locator('#exCanvas');await canvas.scrollIntoViewIfNeeded();
     const {x,y,width,height}=await canvas.boundingBox();
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    assert.ok((await p.locator('#exZoom').boundingBox()).width>180);
     const cdp=await context.newCDPSession(p);
     const touchPoints=span=>[-1,1].map((direction,id)=>({x:x+width/2+span*direction,y:y+height/2,id}));
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:touchPoints(30)});
@@ -125,5 +128,8 @@ test('Explorer browser: failed data is distinct from an empty search and retry r
     await p.locator('#exSearch').fill('nonexistent-source');await p.waitForFunction(()=>document.querySelector('#exList').textContent.includes('Kein Treffer'));
     assert.equal(await p.locator('#exError').isVisible(),false);
     assert.match(await p.locator('#explorer').innerText(),/Himmelsabdeckung unbekannt/);
+    await p.locator('#exZoom').press('End');
+    await p.locator('#exCanvas').scrollIntoViewIfNeeded();
+    await p.waitForFunction(()=>document.getElementById('exMapMessage').textContent.startsWith('Keine Quelle'));
   }finally{await context.close();}
 });

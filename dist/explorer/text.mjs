@@ -10,12 +10,12 @@ export const text = {
   emptySearch: ['Kein Treffer in dieser Datenprobe.', 'No match in this data sample.'],
   loading: ['Katalog wird geprüft …', 'Checking catalogue …'],
   loadingSky: ['Himmelsdaten werden geladen …', 'Loading sky data …'],
+  loadingSearch: ['Suche läuft …', 'Searching …'],
   error: ['Daten konnten nicht geladen oder verifiziert werden.', 'Data could not be loaded or verified.'],
   retry: ['Erneut laden', 'Retry loading'],
   search: ['Name, Alias oder Katalog-ID', 'Name, alias or catalogue ID'],
   searchHint: ['Präfixsuche, z. B. TRAPPIST, Bellerophon oder Gaia', 'Prefix search, e.g. TRAPPIST, Bellerophon or Gaia'],
   sources: ['Quellen auswählen', 'Select sources'],
-  all: ['Alle Objekte', 'All objects'],
   star: ['Stern', 'Star'],
   source: ['Gaia-Quelle · unklassifiziert', 'Gaia source · unclassified'],
   galaxy: ['Galaxie', 'Galaxy'],
@@ -32,7 +32,6 @@ export const text = {
   zoom: ['Zoom · logarithmisch', 'Zoom · logarithmic'],
   camera: ['Kartensteuerung', 'Map controls'],
   help: ['Ziehen verschiebt die Karte. Zum Rad-Zoom die Karte zuerst anklicken. Pinch mit zwei Fingern. Tastatur auf der Karte: Pfeile verschieben, +/− zoomen, Home zeigt alles, Escape gibt das Scrollen frei. Die Liste bietet dieselbe Objektauswahl.', 'Drag to pan. Click the map first to enable wheel zoom. Pinch with two fingers. With the map focused: arrows pan, +/− zoom, Home shows all, Escape releases scrolling. The list offers the same object selection.'],
-  activate: ['Karte zum Zoomen aktivieren', 'Activate map to zoom'],
   direction: ['Himmelsrichtung', 'Sky direction'],
   distance: ['Entfernungsschätzungen', 'Distance estimates'],
   parallax: ['Parallaxe', 'Parallax'],
@@ -73,13 +72,15 @@ export const text = {
   group: ['Quellengruppe', 'Source group'],
   visible: ['Quellen im Ausschnitt', 'sources in view'],
   results: ['Treffer', 'matches'],
+  oneResult: ['Treffer', 'match'],
   geometric: ['Geometrisch', 'Geometric'],
   photogeometric: ['Photogeometrisch', 'Photogeometric'],
   frame: ['Bezugssystem', 'Reference frame'],
   epoch: ['Astrometrische Epoche', 'Astrometric epoch'],
 };
 export const translate = (key, language = 'de') => text[key]?.[language === 'en' ? 1 : 0] ?? key;
-export const number = (value, language = 'de') => new Intl.NumberFormat(language === 'en' ? 'en-GB' : 'de-DE', {maximumSignificantDigits: 12}).format(value);
+const formatters = ['de-DE', 'en-GB'].map(locale => new Intl.NumberFormat(locale, {maximumSignificantDigits: 12}));
+export const number = (value, language = 'de') => formatters[language === 'en' ? 1 : 0].format(value);
 export function measurement(q, language = 'de') {
   const t = key => translate(key, language), n = x => number(x, language);
   if (!q || q.status === 'unknown') return t('unknown');

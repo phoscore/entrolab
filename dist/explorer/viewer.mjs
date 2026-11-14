@@ -44,7 +44,7 @@ export function mountExplorer(root) {
   let camera = homeCamera(), selected = null, data = null, sky = [], results = [], groups = [];
   let active = false, seen = true, disposed = false, frame = null, dirty = true;
   let session = null, loader = null, skyRevision = 0, searchRevision = 0;
-  let loading = true, skyLoading = false, failed = false, searchFailed = false;
+  let loading = true, skyLoading = false, searchLoading = false, failed = false, searchFailed = false;
   let width = 1, height = 1, draws = 0, duration = 0;
   const pointers = new Map();
   let gesture = null, moved = false;
@@ -68,14 +68,15 @@ export function mountExplorer(root) {
 
   function showList() {
     const focused = $('exList').contains(document.activeElement) ? document.activeElement.dataset.object : null;
-    $('exSearchCount').textContent = searchFailed ? t('error') : loading ? t('loading') : `${results.length} ${t('results')}`;
+    const resultLabel = `${results.length} ${t(results.length === 1 ? 'oneResult' : 'results')}`;
+    $('exSearchCount').textContent = searchFailed ? t('error') : loading ? t('loading') : searchLoading ? t('loadingSearch') : resultLabel;
     $('exList').replaceChildren(...results.map(object => {
       const button = node('button'); button.type = 'button'; button.dataset.object = object.id;
       button.setAttribute('aria-pressed', String(object.id === selected));
       button.append(node('span', objectName(object)), node('small', `${t(object.kind)}${object.direction ? '' : ' · ' + t('noDirection')}`));
       return button;
     }));
-    if (data && !results.length && !searchFailed) $('exList').append(node('p', t('emptySearch'), 'ex-small'));
+    if (data && !results.length && !searchLoading && !searchFailed) $('exList').append(node('p', t('emptySearch'), 'ex-small'));
     if (focused) [...$('exList').querySelectorAll('button')].find(button => button.dataset.object === focused)?.focus({preventScroll:true});
   }
 
@@ -160,7 +161,11 @@ export function mountExplorer(root) {
     const changedSize = width !== rect.width || height !== rect.height;
     width = rect.width; height = rect.height;
     const dpr = Math.min(devicePixelRatio || 1, 1.75);
-    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+    const backingWidth = Math.round(width * dpr), backingHeight = Math.round(height * dpr);
+    if (canvas.width !== backingWidth || canvas.height !== backingHeight) {
+      canvas.width = backingWidth;
+      canvas.height = backingHeight;
+    }
     ctx?.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
     invalidate();
     if (changedSize) void refreshSky();
@@ -190,13 +195,20 @@ export function mountExplorer(root) {
     ctx.font = '10px "DM Sans", sans-serif'; ctx.fillStyle = '#9ab0be';
     for (let ra = Math.ceil(Math.max(0, viewLeft) / step) * step; ra <= Math.min(360, viewRight); ra += step) {
       const [x] = screen([ra, 90]); ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
-      ctx.fillText(`${n(ra)}°`, x + 5, Math.min(height - 12, Math.max(28, bottom - 12)));
+      const label = `${n(ra)}°`;
+      if (x > Math.max(32, left + 30) && x + 5 + ctx.measureText(label).width < Math.min(width, right)) {
+        ctx.fillText(label, x + 5, Math.min(height - 54, Math.max(28, bottom - 12)));
+      }
     }
     const lowDec = unproject(0, Math.min(180, viewBottom))[1], highDec = unproject(0, Math.max(0, viewTop))[1];
     const decStep = niceStep(Math.max(.0001, (highDec - lowDec) / 7));
+    let lastDecLabel = Infinity;
     for (let dec = Math.ceil(lowDec / decStep) * decStep; dec <= highDec; dec += decStep) {
       const [, y] = screen(project(0, Math.max(-90, Math.min(90, dec)))); ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
-      ctx.fillText(`${n(dec)}°`, Math.max(10, left + 8), y - 6);
+      if (Math.abs(dec) < 90 && y >= 18 && y < height - 50 && lastDecLabel - y >= 14) {
+        ctx.fillText(`${n(dec)}°`, Math.max(10, left + 8), y - 6);
+        lastDecLabel = y;
+      }
     }
     groups = visibleGroups(sky, camera, width, height, selected);
     for (const group of groups) {
@@ -223,14 +235,17 @@ export function mountExplorer(root) {
     ctx.restore();
     ctx.strokeStyle = '#608590'; ctx.lineWidth = 1; ctx.strokeRect(left, top, right - left, bottom - top);
     ctx.font = '10px "DM Sans", sans-serif'; ctx.fillStyle = '#9ab0be';
-    if (top >= 14 && top < height) ctx.fillText(t('north'), Math.max(10, left + 6), top - 9);
-    if (bottom >= 0 && bottom < height - 14) ctx.fillText(t('south'), Math.max(10, left + 6), bottom + 17);
+    const poleX = Math.min(width - 10, right - 6);
+    ctx.textAlign = 'right';
+    if (top >= 14 && top < height && poleX >= 100) ctx.fillText(t('north'), poleX, top - 9);
+    if (bottom >= 0 && bottom < height - 14 && poleX >= 100) ctx.fillText(t('south'), poleX, bottom + 17);
+    ctx.textAlign = 'left';
     const scaleDegrees = niceStep(60 / scale), pixels = scaleDegrees * scale;
     ctx.strokeStyle = '#c5e1e0';ctx.beginPath();ctx.moveTo(18,height-33);ctx.lineTo(18+pixels,height-33);ctx.stroke();
     ctx.fillStyle = '#c5e1e0';ctx.fillText(`ΔRA ${n(scaleDegrees)}° · Dec 0°`,18,height-42);
     $('exCount').textContent = `${groups.reduce((sum, g) => sum + g.objects.length, 0)} / 19 ${t('visible')}`;
     $('exZoom').value = String(camera.zoom);
-    $('exScale').textContent = `${n(10 ** camera.zoom)}×`;
+    $('exScale').textContent = `${n(Math.round(10 ** camera.zoom * 100) / 100)}×`;
     $('exOut').disabled = camera.zoom === 0;
     $('exIn').disabled = camera.zoom === MAX_ZOOM;
     $('exMapMessage').textContent = failed ? t('error') : loading ? t('loading') : skyLoading ? t('loadingSky') : groups.length ? '' : t('empty');
@@ -256,19 +271,26 @@ export function mountExplorer(root) {
   async function search() {
     if (!data || !loader || !active) return;
     const revision = ++searchRevision;
+    const query = $('exSearch').value;
+    searchLoading = Boolean(query.trim());
+    if (searchLoading) {
+      searchFailed = false;
+      results = [];
+      showList();
+    }
     try {
-      const matches = await findObjects(data.manifest, data.objects, loader, $('exSearch').value);
+      const matches = await findObjects(data.manifest, data.objects, loader, query);
       if (!active || disposed || revision !== searchRevision) return;
-      results = matches; searchFailed = false; $('exError').hidden = !failed; showList();
+      results = matches; searchLoading = false; searchFailed = false; $('exError').hidden = !failed; showList();
     } catch (error) {
       if (!active || disposed || revision !== searchRevision) return;
-      searchFailed = true; results = []; $('exError').hidden = false; showList();
+      searchLoading = false; searchFailed = true; results = []; $('exError').hidden = false; showList();
     }
   }
 
   async function start() {
     const own = new AbortController(); session = own;
-    loading = !data; failed = false; searchFailed = false; $('exError').hidden = true; invalidate();
+    loading = !data; failed = false; searchLoading = false; searchFailed = false; $('exError').hidden = true; invalidate();
     try {
       const loaded = data ?? await loadCatalog(own.signal);
       if (own.signal.aborted || disposed || !active) return;
@@ -340,6 +362,7 @@ export function mountExplorer(root) {
       else if (hit) {
         const center = worldPoint([hit.x,hit.y],camera,width,height);
         camera = {...camera,x:center[0],y:center[1],zoom:Math.min(MAX_ZOOM,camera.zoom + .8)};
+        searchRevision++; searchLoading = false; searchFailed = false; $('exError').hidden = !failed;
         results = hit.objects; $('exSearch').value = ''; showList(); changed();
         $('exAnnouncement').textContent = `${t('group')} · ${hit.objects.length}`;
       }

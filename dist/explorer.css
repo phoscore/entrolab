@@ -52,4 +52,8 @@
 #explorer .ex-reader{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:1050px){#explorer .ex-layout{grid-template-columns:minmax(0,1fr) 290px}#explorer .ex-map-head{align-items:start;flex-direction:column}}
 @media(max-width:760px){#explorer .ex-layout{grid-template-columns:1fr}#explorer .ex-aside{border-left:0;border-top:1px solid var(--ex-line);max-height:none}#explorer .ex-map{height:360px}#explorer .ex-heading{margin-bottom:18px}#explorer .ex-map-head{padding:14px}#explorer .ex-controls button{min-height:42px}#explorer .ex-list{max-height:230px}#explorer .ex-map-foot,#explorer .ex-zoom{padding:12px 14px}#explorer .ex-legend{padding:0 14px 14px}}
+@media(max-width:760px){
+  #explorer .ex-zoom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
+  #explorer .ex-zoom input{grid-column:1/-1;grid-row:2;width:100%;max-width:none;min-height:28px;margin:0}
+}
 @media(prefers-reduced-motion:reduce){#explorer *,#explorer *::before,#explorer *::after{scroll-behavior:auto;transition:none;animation:none}}
