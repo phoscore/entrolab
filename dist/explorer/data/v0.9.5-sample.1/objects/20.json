@@ -1,0 +1,168 @@
+{
+  "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:HR%208799%20b",
+  "kind": "exoplanet",
+  "identity": {
+    "catalog": "oec",
+    "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+    "id": "HR 8799 b",
+    "evidence": {
+      "source": "oec",
+      "row": "systems/HR 8799.xml#HR 8799 b",
+      "columns": [
+        "planet/name"
+      ],
+      "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+    }
+  },
+  "aliases": [
+    {
+      "name": "HD 218396 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/HR 8799.xml#HR 8799 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+      }
+    },
+    {
+      "name": "Gaia DR2 2832463659640297472 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/HR 8799.xml#HR 8799 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+      }
+    },
+    {
+      "name": "TYC 1718-2350-1 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/HR 8799.xml#HR 8799 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+      }
+    },
+    {
+      "name": "HIP 114189 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/HR 8799.xml#HR 8799 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+      }
+    }
+  ],
+  "direction": null,
+  "distances": [],
+  "orbits": [
+    {
+      "solution": {
+        "source": "oec",
+        "row": "systems/HR 8799.xml#HR 8799 b",
+        "columns": [
+          "planet"
+        ],
+        "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751",
+        "kind": "undetermined"
+      },
+      "center": null,
+      "frame": null,
+      "elements": {
+        "period": {
+          "status": "catalog",
+          "value": 166510,
+          "unit": "d",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/period",
+              "planet/period/@errorminus",
+              "planet/period/@errorplus"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 9022,
+            "plus": 9022
+          },
+          "limit": null
+        },
+        "semimajorAxis": {
+          "status": "catalog",
+          "value": 67.96,
+          "unit": "AU",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/semimajoraxis",
+              "planet/semimajoraxis/@errorminus",
+              "planet/semimajoraxis/@errorplus"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 1.85,
+            "plus": 1.85
+          },
+          "limit": null
+        },
+        "eccentricity": {
+          "status": "catalog",
+          "value": 0,
+          "unit": "1",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/eccentricity",
+              "planet/eccentricity/@errorminus",
+              "planet/eccentricity/@errorplus"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "inclination": {
+          "status": "catalog",
+          "value": 30.27,
+          "unit": "deg",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/inclination",
+              "planet/inclination/@errorminus",
+              "planet/inclination/@errorplus"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 4.95,
+            "plus": 4.95
+          },
+          "limit": null
+        }
+      },
+      "phase": null,
+      "capability": "schematic-phase"
+    }
+  ]
+}

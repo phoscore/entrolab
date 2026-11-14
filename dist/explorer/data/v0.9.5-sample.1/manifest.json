@@ -1,0 +1,420 @@
+{
+  "manifestVersion": 1,
+  "schemaVersion": 1,
+  "tileVersion": 1,
+  "indexVersion": 1,
+  "release": "v0.9.5-sample.1",
+  "acquiredDate": "2026-11-13",
+  "distribution": "cleared-sample",
+  "sources": {
+    "gaia": {
+      "release": "Gaia DR3 / gaia.dr3lite",
+      "access": "https://dc.g-vo.org/tap/sync",
+      "license": "ESA Gaia open use with credit",
+      "terms": "https://gea.esac.esa.int/archive/documentation/GDR3/Miscellaneous/sec_credit_and_citation_instructions/",
+      "reference": "https://doi.org/10.1051/0004-6361/202243940"
+    },
+    "gaia-nearby": {
+      "release": "Nearby-star comparison",
+      "access": "https://www.cosmos.esa.int/web/gaia/iow_20250513",
+      "license": "classification evidence only; no table copied"
+    },
+    "bailer-jones": {
+      "release": "Gaia EDR3 distances / I/352 / gedr3dist.main",
+      "access": "https://dc.g-vo.org/tap/sync",
+      "license": "CC-BY-4.0",
+      "terms": "https://dc.g-vo.org/gedr3dist/q/cone/info",
+      "reference": "https://doi.org/10.3847/1538-3881/abd806"
+    },
+    "desi": {
+      "release": "DR1 iron zpix v1 / desi_dr1.zpix",
+      "access": "https://datalab.noirlab.edu/query/query",
+      "license": "CC-BY-4.0",
+      "terms": "https://data.desi.lbl.gov/doc/acknowledgments/",
+      "reference": "https://data.desi.lbl.gov/doc/releases/dr1/"
+    },
+    "oec": {
+      "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+      "access": "https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue/tree/4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+      "license": "OEC MIT-style database license (OEC-LICENSE.txt)",
+      "reference": "https://arxiv.org/abs/1211.7121"
+    }
+  },
+  "inputs": [
+    {
+      "file": "sources.json",
+      "sha256": "2d1646125b5d16af6e3aaee366ea6e16a06904aafd782f22173120fee02e4c99"
+    },
+    {
+      "file": "OEC-LICENSE.txt",
+      "sha256": "b9fec6ed30ee24abfcc1b8b98b2a533e332b3ddadb1c41611253e79f887ee786"
+    },
+    {
+      "file": "CREDITS.md",
+      "sha256": "4c6994fe72f45cd0e06b741a17a154eccf6c454abe00720b1d6f4b23055d62f2"
+    },
+    {
+      "file": "gaia.csv",
+      "type": "gaia",
+      "rows": 6,
+      "maxRows": 14,
+      "query": "SELECT TOP 14 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id IN (5853498713190525696,4472832130942575872,4295806720,34361129088,38655544960,2067082282304626432,762815470562110464) OR g.source_id BETWEEN 1 AND 90000000000 ORDER BY g.source_id",
+      "bytes": 1030,
+      "sha256": "fd5d04b573149c02d83bf348dcf3020de7fae2905711301328dc41cf1d9eab5c"
+    },
+    {
+      "file": "gaia-weak.csv",
+      "type": "gaia",
+      "rows": 4,
+      "maxRows": 4,
+      "query": "SELECT TOP 4 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id BETWEEN 1 AND 3000000000000 AND (g.parallax < 0 OR g.parallax IS NULL) ORDER BY g.source_id",
+      "bytes": 730,
+      "sha256": "a274b625b8136996134abda9d9a21e9f4c0f92dfb72c73f65aab567037f41bb2"
+    },
+    {
+      "file": "gaia-angular.csv",
+      "type": "gaia",
+      "rows": 3,
+      "maxRows": 3,
+      "query": "SELECT TOP 3 g.source_id,g.ra,g.dec,g.parallax,g.parallax_error,g.ruwe,g.astrometric_params_solved,d.r_med_geo,d.r_lo_geo,d.r_hi_geo,d.r_med_photogeo,d.r_lo_photogeo,d.r_hi_photogeo FROM gaia.dr3lite AS g LEFT OUTER JOIN gedr3dist.main AS d ON g.source_id=d.source_id WHERE g.source_id BETWEEN 1 AND 6000000000000 AND g.parallax IS NULL ORDER BY g.source_id",
+      "bytes": 335,
+      "sha256": "f5dbcff5b6c0d7aabed89dbbd6efe749448928bf74bea16ac0f87202ff1ae9a7"
+    },
+    {
+      "file": "desi.csv",
+      "type": "desi",
+      "rows": 6,
+      "maxRows": 12,
+      "query": "SELECT targetid,desiname,mean_fiber_ra,mean_fiber_dec,mean_mjd,z,zerr,zwarn,deltachi2,healpix,survey,program,spectype,zcat_primary FROM desi_dr1.zpix WHERE targetid BETWEEN 39628379988689570 AND 39628379988689900 AND survey='main' AND program='bright' AND spectype='GALAXY' AND zcat_primary=true AND zwarn=0 ORDER BY targetid LIMIT 12",
+      "bytes": 1196,
+      "sha256": "2527dc2297d94fc1b6cebf183d7dce2193fa21d523e5a83c511cc51f40ad9f81"
+    },
+    {
+      "file": "oec.json",
+      "type": "oec",
+      "rows": 3,
+      "maxRows": 3,
+      "query": "Project the first confirmed planet from each pinned systems/51 Peg.xml, systems/HR 8799.xml and systems/TRAPPIST-1.xml into numeric orbit elements, source paths and aliases; omit prose and images.",
+      "bytes": 2712,
+      "sha256": "fb83e72cb892f1419410956b85f022ca1a5cfa9374ee9fb1bfe8f363ca5784b5"
+    }
+  ],
+  "counts": {
+    "objects": 22,
+    "byKind": {
+      "galaxy": 6,
+      "source": 10,
+      "star": 3,
+      "exoplanet": 3
+    },
+    "skyDirections": 19,
+    "noDirection": 3,
+    "noDistance": 12,
+    "negativeParallax": 4,
+    "missingParallax": 3
+  },
+  "layers": {
+    "gaia": {
+      "frame": "ICRS",
+      "projection": "equal-area-ra-sin-dec",
+      "coverage": "selected-rows-only",
+      "tree": {
+        "id": "r",
+        "bounds": [
+          0,
+          0,
+          1
+        ],
+        "count": 13,
+        "pages": 1,
+        "files": [
+          {
+            "path": "tiles/gaia-r-0.bin",
+            "count": 13
+          }
+        ]
+      }
+    },
+    "desi": {
+      "frame": "catalog-equatorial",
+      "projection": "equal-area-ra-sin-dec",
+      "coverage": "selected-rows-only",
+      "tree": {
+        "id": "r",
+        "bounds": [
+          0,
+          0,
+          1
+        ],
+        "count": 6,
+        "pages": 1,
+        "files": [
+          {
+            "path": "tiles/desi-r-0.bin",
+            "count": 6
+          }
+        ]
+      }
+    }
+  },
+  "search": {
+    "shards": {
+      "10": "search/3130.json",
+      "15": "search/3135.json",
+      "21": "search/3231.json",
+      "25": "search/3235.json",
+      "28": "search/3238.json",
+      "34": "search/3334.json",
+      "36": "search/3336.json",
+      "38": "search/3338.json",
+      "39": "search/3339.json",
+      "42": "search/3432.json",
+      "44": "search/3434.json",
+      "51": "search/3531.json",
+      "58": "search/3538.json",
+      "76": "search/3736.json",
+      "92": "search/3932.json",
+      "de": "search/6465.json",
+      "ga": "search/6761.json",
+      "oe": "search/6f65.json",
+      "be": "search/6265.json",
+      "ty": "search/7479.json",
+      "he": "search/6865.json",
+      "gj": "search/676a.json",
+      "hi": "search/6869.json",
+      "hd": "search/6864.json",
+      "hr": "search/6872.json",
+      "tr": "search/7472.json",
+      "2m": "search/326d.json",
+      "k2": "search/6b32.json",
+      "ep": "search/6570.json"
+    },
+    "inspectorPath": "objects/{row}.json"
+  },
+  "packages": {
+    "OEC-LICENSE.txt": {
+      "bytes": 1150,
+      "sha256": "b9fec6ed30ee24abfcc1b8b98b2a533e332b3ddadb1c41611253e79f887ee786"
+    },
+    "CREDITS.md": {
+      "bytes": 3775,
+      "sha256": "4c6994fe72f45cd0e06b741a17a154eccf6c454abe00720b1d6f4b23055d62f2"
+    },
+    "objects.json": {
+      "bytes": 78677,
+      "sha256": "aeb8951ce7e559e5f4d1d3bb48e87fb64900e9e1bc972689499bd4e2c8fbcde0"
+    },
+    "objects/0.json": {
+      "bytes": 2060,
+      "sha256": "59ecfa406d4b25363ef550f856afbbbe8cb1a82a2c69820c0f02ae08a12a9b78"
+    },
+    "objects/1.json": {
+      "bytes": 2058,
+      "sha256": "2713ddb6128ea582cb873fd6237ac8ec890d9ee989dc6dfb10b6430fc2d35379"
+    },
+    "objects/2.json": {
+      "bytes": 2058,
+      "sha256": "43cb6e26cf052f7ddfc54990f8f21e15955da8120f9ab10b3d2a7d8e55daced8"
+    },
+    "objects/3.json": {
+      "bytes": 2055,
+      "sha256": "0834239040ee180adf0aa3594534c193a506d53f64d271826c4c08ea30402497"
+    },
+    "objects/4.json": {
+      "bytes": 2057,
+      "sha256": "92d62403afc47ad3adba3c653a94ee19744bbfcec488f5a1214d1740a28d7700"
+    },
+    "objects/5.json": {
+      "bytes": 2058,
+      "sha256": "798cf7f7e3606d268990ccc608fd9df4ad999d2658835fc9aa798bc4f0d886af"
+    },
+    "objects/6.json": {
+      "bytes": 3230,
+      "sha256": "f1d95f106008fa07469ac6aff7f440567a97e576a1905ecb11d2cafac7e94452"
+    },
+    "objects/7.json": {
+      "bytes": 3228,
+      "sha256": "64d854968bf0f89c4065f8eb21f171d4cb9a9bf729a933fb8c1fd4bc80ca88b4"
+    },
+    "objects/8.json": {
+      "bytes": 3229,
+      "sha256": "8eb3df6aff78be530a56abff96cf561ee516667732b84790b94a450420450bf9"
+    },
+    "objects/9.json": {
+      "bytes": 1640,
+      "sha256": "a7ec676bce1439421d2243ec1c60e954145158ff917985a355c4d956c3ba31c5"
+    },
+    "objects/10.json": {
+      "bytes": 1642,
+      "sha256": "2a039989a012df4201bc868084df338747dcf8433059ddb4fca01774ba1d275f"
+    },
+    "objects/11.json": {
+      "bytes": 3209,
+      "sha256": "f87852e327f1cbc5b543e05c0fe41215821a71158c4b51742fb1ae18485fcb22"
+    },
+    "objects/12.json": {
+      "bytes": 1640,
+      "sha256": "deb1f00c26513fe8361804f8edd8a6abc2de065c2220433016394ceecd30bf3a"
+    },
+    "objects/13.json": {
+      "bytes": 3210,
+      "sha256": "518ec35316503946f765959700a20fee9cc34f0744c2d8d121ef270cad1ee93a"
+    },
+    "objects/14.json": {
+      "bytes": 3201,
+      "sha256": "d3ec6f037d77c27d7a7cfad9a45a8cb65ab18a60c3845a09182e511ce7baf116"
+    },
+    "objects/15.json": {
+      "bytes": 3475,
+      "sha256": "210efe6c2a96c60514fa950960349c90bcfb4276e1a2209b0db89a900ea40695"
+    },
+    "objects/16.json": {
+      "bytes": 3479,
+      "sha256": "cf370ecc0b636a078b6103abf3087e6c76dc1f46054dd1dce51563f2c71ad0f4"
+    },
+    "objects/17.json": {
+      "bytes": 3464,
+      "sha256": "29ba11578224080fe89c88fde46df9e4c93240e3b4359d2e39e06b21fb239deb"
+    },
+    "objects/18.json": {
+      "bytes": 3222,
+      "sha256": "a78f1f4f3f2bd622781fba6dcdf7e80e3b85fa294e8cb80f68cdbf256cd8ec40"
+    },
+    "objects/19.json": {
+      "bytes": 6190,
+      "sha256": "d01bf36c9ff2f57b293a96addf23e517629329dd89a7d74e1835a49fc599e5d6"
+    },
+    "objects/20.json": {
+      "bytes": 4474,
+      "sha256": "43cb5f2e891dbb246c5cebb0b0f633bc1c10ae0cf019297caa0e350bb9a0c924"
+    },
+    "objects/21.json": {
+      "bytes": 5956,
+      "sha256": "13b208fd5f878e5c784700aee6caa2ed5b1de4e503290071fbd34a4b08083406"
+    },
+    "search/6465.json": {
+      "bytes": 1209,
+      "sha256": "c67d37298f1567eb1f6d23a3f6f63fd4012f20d2ea2bc3993371b3987314f5e2"
+    },
+    "search/3339.json": {
+      "bytes": 525,
+      "sha256": "40f6da2373161fdca8f0bd75830a37de8c1a3c7f2e12b34b0ebf0a94aa8f44dc"
+    },
+    "search/6761.json": {
+      "bytes": 1365,
+      "sha256": "b27370603400ffb1fde7e561aba0e2db64d50358aad57350d565b934b35c4cfb"
+    },
+    "search/3130.json": {
+      "bytes": 69,
+      "sha256": "d2f9f90d39494e3a4a99888960b0ef2db49601c3ad9503616eb0b071ed387fad"
+    },
+    "search/3135.json": {
+      "bytes": 69,
+      "sha256": "36364b6ee935bcd5f0add2d4d5c3fa899afba8e6eb04201a77efc23c713e60e1"
+    },
+    "search/3231.json": {
+      "bytes": 69,
+      "sha256": "0c0d6bb9ee44db44910baab14bace81a5f825015e9500f2fe167239b7a90ec42"
+    },
+    "search/3235.json": {
+      "bytes": 69,
+      "sha256": "0f18ac5c6b4e208a453df858291d9fd4c8cf56a81093dede2ed02b0026fceadb"
+    },
+    "search/3238.json": {
+      "bytes": 70,
+      "sha256": "c7c5c4c2649cb16ab7ce96b3f989f8f8c79badbaee87bb4fd318d9a3c627010f"
+    },
+    "search/3334.json": {
+      "bytes": 66,
+      "sha256": "9d50dd78bb8eb6a592d5bff26c1ef3fe320263fa8ef5e10890a54bbf7ecc8f3f"
+    },
+    "search/3336.json": {
+      "bytes": 70,
+      "sha256": "94302e758219e1512f026a952a892659a3d8b480d5612ca1b9fda779500bba5d"
+    },
+    "search/3338.json": {
+      "bytes": 66,
+      "sha256": "0dcff861ae1d384a691a3dbcb617ad8ef981ff028199404175e1b9b38ed49435"
+    },
+    "search/3432.json": {
+      "bytes": 64,
+      "sha256": "cb6292148e8ee018d217f7e8aee5b4e5553637c455902301a553c99c4baf9586"
+    },
+    "search/3434.json": {
+      "bytes": 82,
+      "sha256": "aa978ef3d67eee00bb52b398da40d16d500a45554174809126f55df29561b2f8"
+    },
+    "search/3538.json": {
+      "bytes": 82,
+      "sha256": "fdef92dbd4693f846b599fd22a195d633216e283f311b9756d47da83674e6618"
+    },
+    "search/3736.json": {
+      "bytes": 80,
+      "sha256": "06c4d15ce45090ae2fd30627f33c522cfbf2c73df5e1c2febdb0bc32ef24c086"
+    },
+    "search/3932.json": {
+      "bytes": 68,
+      "sha256": "3f258ed7108d0a9cb6e20b480ec759ec1b8544d34f59be0b8bc7fbd4cfd2b336"
+    },
+    "search/6f65.json": {
+      "bytes": 447,
+      "sha256": "c6e961e665ee95c3c4cfb889b62ea431e141603f4cf8c02c1091dc1fdc542816"
+    },
+    "search/3531.json": {
+      "bytes": 100,
+      "sha256": "64039ced6c5c40fb07b3e6b16128a12485d5658d09f6957bfd2be2276d69e5d5"
+    },
+    "search/6265.json": {
+      "bytes": 103,
+      "sha256": "016bbe17a434248aed4f645277039df7f3fab9d8d133d212d09efb52e04a8463"
+    },
+    "search/7479.json": {
+      "bytes": 216,
+      "sha256": "4d5b60809a68783eb7b744417363ee4e2de1416a79e931e2c827255730b1043b"
+    },
+    "search/6865.json": {
+      "bytes": 103,
+      "sha256": "4cea6e4a8dfead8365b745426079f9e81126d0b555f893be5fb46601fd96b187"
+    },
+    "search/676a.json": {
+      "bytes": 100,
+      "sha256": "4a1bf768fc6ab935e6d5c133ae0bfb6c4770e7e332007cb6a53b3a57452db050"
+    },
+    "search/6869.json": {
+      "bytes": 206,
+      "sha256": "4632fef12d87ea36335c021a668e25a063ef729efd7e878ee44de4f579c8546c"
+    },
+    "search/6864.json": {
+      "bytes": 204,
+      "sha256": "c4acc84b2ed4f289272046d82db76e6e85360014fc9627040c154a4ca57c70d2"
+    },
+    "search/6872.json": {
+      "bytes": 102,
+      "sha256": "f89d97bdc5b3c28a0e7dc6a6c66ee6ba5f144cbc63852d478b89ee4afaf2bcb3"
+    },
+    "search/7472.json": {
+      "bytes": 106,
+      "sha256": "c5abd33e9c3cad4ce5eb86a8b197f405cddb364d184f3d2f302f46d220421a2e"
+    },
+    "search/326d.json": {
+      "bytes": 119,
+      "sha256": "2fd4e0714a4c92d57054ca110a69dc7f3c8640f1f4f66ca8d106421ac76ec52c"
+    },
+    "search/6b32.json": {
+      "bytes": 102,
+      "sha256": "cbca34915a0b55ea4d7647d54ff2558e48075dae3e00245cf9ab9cb1f6436bf2"
+    },
+    "search/6570.json": {
+      "bytes": 110,
+      "sha256": "6371e103cbe8ae335ff1e04ad2c32f41dd75c59687dfb878b2ca7cf97fcac1eb"
+    },
+    "tiles/gaia-r-0.bin": {
+      "bytes": 224,
+      "sha256": "0401785a0cafdc606efcfd3149fc35b1e94441f5b81684c383cd2b103221a426"
+    },
+    "tiles/desi-r-0.bin": {
+      "bytes": 112,
+      "sha256": "71b684861c4ac2fcb8c1e548404e9f71d6f9266409c6659afcfef93aa6c3f97c"
+    }
+  }
+}

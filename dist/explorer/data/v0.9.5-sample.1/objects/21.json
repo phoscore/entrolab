@@ -1,0 +1,216 @@
+{
+  "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:TRAPPIST-1%20b",
+  "kind": "exoplanet",
+  "identity": {
+    "catalog": "oec",
+    "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+    "id": "TRAPPIST-1 b",
+    "evidence": {
+      "source": "oec",
+      "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+      "columns": [
+        "planet/name"
+      ],
+      "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+    }
+  },
+  "aliases": [
+    {
+      "name": "2MASS J23062928-0502285 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+      }
+    },
+    {
+      "name": "K2-112 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+      }
+    },
+    {
+      "name": "EPIC 246199087 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+      }
+    },
+    {
+      "name": "Gaia DR2 2635476908753563008 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+      }
+    }
+  ],
+  "direction": null,
+  "distances": [],
+  "orbits": [
+    {
+      "solution": {
+        "source": "oec",
+        "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+        "columns": [
+          "planet"
+        ],
+        "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0",
+        "kind": "undetermined"
+      },
+      "center": null,
+      "frame": null,
+      "elements": {
+        "period": {
+          "status": "catalog",
+          "value": 1.5108739,
+          "unit": "d",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/period",
+              "planet/period/@errorminus",
+              "planet/period/@errorplus"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 0.0000075,
+            "plus": 0.0000075
+          },
+          "limit": null
+        },
+        "semimajorAxis": {
+          "status": "catalog",
+          "value": 0.01154775,
+          "unit": "AU",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/semimajoraxis",
+              "planet/semimajoraxis/@errorminus",
+              "planet/semimajoraxis/@errorplus"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 5.7e-8,
+            "plus": 5.7e-8
+          },
+          "limit": null
+        },
+        "eccentricity": {
+          "status": "catalog",
+          "value": 0.00622,
+          "unit": "1",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/eccentricity",
+              "planet/eccentricity/@errorminus",
+              "planet/eccentricity/@errorplus"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 0.00304,
+            "plus": 0.00304
+          },
+          "limit": null
+        },
+        "inclination": {
+          "status": "catalog",
+          "value": 89.65,
+          "unit": "deg",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/inclination",
+              "planet/inclination/@errorminus",
+              "planet/inclination/@errorplus"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 0.27,
+            "plus": 0.22
+          },
+          "limit": null
+        },
+        "argumentOfPeriapsis": {
+          "status": "catalog",
+          "value": 336.86,
+          "unit": "deg",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/periastron",
+              "planet/periastron/@errorminus",
+              "planet/periastron/@errorplus"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 34.24,
+            "plus": 34.24
+          },
+          "limit": null
+        }
+      },
+      "phase": {
+        "kind": "transit",
+        "timeSystem": null,
+        "epoch": {
+          "status": "catalog",
+          "value": 2457606.56117,
+          "unit": "d",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/transittime",
+              "planet/transittime/@unit"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 0.00058,
+            "plus": 0.00058
+          },
+          "limit": null
+        }
+      },
+      "capability": "schematic-phase"
+    }
+  ]
+}

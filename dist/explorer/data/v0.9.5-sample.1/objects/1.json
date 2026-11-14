@@ -1,0 +1,99 @@
+{
+  "id": "desi:DR1-iron-zpix-v1:39628379988689626",
+  "kind": "galaxy",
+  "identity": {
+    "catalog": "desi",
+    "release": "DR1-iron-zpix-v1",
+    "id": "39628379988689626",
+    "evidence": {
+      "source": "desi",
+      "row": "39628379988689626",
+      "columns": [
+        "targetid"
+      ],
+      "reference": null
+    }
+  },
+  "aliases": [
+    {
+      "name": "DESI J251.5383+25.3612",
+      "relation": "catalog",
+      "evidence": {
+        "source": "desi",
+        "row": "39628379988689626",
+        "columns": [
+          "desiname"
+        ],
+        "reference": null
+      }
+    }
+  ],
+  "direction": {
+    "frame": "catalog-equatorial",
+    "role": "fiber-mean",
+    "epoch": null,
+    "ra": {
+      "status": "catalog",
+      "value": 251.5382992546074,
+      "unit": "deg",
+      "evidence": {
+        "source": "desi",
+        "row": "39628379988689626",
+        "columns": [
+          "mean_fiber_ra"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    },
+    "dec": {
+      "status": "catalog",
+      "value": 25.36119822290018,
+      "unit": "deg",
+      "evidence": {
+        "source": "desi",
+        "row": "39628379988689626",
+        "columns": [
+          "mean_fiber_dec"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    }
+  },
+  "distances": [],
+  "orbits": [],
+  "redshift": {
+    "frame": "solar-system-barycentric",
+    "measurement": {
+      "status": "catalog",
+      "value": 0.1959410038203733,
+      "unit": "1",
+      "evidence": {
+        "source": "desi",
+        "row": "39628379988689626",
+        "columns": [
+          "z",
+          "zerr"
+        ],
+        "reference": null
+      },
+      "uncertainty": {
+        "kind": "sigma",
+        "sigma": 0.00001637433514702147
+      },
+      "limit": null
+    }
+  },
+  "quality": {
+    "zwarn": 0,
+    "deltaChi2": 565.4991242289543,
+    "survey": "main",
+    "program": "bright",
+    "primary": true,
+    "healpix64Nested": 9239,
+    "meanMjd": 59671.50220541
+  }
+}

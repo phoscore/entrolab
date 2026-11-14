@@ -14,7 +14,7 @@ test('v0.9 navigation: product title, retired tour, Matter order and cold temper
  const {p,context}=await h.lab();try{
   assert.equal(await p.title(),'Reincarnated as a Proton');
   assert.equal(await p.locator('#helpToggle,#quickStart,script[src="discovery.mjs"]').count(),0);
-  assert.deepEqual(await p.locator('[data-tab]').evaluateAll(els=>els.map(e=>e.dataset.tab)),['gravity','blackhole','extreme','entropy','matter','science']);
+  assert.deepEqual(await p.locator('[data-tab]').evaluateAll(els=>els.map(e=>e.dataset.tab)),['gravity','blackhole','extreme','entropy','matter','explorer','science']);
   await p.goto(h.url+'/?v09temp=1#temperature');await h.ready(p);
   assert.equal(await p.locator('#extreme').evaluate(e=>e.classList.contains('active')),true);
   assert.equal(await p.locator('#temperature .lab-jump').count(),0);await select(p,'matter');assert.equal(await p.evaluate(()=>location.hash),'#matter');

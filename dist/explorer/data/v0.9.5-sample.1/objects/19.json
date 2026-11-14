@@ -1,0 +1,232 @@
+{
+  "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:51%20Peg%20b",
+  "kind": "exoplanet",
+  "identity": {
+    "catalog": "oec",
+    "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+    "id": "51 Peg b",
+    "evidence": {
+      "source": "oec",
+      "row": "systems/51 Peg.xml#51 Peg b",
+      "columns": [
+        "planet/name"
+      ],
+      "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+    }
+  },
+  "aliases": [
+    {
+      "name": "Bellerophon",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "TYC 1717-2193-1 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "Helvetios b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "GJ 882 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "Gaia DR2 2835207319109249920 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "HIP 113357 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    },
+    {
+      "name": "HD 217014 b",
+      "relation": "catalog",
+      "evidence": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet/name"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+      }
+    }
+  ],
+  "direction": null,
+  "distances": [],
+  "orbits": [
+    {
+      "solution": {
+        "source": "oec",
+        "row": "systems/51 Peg.xml#51 Peg b",
+        "columns": [
+          "planet"
+        ],
+        "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40",
+        "kind": "undetermined"
+      },
+      "center": null,
+      "frame": null,
+      "elements": {
+        "period": {
+          "status": "catalog",
+          "value": 4.231,
+          "unit": "d",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/period",
+              "planet/period/@errorminus",
+              "planet/period/@errorplus"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "semimajorAxis": {
+          "status": "catalog",
+          "value": 0.052,
+          "unit": "AU",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/semimajoraxis",
+              "planet/semimajoraxis/@errorminus",
+              "planet/semimajoraxis/@errorplus"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "eccentricity": {
+          "status": "catalog",
+          "value": 0,
+          "unit": "1",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/eccentricity",
+              "planet/eccentricity/@errorminus",
+              "planet/eccentricity/@errorplus"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "inclination": {
+          "status": "catalog",
+          "value": 80,
+          "unit": "deg",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/inclination",
+              "planet/inclination/@errorminus",
+              "planet/inclination/@errorplus"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": {
+            "kind": "asymmetric",
+            "minus": 19,
+            "plus": 10
+          },
+          "limit": null
+        },
+        "argumentOfPeriapsis": {
+          "status": "catalog",
+          "value": 0,
+          "unit": "deg",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/periastron",
+              "planet/periastron/@errorminus",
+              "planet/periastron/@errorplus"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "phase": {
+        "kind": "periastron",
+        "timeSystem": "BJD",
+        "epoch": {
+          "status": "catalog",
+          "value": 2456021.256,
+          "unit": "d",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/periastrontime",
+              "planet/periastrontime/@unit"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "capability": "schematic-phase"
+    }
+  ]
+}

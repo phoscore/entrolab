@@ -1,0 +1,84 @@
+{
+  "id": "gaia:DR3:2512556873600",
+  "kind": "source",
+  "identity": {
+    "catalog": "gaia",
+    "release": "DR3",
+    "id": "2512556873600",
+    "evidence": {
+      "source": "gaia",
+      "row": "2512556873600",
+      "columns": [
+        "source_id"
+      ],
+      "reference": null
+    }
+  },
+  "aliases": [],
+  "direction": {
+    "frame": "ICRS",
+    "role": "object",
+    "epoch": {
+      "system": "Julian-year-TCB",
+      "value": 2016,
+      "evidence": {
+        "source": "gaia",
+        "row": "2512556873600",
+        "columns": [
+          "ref_epoch (release constant)"
+        ],
+        "reference": null
+      }
+    },
+    "ra": {
+      "status": "catalog",
+      "value": 45.07492471994457,
+      "unit": "deg",
+      "evidence": {
+        "source": "gaia",
+        "row": "2512556873600",
+        "columns": [
+          "ra"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    },
+    "dec": {
+      "status": "catalog",
+      "value": 0.1108820420939314,
+      "unit": "deg",
+      "evidence": {
+        "source": "gaia",
+        "row": "2512556873600",
+        "columns": [
+          "dec"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    }
+  },
+  "distances": [],
+  "orbits": [],
+  "parallax": {
+    "status": "unknown",
+    "unit": "mas",
+    "evidence": {
+      "source": "gaia",
+      "row": "2512556873600",
+      "columns": [
+        "parallax",
+        "parallax_error"
+      ],
+      "reference": null
+    }
+  },
+  "quality": {
+    "astrometricParamsSolved": 3,
+    "ruwe": null,
+    "parallaxOverError": null
+  }
+}
