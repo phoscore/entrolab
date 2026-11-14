@@ -1,0 +1,1 @@
+select top 3 pl_name,hostname,discoverymethod,ra,dec,sy_dist,sy_disterr1,sy_disterr2,sy_dist_reflink,pl_orbper,pl_orbpererr1,pl_orbpererr2,pl_orbperlim,pl_orbper_reflink,pl_orbsmax,pl_orbsmaxerr1,pl_orbsmaxerr2,pl_orbsmaxlim,pl_orbsmax_reflink from pscomppars where pl_name in ('51 Peg b','TRAPPIST-1 b','HR 8799 b') order by pl_name
