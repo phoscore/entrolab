@@ -9,6 +9,10 @@ export function requireData(ok, message) {
   if (!ok) throw new Error(message);
 }
 
+function requireSchemaVersion(version) {
+  requireData(version === 1 || version === 2, 'Unknown schema version');
+}
+
 const label = x => typeof x === 'string' && x.length > 0 && x === x.trim();
 const finite = Number.isFinite;
 export const objectId = (catalog, release, id) => [catalog, release, id].map(encodeURIComponent).join(':');
@@ -25,6 +29,7 @@ export function quantity(value, unit, evidence, options = {}) {
 }
 
 export function validateQuantity(q, sources, unit, check = () => true, schemaVersion = SCHEMA_VERSION) {
+  requireSchemaVersion(schemaVersion);
   requireData(q && q.unit === unit, `Expected quantity in ${unit}`);
   validateEvidence(q.evidence, sources);
   if (q.status === 'unknown') {
@@ -69,7 +74,7 @@ export function orbitCapability(orbit) {
 }
 
 export function validateObjects(objects, sources, schemaVersion = SCHEMA_VERSION) {
-  requireData([1, SCHEMA_VERSION].includes(schemaVersion), 'Unknown object schema version');
+  requireSchemaVersion(schemaVersion);
   const validate = (q, unit, check) => validateQuantity(q, sources, unit, check, schemaVersion);
   const ids = new Set();
   for (const o of objects) {
@@ -114,6 +119,10 @@ export function validateObjects(objects, sources, schemaVersion = SCHEMA_VERSION
       if (['radial-comoving', 'transverse-comoving', 'angular-diameter', 'luminosity'].includes(d.kind)) {
         requireData(d.measurement.status === 'derived' && o.redshift?.measurement.value > 0 && o.redshift.frame !== 'unspecified', 'Cosmological distance requires model and positive framed redshift');
       }
+    }
+    if (Object.hasOwn(o, 'overview')) {
+      validate(o.overview?.pl_orbper, 'd', positive);
+      validate(o.overview?.pl_orbsmax, 'AU', positive);
     }
     requireData(Array.isArray(o.orbits), 'Orbits must be an array');
     let nasaDefaults = 0;

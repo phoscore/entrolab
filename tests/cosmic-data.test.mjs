@@ -237,6 +237,69 @@ test('Cosmic: NASA default flags follow publications when flags or CSV row order
   assert.throws(() => validateObjects([invalid], {'nea-ps': {}}), /Invalid NASA default flag or provenance/);
 });
 
+test('Cosmic: JSON-round-tripped NASA overview enforces the v1/v2 uncertainty contract', () => {
+  const [, comp] = nasaRows();
+  const row = {...comp, pl_orbpererr1: '0.7', pl_orbpererr2: ''};
+  const result = JSON.parse(JSON.stringify(importNasa([], [row], '2026-11-14')));
+  const sources = {'nea-composite': {}};
+  const {objects, schemaVersion, distribution} = result;
+  const period = objects[0].overview.pl_orbper;
+  assert.equal(schemaVersion, 2);
+  assert.equal(distribution, 'local-only');
+  assert.deepEqual(period.uncertainty, {kind: 'asymmetric', minus: null, plus: .7});
+  assert.strictEqual(validateObjects(objects, sources, 2), objects);
+  assert.strictEqual(validateObjects(objects, sources), objects);
+  assert.throws(() => validateObjects(objects, sources, 1), /Invalid asymmetric errors/);
+
+  period.uncertainty.plus = null;
+  assert.throws(() => validateObjects(objects, sources, 2), /Invalid asymmetric errors/);
+});
+
+test('Cosmic: NASA overview accepts a v1 error pair and an explicitly unknown quantity', () => {
+  const [, comp] = nasaRows();
+  const {objects} = JSON.parse(JSON.stringify(importNasa([], [{...comp, pl_orbsmax: ''}], '2026-11-14')));
+  const {pl_orbper, pl_orbsmax} = objects[0].overview;
+  assert.deepEqual(pl_orbper.uncertainty, {kind: 'asymmetric', minus: .1, plus: .2});
+  assert.equal(pl_orbsmax.status, 'unknown');
+  assert.strictEqual(validateObjects(objects, {'nea-composite': {}}, 1), objects);
+});
+
+test('Cosmic: both NASA overview fields require their unit, positive value, provenance and valid limits', () => {
+  const [, comp] = nasaRows();
+  const {objects} = importNasa([], [comp], '2026-11-14');
+  const sources = {'nea-composite': {}};
+  for (const [field, unit, wrongUnit] of [['pl_orbper', 'd', 'AU'], ['pl_orbsmax', 'AU', 'd']]) {
+    for (const [patch, message] of [
+      [{unit: wrongUnit}, new RegExp(`Expected quantity in ${unit}$`)],
+      [{value: 0}, new RegExp(`Invalid ${unit} value`)],
+      [{evidence: undefined}, /Missing field provenance/],
+      [{uncertainty: {kind: 'sigma', sigma: .1}, limit: 'lower'}, /must be separate/],
+    ]) {
+      const changed = structuredClone(objects);
+      Object.assign(changed[0].overview[field], patch);
+      assert.throws(() => validateObjects(changed, sources), message, field);
+    }
+    const incomplete = structuredClone(objects);
+    delete incomplete[0].overview[field];
+    assert.throws(() => validateObjects(incomplete, sources), /Expected quantity/, field);
+  }
+  assert.throws(() => importNasa([], [{...comp, pl_orbsmax: '-1'}], '2026-11-14'), /Invalid AU value/);
+});
+
+test('Cosmic: both validators reject unsupported or nonnumeric schema versions at entry', () => {
+  const [, comp] = nasaRows();
+  const {objects} = importNasa([], [{...comp, pl_orbpererr2: ''}], '2026-11-14');
+  const sources = {'nea-composite': {}};
+  const period = objects[0].overview.pl_orbper;
+  validateQuantity(period, sources, 'd');
+  for (const version of [3, '2', Infinity]) {
+    assert.throws(() => validateQuantity(period, sources, 'd', undefined, version), /Unknown schema version/);
+    assert.throws(() => validateObjects(objects, sources, version), /Unknown schema version/);
+    assert.throws(() => validateQuantity(null, sources, 'd', undefined, version), /Unknown schema version/);
+    assert.throws(() => validateObjects([], sources, version), /Unknown schema version/);
+  }
+});
+
 test('Cosmic: adaptive angular tiles preserve every row including boundaries and crowded leaves', () => {
   assert.deepEqual(skyCoordinates(0, -90), [0, 0]);
   assert(skyCoordinates(359.999, 90).every(x => x < 1));

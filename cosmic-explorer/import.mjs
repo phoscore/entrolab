@@ -1,4 +1,4 @@
-import {SCHEMA_VERSION, objectId, orbitCapability, provenance, quantity, requireData, validateObjects, validateQuantity} from './schema.mjs';
+import {SCHEMA_VERSION, objectId, orbitCapability, provenance, quantity, requireData, validateObjects} from './schema.mjs';
 
 export function readCsv(text) {
   const rows = [];
@@ -223,10 +223,6 @@ export function importNasa(ps, composite, snapshot) {
   }
   const objects = [...byName.values()];
   const sources = {'nea-ps': {}, 'nea-composite': {}};
-  validateObjects(objects, sources);
-  for (const o of objects) if (o.overview) {
-    validateQuantity(o.overview.pl_orbper, sources, 'd', x => x > 0);
-    validateQuantity(o.overview.pl_orbsmax, sources, 'AU', x => x > 0);
-  }
+  validateObjects(objects, sources, SCHEMA_VERSION);
   return {schemaVersion: SCHEMA_VERSION, snapshot, distribution: 'local-only', objects};
 }
