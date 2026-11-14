@@ -63,7 +63,8 @@ function errors(minus, plus, columns) {
   const lo = number(minus, columns[0]), hi = number(plus, columns[1]);
   requireData(lo === null || lo >= 0, `Negative lower error magnitude: ${columns[0]}`);
   requireData(hi === null || hi >= 0, `Negative upper error magnitude: ${columns[1]}`);
-  return lo !== null && hi !== null && lo + hi > 0 ? {kind: 'asymmetric', minus: lo, plus: hi} : null;
+  if ((lo === null && hi === null) || (lo === 0 && hi === 0)) return null;
+  return {kind: 'asymmetric', minus: lo, plus: hi};
 }
 
 const knownStars = new Set(['762815470562110464', '4472832130942575872', '5853498713190525696']);
@@ -121,7 +122,7 @@ const elements = {period: ['period', 'pl_orbper', 'd'], semimajorAxis: ['semimaj
   eccentricity: ['eccentricity', 'pl_orbeccen', '1'], inclination: ['inclination', 'pl_orbincl', 'deg'],
   argumentOfPeriapsis: ['periastron', 'pl_orblper', 'deg']};
 
-export function importOec(rows, release) {
+export function importOec(rows, release, schemaVersion = SCHEMA_VERSION) {
   return rows.map(row => {
     const key = `${row.file}#${row.name}`;
     const from = column => provenance('oec', key, column, row.blob);
@@ -137,9 +138,12 @@ export function importOec(rows, release) {
     }
     if (row.phase) {
       const field = row.phase.kind === 'transit' ? 'transittime' : 'periastrontime';
+      const path = `planet/${field}`;
+      const uncertainty = errors(row.phase.minus ?? null, row.phase.plus ?? null, ['errorminus', 'errorplus']);
+      const columns = [path, `${path}/@unit`];
+      if (schemaVersion >= 2 && uncertainty) columns.push(`${path}/@errorminus`, `${path}/@errorplus`);
       orbit.phase = {kind: row.phase.kind, timeSystem: row.phase.system,
-        epoch: quantity(required(row.phase.value, field), 'd', from([`planet/${field}`, `planet/${field}/@unit`]),
-          {uncertainty: errors(row.phase.minus ?? null, row.phase.plus ?? null, ['errorminus', 'errorplus'])})};
+        epoch: quantity(required(row.phase.value, field), 'd', from(columns), {uncertainty})};
     }
     orbit.capability = orbitCapability(orbit);
     o.orbits.push(orbit);
@@ -153,16 +157,21 @@ function neaReference(value) {
   return value.trim().replace(/<[^>]+>/g, '').trim() || null;
 }
 
+function neaLowerError(row, column) {
+  const minus = number(row[column], column);
+  requireData(minus === null || minus <= 0, `NASA lower error must be signed: ${column}`);
+  return minus === null ? null : Math.abs(minus);
+}
+
 function neaQuantity(row, field, unit, from) {
   const columns = [field, `${field}err1`, `${field}err2`, `${field}lim`];
   const value = number(row[field], field);
   if (value === null) return quantity(null, unit, from(columns));
   const flag = number(row[columns[3]], columns[3]);
   requireData(flag === null || [-1, 0, 1].includes(flag), 'Unknown NASA limit flag');
-  const low = number(row[columns[2]], columns[2]);
-  requireData(low === null || low <= 0, 'NASA lower error must be signed');
+  const uncertainty = errors(neaLowerError(row, columns[2]), row[columns[1]], [columns[2], columns[1]]);
   return quantity(value, unit, from(columns), {limit: flag === 1 ? 'upper' : flag === -1 ? 'lower' : null,
-    uncertainty: flag ? null : errors(low === null ? null : -low, row[columns[1]], columns.slice(1, 3))});
+    uncertainty: flag ? null : uncertainty});
 }
 
 export function importNasa(ps, composite, snapshot) {
@@ -184,7 +193,8 @@ export function importNasa(ps, composite, snapshot) {
     const o = existing ?? {...base('exoplanet', 'nea', snapshot, name, from('pl_name')), host, discoveryMethod: row.discoverymethod};
     requireData(o.discoveryMethod === row.discoverymethod, `Conflicting NASA discovery method for ${name}`);
     if (kind === 'ps') {
-      const orbit = {solution: {...from('pl_refname'), kind: 'single-reference'}, center: null, frame: null, elements: {}, phase: null};
+      const solution = {...from(['pl_refname', 'default_flag']), kind: 'single-reference', archiveDefault: row.default_flag === '1'};
+      const orbit = {solution, center: null, frame: null, elements: {}, phase: null};
       for (const [key, [, field, unit]] of Object.entries(elements)) orbit.elements[key] = neaQuantity(row, field, unit, from);
       if (['Imaging', 'Microlensing'].includes(row.discoverymethod)) {
         orbit.separationOrSemimajorAxis = orbit.elements.semimajorAxis;
@@ -196,18 +206,15 @@ export function importNasa(ps, composite, snapshot) {
       else if (transit !== null) orbit.phase = {kind: 'transit', timeSystem: row.pl_tsystemref || null, epoch: quantity(transit, 'd', from(['pl_tranmid', 'pl_tsystemref']))};
       orbit.capability = orbitCapability(orbit);
       o.orbits.push(orbit);
-      o.defaultPsSolutions = (o.defaultPsSolutions ?? 0) + Number(row.default_flag);
-      requireData(o.defaultPsSolutions <= 1, `Multiple NASA default solutions for ${name}`);
     } else {
       const ra = number(row.ra, 'ra'), dec = number(row.dec, 'dec');
       requireData((ra === null) === (dec === null), 'Incomplete NASA host direction');
       if (ra !== null) o.direction = direction(ra, dec, i => from(['ra', 'dec'][i]), {frame: 'catalog-equatorial', role: 'host'});
       const distance = number(row.sy_dist, 'sy_dist');
-      const lo = number(row.sy_disterr2, 'sy_disterr2');
-      requireData(lo === null || lo <= 0, 'NASA lower distance error must be signed');
+      const lo = neaLowerError(row, 'sy_disterr2');
       if (distance !== null) o.distances.push({kind: 'stellar-line-of-sight', method: 'archive-host-distance-unspecified', origin: 'catalog-unspecified',
         measurement: quantity(distance, 'pc', from(['sy_dist', 'sy_disterr1', 'sy_disterr2', 'sy_dist_reflink'], neaReference(row.sy_dist_reflink)),
-          {uncertainty: errors(lo === null ? null : -lo, row.sy_disterr1, ['sy_disterr2', 'sy_disterr1'])})});
+          {uncertainty: errors(lo, row.sy_disterr1, ['sy_disterr2', 'sy_disterr1'])})});
       o.overview = Object.fromEntries(['pl_orbper', 'pl_orbsmax'].map((field, i) => [field, neaQuantity(row, field, ['d', 'AU'][i],
         columns => from([...columns, `${field}_reflink`], neaReference(row[`${field}_reflink`])))]));
       o.overview.pl_orbsmaxMeaning = ['Imaging', 'Microlensing'].includes(row.discoverymethod) ? 'semimajor-axis-or-projected-separation' : 'semimajor-axis';

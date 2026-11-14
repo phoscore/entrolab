@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const DISTANCE_KINDS = Object.freeze({
   'stellar-line-of-sight': 'pc', 'local-distance-indicator': 'Mpc',
   'radial-comoving': 'Mpc', 'transverse-comoving': 'Mpc',
@@ -24,7 +24,7 @@ export function quantity(value, unit, evidence, options = {}) {
     ...(options.model ? {model: options.model} : {})};
 }
 
-export function validateQuantity(q, sources, unit, check = () => true) {
+export function validateQuantity(q, sources, unit, check = () => true, schemaVersion = SCHEMA_VERSION) {
   requireData(q && q.unit === unit, `Expected quantity in ${unit}`);
   validateEvidence(q.evidence, sources);
   if (q.status === 'unknown') {
@@ -38,8 +38,11 @@ export function validateQuantity(q, sources, unit, check = () => true) {
   if (u === null) return;
   requireData(u && !q.limit, 'Uncertainty and one-sided limits must be separate');
   if (u.kind === 'sigma') requireData(finite(u.sigma) && u.sigma > 0, 'Invalid sigma');
-  else if (u.kind === 'asymmetric') requireData(finite(u.minus) && u.minus >= 0 && finite(u.plus) && u.plus >= 0 && u.minus + u.plus > 0, 'Invalid asymmetric errors');
-  else requireData(u.kind === 'quantiles' && [u.p16, u.p84].every(x => finite(x) && check(x)) &&
+  else if (u.kind === 'asymmetric') {
+    const sides = [u.minus, u.plus];
+    requireData(sides.every(x => (schemaVersion >= 2 && x === null) || (finite(x) && x >= 0)) &&
+      sides.some(finite) && (sides.includes(null) || u.minus + u.plus > 0), 'Invalid asymmetric errors');
+  } else requireData(u.kind === 'quantiles' && [u.p16, u.p84].every(x => finite(x) && check(x)) &&
     u.p16 <= q.value && q.value <= u.p84 && u.p16 < u.p84, 'Invalid posterior quantiles');
 }
 
@@ -65,7 +68,9 @@ export function orbitCapability(orbit) {
   return 'data-only';
 }
 
-export function validateObjects(objects, sources) {
+export function validateObjects(objects, sources, schemaVersion = SCHEMA_VERSION) {
+  requireData([1, SCHEMA_VERSION].includes(schemaVersion), 'Unknown object schema version');
+  const validate = (q, unit, check) => validateQuantity(q, sources, unit, check, schemaVersion);
   const ids = new Set();
   for (const o of objects) {
     requireData(o && ['star', 'exoplanet', 'galaxy', 'solar-system-body', 'source'].includes(o.kind), 'Unknown object kind');
@@ -89,14 +94,14 @@ export function validateObjects(objects, sources) {
         requireData(['Julian-year-TCB', 'Julian-year-TT'].includes(epoch.system) && finite(epoch.value), 'Invalid astrometric epoch');
         validateEvidence(epoch.evidence, sources);
       }
-      validateQuantity(ra, sources, 'deg', azimuth);
-      validateQuantity(dec, sources, 'deg', x => x >= -90 && x <= 90);
+      validate(ra, 'deg', azimuth);
+      validate(dec, 'deg', x => x >= -90 && x <= 90);
       requireData(ra.status !== 'unknown' && dec.status !== 'unknown' && ra.limit === null && dec.limit === null, 'Incomplete direction');
     }
-    if (o.parallax) validateQuantity(o.parallax, sources, 'mas');
+    if (o.parallax) validate(o.parallax, 'mas');
     if (o.redshift) {
       requireData(['solar-system-barycentric', 'heliocentric', 'CMB', 'observer', 'unspecified'].includes(o.redshift.frame), 'Invalid redshift frame');
-      validateQuantity(o.redshift.measurement, sources, '1', x => x > -1);
+      validate(o.redshift.measurement, '1', x => x > -1);
     }
     requireData(Array.isArray(o.distances), 'Distances must be an array');
     const distanceKeys = new Set();
@@ -105,26 +110,37 @@ export function validateObjects(objects, sources) {
       const key = JSON.stringify([d.kind, d.method, d.origin, d.measurement?.evidence?.source, d.measurement?.evidence?.row]);
       requireData(!distanceKeys.has(key), 'Duplicate distance estimate');
       distanceKeys.add(key);
-      validateQuantity(d.measurement, sources, DISTANCE_KINDS[d.kind], positive);
+      validate(d.measurement, DISTANCE_KINDS[d.kind], positive);
       if (['radial-comoving', 'transverse-comoving', 'angular-diameter', 'luminosity'].includes(d.kind)) {
         requireData(d.measurement.status === 'derived' && o.redshift?.measurement.value > 0 && o.redshift.frame !== 'unspecified', 'Cosmological distance requires model and positive framed redshift');
       }
     }
     requireData(Array.isArray(o.orbits), 'Orbits must be an array');
+    let nasaDefaults = 0;
     for (const orbit of o.orbits) {
       requireData(['single-reference', 'composite', 'undetermined'].includes(orbit.solution?.kind) &&
         (orbit.center === null || label(orbit.center)) && (orbit.frame === null || label(orbit.frame)), 'Invalid orbital solution');
       validateEvidence(orbit.solution, sources);
-      for (const [key, [unit, domain]] of Object.entries(orbitalFields)) if (key in orbit.elements) validateQuantity(orbit.elements[key], sources, unit, domain);
-      if (orbit.separationOrSemimajorAxis) validateQuantity(orbit.separationOrSemimajorAxis, sources, 'AU', positive);
+      const nasaPsSolution = schemaVersion >= 2 && orbit.solution.source === 'nea-ps';
+      if (nasaPsSolution) {
+        requireData(orbit.solution.kind === 'single-reference' && orbit.solution.reference !== null &&
+          typeof orbit.solution.archiveDefault === 'boolean' && orbit.solution.columns.includes('default_flag'),
+        'Invalid NASA default flag or provenance');
+        if (orbit.solution.archiveDefault) nasaDefaults++;
+      } else {
+        requireData(!Object.hasOwn(orbit.solution, 'archiveDefault'), 'Default flag requires a NASA PS solution in schema v2');
+      }
+      for (const [key, [unit, domain]] of Object.entries(orbitalFields)) if (key in orbit.elements) validate(orbit.elements[key], unit, domain);
+      if (orbit.separationOrSemimajorAxis) validate(orbit.separationOrSemimajorAxis, 'AU', positive);
       requireData(Object.keys(orbit.elements).every(key => Object.hasOwn(orbitalFields, key)), 'Unknown orbital element');
       if (orbit.phase !== null) {
         requireData(['periastron', 'mean-anomaly', 'transit'].includes(orbit.phase.kind) && (orbit.phase.timeSystem === null || label(orbit.phase.timeSystem)), 'Invalid orbital phase');
-        validateQuantity(orbit.phase.epoch, sources, 'd');
-        if (orbit.phase.kind === 'mean-anomaly') validateQuantity(orbit.phase.angle, sources, 'deg', azimuth);
+        validate(orbit.phase.epoch, 'd');
+        if (orbit.phase.kind === 'mean-anomaly') validate(orbit.phase.angle, 'deg', azimuth);
       }
       requireData(orbit.capability === orbitCapability(orbit), 'Orbital capability overstates the data');
     }
+    requireData(nasaDefaults <= 1, `Multiple NASA default solutions for ${o.identity.id}`);
   }
   return objects;
 }

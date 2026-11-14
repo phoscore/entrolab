@@ -4,7 +4,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {searchKey, searchShard} from './access.mjs';
 import {importDesi, importGaia, importOec, readCsv} from './import.mjs';
-import {requireData, SCHEMA_VERSION, validateObjects} from './schema.mjs';
+import {requireData, validateObjects} from './schema.mjs';
 import {buildTiles, encodeTile, skyCoordinates, TILE_VERSION} from './tiles.mjs';
 
 export const sampleDir = fileURLToPath(new URL('./samples/', import.meta.url));
@@ -16,6 +16,7 @@ const safeName = value => typeof value === 'string' && /^[a-z0-9][a-z0-9.-]*$/i.
 export async function buildSample(input = sampleDir) {
   const configBytes = await readFile(join(input, 'sources.json'));
   const config = JSON.parse(configBytes);
+  const {schemaVersion = 1} = config;
   requireData(config.version === 1 && safeName(config.release) && config.distribution === 'cleared-sample', 'Invalid sample source manifest');
   const license = await readFile(join(input, 'OEC-LICENSE.txt'));
   const credits = await readFile(join(input, 'CREDITS.md'));
@@ -29,11 +30,11 @@ export async function buildSample(input = sampleDir) {
     requireData(bytes.length <= 128 * 1024, `Sample exceeds input byte budget: ${file}`);
     const rows = type === 'oec' ? JSON.parse(bytes) : readCsv(bytes.toString('utf8'));
     requireData(Array.isArray(rows) && rows.length === expectedRows && rows.length <= maxRows && rows.length > 0, `Unexpected row count: ${file}`);
-    const imported = type === 'gaia' ? importGaia(rows) : type === 'desi' ? importDesi(rows) : importOec(rows, config.sources.oec.release);
+    const imported = type === 'gaia' ? importGaia(rows) : type === 'desi' ? importDesi(rows) : importOec(rows, config.sources.oec.release, schemaVersion);
     inputs.push({file, type, rows: rows.length, maxRows, query, bytes: bytes.length, sha256: sha256(bytes)});
     objects.push(...imported);
   }
-  validateObjects(objects, config.sources);
+  validateObjects(objects, config.sources, schemaVersion);
   objects.sort((a, b) => compare(a.id, b.id));
   const files = new Map(), packages = {};
   function add(path, bytes) {
@@ -43,7 +44,7 @@ export async function buildSample(input = sampleDir) {
   }
   add('OEC-LICENSE.txt', license);
   add('CREDITS.md', credits);
-  add('objects.json', json({schemaVersion: SCHEMA_VERSION, release: config.release, objects}));
+  add('objects.json', json({schemaVersion, release: config.release, objects}));
   const lookup = new Map();
   objects.forEach((o, row) => {
     add(`objects/${row}.json`, json(o));
@@ -72,7 +73,7 @@ export async function buildSample(input = sampleDir) {
   }
   const kinds = {};
   for (const o of objects) kinds[o.kind] = (kinds[o.kind] ?? 0) + 1;
-  const manifest = {manifestVersion: 1, schemaVersion: SCHEMA_VERSION, tileVersion: TILE_VERSION, indexVersion: 1,
+  const manifest = {manifestVersion: 1, schemaVersion, tileVersion: TILE_VERSION, indexVersion: 1,
     release: config.release, acquiredDate: config.acquiredDate, distribution: config.distribution, sources: config.sources,
     inputs, counts: {objects: objects.length, byKind: kinds, skyDirections: sky.length, noDirection: objects.length - sky.length,
       noDistance: objects.filter(o => !o.distances.length).length, negativeParallax: objects.filter(o => o.parallax?.value < 0).length,
