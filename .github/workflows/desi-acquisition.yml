@@ -19,13 +19,14 @@ jobs:
           import concurrent.futures
           endpoints = 'https://data.desi.lbl.gov/public/dr1/spectro/redux/iron/'
           mirror = 'https://datalab.noirlab.edu/query/query'
-          where = """survey='main' AND program='bright' AND objtype='TGT' AND zcat_primary
+          where = """survey='main' AND program='bright' AND zcat_primary
               AND spectype='GALAXY' AND zwarn=0 AND deltachi2>40 AND zerr>0 AND (bgs_target & 2)=2
-              AND z>=0.003 AND z<0.05 AND target_ra>=0 AND target_ra<360 AND target_dec BETWEEN -90 AND 90"""
+              AND z>=0.003 AND z<0.05 AND mean_fiber_ra>=0 AND mean_fiber_ra<360 AND mean_fiber_dec BETWEEN -90 AND 90"""
           def sql(name, query):
               return name, mirror+'?'+url.urlencode({'sql':query,'ofmt':'csv','out':'','async':'False'}), 'GET', 4096
           tasks = [
-              sql('rows','SELECT targetid,target_ra,target_dec,z,zerr,deltachi2,healpix,bgs_target,desiname FROM desi_dr1.zpix WHERE '+where+' AND healpix=9239 ORDER BY targetid LIMIT 3'),
+              sql('sql-test','SELECT 1 AS access'),
+              sql('rows','SELECT targetid,mean_fiber_ra,mean_fiber_dec,z,zerr,deltachi2,healpix,bgs_target,desiname FROM desi_dr1.zpix WHERE '+where+' AND healpix=9239 ORDER BY targetid LIMIT 3'),
               sql('counts','SELECT '+','.join('count(*) FILTER (WHERE z<'+str(z)+') AS z'+k for k,z in [('025',0.025),('030',0.030),('035',0.035),('040',0.040),('045',0.045),('050',0.050)])+' FROM desi_dr1.zpix WHERE '+where),
               ('footprint',endpoints+'tiles-iron.fits','HEAD',0),
               ('redrock',endpoints+'healpix/main/bright/92/9239/redrock-main-bright-9239.fits','HEAD',0),
@@ -35,11 +36,13 @@ jobs:
               name, endpoint, method, n = task
               try:
                   headers={'User-Agent':'entrolab Deep Sky DR1 catalogue preflight'}
-                  if name in ('rows','counts'): headers['X-DL-AuthToken']='anonymous.0.0.anon_access'
+                  if name in ('sql-test','rows','counts'): headers['X-DL-AuthToken']='anonymous.0.0.anon_access'
                   with req.urlopen(req.Request(endpoint,method=method,headers=headers),timeout=80) as response:
                       raw=response.read(n) if n else b''
-                      result=raw.decode('utf8') if name in ('rows','counts') else ('CC BY 4.0' in raw.decode('utf8')) if name=='license' else ''
+                      result=raw.decode('utf8') if name in ('sql-test','rows','counts') else ('CC BY 4.0' in raw.decode('utf8')) if name=='license' else ''
                       return (name,response.status,response.headers.get('Content-Type'),response.headers.get('Content-Length'),response.headers.get('Accept-Ranges'),result)
+              except req.HTTPError as error:
+                  return name,error.code,error.read(1500).decode('utf8','replace')
               except Exception as error:
                   return (name,type(error).__name__,str(error))
           with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
