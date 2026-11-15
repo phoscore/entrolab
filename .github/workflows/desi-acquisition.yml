@@ -2,7 +2,7 @@ name: DESI offline build
 on:
   push:
     branches: [feature/v0.9.5-explorer-deep-sky-2cb]
-    paths: ['.github/workflows/desi-acquisition.yml']
+    paths: ['.github/workflows/desi-acquisition.yml', 'scripts/build-deep-sky.mjs']
 permissions:
   contents: write
 jobs:

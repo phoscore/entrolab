@@ -14,7 +14,7 @@ for (const [relative,expected] of files) {
   const path = join(root,relative);
   const existing = await readFile(path).catch(error=>{if(error.code !== 'ENOENT') throw error;return null;});
   if (existing) {
-    if (!expected.equals(existing)) throw new Error(`Immutable DESI release mismatch: ${relative}`);
+    if (!existing.equals(expected)) throw new Error(`Immutable DESI release mismatch: ${relative}`);
   } else {
     if (command === '--check') throw new Error(`Missing DESI payload: ${relative}`);
     await mkdir(dirname(path),{recursive:true});
