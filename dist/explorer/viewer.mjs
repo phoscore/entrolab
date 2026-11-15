@@ -23,8 +23,10 @@ export function mountExplorer(root) {
     <div class="ex-mode-bar" role="group" aria-label="Cosmic Explorer">
       <button type="button" id="exSkyMode" data-ex="skyMode" aria-pressed="true" aria-controls="exSkyPanel"></button>
       <button type="button" id="exSolarMode" data-ex="solarMode" aria-pressed="false" aria-controls="exSolarPanel"></button>
+      <button type="button" id="exNeighborhoodMode" data-ex="neighborhoodMode" aria-pressed="false" aria-controls="exNeighborhoodPanel"></button>
     </div>
     <div id="exSolarPanel" hidden></div>
+    <div id="exNeighborhoodPanel" hidden></div>
     <div id="exSkyPanel">
     <div class="ex-orientation"><strong data-ex="observer"></strong>
       <details><summary data-ex="skyHelp"></summary><p data-ex="skyExplanation"></p><p data-ex="skyScope"></p></details>
@@ -69,6 +71,7 @@ export function mountExplorer(root) {
   let loading = true, skyLoading = false, searchLoading = false, failed = false, searchFailed = false;
   let width = 1, height = 1, draws = 0, duration = 0;
   let panelActive = false, mode = 'sky', solar = null, solarPending = false, solarStatus = 'solarLoad';
+  let neighborhood=null, neighborhoodPending=false, neighborhoodStatus='neighborhoodLoad';
   let gaiaExamples = new Set();
   const starName = object => preferredStarName(object, language());
   const atlas = mountAtlas(root, {
@@ -95,6 +98,7 @@ export function mountExplorer(root) {
       return label;
     }));
     if (!solar && mode === 'solar') $('exSolarPanel').textContent = t(solarStatus);
+    if (!neighborhood && mode === 'neighborhood') $('exNeighborhoodPanel').textContent=t(neighborhoodStatus);
     atlas.localize();desi.localize();showList();showInspector();invalidate();
   }
 
@@ -436,16 +440,34 @@ export function mountExplorer(root) {
     panelActive = value;
     setSkyActive(value && mode === 'sky');
     solar?.setActive(value && mode === 'solar');
+    neighborhood?.setActive(value && mode === 'neighborhood');
   }
   async function changeMode(next) {
     mode = next;
-    const system = mode === 'solar';
-    $('exSkyMode').setAttribute('aria-pressed',String(!system));
-    $('exSolarMode').setAttribute('aria-pressed',String(system));
-    $('exSkyPanel').hidden = system;
-    $('exSolarPanel').hidden = !system;
+    const modes=[['sky','Sky'],['solar','Solar'],['neighborhood','Neighborhood']];
+    for (const [key,id] of modes) {
+      $('ex'+id+'Mode').setAttribute('aria-pressed',String(mode===key));
+      $('ex'+id+'Panel').hidden=mode!==key;
+    }
     setActive(panelActive);
-    if (!system || solar || solarPending) return;
+    if (mode==='neighborhood') {
+      if(neighborhood||neighborhoodPending)return;
+      neighborhoodPending=true;neighborhoodStatus='neighborhoodLoad';
+      $('exNeighborhoodPanel').textContent=t(neighborhoodStatus);
+      try {
+        const {mountNeighborhood}=await import('./neighborhood-view.mjs');
+        if(disposed)return;
+        neighborhood=mountNeighborhood($('exNeighborhoodPanel'),{onSky:openSkyDirection});
+        neighborhood.setActive(panelActive&&mode==='neighborhood');
+      } catch {
+        if(!disposed) {
+          neighborhoodStatus='neighborhoodError';
+          $('exNeighborhoodPanel').textContent=t(neighborhoodStatus);
+        }
+      } finally {neighborhoodPending=false;}
+      return;
+    }
+    if (mode!=='solar' || solar || solarPending) return;
     solarPending = true;
     solarStatus = 'solarLoad';
     $('exSolarPanel').textContent = t(solarStatus);
@@ -461,8 +483,18 @@ export function mountExplorer(root) {
       }
     } finally {solarPending = false;}
   }
+  function openSkyDirection(row) {
+    atlas.clearSelection();desi.clearSelection();selected=null;
+    const [x,y]=project(row.ra,row.dec);
+    camera={x,y,zoom:.9};
+    void changeMode('sky');
+    $('exAnnouncement').textContent=t('neighborhoodSkyDirection');
+    showInspector();showList();changed();
+    canvas.focus();
+  }
   listen($('exSkyMode'),'click',()=>void changeMode('sky'));
   listen($('exSolarMode'),'click',()=>void changeMode('solar'));
+  listen($('exNeighborhoodMode'),'click',()=>void changeMode('neighborhood'));
   const fit = () => {camera = homeCamera();changed();};
   listen($('exIn'), 'click', () => gestures.zoomBy(.25)); listen($('exOut'), 'click', () => gestures.zoomBy(-.25));
   listen($('exZoom'), 'input', () => gestures.zoomTo(Number($('exZoom').value)));
@@ -520,7 +552,7 @@ export function mountExplorer(root) {
   localize();
   return {
     setActive,
-    inspect: () => ({active,mode,atlas:atlas.inspect(),desi:desi.inspect(),solar:solar?.inspect()??null,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
-    dispose() {if(disposed)return;active=false;stop();atlas.dispose();desi.dispose();disposed=true;listeners.abort();solar?.dispose();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
+    inspect: () => ({active,mode,atlas:atlas.inspect(),desi:desi.inspect(),solar:solar?.inspect()??null,neighborhood:neighborhood?.inspect()??null,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
+    dispose() {if(disposed)return;active=false;stop();atlas.dispose();desi.dispose();disposed=true;listeners.abort();solar?.dispose();neighborhood?.dispose();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
   };
 }

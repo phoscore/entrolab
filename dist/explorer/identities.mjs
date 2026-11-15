@@ -6,10 +6,15 @@ const starNames = Object.freeze({
   '4472832130942575872':['Barnards Stern',"Barnard's Star"],
   '762815470562110464':['Lalande 21185','Lalande 21185'],
 });
+export const GAIA_KNOWN_STAR_IDS = Object.freeze(Object.keys(starNames));
+
+export function gaiaKnownStarName(id,lang) {
+  return Object.hasOwn(starNames,id)?starNames[id][lang==='en'?1:0]:null;
+}
 
 export function preferredStarName(object, lang) {
   if (object.kind !== 'star' || object.identity.catalog !== 'gaia' || object.identity.release !== 'DR3') return null;
-  return Object.hasOwn(starNames,object.identity.id) ? starNames[object.identity.id][lang === 'en' ? 1 : 0] : null;
+  return gaiaKnownStarName(object.identity.id,lang);
 }
 
 export const OEC_REVISION = '4a61419b92d4a57366b111b2d11d0a03eb0b5df0';

@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "test": "node scripts/test.mjs",
-    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs tests/explanations-browser.test.mjs tests/learning-browser.test.mjs tests/creature-browser.test.mjs tests/upgrades-browser.test.mjs tests/reimagined-browser.test.mjs tests/v0925-browser.test.mjs tests/explorer-browser.test.mjs tests/real-sky-browser.test.mjs tests/deep-sky-browser.test.mjs",
+    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs tests/explanations-browser.test.mjs tests/learning-browser.test.mjs tests/creature-browser.test.mjs tests/upgrades-browser.test.mjs tests/reimagined-browser.test.mjs tests/v0925-browser.test.mjs tests/explorer-browser.test.mjs tests/real-sky-browser.test.mjs tests/deep-sky-browser.test.mjs tests/neighborhood-browser.test.mjs",
     "build:explorer": "node scripts/build-explorer.mjs",
     "check:real-sky": "node scripts/build-real-sky.mjs --check",
-    "check:deep-sky": "node scripts/build-deep-sky.mjs --check"
+    "check:deep-sky": "node scripts/build-deep-sky.mjs --check",
+    "check:neighborhood": "node scripts/build-neighborhood.mjs --check"
   },
   "devDependencies": {
     "playwright": "1.62.1"
