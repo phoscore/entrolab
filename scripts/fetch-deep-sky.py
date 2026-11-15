@@ -95,7 +95,14 @@ def credits(path):
 def get_footprint(path):
     raw = get(ROOT + "tiles-iron.fits", 2 * MIB)
     with fits.open(io.BytesIO(raw)) as hdus:
-        table = hdus["TILES"].data
+        fields = {"TILEID", "SURVEY", "PROGRAM"}
+        matches = [i for i, hdu in enumerate(hdus) if isinstance(hdu, fits.BinTableHDU)
+                   and fields <= set(hdu.columns.names)]
+        if len(matches) != 1:
+            raise ValueError(f"Unexpected tile catalogue HDUs: {[(h.name, getattr(getattr(h, 'columns', None), 'names', None)) for h in hdus]}")
+        hdu = hdus[matches[0]]
+        table = hdu.data
+        hdu_ref = {"index": matches[0], "name": hdu.name}
         ra_key, dec_key = ("TILERA", "TILEDEC") if "TILERA" in table.names else ("RA", "DEC")
         rows = [
             (int(row["TILEID"]), float(row[ra_key]), float(row[dec_key]))
@@ -108,7 +115,7 @@ def get_footprint(path):
         raise ValueError("Unexpected set of DESI Main Bright observation tiles")
     save_csv(path, ("tileid", "ra", "dec"), rows)
     return {"url": ROOT + "tiles-iron.fits", "sourceBytes": len(raw),
-            "sourceSha256": digest(raw), "rows": len(rows), "hdu": "TILES",
+            "sourceSha256": digest(raw), "rows": len(rows), "hdu": hdu_ref,
             "columns": ["TILEID", ra_key, dec_key, "SURVEY", "PROGRAM"]}
 
 
