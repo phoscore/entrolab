@@ -490,7 +490,7 @@ export function mountExplorer(root) {
     void changeMode('sky');
     $('exAnnouncement').textContent=t('neighborhoodSkyDirection');
     showInspector();showList();changed();
-    canvas.focus({preventScroll:true});
+    canvas.focus();
   }
   listen($('exSkyMode'),'click',()=>void changeMode('sky'));
   listen($('exSolarMode'),'click',()=>void changeMode('solar'));

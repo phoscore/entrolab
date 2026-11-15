@@ -260,9 +260,13 @@ test('Home & Systems: 320 px touch, pinch on first contact, DE/EN and reduced mo
     assert.ok(Math.abs((await inspect(p)).solar.camera.zoom-Math.log10(2))<.02);
     await p.locator('[data-language=en]').click();
     assert.match(await p.locator('#exSolarPanel').innerText(),/Computed model positions/);
+    const beforeFit=(await inspect(p)).solar.draws;
     await p.locator('#solFit').press('Enter');
     await canvas.scrollIntoViewIfNeeded();
-    await p.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().solar;return !s.scheduled&&s.camera.zoom===0;});
+    await p.waitForFunction(before=>{
+      const solar=window.entrolabExplorer.inspect().solar;
+      return solar.camera.zoom===0 && solar.draws>before && solar.markers.length===9 && !solar.scheduled;
+    },beforeFit);
     const idle=(await inspect(p)).solar;
     await p.waitForTimeout(180);
     assert.deepEqual((await inspect(p)).solar,idle);

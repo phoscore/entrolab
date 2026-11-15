@@ -13,7 +13,7 @@ const formatter=['de-DE','en-GB'].map(locale=>new Intl.NumberFormat(locale,{maxi
 const copy={
   title:['Sonnenumgebung','Stellar Neighborhood'],
   origin:['Sonne im Ursprung','Sun at the origin'],
-  intro:['Räumlich geschätzte Positionen um die Sonne. Die Karte legt zwei galaktische Achsen flach auf den Bildschirm.','Estimated locations around the Sun. The map lays two Galactic axes flat on the screen.'],
+  intro:['2D-Projektion geschätzter Positionen um die Sonne in galaktischen 3D-Koordinaten.','2D projection of estimated positions around the Sun in Galactic 3D coordinates.'],
   xy:['Galaktische Ebene (X/Y)','Galactic plane (X/Y)'],
   xz:['Seitenansicht (X/Z)','Side view (X/Z)'],
   axesXy:['Rechts zum galaktischen Zentrum (+X) · oben Richtung l = 90° (+Y)','Right toward the Galactic centre (+X) · up toward l = 90° (+Y)'],
