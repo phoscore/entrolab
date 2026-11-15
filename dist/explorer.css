@@ -102,6 +102,18 @@
 #explorer .ex-atlas-browse h3{margin:0;color:#d3edf0;font-size:13px}
 #explorer .ex-atlas-browse p{margin:4px 0}
 #explorer #exAtlasResults button{overflow-wrap:anywhere}
+#explorer .ex-desi-controls{background:#1b212b}
+#explorer .ex-desi-controls input{accent-color:#f5c48f}
+#explorer .ex-desi-controls select{background:#242731;border-color:#76614c}
+#explorer .ex-desi-summary{color:#ffebd5;background:linear-gradient(110deg,#2d2629,#181f2d 82%);border-color:#66503f}
+#explorer #exDesiCounts{font-weight:600;font-variant-numeric:tabular-nums}
+#explorer #exDesiStatus{color:#e3cec0;line-height:1.55}
+#explorer .ex-desi-key{display:flex;flex-wrap:wrap;gap:5px 15px;margin-top:7px;color:#eddac8}
+#explorer .ex-desi-key>span{display:flex;align-items:center;gap:7px}
+#explorer .ex-desi-dot{display:inline-block;width:8px;height:8px;border:1px solid #ffd39e;transform:rotate(45deg)}
+#explorer .ex-desi-patch{display:inline-block;width:15px;height:8px;background:#694c3d;border:1px solid #c38c61}
+#explorer .ex-desi-summary details{margin-top:9px;padding-top:6px}
+#explorer #exDesiRetry{margin-top:8px}
 @media(max-width:760px){
   #explorer .ex-mode-bar{gap:6px}
   #explorer .ex-mode-bar button{flex:1;padding-inline:8px}
@@ -110,5 +122,6 @@
   #explorer .ex-time-inputs input,#explorer .ex-time-inputs select{min-height:42px}
   #explorer .ex-body-list button{min-height:42px}
   #explorer .ex-atlas-controls select{min-height:36px}
+  #explorer .ex-desi-controls label:first-child{min-height:33px}
 }
 @media(prefers-reduced-motion:reduce){#explorer *,#explorer *::before,#explorer *::after{scroll-behavior:auto;transition:none;animation:none}}
