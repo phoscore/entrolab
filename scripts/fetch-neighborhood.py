@@ -82,7 +82,7 @@ def gavo_async(query, row_cap, byte_cap):
     if not match:
         raise RuntimeError(f"Unexpected GAVO UWS location path: {location.path.rsplit('/',1)[0]}")
     job = "https://dc.g-vo.org"+location.path.rstrip("/")
-    deadline = time.monotonic()+280
+    deadline = time.monotonic()+90
     while time.monotonic() < deadline:
         state = read(request(job+"/phase"),512).decode().strip()
         if state == "COMPLETED":
@@ -200,13 +200,23 @@ def save(path, rows, fields):
 def run(output,radius,max_g):
     where=QUALITY+f" AND r_med_geo<={radius} AND phot_g_mean_mag<={max_g}"
     select=f"SELECT {FIELDS} FROM {TABLE} WHERE {where} ORDER BY source_id"
-    count_sql=f"SELECT COUNT(*) AS n FROM {TABLE} WHERE {where}"
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-        counting=pool.submit(gavo_async,count_sql,1,2048)
-        raw=gavo_async(select,MAX_ROWS+1,8*1024**2)
-        expected=int(csv_dict(counting.result())[1][0]["n"])
+    count_sql=f"SELECT source_id FROM {TABLE} WHERE {where} ORDER BY source_id"
+    limits = {"row_cap": MAX_ROWS+1, "byte_cap": 8*1024**2}
+    def get(sql):
+        try:
+            return read(request(GAVO+"sync",tap_args(sql,limits["row_cap"])),limits["byte_cap"])
+        except Exception as error:
+            print(f"GAVO synchronous request failed: {error}",flush=True)
+            if radius<=10:
+                raise
+            return gavo_async(sql,**limits)
+    raw=get(select)
     cols,rows=csv_dict(raw)
     ids=[int(r["source_id"]) for r in rows]
+    check_ids=[int(r["source_id"]) for r in csv_dict(get(count_sql))[1]]
+    expected=len(check_ids)
+    if check_ids!=ids:
+        raise ValueError("The independent identifier export disagrees with the full export")
     if ",".join(cols)!=FIELDS or not 30<=len(rows)==expected<=MAX_ROWS or ids!=sorted(set(ids)):
         raise ValueError(f"Truncated, duplicate or incompatible source data. Count={expected}, export={len(rows)}")
     print(f"Frozen {len(rows)} complete rows, {len(raw)} raw bytes, SHA-256 {digest(raw)}",flush=True)
@@ -229,7 +239,7 @@ def run(output,radius,max_g):
     save(output/"distance-reference.csv",d,DISTANCE_COLUMNS)
     (output/"galactic-reference.json").write_text(json.dumps(vectors,indent=2)+"\n",encoding="utf8",newline="\n")
     receipt={"table":TABLE,"endpoint":GAVO+"async","capturedAt":datetime.now(timezone.utc).isoformat(),
-             "query":select,"countQuery":count_sql,"radius":radius,"maxG":max_g,"rows":len(rows),
+             "query":select,"idCheckQuery":count_sql,"idCheckRows":expected,"radius":radius,"maxG":max_g,"rows":len(rows),
              "bytes":len(raw),"sha256":digest(raw),"reference":{"gaia":g_meta,"distances":d_meta,"astropy":astropy.__version__,"ids":source_ids},
              "inputs":{name:digest((output/name).read_bytes()) for name in
                        ("gaia-reference.csv","distance-reference.csv","galactic-reference.json")}}

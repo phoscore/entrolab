@@ -12,7 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python -m pip install astropy==7.2.0
-      - run: python scripts/fetch-neighborhood.py cosmic-explorer/neighborhood/source 50 14
+      - name: Capture complete local selection, with measured pilot fallback
+        run: |
+          python scripts/fetch-neighborhood.py cosmic-explorer/neighborhood/source 25 14 ||
+            python scripts/fetch-neighborhood.py cosmic-explorer/neighborhood/source 10 14
       - uses: actions/upload-artifact@v4
         with:
           name: stellar-neighborhood-source
