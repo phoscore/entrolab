@@ -78,10 +78,10 @@ def gavo_async(query, row_cap, byte_cap):
         error.close()
     else:
         raise RuntimeError("No UWS job location")
-    match = re.fullmatch(r"/tap/async/([A-Za-z0-9_-]+)/?",location.path)
+    match = re.fullmatch(r"(?:/tap|/__system__/tap/run)/async/([A-Za-z0-9_-]+)/?",location.path)
     if not match:
         raise RuntimeError(f"Unexpected GAVO UWS location path: {location.path.rsplit('/',1)[0]}")
-    job = GAVO+"async/"+match[1]
+    job = "https://dc.g-vo.org"+location.path.rstrip("/")
     deadline = time.monotonic()+280
     while time.monotonic() < deadline:
         state = read(request(job+"/phase"),512).decode().strip()
