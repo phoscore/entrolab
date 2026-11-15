@@ -125,3 +125,29 @@
   #explorer .ex-desi-controls label:first-child{min-height:33px}
 }
 @media(prefers-reduced-motion:reduce){#explorer *,#explorer *::before,#explorer *::after{scroll-behavior:auto;transition:none;animation:none}}
+
+#explorer .sn-head{display:flex;justify-content:space-between;gap:24px;align-items:end;padding:18px 2px 16px}
+#explorer .sn-head h2{font-size:clamp(22px,3vw,33px);font-weight:500;line-height:1.1;margin:7px 0}
+#explorer .sn-head p{max-width:62ch;margin:0;color:#aec5ca;font-size:13px;line-height:1.6}
+#explorer .sn-head .sn-origin{color:#f4c594;font-size:12px}
+#explorer .sn-layout{border-color:#2c474e;background:#0c171e}
+#explorer .sn-aside{background:#102028;border-color:#2c474e}
+#explorer .sn-planes button[aria-pressed=true]{background:#203d3b;border-color:#618880}
+#explorer .sn-toolbar{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid #2c474e}
+#explorer .sn-toolbar label{display:flex;gap:8px;align-items:center;margin:0;color:#b5c6c8;font-size:12px;text-transform:none;letter-spacing:0}
+#explorer .sn-toolbar select{color-scheme:dark;color:#e1eeeb;background:#182a32;border:1px solid #3b5961;border-radius:6px;padding:7px}
+#explorer .sn-map{background:radial-gradient(ellipse at 50% 48%,#173037,#102229 62%,#0a171f)}
+#explorer .sn-caption{padding:10px 16px;border-top:1px solid #2c474e}
+#explorer .sn-caption p{margin:3px 0;color:#afc3c8;font-size:12px;line-height:1.55}
+#explorer #snCount{font-variant-numeric:tabular-nums;color:#cee2e2}
+#explorer #snStatus:empty{display:none}
+#explorer .sn-interval{position:relative;height:5px;margin:12px 3px 6px;border-radius:3px;background:#98744f}
+#explorer .sn-interval span{position:absolute;top:-3px;width:2px;height:11px;background:#ffe3b0}
+#explorer [data-sn-sky]{margin:6px 0}
+@media(max-width:760px){
+  #explorer .sn-head{align-items:start;flex-direction:column;gap:12px}
+  #explorer .sn-map{height:clamp(290px,90vw,420px)}
+  #explorer .sn-toolbar{padding:10px 12px}
+  #explorer .sn-toolbar button,#explorer .sn-toolbar select{min-height:42px}
+}
+@media(max-width:370px){#explorer .ex-mode-bar #exNeighborhoodMode{flex-basis:100%}}

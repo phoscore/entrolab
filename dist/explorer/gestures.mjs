@@ -1,7 +1,7 @@
-import {panBy, zoomAt} from './camera.mjs';
+import {panBy, zoomAt, MAX_ZOOM} from './camera.mjs';
 
 // Both maps use the same CSS-pixel pan, zoom anchors and keyboard controls.
-export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, fit, exit, tap}) {
+export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, maxZoom=MAX_ZOOM, fit, exit, tap}) {
   const pointers = new Map();
   let gesture = null;
   let moved = false;
@@ -21,7 +21,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
   }
   function zoomTo(zoom, anchor) {
     const [w,h] = size();
-    setCamera(zoomAt(getCamera(), zoom, anchor ?? [w/2,h/2], w, h, frame));
+    setCamera(zoomAt(getCamera(), Math.min(maxZoom,zoom), anchor ?? [w/2,h/2], w, h, frame));
   }
   function zoomBy(amount) { zoomTo(getCamera().zoom + amount); }
   function cancel() {
@@ -50,7 +50,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
     const [w,h] = size();
     let next = gesture.camera;
     if (span && gesture.span) {
-      next = zoomAt(next, next.zoom + Math.log10(Math.max(1,span) / gesture.span), gesture.midpoint, w, h, frame);
+      next = zoomAt(next, Math.min(maxZoom,next.zoom + Math.log10(Math.max(1,span) / gesture.span)), gesture.midpoint, w, h, frame);
     }
     setCamera(panBy(next, dx, dy, w, h, frame));
   });
