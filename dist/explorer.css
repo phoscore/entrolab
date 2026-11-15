@@ -88,6 +88,20 @@
 #explorer .ex-aside .ex-symbol-option{display:flex;gap:8px;align-items:start;line-height:1.5;margin:0 0 18px}
 #explorer .ex-symbol-option input{margin:2px 0 0;accent-color:var(--ex-ice)}
 #explorer .ex-solar .ex-aside{max-height:none}
+#explorer .ex-atlas-controls{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid #284458;background:#101e2c}
+#explorer .ex-atlas-controls label{margin:0;display:flex;align-items:center;gap:7px;letter-spacing:0;text-transform:none;color:#cddfe8;font-size:12px}
+#explorer .ex-atlas-controls input{accent-color:var(--ex-ice)}
+#explorer .ex-atlas-controls select{width:auto;min-height:32px;background:#132636;color:#e8f4f8;border:1px solid #436476;border-radius:5px;padding:5px 7px}
+#explorer .ex-atlas-filter span{flex-shrink:0}
+#explorer .ex-atlas-summary{background:linear-gradient(110deg,#142a37,#102032 72%);padding:10px 16px;border-top:1px solid #315165;color:#ddf5f6;font-size:12px}
+#explorer #exAtlasCounts{font-variant-numeric:tabular-nums;font-weight:600}
+#explorer #exAtlasStatus{color:#b9d3df;line-height:1.5}
+#explorer #exAtlasRetry{margin-top:8px}
+#explorer .ex-dot[data-kind=atlasDensityLegend]{width:25px;height:8px;border-radius:2px;background:linear-gradient(90deg,#245170,#5fa7b7,#d5cf96)}
+#explorer .ex-atlas-browse{margin:12px 0 16px;border-top:1px solid #385064;padding-top:10px}
+#explorer .ex-atlas-browse h3{margin:0;color:#d3edf0;font-size:13px}
+#explorer .ex-atlas-browse p{margin:4px 0}
+#explorer #exAtlasResults button{overflow-wrap:anywhere}
 @media(max-width:760px){
   #explorer .ex-mode-bar{gap:6px}
   #explorer .ex-mode-bar button{flex:1;padding-inline:8px}
@@ -95,5 +109,6 @@
   #explorer .ex-time{padding:12px 14px}
   #explorer .ex-time-inputs input,#explorer .ex-time-inputs select{min-height:42px}
   #explorer .ex-body-list button{min-height:42px}
+  #explorer .ex-atlas-controls select{min-height:36px}
 }
 @media(prefers-reduced-motion:reduce){#explorer *,#explorer *::before,#explorer *::after{scroll-behavior:auto;transition:none;animation:none}}

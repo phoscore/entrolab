@@ -6,6 +6,7 @@ import {mapGestures} from './gestures.mjs';
 import {placeLabels, drawLabels} from './labels.mjs';
 import {preferredStarName, systemFor} from './identities.mjs';
 import {searchKey} from './foundation/access.mjs';
+import {atlasControls, atlasSummary, atlasBrowse, mountAtlas} from './atlas-layer.mjs';
 
 export function mountExplorer(root) {
   const t = key => translate(key, language());
@@ -36,17 +37,21 @@ export function mountExplorer(root) {
             <button type="button" id="exCenter" data-ex="center" disabled></button>
           </div>
         </div>
-        <div class="ex-map"><canvas id="exCanvas" tabindex="0" aria-describedby="exHelp exProjection"></canvas><p class="ex-overlay" id="exMapMessage"></p></div>
+        ${atlasControls}
+        <div class="ex-map ex-real-sky-map"><canvas id="exCanvas" tabindex="0" aria-describedby="exHelp exProjection exAtlasStatus"></canvas><p class="ex-overlay" id="exMapMessage"></p></div>
+        ${atlasSummary}
         <div class="ex-map-foot"><span id="exCount"></span><span data-ex="coverage"></span></div>
         <div class="ex-zoom"><label for="exZoom" data-ex="zoom"></label><input id="exZoom" type="range" min="0" max="5" step="0.01" value="0"><output id="exScale"></output></div>
         <div class="ex-legend" id="exLegend"></div>
         <div class="ex-error" id="exError" role="alert" hidden><p data-ex="error"></p><button type="button" id="exRetry" data-ex="retry"></button></div>
         <div class="ex-notes"><p id="exHelp" data-ex="help"></p>
           <details><summary data-ex="projection"></summary><p id="exProjection" data-ex="limits"></p><p data-ex="fixed"></p></details>
+          <details><summary data-ex="atlasAbout"></summary><p data-ex="atlasAboutBody"></p><a id="exAtlasCredits" data-ex="atlasCredits" target="_blank" rel="noopener"></a> · <a id="exAtlasManifest" data-ex="manifest" target="_blank" rel="noopener"></a></details>
           <details><summary data-ex="sample"></summary><p data-ex="sampleNote"></p><a id="exCredits" data-ex="credits" target="_blank" rel="noopener"></a> · <a id="exManifest" data-ex="manifest" target="_blank" rel="noopener"></a></details>
         </div>
       </div>
       <aside class="ex-aside"><h2 data-ex="sources"></h2><label for="exSearch" data-ex="search"></label><input id="exSearch" type="search" autocomplete="off" aria-describedby="exSearchHint"><p id="exSearchHint" class="ex-small" data-ex="searchHint"></p><p id="exSearchCount" class="ex-small" aria-live="polite"></p><div id="exList" class="ex-list"></div>
+        ${atlasBrowse}
         <section class="ex-inspector" aria-labelledby="exInspectorHeading"><h2 id="exInspectorHeading" data-ex="inspector"></h2><div id="exInspector"></div></section>
       </aside>
     </div></div><div id="exAnnouncement" class="ex-reader" role="status" aria-live="polite"></div>`;
@@ -60,7 +65,12 @@ export function mountExplorer(root) {
   let loading = true, skyLoading = false, searchLoading = false, failed = false, searchFailed = false;
   let width = 1, height = 1, draws = 0, duration = 0;
   let panelActive = false, mode = 'sky', solar = null, solarPending = false, solarStatus = 'solarLoad';
+  let gaiaExamples = new Set();
   const starName = object => preferredStarName(object, language());
+  const atlas = mountAtlas(root, {
+    listen,t,n,invalidate,project,onInspector:showInspector,curatedIds:()=>gaiaExamples,
+    onSelect:selectAtlas,onCenter:centerAtlas,
+  });
 
   function localize() {
     for (const el of root.querySelectorAll('[data-ex]')) el.textContent = t(el.dataset.ex);
@@ -70,7 +80,7 @@ export function mountExplorer(root) {
     $('exIn').setAttribute('aria-label', t('zoomIn'));
     $('exCredits').href = new URL('CREDITS.md', DATA_URL);
     $('exManifest').href = new URL('manifest.json', DATA_URL);
-    $('exLegend').replaceChildren(...['star', 'source', 'galaxy', 'groupLegend', 'noMapPlanets'].map(kind => {
+    $('exLegend').replaceChildren(...['atlasDensityLegend','star', 'source', 'galaxy', 'groupLegend', 'noMapPlanets'].map(kind => {
       const label = node('span');
       if (kind !== 'noMapPlanets') {
         const dot = node('span', '', 'ex-dot'); dot.dataset.kind = kind;
@@ -80,12 +90,12 @@ export function mountExplorer(root) {
       return label;
     }));
     if (!solar && mode === 'solar') $('exSolarPanel').textContent = t(solarStatus);
-    showList(); showInspector(); invalidate();
+    atlas.localize();showList(); showInspector(); invalidate();
   }
 
   function showList() {
     const focused = $('exList').contains(document.activeElement) ? document.activeElement.dataset.object : null;
-    const resultLabel = `${results.length} ${t(results.length === 1 ? 'oneResult' : 'results')}`;
+    const resultLabel = `${t('sampleShort')} · ${results.length} ${t(results.length === 1 ? 'oneResult' : 'results')}`;
     $('exSearchCount').textContent = searchFailed ? t('error') : loading ? t('loading') : searchLoading ? t('loadingSearch') : resultLabel;
     $('exList').replaceChildren(...results.map(object => {
       const button = node('button'); button.type = 'button'; button.dataset.object = object.id;
@@ -140,6 +150,11 @@ export function mountExplorer(root) {
 
   function showInspector() {
     const inspector = $('exInspector'); inspector.replaceChildren();
+    if (atlas.selection) {
+      $('exCenter').disabled=!atlas.selection.detail;
+      atlas.renderDetail(inspector);
+      return;
+    }
     const object = data?.objects.find(o => o.id === selected);
     $('exCenter').disabled = !object?.direction;
     if (!object) { inspector.append(node('p', t('choose'), 'ex-selected'), node('p', t('chooseHint'), 'ex-small')); return; }
@@ -179,12 +194,35 @@ export function mountExplorer(root) {
   }
 
   function select(object, center = true) {
+    atlas.clearSelection();
     selected = object.id;
     if (center) camera = centerObject(camera, object);
     for (const button of $('exList').querySelectorAll('button')) button.setAttribute('aria-pressed', String(button.dataset.object === selected));
     showInspector();
     $('exAnnouncement').textContent = `${starName(object) ?? objectName(object)} · ${t(object.kind)}${object.direction ? '' : ' · ' + t('noDirection')}`;
     changed();
+  }
+
+  function selectAtlas(ref) {
+    const example=data?.objects.find(o=>o.identity.catalog==='gaia'&&o.identity.id===ref.id);
+    if (example) {select(example);return;}
+    selected=null;
+    for (const button of $('exList').querySelectorAll('button')) button.setAttribute('aria-pressed','false');
+    void atlas.select(ref);
+    $('exAnnouncement').textContent='Gaia DR3 '+ref.id;
+  }
+  function centerAtlas(detail) {
+    const [x,y]=project(detail.ra,detail.dec);
+    camera={x,y,zoom:Math.max(camera.zoom,1.4)};
+    changed();
+  }
+  function updateAtlasView() {
+    atlas.setView({viewport:skyViewport(camera,width,height),zoom:camera.zoom,width,height});
+  }
+  function atlasFrame() {
+    const [left,top]=screenPoint([0,0],camera,width,height);
+    const [right,bottom]=screenPoint([360,180],camera,width,height);
+    return {left,top,right,bottom,width,height};
   }
 
   function invalidate() {
@@ -204,7 +242,7 @@ export function mountExplorer(root) {
     }
     ctx?.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
     invalidate();
-    if (changedSize) void refreshSky();
+    if (changedSize) {updateAtlasView();void refreshSky();}
   }
   function draw() {
     frame = null;
@@ -219,10 +257,12 @@ export function mountExplorer(root) {
   function render() {
     ctx.clearRect(0, 0, width, height);
     const screen = point => screenPoint(point, camera, width, height);
-    const [left, top] = screen([0, 0]), [right, bottom] = screen([360, 180]);
+    const bounds=atlasFrame();
+    const {left,top,right,bottom}=bounds;
     ctx.save();
     ctx.beginPath(); ctx.rect(left, top, right - left, bottom - top); ctx.clip();
     ctx.fillStyle = '#12263866'; ctx.fillRect(left, top, right - left, bottom - top);
+    atlas.paint(ctx,bounds);
     ctx.lineWidth = 1; ctx.strokeStyle = '#81b2c021';
     const scale = cameraScale(camera, width, height);
     const step = niceStep(80 / scale);
@@ -278,6 +318,8 @@ export function mountExplorer(root) {
         : starName(object) ?? (chosen || (object.kind === 'galaxy' && camera.zoom > .6) ? objectName(object) : '');
       labels.push({x,y,radius:chosen?14:radius,label:caption,selected:chosen,priority:chosen?10:object.kind==='star'?5:multi?3:1});
     }
+    const selectedAtlasLabel=atlas.selectedLabel(ctx,bounds);
+    if (selectedAtlasLabel) labels.push(selectedAtlasLabel);
     ctx.font = '12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(labels,label=>ctx.measureText(label).width,width,height,{
       top:Math.max(8,top+12),bottom:Math.min(height-59,bottom-26),limit:width<420?5:10,
@@ -293,12 +335,13 @@ export function mountExplorer(root) {
     const scaleDegrees = niceStep(60 / scale), pixels = scaleDegrees * scale;
     ctx.strokeStyle = '#c5e1e0';ctx.beginPath();ctx.moveTo(18,height-33);ctx.lineTo(18+pixels,height-33);ctx.stroke();
     ctx.fillStyle = '#c5e1e0';ctx.fillText(`ΔRA ${n(scaleDegrees)}° · Dec 0°`,18,height-42);
-    $('exCount').textContent = `${groups.reduce((sum, g) => sum + g.objects.length, 0)} / 19 ${t('visible')}`;
+    $('exCount').textContent = `${t('sampleShort')} · ${groups.reduce((sum, g) => sum + g.objects.length, 0)} / 19 ${t('visible')}`;
     $('exZoom').value = String(camera.zoom);
     $('exScale').textContent = `${n(Math.round(10 ** camera.zoom * 100) / 100)}×`;
     $('exOut').disabled = camera.zoom === 0;
     $('exIn').disabled = camera.zoom === MAX_ZOOM;
-    $('exMapMessage').textContent = failed ? t('error') : loading ? t('loading') : skyLoading ? t('loadingSky') : groups.length ? '' : t('empty');
+    $('exMapMessage').textContent = failed&&!atlas.hasContent() ? t('error') : atlas.hasContent() ? '' :
+      loading ? t('loading') : skyLoading ? t('loadingSky') : groups.length ? '' : t('empty');
   }
 
   async function refreshSky() {
@@ -316,7 +359,7 @@ export function mountExplorer(root) {
       if (revision === skyRevision) { skyLoading = false; invalidate(); }
     }
   }
-  function changed() { invalidate(); void refreshSky(); }
+  function changed() { updateAtlasView();invalidate();void refreshSky(); }
 
   async function search() {
     if (!data || !loader || !active) return;
@@ -346,6 +389,7 @@ export function mountExplorer(root) {
       const loaded = data ?? await loadCatalog(own.signal);
       if (own.signal.aborted || disposed || !active) return;
       data = loaded; loading = false; loader = makeLoader(data.manifest);
+      gaiaExamples=new Set(data.objects.filter(o=>o.identity.catalog==='gaia').map(o=>o.identity.id));
       results = data.objects; showList(); showInspector(); resize();
       await Promise.all([refreshSky(), search()]);
     } catch (error) {
@@ -361,7 +405,8 @@ export function mountExplorer(root) {
   function setSkyActive(value) {
     if (disposed || active === value) return;
     active = value;
-    if (active) { resize(); void start(); } else stop();
+    if (active) { resize();updateAtlasView();atlas.setActive(true);void start(); }
+    else {atlas.setActive(false);stop();}
   }
 
   function setActive(value) {
@@ -400,9 +445,12 @@ export function mountExplorer(root) {
   listen($('exIn'), 'click', () => gestures.zoomBy(.25)); listen($('exOut'), 'click', () => gestures.zoomBy(-.25));
   listen($('exZoom'), 'input', () => gestures.zoomTo(Number($('exZoom').value)));
   listen($('exHome'), 'click', fit);
-  listen($('exCenter'), 'click', () => {const object = data?.objects.find(o => o.id === selected);if (object) select(object);});
+  listen($('exCenter'), 'click', () => {
+    if (atlas.selection?.detail) {centerAtlas(atlas.selection.detail);return;}
+    const object = data?.objects.find(o => o.id === selected);if (object) select(object);
+  });
   listen($('exRetry'), 'click', () => {stop();void start();});
-  listen($('exSearch'), 'input', search);
+  listen($('exSearch'), 'input', () => {atlas.search($('exSearch').value);void search();});
   listen($('exList'), 'click', event => {const id = event.target.closest('button')?.dataset.object; const object = data?.objects.find(o => o.id === id); if (object) select(object);});
   listen($('exList'), 'keydown', event => {
     const buttons = [...$('exList').querySelectorAll('button')], current = buttons.indexOf(document.activeElement);
@@ -422,8 +470,16 @@ export function mountExplorer(root) {
         const center = worldPoint([hit.x,hit.y],camera,width,height);
         camera = {...camera,x:center[0],y:center[1],zoom:Math.min(MAX_ZOOM,camera.zoom + .8)};
         searchRevision++; searchLoading = false; searchFailed = false; $('exError').hidden = !failed;
-        results = hit.objects; $('exSearch').value = ''; showList(); changed();
+        results = hit.objects; $('exSearch').value = '';atlas.search('');showList(); changed();
         $('exAnnouncement').textContent = `${t('group')} · ${hit.objects.length}`;
+      } else {
+        const picked=atlas.hit(x,y,atlasFrame());
+        if (picked?.ref) selectAtlas(picked.ref);
+        else if (picked?.zoom) {
+          const [ra,dec]=worldPoint([x,y],camera,width,height);
+          camera={x:Math.max(0,Math.min(360,ra)),y:Math.max(0,Math.min(180,dec)),zoom:Math.min(MAX_ZOOM,Math.max(.92,camera.zoom+.45))};
+          changed();
+        }
       }
     },
   });
@@ -436,7 +492,7 @@ export function mountExplorer(root) {
   localize();
   return {
     setActive,
-    inspect: () => ({active,mode,solar:solar?.inspect()??null,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
-    dispose() {if(disposed)return;active=false;stop();disposed=true;listeners.abort();solar?.dispose();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
+    inspect: () => ({active,mode,atlas:atlas.inspect(),solar:solar?.inspect()??null,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
+    dispose() {if(disposed)return;active=false;stop();atlas.dispose();disposed=true;listeners.abort();solar?.dispose();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
   };
 }

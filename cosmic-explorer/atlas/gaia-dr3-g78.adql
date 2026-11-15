@@ -1,0 +1,1 @@
+SELECT source_id,ra,dec,phot_g_mean_mag,astrometric_params_solved,parallax,parallax_error,ruwe,ra_error,dec_error FROM gaia.dr3lite WHERE phot_g_mean_mag <= 7.8 AND astrometric_params_solved IN (3,31,95) AND ra >= 0 AND ra < 360 AND dec >= -90 AND dec <= 90 ORDER BY source_id
