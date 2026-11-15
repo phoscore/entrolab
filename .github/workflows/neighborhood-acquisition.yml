@@ -1,29 +1,30 @@
-name: Stellar Neighborhood acquisition
+name: Stellar Neighborhood offline build
 on:
   push:
     branches: [feature/v0.9.5-explorer-stellar-neighborhood]
-    paths: ['.github/workflows/neighborhood-acquisition.yml', 'scripts/fetch-neighborhood.py']
+    paths:
+      - '.github/workflows/neighborhood-acquisition.yml'
+      - 'scripts/build-neighborhood.mjs'
+      - 'cosmic-explorer/neighborhood-build.mjs'
+      - 'dist/explorer/foundation/neighborhood-format.mjs'
 permissions:
   contents: write
 jobs:
-  capture:
+  reproducible-package:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - run: python -m pip install astropy==7.2.0
-      - name: Capture complete local selection, with measured pilot fallback
-        run: |
-          python scripts/fetch-neighborhood.py cosmic-explorer/neighborhood/source 25 14 ||
-            python scripts/fetch-neighborhood.py cosmic-explorer/neighborhood/source 10 14
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-          name: stellar-neighborhood-source
-          path: cosmic-explorer/neighborhood/source
-          if-no-files-found: error
-      - name: Preserve captures on feature ref
+          node-version: 22
+      - name: Build and verify from frozen original data
+        run: |
+          node scripts/build-neighborhood.mjs --build
+          node scripts/build-neighborhood.mjs --check
+      - name: Preserve verified output on feature ref
         run: |
           test "$GITHUB_REF" = refs/heads/feature/v0.9.5-explorer-stellar-neighborhood
-          git add cosmic-explorer/neighborhood/source
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m '[CF-Pages-Skip] data(explorer): freeze local Gaia and geometric distance references'
+          git add dist/explorer/data/v0.9.5-neighborhood-25pc-g14.1 dist/explorer/neighborhood-pin.mjs
+          git -c user.name=github-actions -c user.email=41898282+github-actions[bot]@users.noreply.github.com commit -m '[CF-Pages-Skip] Freeze byte-reproducible Stellar Neighborhood package'
           git push origin "HEAD:$GITHUB_REF"
