@@ -83,10 +83,12 @@ def credits(path):
     parser = Acknowledgments()
     parser.feed(raw.decode("utf-8"))
     start = next(i for i, p in enumerate(parser.parts) if p.startswith("This research used data"))
-    paragraphs = parser.parts[start:]
-    if len(paragraphs) != 3 or not paragraphs[-1].endswith("listed funding agencies."):
-        raise ValueError("DESI acknowledgment template changed")
-    path.write_text("\n\n".join(paragraphs) + "\n", encoding="utf-8", newline="\n")
+    template = "\n\n".join(parser.parts[start:])
+    end = "listed funding agencies."
+    finish = template.find(end)
+    if finish < 0 or not 1200 < finish < 3000 or "Kitt Peak" not in template[:finish]:
+        raise ValueError("DESI acknowledgment text markers changed")
+    path.write_text(template[:finish + len(end)] + "\n", encoding="utf-8", newline="\n")
     return digest(raw)
 
 
