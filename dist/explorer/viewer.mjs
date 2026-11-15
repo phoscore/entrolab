@@ -1,7 +1,11 @@
 import {language, onLanguageChange} from '../i18n.mjs';
 import {translate, number, measurement, objectName} from './text.mjs';
 import {loadCatalog, makeLoader, loadSky, findObjects, DATA_URL} from './catalog.mjs';
-import {homeCamera, cameraScale, screenPoint, worldPoint, project, unproject, panBy, zoomAt, centerObject, visibleGroups, hitGroup, skyViewport, niceStep, MAX_ZOOM} from './camera.mjs';
+import {homeCamera, cameraScale, screenPoint, worldPoint, project, unproject, centerObject, visibleGroups, hitGroup, skyViewport, niceStep, MAX_ZOOM} from './camera.mjs';
+import {mapGestures} from './gestures.mjs';
+import {placeLabels, drawLabels} from './labels.mjs';
+import {preferredStarName, systemFor} from './identities.mjs';
+import {searchKey} from './foundation/access.mjs';
 
 export function mountExplorer(root) {
   const t = key => translate(key, language());
@@ -14,6 +18,15 @@ export function mountExplorer(root) {
   };
   root.innerHTML = `
     <div class="ex-heading"><div><p class="ex-kicker" data-ex="subtitle"></p><h1>Cosmic Explorer</h1><p data-ex="intro"></p></div></div>
+    <div class="ex-mode-bar" role="group" aria-label="Cosmic Explorer">
+      <button type="button" id="exSkyMode" data-ex="skyMode" aria-pressed="true" aria-controls="exSkyPanel"></button>
+      <button type="button" id="exSolarMode" data-ex="solarMode" aria-pressed="false" aria-controls="exSolarPanel"></button>
+    </div>
+    <div id="exSolarPanel" hidden></div>
+    <div id="exSkyPanel">
+    <div class="ex-orientation"><strong data-ex="observer"></strong>
+      <details><summary data-ex="skyHelp"></summary><p data-ex="skyExplanation"></p><p data-ex="skyScope"></p></details>
+    </div>
     <div class="ex-layout">
       <div class="ex-left">
         <div class="ex-map-head"><div><strong data-ex="map"></strong><p data-ex="projection"></p></div>
@@ -36,7 +49,7 @@ export function mountExplorer(root) {
       <aside class="ex-aside"><h2 data-ex="sources"></h2><label for="exSearch" data-ex="search"></label><input id="exSearch" type="search" autocomplete="off" aria-describedby="exSearchHint"><p id="exSearchHint" class="ex-small" data-ex="searchHint"></p><p id="exSearchCount" class="ex-small" aria-live="polite"></p><div id="exList" class="ex-list"></div>
         <section class="ex-inspector" aria-labelledby="exInspectorHeading"><h2 id="exInspectorHeading" data-ex="inspector"></h2><div id="exInspector"></div></section>
       </aside>
-    </div><div id="exAnnouncement" class="ex-reader" role="status" aria-live="polite"></div>`;
+    </div></div><div id="exAnnouncement" class="ex-reader" role="status" aria-live="polite"></div>`;
   const $ = id => root.querySelector(`#${id}`);
   const canvas = $('exCanvas'), ctx = canvas.getContext('2d');
   const listeners = new AbortController();
@@ -46,8 +59,8 @@ export function mountExplorer(root) {
   let session = null, loader = null, skyRevision = 0, searchRevision = 0;
   let loading = true, skyLoading = false, searchLoading = false, failed = false, searchFailed = false;
   let width = 1, height = 1, draws = 0, duration = 0;
-  const pointers = new Map();
-  let gesture = null, moved = false;
+  let panelActive = false, mode = 'sky', solar = null, solarPending = false, solarStatus = 'solarLoad';
+  const starName = object => preferredStarName(object, language());
 
   function localize() {
     for (const el of root.querySelectorAll('[data-ex]')) el.textContent = t(el.dataset.ex);
@@ -57,12 +70,16 @@ export function mountExplorer(root) {
     $('exIn').setAttribute('aria-label', t('zoomIn'));
     $('exCredits').href = new URL('CREDITS.md', DATA_URL);
     $('exManifest').href = new URL('manifest.json', DATA_URL);
-    $('exLegend').replaceChildren(...['star', 'source', 'galaxy', 'exoplanet'].map(kind => {
+    $('exLegend').replaceChildren(...['star', 'source', 'galaxy', 'groupLegend', 'noMapPlanets'].map(kind => {
       const label = node('span');
-      const dot = node('span', '', 'ex-dot'); dot.dataset.kind = kind;
-      label.append(dot, document.createTextNode(t(kind)));
+      if (kind !== 'noMapPlanets') {
+        const dot = node('span', '', 'ex-dot'); dot.dataset.kind = kind;
+        label.append(dot);
+      }
+      label.append(document.createTextNode(t(kind)));
       return label;
     }));
+    if (!solar && mode === 'solar') $('exSolarPanel').textContent = t(solarStatus);
     showList(); showInspector(); invalidate();
   }
 
@@ -73,7 +90,8 @@ export function mountExplorer(root) {
     $('exList').replaceChildren(...results.map(object => {
       const button = node('button'); button.type = 'button'; button.dataset.object = object.id;
       button.setAttribute('aria-pressed', String(object.id === selected));
-      button.append(node('span', objectName(object)), node('small', `${t(object.kind)}${object.direction ? '' : ' · ' + t('noDirection')}`));
+      const preferred = starName(object);
+      button.append(node('span', preferred ?? objectName(object)), node('small', `${t(object.kind)}${preferred ? ' · ' + objectName(object) : ''}${object.direction ? '' : ' · ' + t('noDirection')}`));
       return button;
     }));
     if (data && !results.length && !searchLoading && !searchFailed) $('exList').append(node('p', t('emptySearch'), 'ex-small'));
@@ -104,13 +122,31 @@ export function mountExplorer(root) {
     container.append(dl); evidence(container, q);
   }
 
+  function showSystem(container, object) {
+    const system = systemFor(object,data.manifest.release);
+    if (!system) return;
+    const details = node('details',undefined,'ex-system-info');
+    details.append(node('summary',t('system')),node('h3',system.host),node('p',`${t('host')} · ${system.aliases.join(' · ')}`,'ex-small'));
+    details.append(node('p',t('systemScope'),'ex-small'),node('h4',t('systemNames')));
+    const planets = node('ul');
+    for (const planet of system.planets) {
+      planets.append(node('li',`${planet} · ${t(planet === object.identity.id ? 'systemSample' : 'systemNameOnly')}`));
+    }
+    const source = node('a','Open Exoplanet Catalogue');
+    source.href = system.source;source.target = '_blank';source.rel = 'noopener';
+    details.append(planets,source);
+    container.append(details);
+  }
+
   function showInspector() {
     const inspector = $('exInspector'); inspector.replaceChildren();
     const object = data?.objects.find(o => o.id === selected);
     $('exCenter').disabled = !object?.direction;
     if (!object) { inspector.append(node('p', t('choose'), 'ex-selected'), node('p', t('chooseHint'), 'ex-small')); return; }
-    inspector.append(node('p', objectName(object), 'ex-selected'), node('p', t(object.kind), 'ex-small'), node('p', object.id, 'ex-small'));
+    inspector.append(node('p', starName(object) ?? objectName(object), 'ex-selected'), node('p', t(object.kind), 'ex-small'), node('p', object.id, 'ex-small'));
     evidence(inspector, {evidence: object.identity.evidence});
+    if (object.classificationEvidence) evidence(inspector,{evidence:object.classificationEvidence});
+    showSystem(inspector,object);
     if (object.aliases.length) {
       const aliases = node('details'); aliases.append(node('summary', t('aliases')), node('p', object.aliases.map(a => a.name).join(' · '), 'ex-small')); inspector.append(aliases);
     }
@@ -147,7 +183,7 @@ export function mountExplorer(root) {
     if (center) camera = centerObject(camera, object);
     for (const button of $('exList').querySelectorAll('button')) button.setAttribute('aria-pressed', String(button.dataset.object === selected));
     showInspector();
-    $('exAnnouncement').textContent = `${objectName(object)} · ${t(object.kind)}${object.direction ? '' : ' · ' + t('noDirection')}`;
+    $('exAnnouncement').textContent = `${starName(object) ?? objectName(object)} · ${t(object.kind)}${object.direction ? '' : ' · ' + t('noDirection')}`;
     changed();
   }
 
@@ -211,27 +247,41 @@ export function mountExplorer(root) {
       }
     }
     groups = visibleGroups(sky, camera, width, height, selected);
+    const labels = [];
     for (const group of groups) {
       const object = group.objects[0], chosen = object.id === selected;
       const color = object.kind === 'star' ? '#ffdc9c' : object.kind === 'galaxy' ? '#c2a7ef' : '#94b6ce';
-      const radius = group.objects.length > 1 ? 15 : chosen ? 6 : 4;
+      const multi = group.objects.length > 1, x = group.x, y = group.y;
+      const radius = multi ? 15 : chosen ? 8 : object.kind === 'star' ? 6 : 5;
       ctx.shadowBlur = chosen ? 18 : 9; ctx.shadowColor = color;
-      ctx.fillStyle = group.objects.length > 1 ? '#1a3449' : color; ctx.strokeStyle = color; ctx.lineWidth = 1;
+      ctx.fillStyle = multi || object.kind === 'source' ? '#17283d' : color; ctx.strokeStyle = color; ctx.lineWidth = 1.25;
       ctx.beginPath();
-      if (object.kind === 'galaxy' && group.objects.length === 1) {
-        ctx.moveTo(group.x, group.y - radius - 1); ctx.lineTo(group.x + radius + 1, group.y); ctx.lineTo(group.x, group.y + radius + 1); ctx.lineTo(group.x - radius - 1, group.y); ctx.closePath();
-      } else ctx.arc(group.x, group.y, radius, 0, Math.PI * 2);
+      if (multi || object.kind === 'star' || object.kind === 'galaxy') {
+        const vertices = multi ? 6 : object.kind === 'star' ? 8 : 4;
+        for (let i = 0; i < vertices; i++) {
+          const angle = i * 2 * Math.PI / vertices - Math.PI / 2;
+          const r = !multi && object.kind === 'star' && i % 2 ? radius * .32 : radius;
+          const px = x + Math.cos(angle) * r, py = y + Math.sin(angle) * r;
+          if (i === 0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+        }
+        ctx.closePath();
+      } else ctx.arc(x,y,radius,0,Math.PI*2);
       ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
-      if (group.objects.length > 1) {
+      if (multi) {
         ctx.fillStyle = '#e0f6fa'; ctx.textAlign = 'center'; ctx.font = '12px "DM Sans", sans-serif'; ctx.fillText(group.objects.length, group.x, group.y + 4); ctx.textAlign = 'left';
       }
       if (chosen) {
-        ctx.beginPath(); ctx.arc(group.x, group.y, 12, 0, Math.PI * 2); ctx.stroke();
-        ctx.font = '11px "DM Sans", sans-serif'; ctx.fillStyle = '#eaf6f4';
-        const title = objectName(object); const length = ctx.measureText(title).width;
-        ctx.fillText(title, Math.max(8, Math.min(width - length - 8, group.x + 18)), Math.max(18, group.y - 16));
+        ctx.strokeStyle = '#c7fff0'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.stroke();
       }
+      const caption = multi ? t(object.kind === 'galaxy' ? 'groupGalaxies' : 'groupGaia')
+        : starName(object) ?? (chosen || (object.kind === 'galaxy' && camera.zoom > .6) ? objectName(object) : '');
+      labels.push({x,y,radius:chosen?14:radius,label:caption,selected:chosen,priority:chosen?10:object.kind==='star'?5:multi?3:1});
     }
+    ctx.font = '12px "DM Sans", sans-serif';
+    drawLabels(ctx,placeLabels(labels,label=>ctx.measureText(label).width,width,height,{
+      top:Math.max(8,top+12),bottom:Math.min(height-59,bottom-26),limit:width<420?5:10,
+    }));
     ctx.restore();
     ctx.strokeStyle = '#608590'; ctx.lineWidth = 1; ctx.strokeRect(left, top, right - left, bottom - top);
     ctx.font = '10px "DM Sans", sans-serif'; ctx.fillStyle = '#9ab0be';
@@ -281,7 +331,8 @@ export function mountExplorer(root) {
     try {
       const matches = await findObjects(data.manifest, data.objects, loader, query);
       if (!active || disposed || revision !== searchRevision) return;
-      results = matches; searchLoading = false; searchFailed = false; $('exError').hidden = !failed; showList();
+      const extra = query.trim() ? data.objects.filter(o=>[preferredStarName(o,'de'),preferredStarName(o,'en')].some(name=>name && searchKey(name).startsWith(searchKey(query)))) : [];
+      results = [...new Set([...matches,...extra])]; searchLoading = false; searchFailed = false; $('exError').hidden = !failed; showList();
     } catch (error) {
       if (!active || disposed || revision !== searchRevision) return;
       searchLoading = false; searchFailed = true; results = []; $('exError').hidden = false; showList();
@@ -305,18 +356,50 @@ export function mountExplorer(root) {
   function stop() {
     session?.abort(); loader?.dispose(); loader = null; skyRevision++; searchRevision++;
     if (frame !== null) cancelAnimationFrame(frame);
-    frame = null; pointers.clear(); gesture = null; canvas.dataset.interacting = 'false';
+    frame = null; gestures.cancel();
   }
-  function setActive(value) {
+  function setSkyActive(value) {
     if (disposed || active === value) return;
     active = value;
     if (active) { resize(); void start(); } else stop();
   }
 
-  const zoom = amount => {camera = zoomAt(camera, camera.zoom + amount, [width / 2, height / 2], width, height); changed();};
-  listen($('exIn'), 'click', () => zoom(.25)); listen($('exOut'), 'click', () => zoom(-.25));
-  listen($('exZoom'), 'input', () => {camera = zoomAt(camera, Number($('exZoom').value), [width / 2, height / 2], width, height);changed();});
-  listen($('exHome'), 'click', () => {camera = homeCamera(); changed();});
+  function setActive(value) {
+    if (disposed) return;
+    panelActive = value;
+    setSkyActive(value && mode === 'sky');
+    solar?.setActive(value && mode === 'solar');
+  }
+  async function changeMode(next) {
+    mode = next;
+    const system = mode === 'solar';
+    $('exSkyMode').setAttribute('aria-pressed',String(!system));
+    $('exSolarMode').setAttribute('aria-pressed',String(system));
+    $('exSkyPanel').hidden = system;
+    $('exSolarPanel').hidden = !system;
+    setActive(panelActive);
+    if (!system || solar || solarPending) return;
+    solarPending = true;
+    solarStatus = 'solarLoad';
+    $('exSolarPanel').textContent = t(solarStatus);
+    try {
+      const {mountSolar} = await import('./solar-view.mjs');
+      if (disposed) return;
+      solar = mountSolar($('exSolarPanel'));
+      solar.setActive(panelActive && mode === 'solar');
+    } catch {
+      if (!disposed) {
+        solarStatus = 'solarError';
+        $('exSolarPanel').textContent = t(solarStatus);
+      }
+    } finally {solarPending = false;}
+  }
+  listen($('exSkyMode'),'click',()=>void changeMode('sky'));
+  listen($('exSolarMode'),'click',()=>void changeMode('solar'));
+  const fit = () => {camera = homeCamera();changed();};
+  listen($('exIn'), 'click', () => gestures.zoomBy(.25)); listen($('exOut'), 'click', () => gestures.zoomBy(-.25));
+  listen($('exZoom'), 'input', () => gestures.zoomTo(Number($('exZoom').value)));
+  listen($('exHome'), 'click', fit);
   listen($('exCenter'), 'click', () => {const object = data?.objects.find(o => o.id === selected);if (object) select(object);});
   listen($('exRetry'), 'click', () => {stop();void start();});
   listen($('exSearch'), 'input', search);
@@ -328,36 +411,12 @@ export function mountExplorer(root) {
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : Math.max(0, Math.min(buttons.length - 1, current + (event.key === 'ArrowDown' ? 1 : -1)));
     buttons[next]?.focus();
   });
-  const point = event => {const rect = canvas.getBoundingClientRect();return [event.clientX - rect.left, event.clientY - rect.top];};
-  function resetGesture() {
-    const points = [...pointers.values()];
-    if (!points.length) {gesture = null; return;}
-    const midpoint = points.length > 1 ? [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2] : points[0];
-    gesture = {camera: {...camera}, midpoint, span: points.length > 1 ? Math.hypot(points[0][0] - points[1][0], points[0][1] - points[1][1]) : 0};
-  }
-  listen(canvas, 'pointerdown', event => {
-    if (event.button !== 0 || pointers.size >= 2) return;
-    canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);canvas.dataset.interacting = 'true';
-    pointers.set(event.pointerId, point(event)); moved = pointers.size > 1; resetGesture();
-  });
-  listen(canvas, 'pointermove', event => {
-    if (!pointers.has(event.pointerId) || !gesture) return;
-    pointers.set(event.pointerId, point(event));
-    const points = [...pointers.values()];
-    const midpoint = points.length > 1 ? [(points[0][0]+points[1][0])/2,(points[0][1]+points[1][1])/2] : points[0];
-    const dx = midpoint[0] - gesture.midpoint[0], dy = midpoint[1] - gesture.midpoint[1];
-    if (Math.hypot(dx, dy) > 4) moved = true;
-    let next = gesture.camera;
-    if (points.length > 1 && gesture.span > 0) {
-      const span = Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]);
-      next = zoomAt(next, next.zoom + Math.log10(Math.max(1, span) / gesture.span), gesture.midpoint, width, height);
-    }
-    camera = panBy(next, dx, dy, width, height); changed();
-  });
-  function release(event) {
-    if (!pointers.has(event.pointerId)) return;
-    if (event.type === 'pointerup' && !moved && pointers.size === 1) {
-      const [x,y] = point(event), hit = hitGroup(groups,x,y);
+  const gestures = mapGestures(canvas, listen, {
+    getCamera:()=>camera, size:()=>[width,height],
+    setCamera(next) {camera=next;changed();},
+    fit, exit:()=>$('exHome').focus(),
+    tap(x,y) {
+      const hit = hitGroup(groups,x,y);
       if (hit?.objects.length === 1) select(hit.objects[0]);
       else if (hit) {
         const center = worldPoint([hit.x,hit.y],camera,width,height);
@@ -366,25 +425,7 @@ export function mountExplorer(root) {
         results = hit.objects; $('exSearch').value = ''; showList(); changed();
         $('exAnnouncement').textContent = `${t('group')} · ${hit.objects.length}`;
       }
-    }
-    pointers.delete(event.pointerId); resetGesture();
-    if (!pointers.size) canvas.dataset.interacting = 'false';
-  }
-  listen(canvas,'pointerup',release);listen(canvas,'pointercancel',release);listen(canvas,'lostpointercapture',release);
-  listen(canvas, 'wheel', event => {
-    if (document.activeElement !== canvas) return;
-    event.preventDefault();
-    const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1);
-    camera = zoomAt(camera, camera.zoom - Math.max(-.4,Math.min(.4,delta*.001)),point(event),width,height);changed();
-  }, {passive:false});
-  listen(canvas,'keydown',event => {
-    if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','Home','Escape'].includes(event.key)) return;
-    event.preventDefault();
-    if (event.key === 'Escape') {canvas.blur();$('exHome').focus();return;}
-    if (event.key === 'Home') camera = homeCamera();
-    else if (['+','=','-'].includes(event.key)) {zoom(event.key === '-' ? -.25 : .25);return;}
-    else camera = panBy(camera,event.key==='ArrowLeft'?48:event.key==='ArrowRight'?-48:0,event.key==='ArrowUp'?48:event.key==='ArrowDown'?-48:0,width,height);
-    changed();
+    },
   });
   listen(document,'visibilitychange',() => {
     if(document.hidden){if(frame!==null)cancelAnimationFrame(frame);frame=null;}else invalidate();
@@ -395,7 +436,7 @@ export function mountExplorer(root) {
   localize();
   return {
     setActive,
-    inspect: () => ({active,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
-    dispose() {if(disposed)return;active=false;stop();disposed=true;listeners.abort();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
+    inspect: () => ({active,mode,solar:solar?.inspect()??null,loading,failed,searchFailed,selected,camera:{...camera},draws,duration,scheduled:frame!==null,requests:loader?.active??0,queued:loader?.queued??0,cacheBytes:loader?.cache.byteLength??0,objectCount:data?.objects.length??0,groups:groups.map(g=>({x:g.x,y:g.y,ids:g.objects.map(o=>o.id)}))}),
+    dispose() {if(disposed)return;active=false;stop();disposed=true;listeners.abort();solar?.dispose();observer.disconnect();intersection.disconnect();unsubscribe();root.replaceChildren();},
   };
 }

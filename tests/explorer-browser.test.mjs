@@ -37,6 +37,11 @@ async function open(p){
   await p.waitForFunction(()=>window.entrolabExplorer.inspect().groups.length>0);
 }
 const inspect=p=>p.evaluate(()=>window.entrolabExplorer.inspect());
+async function openSolar(p) {
+  await p.locator('#exSolarMode').click();
+  await p.locator('#solCanvas').scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar?.markers.length>0);
+}
 
 test('Explorer browser: lazy loading, real source selection, aliases and unchanged physical state',async()=>{
   const {p,context,errors}=await page();try{
@@ -135,5 +140,138 @@ test('Explorer browser: failed data is distinct from an empty search and retry r
     await p.locator('#exZoom').press('End');
     await p.locator('#exCanvas').scrollIntoViewIfNeeded();
     await p.waitForFunction(()=>document.getElementById('exMapMessage').textContent.startsWith('Keine Quelle'));
+  }finally{await context.close();}
+});
+
+test('Home & Systems: observer context, proven star names and pinned system membership',async()=>{
+  const {p,context,errors}=await page();
+  try {
+    await open(p);
+    assert.match(await p.locator('.ex-orientation').innerText(),/Beobachter: Sonnensystem/);
+    await p.locator('.ex-orientation summary').press('Enter');
+    assert.match(await p.locator('.ex-orientation').innerText(),/Jeder Punkt markiert eine Blickrichtung/);
+    assert.equal(await p.evaluate(()=>performance.getEntriesByType('resource').some(r=>r.name.endsWith('/solar-model.mjs'))),false);
+    await p.locator('#exSearch').fill('Proxima');
+    await p.locator('#exList button').filter({hasText:'Proxima Centauri'}).press('Enter');
+    assert.match(await p.locator('#exInspector').innerText(),/5853498713190525696/);
+    for (const [name,planets] of [['51 Peg b',1],['TRAPPIST-1 b',7],['HR 8799 b',4]]) {
+      await p.locator('#exSearch').fill(name);
+      await p.locator('#exList button').filter({hasText:name}).press('Enter');
+      await p.locator('.ex-system-info summary').press('Enter');
+      assert.equal(await p.locator('.ex-system-info li').count(),planets);
+      assert.match(await p.locator('.ex-system-info').innerText(),/Positionen unbekannt/);
+      assert.match(await p.locator('.ex-system-info a').getAttribute('href'),/blob\/4a61419b92d4a57366b111b2d11d0a03eb0b5df0/);
+      assert.equal(await p.locator('#exCenter').isDisabled(),true);
+    }
+    await p.locator('[data-language=en]').click();
+    assert.match(await p.locator('.ex-orientation').innerText(),/Observer: Solar System/);
+    await p.locator('.ex-system-info summary').click();
+    await p.locator('#explorer').screenshot({path:join(output,'systems-catalogue.png')});
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('Home & Systems: shared camera, model date, scaled radii, playback and separate lifecycle',async()=>{
+  const {p,context,errors}=await page({reducedMotion:'no-preference'});
+  try {
+    await open(p);
+    await p.locator('#exCanvas').press('+');
+    const skyCamera=(await inspect(p)).camera;
+    const physical=()=>p.evaluate(()=>({b:window.entrolab.inspect().bodies,t:window.entrolabThermal.inspect(),e:window.entrolabEntropy.inspect()}));
+    const before=await physical();
+    await openSolar(p);
+    assert.equal(await p.locator('#solList button').count(),9);
+    assert.match(await p.locator('#solTimestamp').innerText(),/2000-01-01 12:00 TDB/);
+    assert.match(await p.locator('#solScaleNote').innerText(),/Symbole vergrößert/);
+    assert.equal((await inspect(p)).active,false);
+    assert.equal((await inspect(p)).requests,0);
+    await p.locator('#explorer').screenshot({path:join(output,'systems-solar-desktop.png')});
+
+    const canvas=p.locator('#solCanvas');
+    const mars=(await inspect(p)).solar.markers.find(m=>m.id==='mars');
+    // Inner bodies are close in the overview. The dedicated view separates them.
+    await p.locator('#solInner').click();
+    await p.waitForFunction(x=>{
+      const s=window.entrolabExplorer.inspect().solar;
+      return s.camera.zoom===1.2&&Math.abs(s.markers.find(m=>m.id==='mars')?.x-x)>12;
+    },mars.x);
+    const spot=(await inspect(p)).solar.markers.find(m=>m.id==='mars');
+    await canvas.click({position:{x:spot.x,y:spot.y}});
+    assert.equal((await inspect(p)).solar.selected,'mars');
+    await p.locator('[data-body=earth]').press('Enter');
+    assert.match(await p.locator('#solEarth').innerText(),/Erd-Mond-Schwerpunkt/);
+    const firstDay=(await inspect(p)).solar.day;
+    await p.locator('#solNext').press('Enter');
+    assert.equal((await inspect(p)).solar.day,firstDay+1);
+    await p.locator('#solDate').fill('2049-12-31');
+    assert.match(await p.locator('#solTimestamp').innerText(),/2049-12-31 00:00 TDB/);
+
+    await p.locator('#solSymbols').uncheck();
+    assert.match(await p.locator('#solScaleNote').innerText(),/Körperradien im selben Maßstab/);
+    await p.locator('#solCenter').click();
+    await p.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().solar;return !s.enlarged&&s.markers.some(m=>m.id==='earth'&&m.radius<1);});
+    await canvas.scrollIntoViewIfNeeded();
+    await canvas.press('Home');
+    await canvas.press('+');
+    const rect=await canvas.boundingBox(), x=Math.round(rect.x+rect.width*.63), y=Math.round(rect.y+rect.height*.44);
+    const previous=(await inspect(p)).solar.camera;
+    await p.mouse.move(x,y);await p.mouse.wheel(0,-180);
+    await p.waitForFunction(z=>window.entrolabExplorer.inspect().solar.camera.zoom>z,previous.zoom);
+    const next=(await inspect(p)).solar.camera;
+    const drift=await p.evaluate(async({x,y,previous,next})=>{
+      const {worldPoint}=await import('./explorer/camera.mjs'), {SOLAR_FRAME}=await import('./explorer/solar-view.mjs');
+      const r=document.getElementById('solCanvas').getBoundingClientRect();
+      const [a,b]=[previous,next].map(c=>worldPoint([x-r.left,y-r.top],c,r.width,r.height,SOLAR_FRAME));
+      return Math.hypot(a[0]-b[0],a[1]-b[1]);
+    },{x,y,previous,next});
+    assert.ok(drift<1e-5);
+
+    await p.locator('#solEpoch').press('Enter');
+    await p.locator('#solPlay').press('Enter');
+    await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.day>2451545.02);
+    await p.locator('#exSkyMode').press('Enter');
+    const stopped = (await inspect(p)).solar;
+    assert.deepEqual((await inspect(p)).camera,skyCamera);
+    assert.equal(stopped.scheduled,false);
+    assert.equal(stopped.playing,false);
+    assert.equal(await p.locator('#exSkyMode').evaluate(el=>document.activeElement===el),true);
+    for(let i=0;i<3;i++){await p.locator('#exSolarMode').press('Enter');await p.locator('#exSkyMode').press('Enter');}
+    assert.equal((await inspect(p)).solar.day,stopped.day);
+    await openSolar(p);
+    await p.locator('[data-tab=gravity]').click();
+    assert.equal((await inspect(p)).solar.scheduled,false);
+    assert.deepEqual(await physical(),before);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
+test('Home & Systems: 320 px touch, pinch on first contact, DE/EN and reduced motion idle',async()=>{
+  const {p,context,errors}=await page({viewport:{width:320,height:900},isMobile:true,hasTouch:true,deviceScaleFactor:2});
+  try {
+    await open(p);await openSolar(p);
+    assert.equal(await p.locator('#solPlay').isDisabled(),true);
+    const canvas=p.locator('#solCanvas'), {x,y,width,height}=await canvas.boundingBox();
+    const cdp=await context.newCDPSession(p);
+    const points=span=>[-1,1].map((d,id)=>({id,x:x+width/2+span*d,y:y+height/2}));
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(30)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(60)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.camera.zoom>.2);
+    assert.ok(Math.abs((await inspect(p)).solar.camera.zoom-Math.log10(2))<.02);
+    await p.locator('[data-language=en]').click();
+    assert.match(await p.locator('#exSolarPanel').innerText(),/Computed model positions/);
+    await p.locator('#solFit').press('Enter');
+    await canvas.scrollIntoViewIfNeeded();
+    await p.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().solar;return !s.scheduled&&s.camera.zoom===0;});
+    const idle=(await inspect(p)).solar;
+    await p.waitForTimeout(180);
+    assert.deepEqual((await inspect(p)).solar,idle);
+    for (const width of [320,390]) {
+      await p.setViewportSize({width,height:900});
+      assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    }
+    await p.setViewportSize({width:320,height:900});
+    await p.locator('#explorer').screenshot({path:join(output,'systems-solar-mobile.png')});
+    assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });

@@ -56,4 +56,44 @@
   #explorer .ex-zoom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
   #explorer .ex-zoom input{grid-column:1/-1;grid-row:2;width:100%;max-width:none;min-height:28px;margin:0}
 }
+
+#explorer .ex-heading{margin-bottom:16px}
+#explorer .ex-mode-bar{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+#explorer .ex-mode-bar button{min-height:42px;padding-inline:16px}
+#explorer .ex-mode-bar button[aria-pressed=true]{background:#173838;color:#e6f9f4;border-color:#579693}
+#explorer .ex-orientation{padding:12px 16px;margin-bottom:12px;border:1px solid #2c4d59;border-radius:10px;background:#10212bd9;color:#b8e8e2;font-size:13px}
+#explorer .ex-orientation details{border:none;margin:7px 0 0;padding:0}
+#explorer .ex-orientation p{color:#bfd0db;font-size:13px;line-height:1.65;max-width:75ch;margin:9px 0 2px}
+#explorer .ex-dot[data-kind=star]{width:11px;height:11px;border-radius:0;clip-path:polygon(50% 0,64% 36%,100% 50%,64% 64%,50% 100%,36% 64%,0 50%,36% 36%)}
+#explorer .ex-dot[data-kind=source]{background:transparent;border:1px solid #a8c7df}
+#explorer .ex-dot[data-kind=groupLegend]{width:10px;height:10px;border-radius:0;background:#a7c8df;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+#explorer .ex-system-info{padding:12px;border:1px solid #365468;border-radius:8px;background:#142537}
+#explorer .ex-system-info h3{margin:12px 0 6px}
+#explorer .ex-system-info h4{font-size:11px;margin:12px 0 4px}
+#explorer .ex-system-info ul{padding-left:17px;color:#cbdbe8;font-size:11px;line-height:1.65}
+#explorer #exSkyPanel .ex-map{background:radial-gradient(ellipse at 35% 25%,#18324b 0%,#102035 38%,#0a1423 75%,#080e17 100%)}
+#explorer .ex-solar-map{background:radial-gradient(ellipse at 48% 48%,#273140 0%,#142438 32%,#0c182b 61%,#070e1a 100%)}
+#explorer .ex-solar .ex-map-foot span:first-child{color:#f1cd9d}
+#explorer .ex-time{padding:14px 20px;border-top:1px solid var(--ex-line)}
+#explorer .ex-time-title{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:12px}
+#explorer #solTimestamp{color:#d0e8ea;font-variant-numeric:tabular-nums}
+#explorer .ex-time-inputs{display:flex;flex-wrap:wrap;gap:12px 16px;margin-top:12px}
+#explorer .ex-time-inputs label{display:grid;gap:6px;margin:0;color:var(--ex-muted);text-transform:none;letter-spacing:0;font-size:12px}
+#explorer .ex-time-inputs input,#explorer .ex-time-inputs select{color-scheme:dark;padding:8px;max-width:100%;min-height:36px;color:#eff6ff;background:#101d2e;border:1px solid #3b5363;border-radius:6px}
+#explorer #solMotion{font-size:12px;color:var(--ex-muted);margin-bottom:0}
+#explorer .ex-body-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:15px}
+#explorer .ex-body-list button{display:flex;align-items:center;gap:7px;padding:8px;text-align:left}
+#explorer .ex-body-list button::before{content:'';width:8px;height:8px;flex:none;border-radius:50%;background:var(--body-color)}
+#explorer .ex-body-list [aria-pressed=true]{background:#173838;border-color:#579693}
+#explorer .ex-aside .ex-symbol-option{display:flex;gap:8px;align-items:start;line-height:1.5;margin:0 0 18px}
+#explorer .ex-symbol-option input{margin:2px 0 0;accent-color:var(--ex-ice)}
+#explorer .ex-solar .ex-aside{max-height:none}
+@media(max-width:760px){
+  #explorer .ex-mode-bar{gap:6px}
+  #explorer .ex-mode-bar button{flex:1;padding-inline:8px}
+  #explorer .ex-solar-map{height:clamp(290px,96vw,390px)}
+  #explorer .ex-time{padding:12px 14px}
+  #explorer .ex-time-inputs input,#explorer .ex-time-inputs select{min-height:42px}
+  #explorer .ex-body-list button{min-height:42px}
+}
 @media(prefers-reduced-motion:reduce){#explorer *,#explorer *::before,#explorer *::after{scroll-behavior:auto;transition:none;animation:none}}
