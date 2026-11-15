@@ -1,7 +1,7 @@
 import {requireData} from './schema.mjs';
 import {decodeTile, encodeTile, TILE_LIMIT} from './tiles.mjs';
 
-export const ATLAS_RELEASE = 'v0.9.5-gaia-dr3-g78.1';
+export const ATLAS_RELEASE = 'v0.9.5-gaia-dr3-g78.2';
 export const ATLAS_FORMAT = 1;
 export const DETAIL_ROWS = 512;
 export const DENSITY_SIDE = 128;

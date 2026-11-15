@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,readdir} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {ATLAS_RELEASE,DENSITY_SIDE,atlasRow,atlasLines,decodeAtlasTile,decodeAtlasSearch,flagOf,MASKS} from '../cosmic-explorer/atlas-format.mjs';
@@ -20,6 +20,32 @@ const signal=new AbortController().signal;
 const manifest=await loadAtlasManifest(signal,localFetch);
 const original=await frozenExport(dataDir);
 const rows=atlasLines(original).map(atlasRow);
+
+test('shipped Gaia licence and package digests match, and the historical First Light sample is byte-identical',async()=>{
+  const credits=await file('CREDITS.md');
+  const notice=new TextDecoder().decode(credits);
+  assert.match(notice,/\[CC BY-NC 3\.0 IGO\]\(https:\/\/creativecommons\.org\/licenses\/by-nc\/3\.0\/igo\/\)/);
+  assert.match(notice,/https:\/\/www\.cosmos\.esa\.int\/web\/gaia-users\/license\)/);
+  assert.match(notice,/https:\/\/www\.cosmos\.esa\.int\/web\/esdc\/terms-and-conditions\)/);
+  assert.match(notice,/NonCommercial condition limits reuse/);
+  assert.match(notice,/separate authorization from ESA before commercial use/);
+  assert.match(notice,/separate from the licence of the website source code/);
+
+  const sampleUrl=new URL('../dist/explorer/data/v0.9.5-sample.1/',import.meta.url);
+  const sampleBytes=await readFile(new URL('manifest.json',sampleUrl));
+  assert.equal(atlasSha256(sampleBytes),'570dc33b4824bd01e39a3c7065caf0e4a9db2f977aa8699c486a552441ddea6e');
+  const sample=JSON.parse(sampleBytes);
+  for (const [url,release,count] of [[ATLAS_URL,manifest,463],[sampleUrl,sample,57]]) {
+    const entries=await readdir(url,{recursive:true,withFileTypes:true});
+    assert.equal(entries.filter(entry=>entry.isFile()).length,count);
+    assert.equal(Object.keys(release.packages).length+1,count);
+    for (const [path,expected] of Object.entries(release.packages)) {
+      const bytes=await readFile(new URL(path,url));
+      assert.equal(bytes.length,expected.bytes,path);
+      assert.equal(atlasSha256(bytes),expected.sha256,path);
+    }
+  }
+});
 
 test('Real Sky build reproduces all shipped files and 62 official ESA cross-checks from frozen bytes',()=>{
   const result=spawnSync(process.execPath,['scripts/build-real-sky.mjs','--check'],{cwd:root,encoding:'utf8'});
