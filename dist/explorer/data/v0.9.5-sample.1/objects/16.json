@@ -1,0 +1,153 @@
+{
+  "id": "gaia:DR3:5853498713190525696",
+  "kind": "star",
+  "identity": {
+    "catalog": "gaia",
+    "release": "DR3",
+    "id": "5853498713190525696",
+    "evidence": {
+      "source": "gaia",
+      "row": "5853498713190525696",
+      "columns": [
+        "source_id"
+      ],
+      "reference": null
+    }
+  },
+  "aliases": [],
+  "direction": {
+    "frame": "ICRS",
+    "role": "object",
+    "epoch": {
+      "system": "Julian-year-TCB",
+      "value": 2016,
+      "evidence": {
+        "source": "gaia",
+        "row": "5853498713190525696",
+        "columns": [
+          "ref_epoch (release constant)"
+        ],
+        "reference": null
+      }
+    },
+    "ra": {
+      "status": "catalog",
+      "value": 217.39232147200883,
+      "unit": "deg",
+      "evidence": {
+        "source": "gaia",
+        "row": "5853498713190525696",
+        "columns": [
+          "ra"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    },
+    "dec": {
+      "status": "catalog",
+      "value": -62.67607511676666,
+      "unit": "deg",
+      "evidence": {
+        "source": "gaia",
+        "row": "5853498713190525696",
+        "columns": [
+          "dec"
+        ],
+        "reference": null
+      },
+      "uncertainty": null,
+      "limit": null
+    }
+  },
+  "distances": [
+    {
+      "kind": "stellar-line-of-sight",
+      "method": "geometric",
+      "origin": "solar-system-barycenter",
+      "measurement": {
+        "status": "derived",
+        "value": 1.3019114,
+        "unit": "pc",
+        "evidence": {
+          "source": "bailer-jones",
+          "row": "5853498713190525696",
+          "columns": [
+            "r_med_geo",
+            "r_lo_geo",
+            "r_hi_geo"
+          ],
+          "reference": "https://doi.org/10.3847/1538-3881/abd806"
+        },
+        "uncertainty": {
+          "kind": "quantiles",
+          "p16": 1.3018136,
+          "p84": 1.3020053
+        },
+        "limit": null,
+        "model": "Bailer-Jones et al. 2021 geometric"
+      }
+    },
+    {
+      "kind": "stellar-line-of-sight",
+      "method": "photogeometric",
+      "origin": "solar-system-barycenter",
+      "measurement": {
+        "status": "derived",
+        "value": 1.3019346,
+        "unit": "pc",
+        "evidence": {
+          "source": "bailer-jones",
+          "row": "5853498713190525696",
+          "columns": [
+            "r_med_photogeo",
+            "r_lo_photogeo",
+            "r_hi_photogeo"
+          ],
+          "reference": "https://doi.org/10.3847/1538-3881/abd806"
+        },
+        "uncertainty": {
+          "kind": "quantiles",
+          "p16": 1.3018495,
+          "p84": 1.3020064
+        },
+        "limit": null,
+        "model": "Bailer-Jones et al. 2021 photogeometric"
+      }
+    }
+  ],
+  "orbits": [],
+  "classificationEvidence": {
+    "source": "gaia-nearby",
+    "row": "5853498713190525696",
+    "columns": [
+      "Gaia DR3 identifier in nearby-star comparison"
+    ],
+    "reference": null
+  },
+  "parallax": {
+    "status": "catalog",
+    "value": 768.0665,
+    "unit": "mas",
+    "evidence": {
+      "source": "gaia",
+      "row": "5853498713190525696",
+      "columns": [
+        "parallax",
+        "parallax_error"
+      ],
+      "reference": null
+    },
+    "uncertainty": {
+      "kind": "sigma",
+      "sigma": 0.049872905
+    },
+    "limit": null
+  },
+  "quality": {
+    "astrometricParamsSolved": 95,
+    "ruwe": 0.97145325,
+    "parallaxOverError": 15400.476471141996
+  }
+}

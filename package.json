@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "node scripts/test.mjs",
-    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs tests/explanations-browser.test.mjs tests/learning-browser.test.mjs tests/creature-browser.test.mjs tests/upgrades-browser.test.mjs tests/reimagined-browser.test.mjs tests/v0925-browser.test.mjs"
+    "test:browser": "node --test tests/browser-review.test.mjs tests/entropy-browser.test.mjs tests/thermal-browser.test.mjs tests/knowledge-browser.test.mjs tests/explanations-browser.test.mjs tests/learning-browser.test.mjs tests/creature-browser.test.mjs tests/upgrades-browser.test.mjs tests/reimagined-browser.test.mjs tests/v0925-browser.test.mjs tests/explorer-browser.test.mjs",
+    "build:explorer": "node scripts/build-explorer.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

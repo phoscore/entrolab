@@ -1,0 +1,2942 @@
+{
+  "schemaVersion": 1,
+  "release": "v0.9.5-sample.1",
+  "objects": [
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689587",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689587",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689587",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5358+25.2900",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689587",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5359034749192,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689587",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.29005210286309,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689587",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.2727416138134127,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689587",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.0000156698173519868
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 395.8479163050652,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59700.09094705999
+      }
+    },
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689626",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689626",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689626",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5383+25.3612",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689626",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5382992546074,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689626",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.36119822290018,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689626",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.1959410038203733,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689626",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.00001637433514702147
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 565.4991242289543,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59671.50220541
+      }
+    },
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689658",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689658",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689658",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5399+25.1374",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689658",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5399462137839,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689658",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.13743271214165,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689658",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.3599246903197666,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689658",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.00001831688979670185
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 1524.066400706768,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59401.24779219
+      }
+    },
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689697",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689697",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689697",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5416+25.2851",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689697",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5416316074823,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689697",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.28511900793748,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689697",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.19688183540653,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689697",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.0000236844152386291
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 1018.395434245467,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59401.24779219
+      }
+    },
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689700",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689700",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689700",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5416+25.1382",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689700",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5416808694132,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689700",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.13819244352038,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689700",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.359683053402157,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689700",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.00001012076178415382
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 1134.945182561874,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59714.38531668
+      }
+    },
+    {
+      "id": "desi:DR1-iron-zpix-v1:39628379988689828",
+      "kind": "galaxy",
+      "identity": {
+        "catalog": "desi",
+        "release": "DR1-iron-zpix-v1",
+        "id": "39628379988689828",
+        "evidence": {
+          "source": "desi",
+          "row": "39628379988689828",
+          "columns": [
+            "targetid"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [
+        {
+          "name": "DESI J251.5488+25.1778",
+          "relation": "catalog",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689828",
+            "columns": [
+              "desiname"
+            ],
+            "reference": null
+          }
+        }
+      ],
+      "direction": {
+        "frame": "catalog-equatorial",
+        "role": "fiber-mean",
+        "epoch": null,
+        "ra": {
+          "status": "catalog",
+          "value": 251.5488536006446,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689828",
+            "columns": [
+              "mean_fiber_ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 25.17780589526002,
+          "unit": "deg",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689828",
+            "columns": [
+              "mean_fiber_dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "redshift": {
+        "frame": "solar-system-barycentric",
+        "measurement": {
+          "status": "catalog",
+          "value": 0.1736209081950692,
+          "unit": "1",
+          "evidence": {
+            "source": "desi",
+            "row": "39628379988689828",
+            "columns": [
+              "z",
+              "zerr"
+            ],
+            "reference": null
+          },
+          "uncertainty": {
+            "kind": "sigma",
+            "sigma": 0.00004122838435188564
+          },
+          "limit": null
+        }
+      },
+      "quality": {
+        "zwarn": 0,
+        "deltaChi2": 669.7024032059126,
+        "survey": "main",
+        "program": "bright",
+        "primary": true,
+        "healpix64Nested": 9239,
+        "meanMjd": 59401.24779219
+      }
+    },
+    {
+      "id": "gaia:DR3:1099511693312",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "1099511693312",
+        "evidence": {
+          "source": "gaia",
+          "row": "1099511693312",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "1099511693312",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 44.96654617792031,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "1099511693312",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.046308658367763794,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "1099511693312",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 3269.3162,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "1099511693312",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2493.5842,
+              "p84": 4595.9365
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 3061.5295,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "1099511693312",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2630.2432,
+              "p84": 3468.658
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": -0.34477833,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "1099511693312",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.2700788
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 95,
+        "ruwe": 1.0614251,
+        "parallaxOverError": -1.2765842043137041
+      }
+    },
+    {
+      "id": "gaia:DR3:1511828647680",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "1511828647680",
+        "evidence": {
+          "source": "gaia",
+          "row": "1511828647680",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "1511828647680",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 44.95265152874727,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "1511828647680",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.08495205087426602,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "1511828647680",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2822.1357,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "1511828647680",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2051.978,
+              "p84": 4880.2485
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 8557.534,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "1511828647680",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 7054.524,
+              "p84": 10120.569
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": -0.0979929,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "1511828647680",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.24349307
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 31,
+        "ruwe": 0.94457185,
+        "parallaxOverError": -0.4024463612044482
+      }
+    },
+    {
+      "id": "gaia:DR3:2130304202496",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "2130304202496",
+        "evidence": {
+          "source": "gaia",
+          "row": "2130304202496",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "2130304202496",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 44.98413214856149,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2130304202496",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.1276853526886549,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2130304202496",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 996.3454,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "2130304202496",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 656.2746,
+              "p84": 1508.136
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2591.4175,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "2130304202496",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2100.5376,
+              "p84": 3103.736
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": -0.070318356,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "2130304202496",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 1.1713048
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 95,
+        "ruwe": 0.96179855,
+        "parallaxOverError": -0.060034208004611615
+      }
+    },
+    {
+      "id": "gaia:DR3:2512556873600",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "2512556873600",
+        "evidence": {
+          "source": "gaia",
+          "row": "2512556873600",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "2512556873600",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.07492471994457,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2512556873600",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.1108820420939314,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2512556873600",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "parallax": {
+        "status": "unknown",
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "2512556873600",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        }
+      },
+      "quality": {
+        "astrometricParamsSolved": 3,
+        "ruwe": null,
+        "parallaxOverError": null
+      }
+    },
+    {
+      "id": "gaia:DR3:2821794351744",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "2821794351744",
+        "evidence": {
+          "source": "gaia",
+          "row": "2821794351744",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "2821794351744",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.124152453120615,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2821794351744",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.13677852527701542,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "2821794351744",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "parallax": {
+        "status": "unknown",
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "2821794351744",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        }
+      },
+      "quality": {
+        "astrometricParamsSolved": 3,
+        "ruwe": null,
+        "parallaxOverError": null
+      }
+    },
+    {
+      "id": "gaia:DR3:34361129088",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "34361129088",
+        "evidence": {
+          "source": "gaia",
+          "row": "34361129088",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "34361129088",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.00432028915398,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "34361129088",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.021047763781174733,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "34361129088",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 306.34778,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "34361129088",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 294.81198,
+              "p84": 316.8109
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 310.8287,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "34361129088",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 300.25058,
+              "p84": 319.78366
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": 3.2350173,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "34361129088",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.12045025
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 31,
+        "ruwe": 1.0578898,
+        "parallaxOverError": 26.857705152127124
+      }
+    },
+    {
+      "id": "gaia:DR3:3680787975936",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "3680787975936",
+        "evidence": {
+          "source": "gaia",
+          "row": "3680787975936",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "3680787975936",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.01912373732518,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "3680787975936",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.1632369297191619,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "3680787975936",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [],
+      "orbits": [],
+      "parallax": {
+        "status": "unknown",
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "3680787975936",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        }
+      },
+      "quality": {
+        "astrometricParamsSolved": 3,
+        "ruwe": null,
+        "parallaxOverError": null
+      }
+    },
+    {
+      "id": "gaia:DR3:38655544960",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "38655544960",
+        "evidence": {
+          "source": "gaia",
+          "row": "38655544960",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "38655544960",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.004978371745516,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "38655544960",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.019879675701858644,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "38655544960",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 314.09866,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "38655544960",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 312.24747,
+              "p84": 316.44965
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 313.4547,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "38655544960",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 311.59113,
+              "p84": 315.8233
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": 3.1391702,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "38655544960",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.022347411
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 31,
+        "ruwe": 1.012191,
+        "parallaxOverError": 140.47131455182884
+      }
+    },
+    {
+      "id": "gaia:DR3:4295806720",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "4295806720",
+        "evidence": {
+          "source": "gaia",
+          "row": "4295806720",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "4295806720",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 44.99615537864534,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "4295806720",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.005615226341865997,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "4295806720",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2530.1523,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "4295806720",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1989.7006,
+              "p84": 3381.6545
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2555.457,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "4295806720",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2213.3289,
+              "p84": 3038.3936
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": 0.35433057,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "4295806720",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.12266381
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 31,
+        "ruwe": 1.1429516,
+        "parallaxOverError": 2.888631699928447
+      }
+    },
+    {
+      "id": "gaia:DR3:4472832130942575872",
+      "kind": "star",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "4472832130942575872",
+        "evidence": {
+          "source": "gaia",
+          "row": "4472832130942575872",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "4472832130942575872",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 269.44850252543836,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "4472832130942575872",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 4.739420051112412,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "4472832130942575872",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 1.8281064,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "4472832130942575872",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1.8279749,
+              "p84": 1.8282253
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 1.8281,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "4472832130942575872",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1.8279696,
+              "p84": 1.8282255
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "classificationEvidence": {
+        "source": "gaia-nearby",
+        "row": "4472832130942575872",
+        "columns": [
+          "Gaia DR3 identifier in nearby-star comparison"
+        ],
+        "reference": null
+      },
+      "parallax": {
+        "status": "catalog",
+        "value": 546.97595,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "4472832130942575872",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.040116355
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 31,
+        "ruwe": 1.0848505,
+        "parallaxOverError": 13634.737004396336
+      }
+    },
+    {
+      "id": "gaia:DR3:5853498713190525696",
+      "kind": "star",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "5853498713190525696",
+        "evidence": {
+          "source": "gaia",
+          "row": "5853498713190525696",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "5853498713190525696",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 217.39232147200883,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "5853498713190525696",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": -62.67607511676666,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "5853498713190525696",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 1.3019114,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "5853498713190525696",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1.3018136,
+              "p84": 1.3020053
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 1.3019346,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "5853498713190525696",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1.3018495,
+              "p84": 1.3020064
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "classificationEvidence": {
+        "source": "gaia-nearby",
+        "row": "5853498713190525696",
+        "columns": [
+          "Gaia DR3 identifier in nearby-star comparison"
+        ],
+        "reference": null
+      },
+      "parallax": {
+        "status": "catalog",
+        "value": 768.0665,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "5853498713190525696",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.049872905
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 95,
+        "ruwe": 0.97145325,
+        "parallaxOverError": 15400.476471141996
+      }
+    },
+    {
+      "id": "gaia:DR3:762815470562110464",
+      "kind": "star",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "762815470562110464",
+        "evidence": {
+          "source": "gaia",
+          "row": "762815470562110464",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "762815470562110464",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 165.83095967577933,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "762815470562110464",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 35.948653032660104,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "762815470562110464",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2.5459516,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "762815470562110464",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2.545706,
+              "p84": 2.546205
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2.545851,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "762815470562110464",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 2.5456924,
+              "p84": 2.546106
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "classificationEvidence": {
+        "source": "gaia-nearby",
+        "row": "762815470562110464",
+        "columns": [
+          "Gaia DR3 identifier in nearby-star comparison"
+        ],
+        "reference": null
+      },
+      "parallax": {
+        "status": "catalog",
+        "value": 392.75296,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "762815470562110464",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.03206665
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 95,
+        "ruwe": 0.9638494,
+        "parallaxOverError": 12248.019671527894
+      }
+    },
+    {
+      "id": "gaia:DR3:927713095040",
+      "kind": "source",
+      "identity": {
+        "catalog": "gaia",
+        "release": "DR3",
+        "id": "927713095040",
+        "evidence": {
+          "source": "gaia",
+          "row": "927713095040",
+          "columns": [
+            "source_id"
+          ],
+          "reference": null
+        }
+      },
+      "aliases": [],
+      "direction": {
+        "frame": "ICRS",
+        "role": "object",
+        "epoch": {
+          "system": "Julian-year-TCB",
+          "value": 2016,
+          "evidence": {
+            "source": "gaia",
+            "row": "927713095040",
+            "columns": [
+              "ref_epoch (release constant)"
+            ],
+            "reference": null
+          }
+        },
+        "ra": {
+          "status": "catalog",
+          "value": 45.02672698087207,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "927713095040",
+            "columns": [
+              "ra"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        },
+        "dec": {
+          "status": "catalog",
+          "value": 0.08169947826793385,
+          "unit": "deg",
+          "evidence": {
+            "source": "gaia",
+            "row": "927713095040",
+            "columns": [
+              "dec"
+            ],
+            "reference": null
+          },
+          "uncertainty": null,
+          "limit": null
+        }
+      },
+      "distances": [
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "geometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 2507.6306,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "927713095040",
+              "columns": [
+                "r_med_geo",
+                "r_lo_geo",
+                "r_hi_geo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1645.8883,
+              "p84": 4422.298
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 geometric"
+          }
+        },
+        {
+          "kind": "stellar-line-of-sight",
+          "method": "photogeometric",
+          "origin": "solar-system-barycenter",
+          "measurement": {
+            "status": "derived",
+            "value": 1666.9054,
+            "unit": "pc",
+            "evidence": {
+              "source": "bailer-jones",
+              "row": "927713095040",
+              "columns": [
+                "r_med_photogeo",
+                "r_lo_photogeo",
+                "r_hi_photogeo"
+              ],
+              "reference": "https://doi.org/10.3847/1538-3881/abd806"
+            },
+            "uncertainty": {
+              "kind": "quantiles",
+              "p16": 1457.9774,
+              "p84": 1936.1094
+            },
+            "limit": null,
+            "model": "Bailer-Jones et al. 2021 photogeometric"
+          }
+        }
+      ],
+      "orbits": [],
+      "parallax": {
+        "status": "catalog",
+        "value": -0.12272832,
+        "unit": "mas",
+        "evidence": {
+          "source": "gaia",
+          "row": "927713095040",
+          "columns": [
+            "parallax",
+            "parallax_error"
+          ],
+          "reference": null
+        },
+        "uncertainty": {
+          "kind": "sigma",
+          "sigma": 0.36876312
+        },
+        "limit": null
+      },
+      "quality": {
+        "astrometricParamsSolved": 95,
+        "ruwe": 1.0942938,
+        "parallaxOverError": -0.33281072141921353
+      }
+    },
+    {
+      "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:51%20Peg%20b",
+      "kind": "exoplanet",
+      "identity": {
+        "catalog": "oec",
+        "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+        "id": "51 Peg b",
+        "evidence": {
+          "source": "oec",
+          "row": "systems/51 Peg.xml#51 Peg b",
+          "columns": [
+            "planet/name"
+          ],
+          "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+        }
+      },
+      "aliases": [
+        {
+          "name": "Bellerophon",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "TYC 1717-2193-1 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "Helvetios b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "GJ 882 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "Gaia DR2 2835207319109249920 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "HIP 113357 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        },
+        {
+          "name": "HD 217014 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+          }
+        }
+      ],
+      "direction": null,
+      "distances": [],
+      "orbits": [
+        {
+          "solution": {
+            "source": "oec",
+            "row": "systems/51 Peg.xml#51 Peg b",
+            "columns": [
+              "planet"
+            ],
+            "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40",
+            "kind": "undetermined"
+          },
+          "center": null,
+          "frame": null,
+          "elements": {
+            "period": {
+              "status": "catalog",
+              "value": 4.231,
+              "unit": "d",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/period",
+                  "planet/period/@errorminus",
+                  "planet/period/@errorplus"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": null,
+              "limit": null
+            },
+            "semimajorAxis": {
+              "status": "catalog",
+              "value": 0.052,
+              "unit": "AU",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/semimajoraxis",
+                  "planet/semimajoraxis/@errorminus",
+                  "planet/semimajoraxis/@errorplus"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": null,
+              "limit": null
+            },
+            "eccentricity": {
+              "status": "catalog",
+              "value": 0,
+              "unit": "1",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/eccentricity",
+                  "planet/eccentricity/@errorminus",
+                  "planet/eccentricity/@errorplus"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": null,
+              "limit": null
+            },
+            "inclination": {
+              "status": "catalog",
+              "value": 80,
+              "unit": "deg",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/inclination",
+                  "planet/inclination/@errorminus",
+                  "planet/inclination/@errorplus"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 19,
+                "plus": 10
+              },
+              "limit": null
+            },
+            "argumentOfPeriapsis": {
+              "status": "catalog",
+              "value": 0,
+              "unit": "deg",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/periastron",
+                  "planet/periastron/@errorminus",
+                  "planet/periastron/@errorplus"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": null,
+              "limit": null
+            }
+          },
+          "phase": {
+            "kind": "periastron",
+            "timeSystem": "BJD",
+            "epoch": {
+              "status": "catalog",
+              "value": 2456021.256,
+              "unit": "d",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/51 Peg.xml#51 Peg b",
+                "columns": [
+                  "planet/periastrontime",
+                  "planet/periastrontime/@unit"
+                ],
+                "reference": "442932a7ec7f4d09522b8e8341b22cb6584e6f40"
+              },
+              "uncertainty": null,
+              "limit": null
+            }
+          },
+          "capability": "schematic-phase"
+        }
+      ]
+    },
+    {
+      "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:HR%208799%20b",
+      "kind": "exoplanet",
+      "identity": {
+        "catalog": "oec",
+        "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+        "id": "HR 8799 b",
+        "evidence": {
+          "source": "oec",
+          "row": "systems/HR 8799.xml#HR 8799 b",
+          "columns": [
+            "planet/name"
+          ],
+          "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+        }
+      },
+      "aliases": [
+        {
+          "name": "HD 218396 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          }
+        },
+        {
+          "name": "Gaia DR2 2832463659640297472 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          }
+        },
+        {
+          "name": "TYC 1718-2350-1 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          }
+        },
+        {
+          "name": "HIP 114189 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+          }
+        }
+      ],
+      "direction": null,
+      "distances": [],
+      "orbits": [
+        {
+          "solution": {
+            "source": "oec",
+            "row": "systems/HR 8799.xml#HR 8799 b",
+            "columns": [
+              "planet"
+            ],
+            "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751",
+            "kind": "undetermined"
+          },
+          "center": null,
+          "frame": null,
+          "elements": {
+            "period": {
+              "status": "catalog",
+              "value": 166510,
+              "unit": "d",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/HR 8799.xml#HR 8799 b",
+                "columns": [
+                  "planet/period",
+                  "planet/period/@errorminus",
+                  "planet/period/@errorplus"
+                ],
+                "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 9022,
+                "plus": 9022
+              },
+              "limit": null
+            },
+            "semimajorAxis": {
+              "status": "catalog",
+              "value": 67.96,
+              "unit": "AU",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/HR 8799.xml#HR 8799 b",
+                "columns": [
+                  "planet/semimajoraxis",
+                  "planet/semimajoraxis/@errorminus",
+                  "planet/semimajoraxis/@errorplus"
+                ],
+                "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 1.85,
+                "plus": 1.85
+              },
+              "limit": null
+            },
+            "eccentricity": {
+              "status": "catalog",
+              "value": 0,
+              "unit": "1",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/HR 8799.xml#HR 8799 b",
+                "columns": [
+                  "planet/eccentricity",
+                  "planet/eccentricity/@errorminus",
+                  "planet/eccentricity/@errorplus"
+                ],
+                "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+              },
+              "uncertainty": null,
+              "limit": null
+            },
+            "inclination": {
+              "status": "catalog",
+              "value": 30.27,
+              "unit": "deg",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/HR 8799.xml#HR 8799 b",
+                "columns": [
+                  "planet/inclination",
+                  "planet/inclination/@errorminus",
+                  "planet/inclination/@errorplus"
+                ],
+                "reference": "3f6378b7d0763e1c4a1296ef726658c7eb194751"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 4.95,
+                "plus": 4.95
+              },
+              "limit": null
+            }
+          },
+          "phase": null,
+          "capability": "schematic-phase"
+        }
+      ]
+    },
+    {
+      "id": "oec:4a61419b92d4a57366b111b2d11d0a03eb0b5df0:TRAPPIST-1%20b",
+      "kind": "exoplanet",
+      "identity": {
+        "catalog": "oec",
+        "release": "4a61419b92d4a57366b111b2d11d0a03eb0b5df0",
+        "id": "TRAPPIST-1 b",
+        "evidence": {
+          "source": "oec",
+          "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+          "columns": [
+            "planet/name"
+          ],
+          "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+        }
+      },
+      "aliases": [
+        {
+          "name": "2MASS J23062928-0502285 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          }
+        },
+        {
+          "name": "K2-112 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          }
+        },
+        {
+          "name": "EPIC 246199087 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          }
+        },
+        {
+          "name": "Gaia DR2 2635476908753563008 b",
+          "relation": "catalog",
+          "evidence": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet/name"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+          }
+        }
+      ],
+      "direction": null,
+      "distances": [],
+      "orbits": [
+        {
+          "solution": {
+            "source": "oec",
+            "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+            "columns": [
+              "planet"
+            ],
+            "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0",
+            "kind": "undetermined"
+          },
+          "center": null,
+          "frame": null,
+          "elements": {
+            "period": {
+              "status": "catalog",
+              "value": 1.5108739,
+              "unit": "d",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/period",
+                  "planet/period/@errorminus",
+                  "planet/period/@errorplus"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 0.0000075,
+                "plus": 0.0000075
+              },
+              "limit": null
+            },
+            "semimajorAxis": {
+              "status": "catalog",
+              "value": 0.01154775,
+              "unit": "AU",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/semimajoraxis",
+                  "planet/semimajoraxis/@errorminus",
+                  "planet/semimajoraxis/@errorplus"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 5.7e-8,
+                "plus": 5.7e-8
+              },
+              "limit": null
+            },
+            "eccentricity": {
+              "status": "catalog",
+              "value": 0.00622,
+              "unit": "1",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/eccentricity",
+                  "planet/eccentricity/@errorminus",
+                  "planet/eccentricity/@errorplus"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 0.00304,
+                "plus": 0.00304
+              },
+              "limit": null
+            },
+            "inclination": {
+              "status": "catalog",
+              "value": 89.65,
+              "unit": "deg",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/inclination",
+                  "planet/inclination/@errorminus",
+                  "planet/inclination/@errorplus"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 0.27,
+                "plus": 0.22
+              },
+              "limit": null
+            },
+            "argumentOfPeriapsis": {
+              "status": "catalog",
+              "value": 336.86,
+              "unit": "deg",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/periastron",
+                  "planet/periastron/@errorminus",
+                  "planet/periastron/@errorplus"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 34.24,
+                "plus": 34.24
+              },
+              "limit": null
+            }
+          },
+          "phase": {
+            "kind": "transit",
+            "timeSystem": null,
+            "epoch": {
+              "status": "catalog",
+              "value": 2457606.56117,
+              "unit": "d",
+              "evidence": {
+                "source": "oec",
+                "row": "systems/TRAPPIST-1.xml#TRAPPIST-1 b",
+                "columns": [
+                  "planet/transittime",
+                  "planet/transittime/@unit"
+                ],
+                "reference": "3c73bdeca3b237ab8411a406d1b5c70429b372d0"
+              },
+              "uncertainty": {
+                "kind": "asymmetric",
+                "minus": 0.00058,
+                "plus": 0.00058
+              },
+              "limit": null
+            }
+          },
+          "capability": "schematic-phase"
+        }
+      ]
+    }
+  ]
+}

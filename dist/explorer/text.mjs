@@ -1,0 +1,96 @@
+export const text = {
+  subtitle: ['First Light · 22 reale Katalogeinträge', 'First Light · 22 real catalogue entries'],
+  intro: ['Ein kleiner Ausschnitt des vermessenen Himmels. Wähle eine Quelle und folge ihren Messwerten.', 'A small sample of the measured sky. Choose a source and follow its measurements.'],
+  map: ['Himmelskarte', 'Sky map'],
+  projection: ['Flächentreue Zylinderprojektion · RA / sin(Dec)', 'Equal-area cylindrical projection · RA / sin(Dec)'],
+  limits: ['RA 0–360° · Dec −90–+90°. Formen und Abstände sind verzerrt, besonders an den Polen. Der Maßstab zeigt die RA-Differenz am Äquator.', 'RA 0–360° · Dec −90–+90°. Shapes and distances are distorted, especially at the poles. The scale shows RA difference at the equator.'],
+  fixed: ['Gaia DR3 · J2016.0. DESI · mittlere Faserrichtung. Feste Katalogrichtungen, keine Eigenbewegungsfortschreibung.', 'Gaia DR3 · J2016.0. DESI · mean fibre direction. Fixed catalogue directions, without proper-motion propagation.'],
+  coverage: ['Ausgewählte Quellen · Himmelsabdeckung unbekannt', 'Selected sources · sky coverage unknown'],
+  empty: ['Keine Quelle dieser Probe im Ausschnitt. Die Himmelsabdeckung ist unbekannt.', 'No source from this sample in view. Sky coverage is unknown.'],
+  emptySearch: ['Kein Treffer in dieser Datenprobe.', 'No match in this data sample.'],
+  loading: ['Katalog wird geprüft …', 'Checking catalogue …'],
+  loadingSky: ['Himmelsdaten werden geladen …', 'Loading sky data …'],
+  loadingSearch: ['Suche läuft …', 'Searching …'],
+  error: ['Daten konnten nicht geladen oder verifiziert werden.', 'Data could not be loaded or verified.'],
+  retry: ['Erneut laden', 'Retry loading'],
+  search: ['Name, Alias oder Katalog-ID', 'Name, alias or catalogue ID'],
+  searchHint: ['Präfixsuche, z. B. TRAPPIST, Bellerophon oder Gaia', 'Prefix search, e.g. TRAPPIST, Bellerophon or Gaia'],
+  sources: ['Quellen auswählen', 'Select sources'],
+  star: ['Stern', 'Star'],
+  source: ['Gaia-Quelle · unklassifiziert', 'Gaia source · unclassified'],
+  galaxy: ['Galaxie', 'Galaxy'],
+  exoplanet: ['Exoplanet', 'Exoplanet'],
+  noDirection: ['Himmelsrichtung unbekannt', 'Sky direction unknown'],
+  noDistance: ['Entfernung unbekannt', 'Distance unknown'],
+  choose: ['Eine Quelle auswählen', 'Choose a source'],
+  chooseHint: ['Klicke auf einen Marker oder wähle ein Objekt aus der Liste. Gruppen zeigen die Anzahl überlagerter Quellen.', 'Click a marker or select an object from the list. Groups show the number of overlapping sources.'],
+  inspector: ['Objektdaten', 'Object details'],
+  center: ['Auswahl zentrieren', 'Center selection'],
+  fit: ['Gesamter Himmel', 'All sky'],
+  zoomIn: ['Hineinzoomen', 'Zoom in'],
+  zoomOut: ['Herauszoomen', 'Zoom out'],
+  zoom: ['Zoom · logarithmisch', 'Zoom · logarithmic'],
+  camera: ['Kartensteuerung', 'Map controls'],
+  help: ['Ziehen verschiebt die Karte. Zum Rad-Zoom die Karte zuerst anklicken. Pinch mit zwei Fingern. Tastatur auf der Karte: Pfeile verschieben, +/− zoomen, Home zeigt alles, Escape gibt das Scrollen frei. Die Liste bietet dieselbe Objektauswahl.', 'Drag to pan. Click the map first to enable wheel zoom. Pinch with two fingers. With the map focused: arrows pan, +/− zoom, Home shows all, Escape releases scrolling. The list offers the same object selection.'],
+  direction: ['Himmelsrichtung', 'Sky direction'],
+  distance: ['Entfernungsschätzungen', 'Distance estimates'],
+  parallax: ['Parallaxe', 'Parallax'],
+  redshift: ['Spektroskopische Rotverschiebung', 'Spectroscopic redshift'],
+  unknown: ['unbekannt', 'unknown'],
+  uncertainty: ['Unsicherheit unbekannt', 'Uncertainty unknown'],
+  minusUnknown: ['negative Fehlerseite unbekannt', 'negative error unknown'],
+  plusUnknown: ['positive Fehlerseite unbekannt', 'positive error unknown'],
+  upper: ['Obergrenze', 'Upper limit'],
+  lower: ['Untergrenze', 'Lower limit'],
+  catalog: ['Katalogwert', 'Catalogue value'],
+  derived: ['Modellabhängige Schätzung', 'Model-dependent estimate'],
+  schematic: ['Schematisch', 'Schematic'],
+  quantiles: ['16.–84. Perzentil', '16th–84th percentile'],
+  reference: ['Referenz', 'Reference'],
+  field: ['Originalfelder', 'Original fields'],
+  row: ['Quellzeile', 'Source row'],
+  release: ['Katalogstand', 'Catalogue release'],
+  provenance: ['Herkunft & Messverfahren', 'Provenance & method'],
+  aliases: ['Weitere Namen', 'Other names'],
+  quality: ['Qualitätsangaben', 'Quality metadata'],
+  orbit: ['Publizierte Bahnparameter', 'Published orbital parameters'],
+  orbitNote: ['Dieser Parametersatz reicht für keine zeitlich bestimmte Himmelsbahn. Die Karte ergänzt keine fehlende Richtung.', 'These parameters do not qualify a time-dependent sky orbit. The map supplies no missing direction.'],
+  period: ['Periode', 'Period'],
+  semimajorAxis: ['Große Halbachse', 'Semi-major axis'],
+  eccentricity: ['Exzentrizität', 'Eccentricity'],
+  inclination: ['Neigung', 'Inclination'],
+  argumentOfPeriapsis: ['Periapsisargument', 'Argument of periapsis'],
+  ascendingNode: ['Aufsteigender Knoten', 'Ascending node'],
+  phase: ['Phasenepoche', 'Phase epoch'],
+  noPosition: ['Für dieses Objekt ist keine Himmelsposition in der Probe hinterlegt.', 'This sample provides no sky position for this object.'],
+  sample: ['Datenprobe & Quellen', 'Data sample & credits'],
+  sampleNote: ['22 selektierte Einträge, davon 19 mit Richtung und 12 ohne Entfernung. Leere Kartenflächen sind kein Nachweis eines leeren Himmels. Symbolgrößen und Farben kennzeichnen Auswahl und Objektart.', '22 selected entries, including 19 with directions and 12 without distances. Empty map areas do not establish an empty sky. Symbol sizes and colours encode selection and object type.'],
+  credits: ['Credits und Lizenzen', 'Credits and licences'],
+  manifest: ['Datenmanifest', 'Data manifest'],
+  north: ['Nordpol +90°', 'North pole +90°'],
+  south: ['Südpol −90°', 'South pole −90°'],
+  group: ['Quellengruppe', 'Source group'],
+  visible: ['Quellen im Ausschnitt', 'sources in view'],
+  results: ['Treffer', 'matches'],
+  oneResult: ['Treffer', 'match'],
+  geometric: ['Geometrisch', 'Geometric'],
+  photogeometric: ['Photogeometrisch', 'Photogeometric'],
+  frame: ['Bezugssystem', 'Reference frame'],
+  epoch: ['Astrometrische Epoche', 'Astrometric epoch'],
+};
+export const translate = (key, language = 'de') => text[key]?.[language === 'en' ? 1 : 0] ?? key;
+const formatters = ['de-DE', 'en-GB'].map(locale => new Intl.NumberFormat(locale, {maximumSignificantDigits: 12}));
+export const number = (value, language = 'de') => formatters[language === 'en' ? 1 : 0].format(value);
+export function measurement(q, language = 'de') {
+  const t = key => translate(key, language), n = x => number(x, language);
+  if (!q || q.status === 'unknown') return t('unknown');
+  const main = `${q.limit ? t(q.limit) + ' ' : ''}${n(q.value)} ${q.unit}`;
+  const u = q.uncertainty;
+  if (!u) return `${main} · ${q.limit ? t('catalog') : t('uncertainty')}`;
+  if (u.kind === 'sigma') return `${main} · σ ${n(u.sigma)} ${q.unit}`;
+  if (u.kind === 'quantiles') return `${main} · ${t('quantiles')} [${n(u.p16)}, ${n(u.p84)}] ${q.unit}`;
+  return `${main} · ${u.minus === null ? t('minusUnknown') : '−' + n(u.minus)} / ${u.plus === null ? t('plusUnknown') : '+' + n(u.plus)} ${q.unit}`;
+}
+export function objectName(object) {
+  return object.identity.catalog === 'gaia' ? `Gaia DR3 ${object.identity.id}` : object.aliases[0]?.name && object.kind === 'galaxy' ? object.aliases[0].name : object.identity.id;
+}

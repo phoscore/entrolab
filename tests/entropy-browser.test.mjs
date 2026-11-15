@@ -89,6 +89,7 @@ test('review P2 browser: context return/Escape and lab navigation preserve visib
     if(target==='blackhole')await p.screenshot({path:resolve(output,'review-context-focus-'+width+'.png')});
    }
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'matter');
+   await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'explorer');
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');
    assert.deepEqual(await reviewModel(p),before);
    const lastId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('review sentinel','planet',1,0,0,0,0,'white').id});assert.equal(lastId,firstId+1);
