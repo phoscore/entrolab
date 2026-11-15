@@ -54,7 +54,7 @@ export function paintDesiPoints(ctx,tiles,frame,filter) {
   const grid = 6, pitch = Math.ceil(width/grid);
   const slots = new Uint8Array(pitch*Math.ceil(height/grid));
   const markers = [];
-  let visible = 0;
+  let total = 0, selected = 0;
   ctx.strokeStyle = '#ffd39e';
   ctx.lineWidth = 1.25;
   ctx.beginPath();
@@ -62,8 +62,10 @@ export function paintDesiPoints(ctx,tiles,frame,filter) {
     for (let i=0;i<rows.length;i++) {
       const x = left+(u+span*xy[2*i])*(right-left);
       const y = bottom-(v+span*xy[2*i+1])*(bottom-top);
-      if (x<0 || x>=width || y<0 || y>=height || !desiFilter(flags[i],filter)) continue;
-      visible++;
+      if (x<0 || x>=width || y<0 || y>=height) continue;
+      total++;
+      if (!desiFilter(flags[i],filter)) continue;
+      selected++;
       const key = Math.floor(y/grid)*pitch+Math.floor(x/grid);
       if (slots[key]) continue;
       slots[key] = 1;
@@ -72,7 +74,7 @@ export function paintDesiPoints(ctx,tiles,frame,filter) {
     }
   }
   ctx.stroke();
-  return {markers,visible};
+  return {markers,total,selected};
 }
 
 export function paintDesiSelection(ctx,detail,frame,project) {

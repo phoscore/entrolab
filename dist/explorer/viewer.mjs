@@ -487,7 +487,13 @@ export function mountExplorer(root) {
     setCamera(next) {camera=next;changed();},
     fit, exit:()=>$('exHome').focus(),
     tap(x,y) {
-      const hit = hitGroup(groups,x,y);
+      const hit = hitGroup(groups,x,y), bounds=atlasFrame(), galaxy=desi.hit(x,y,bounds);
+      const picked=(!hit||galaxy?.ref)?atlas.hit(x,y,bounds):null;
+      const distance = marker => (marker.x-x)**2+(marker.y-y)**2;
+      if (galaxy?.ref && (!hit || distance(galaxy.ref)<distance(hit)) &&
+        (!picked?.ref || distance(galaxy.ref)<=distance(picked.ref))) {
+        selectDesi(galaxy.ref);return;
+      }
       if (hit?.objects.length === 1) select(hit.objects[0]);
       else if (hit) {
         const center = worldPoint([hit.x,hit.y],camera,width,height);
@@ -496,10 +502,7 @@ export function mountExplorer(root) {
         results = hit.objects; $('exSearch').value = '';atlas.search('');desi.search('');showList(); changed();
         $('exAnnouncement').textContent = `${t('group')} · ${hit.objects.length}`;
       } else {
-        const frame=atlasFrame(), galaxy=desi.hit(x,y,frame), picked=atlas.hit(x,y,frame);
-        const distance = ref => Math.hypot(ref.x-x,ref.y-y);
-        if (galaxy?.ref && (!picked?.ref || distance(galaxy.ref)<=distance(picked.ref))) selectDesi(galaxy.ref);
-        else if (picked?.ref) selectAtlas(picked.ref);
+        if (picked?.ref) selectAtlas(picked.ref);
         else if (picked?.zoom || galaxy?.zoom) {
           const [ra,dec]=worldPoint([x,y],camera,width,height);
           camera={x:Math.max(0,Math.min(360,ra)),y:Math.max(0,Math.min(180,dec)),zoom:Math.min(MAX_ZOOM,Math.max(.92,camera.zoom+.45))};

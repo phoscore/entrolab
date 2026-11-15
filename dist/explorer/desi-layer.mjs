@@ -60,7 +60,8 @@ export function mountDesi(root,{listen,t,n,invalidate,project,onSelect,onInspect
     const f = filter();
     const title = manifest ? `${n(manifest.counts.sources)} ${t('desiTotal')}` : '';
     const chosen = manifest && f !== 'all' ? ` · ${n(manifest.counts[f])} ${t('atlasSelected')}` : '';
-    const shown = counts ? status==='points' ? ` · ${n(drawn)} ${t('atlasDrawn')}` : ` · ${n(counts.selected)} ${t('desiCellCount')}` : '';
+    const shown = counts ? status==='points' ? ` · ${n(counts.selected)} ${t('atlasVisible')} · ${n(drawn)} ${t('atlasDrawn')}` :
+      ` · ${n(counts.selected)} ${t('desiCellCount')}` : '';
     setText($('exDesiCounts'),title+chosen+shown);
     setText($('exDesiStatus'),statusText());
     retry.hidden = status!=='error' && searchState!=='error' && selection?.state!=='error';
@@ -194,7 +195,9 @@ export function mountDesi(root,{listen,t,n,invalidate,project,onSelect,onInspect
     if (grid && view) {
       counts=viewDesiCounts(grid,view.viewport,filter());
       if (status==='points') {
-        ({markers}=paintDesiPoints(ctx,tiles,frame,filter()));
+        const points=paintDesiPoints(ctx,tiles,frame,filter());
+        markers=points.markers;
+        counts={covered:counts.covered,total:points.total,selected:points.selected};
         drawn=markers.length;
       } else if (status!=='error') {
         ctx.imageSmoothingEnabled=false;

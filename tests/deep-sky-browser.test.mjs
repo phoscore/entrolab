@@ -7,7 +7,9 @@ import {readDesiSource} from '../cosmic-explorer/desi-build.mjs';
 import {DESI_RELEASE,DESI_COUNT} from '../dist/explorer/foundation/desi-format.mjs';
 
 const {rows}=await readDesiSource();
-const sample=rows.filter(row=>row.ra>167&&row.ra<204&&row.dec>0&&row.dec<30&&row.z<.012)[40];
+const sample=rows.filter(row=>row.ra>167&&row.ra<204&&row.dec>0&&row.dec<30&&row.z<.012).slice(40)
+  .find(row=>Math.abs((row.ra/360*128)%1-.5)<.4 &&
+    !rows.some(other=>other!==row&&Math.abs(other.ra-row.ra)<.02&&Math.abs(other.dec-row.dec)<.02));
 const atlasPath=new RegExp('/'+DESI_RELEASE.replaceAll('.','\\.')+'/');
 let harness;
 test.before(async()=>{harness=await browserHarness();});
@@ -58,8 +60,36 @@ test('Deep Sky cold start, keyboard selection, DESI measurements, filter and Fir
     await p.locator('#exCanvas').scrollIntoViewIfNeeded();
     await p.waitForFunction(()=>window.entrolabExplorer.inspect().desi.status==='points');
     await p.locator('#exSkyPanel').screenshot({path:join(harness.output,'deep-sky-inspector.png')});
+    await p.locator('#exCanvas').scrollIntoViewIfNeeded();
+    await p.locator('#exZoom').evaluate(el=>{el.value='5';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    await p.waitForFunction(()=>window.entrolabExplorer.inspect().desi.counts?.selected===1);
+    const box=await p.locator('#exCanvas').boundingBox();
+    await p.mouse.move(box.x+box.width*.2,box.y+box.height*.42);
+    await p.mouse.down();
+    await p.mouse.move(box.x+box.width*.85,box.y+box.height*.42,{steps:8});
+    await p.mouse.up();
+    await p.waitForFunction(()=>window.entrolabExplorer.inspect().desi.counts?.selected===0);
+    assert.doesNotMatch(await p.locator('#exDesiStatus').innerText(),/Rauten oder Liste wählen/);
     await p.locator('#exDesiFilter').selectOption('high');
     await p.waitForFunction(()=>!window.entrolabExplorer.inspect().desi.selected);
+    await p.locator('#exDesiFilter').selectOption('all');
+    const adjacent=rows.find(row=>row.id==='39627791523646374');
+    await choose(p,adjacent);
+    await p.locator('#exCanvas').scrollIntoViewIfNeeded();
+    await p.locator('#exZoom').evaluate(el=>{el.value='2.2';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    await p.locator('#exSearch').fill('');
+    await p.locator('#exDesiFilter').selectOption(adjacent.z<.012?'high':'low');
+    await p.locator('#exDesiFilter').selectOption('all');
+    await p.locator('#exCanvas').scrollIntoViewIfNeeded();
+    const overlap=await p.waitForFunction(id=>{
+      const view=window.entrolabExplorer.inspect();
+      const point=view.desi.sample.find(row=>row.id===id);
+      const first=view.groups.find(group=>group.ids.some(key=>key.includes('2821794351744')));
+      return point&&first&&Math.hypot(point.x-first.x,point.y-first.y)<16 ? point : false;
+    },adjacent.id);
+    const hit=await overlap.jsonValue();
+    await p.locator('#exCanvas').click({position:{x:hit.x,y:hit.y}});
+    await p.waitForFunction(id=>window.entrolabExplorer.inspect().desi.selected===id,adjacent.id);
     await p.locator('#exDesiEnabled').uncheck();
     await p.locator('#exSearch').fill('');
     await p.locator('#exList button').first().click();
