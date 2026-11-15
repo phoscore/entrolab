@@ -2,9 +2,9 @@ name: DESI DR1 acquisition
 on:
   push:
     branches: [feature/v0.9.5-explorer-deep-sky-2cb]
-    paths: ['.github/workflows/desi-acquisition.yml', 'scripts/fetch-deep-sky.py', 'cosmic-explorer/deep-sky/**']
+    paths: ['.github/workflows/desi-acquisition.yml', 'scripts/fetch-deep-sky.py']
 permissions:
-  contents: read
+  contents: write
 jobs:
   source:
     runs-on: ubuntu-latest
@@ -59,3 +59,13 @@ jobs:
           name: desi-deep-sky-capture
           path: deep-sky-capture
           if-no-files-found: error
+      - name: Preserve the verified frozen input on the feature branch
+        if: ${{ hashFiles('scripts/fetch-deep-sky.py') != '' }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/feature/v0.9.5-explorer-deep-sky-2cb
+          test ! -d cosmic-explorer/deep-sky/source
+          mkdir -p cosmic-explorer/deep-sky
+          mv deep-sky-capture cosmic-explorer/deep-sky/source
+          git add cosmic-explorer/deep-sky/source
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m '[CF-Pages-Skip] data(explorer): freeze verified DESI DR1 acquisition'
+          git push origin "HEAD:$GITHUB_REF"
