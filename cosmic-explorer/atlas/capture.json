@@ -1,0 +1,19 @@
+{
+  "source": "ESA Gaia DR3 / gaiadr3.gaia_source",
+  "mirror": "GAVO Data Center / gaia.dr3lite",
+  "endpoint": "https://dc.g-vo.org/tap/sync",
+  "capturedAt": "2026-11-15T03:53:36Z",
+  "sha256": "8e2dc5ee13af9f06e736e07f476bc2a15176b254d0ccc26d5d9e259c43d899da",
+  "bytes": 6321087,
+  "brightCountBeforePositionAndMaskFilter": 50635,
+  "rows": 50635,
+  "solutionCounts": {"3": 779, "31": 46968, "95": 2888},
+  "query": "gaia-dr3-g78.adql",
+  "esa": {
+    "endpoint": "https://gea.esac.esa.int/tap-server/tap/sync",
+    "table": "gaiadr3.gaia_source",
+    "queriedAt": "2026-11-15T03:54:44Z",
+    "rows": 62,
+    "sha256": "64d0dc2ed28ce2bfb95b3a364bfe8710cf6415819048930e199f61251f8dabf1"
+  }
+}
