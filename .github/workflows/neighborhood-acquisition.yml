@@ -1,0 +1,75 @@
+name: Stellar Neighborhood acquisition
+on:
+  push:
+    branches: [feature/v0.9.5-explorer-stellar-neighborhood]
+    paths: ['.github/workflows/neighborhood-acquisition.yml']
+permissions:
+  contents: read
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Check catalogue endpoints, rights and bounded pilot sizes
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, csv, io
+          from urllib.request import urlopen, Request
+          from urllib.parse import urlencode
+          
+          GAVO = 'https://dc.g-vo.org/tap/sync'
+          VIZIER = 'https://tapvizier.cds.unistra.fr/TAPVizieR/tap/sync'
+          AIP = 'https://gaia.aip.de/tap/sync'
+          QUALITY = """ra>=0 AND ra<360 AND dec BETWEEN -90 AND 90
+              AND astrometric_params_solved IN (31,95) AND visibility_periods_used>=10
+              AND ruwe>0 AND ruwe<1.4 AND parallax>=5 AND parallax_error>0
+              AND parallax>=10*parallax_error AND r_lo_geo>0 AND r_lo_geo<=r_med_geo
+              AND r_med_geo<=r_hi_geo AND r_hi_geo-r_lo_geo<=0.2*r_med_geo"""
+          FIELDS = 'source_id,ra,dec,parallax,parallax_error,phot_g_mean_mag,ruwe,astrometric_params_solved,visibility_periods_used,r_lo_geo,r_med_geo,r_hi_geo'
+          TEST_ID = '762815470562110464'
+          
+          def tap(endpoint, sql, limit=500):
+              payload = urlencode({'QUERY': sql, 'LANG': 'ADQL', 'REQUEST': 'doQuery',
+                                   'FORMAT': 'csv', 'MAXREC': str(limit)}).encode()
+              return Request(endpoint, data=payload)
+          
+          def inspect(item):
+              name, req, markers = item
+              try:
+                  req.add_header('User-Agent', 'entrolab public stellar-neighborhood data preflight')
+                  with urlopen(req, timeout=100 if markers is None else 20) as response:
+                      raw = response.read(256000)
+                      if markers is not None:
+                          body = raw.decode('utf8','replace')
+                          out = [m in body for m in markers]
+                      else:
+                          data = list(csv.reader(io.StringIO(raw.decode('utf8'))))
+                          out = [len(raw), len(data)-1, data[0] if data else None, data[1] if len(data)>1 else None]
+                      return name, response.status, out
+              except Exception as error:
+                  return name, type(error).__name__, str(error), getattr(error,'read',lambda n:b'')(450).decode('utf8','replace')
+          
+          def count(radius, g):
+              return tap(GAVO,f'SELECT COUNT(*) AS n FROM gedr3dist.litewithdist WHERE {QUALITY} AND r_med_geo<={radius} AND phot_g_mean_mag<={g}', 1)
+          
+          queries = [
+              ('pilot10pc',tap(GAVO,f'SELECT {FIELDS} FROM gedr3dist.litewithdist WHERE {QUALITY} AND r_med_geo<=10 AND phot_g_mean_mag<=14 ORDER BY source_id'), None),
+              ('count50pc-G12.5',count(50,12.5),None),
+              ('count50pc-G14',count(50,14),None),
+              ('count50pc-G16',count(50,16),None),
+              ('count100pc-G14',count(100,14),None),
+          ]
+          references = [
+              ('vizier',tap(VIZIER,f'SELECT * FROM "I/352/gedr3dis" WHERE Source={TEST_ID}', 1),None),
+              ('aip',tap(AIP,f'SELECT source_id,ra,dec,ref_epoch,parallax,parallax_error FROM gaiadr3.gaia_source WHERE source_id={TEST_ID}',1),None),
+              ('esa-license',Request('https://www.cosmos.esa.int/web/gaia-users/license'),['CC BY-NC 3.0 IGO']),
+              ('esa-terms',Request('https://www.cosmos.esa.int/web/esdc/terms-and-conditions'),['commercial use','CC BY-NC 3.0 IGO']),
+              ('gavo-distance-license',Request('https://dc.g-vo.org/gedr3dist/q/cone/info'),['Creative Commons Attribution 4.0']),
+          ]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+              futures = [pool.submit(inspect,item) for item in references]
+              for item in queries:
+                  print('NEIGHBORHOOD_PREFLIGHT',inspect(item),flush=True)
+              for work in futures:
+                  print('NEIGHBORHOOD_PREFLIGHT',work.result(),flush=True)
+          PY
