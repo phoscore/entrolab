@@ -105,16 +105,22 @@ def csv_dict(data):
 
 
 def tap_rows(endpoint, sql):
-    raw=read(request(endpoint,tap_args(sql,200),timeout=30),400_000)
+    raw=read(request(endpoint,tap_args(sql,200),timeout=18),400_000)
+    def normalize(name):
+        return name.strip().lower().rsplit(".",1)[-1].strip('"')
     if raw.lstrip().startswith(b"<"):
-        table=parse_single_table(io.BytesIO(raw)).to_table()
-        return [{k.lower(): v.item() if hasattr(v,"item") else v for k,v in zip(table.colnames,row)}
+        result=parse_single_table(io.BytesIO(raw))
+        fields=[normalize(field.name or field.ID) for field in result.fields]
+        table=result.to_table()
+        return [{k: v.item() if hasattr(v,"item") else v for k,v in zip(fields,row)}
                 for row in table]
     _, rows = csv_dict(raw)
-    return [{k.lower():v for k,v in row.items()} for row in rows]
+    return [{normalize(k):v for k,v in row.items()} for row in rows]
 
 
 def validate_ids(rows, source_ids):
+    if rows and "source_id" not in rows[0]:
+        raise ValueError(f"Unexpected reference column names: {tuple(rows[0])}")
     if len(rows)!=len(source_ids) or {str(r["source_id"]) for r in rows}!=set(source_ids):
         raise ValueError("Reference rows did not contain every requested source exactly once")
     return sorted(rows,key=lambda r:int(r["source_id"]))
@@ -136,7 +142,7 @@ def vizier_tsv(source_ids, host):
     query = urlencode({"-source":"I/352/gedr3dis","-out":",".join(columns),"-out.max":"200",
                        "Source":",".join(source_ids)})
     url=host+"?"+query
-    raw=read(request(url,timeout=30),400_000).decode("utf-8")
+    raw=read(request(url,timeout=12),400_000).decode("utf-8")
     lines=[line for line in raw.splitlines() if not line.startswith("#") and line.strip()]
     header=next(i for i,line in enumerate(lines) if line.split("\t")[0].strip()=="Source")
     names=[field.strip() for field in lines[header].split("\t")]
@@ -151,23 +157,17 @@ def vizier_tsv(source_ids, host):
 
 def get_distances(source_ids):
     where=" WHERE source_id IN ("+",".join(source_ids)+")"
-    sql="SELECT "+",".join(DISTANCE_COLUMNS)+" FROM external.gaiaedr3_distance"+where
-    for url in ("https://vizier.cds.unistra.fr/viz-bin/asu-tsv",VIZIER):
+    sql="SELECT "+",".join(DISTANCE_COLUMNS)+" FROM {catalog}"+where
+    for url in ("https://vizier.u-strasbg.fr/viz-bin/asu-tsv",VIZIER):
         try:
             return vizier_tsv(source_ids,url)
         except Exception as error:
-            print(f"Bailer-Jones reference {url}: {error}",flush=True)
-    try:
-        return validate_ids(tap_rows(ESA,sql),source_ids),{"url":ESA,"query":sql,"catalog":"external.gaiaedr3_distance"}
-    except Exception as error:
-        print(f"Bailer-Jones reference {ESA}: {error}",flush=True)
-    # A second independent distribution path with explicit ADQL column names.
-    sql = ('SELECT Source AS source_id, "b_rgeo" AS r_lo_geo, rgeo AS r_med_geo, '
-           '"B_rgeo" AS r_hi_geo FROM "I/352/gedr3dis" WHERE Source IN ('+",".join(source_ids)+")")
-    for url in ("https://tapvizier.cds.unistra.fr/TAPVizieR/tap/sync",
-                "https://tapvizier.u-strasbg.fr/TAPVizieR/tap/sync"):
+            print(f"Bailer-Jones reference {url}: {type(error).__name__} {error}",flush=True)
+    # Query the authors' published parent table directly by exact ID.
+    for url,catalog in ((ESA,"external.gaiaedr3_distance"),(GAVO+"sync","gedr3dist.main")):
         try:
-            return validate_ids(tap_rows(url,sql),source_ids),{"url":url,"query":sql,"catalog":"VizieR I/352"}
+            query=sql.format(catalog=catalog)
+            return validate_ids(tap_rows(url,query),source_ids),{"url":url,"query":query,"catalog":catalog}
         except Exception as error:
             print(f"Bailer-Jones reference {url}: {error}",flush=True)
     raise RuntimeError("No complete independent Bailer-Jones distance snapshot")
@@ -204,16 +204,17 @@ def run(output,radius,max_g):
     limits = {"row_cap": MAX_ROWS+1, "byte_cap": 8*1024**2}
     def get(sql):
         try:
-            return read(request(GAVO+"sync",tap_args(sql,limits["row_cap"])),limits["byte_cap"])
+            return read(request(GAVO+"sync",tap_args(sql,limits["row_cap"])),limits["byte_cap"]),GAVO+"sync"
         except Exception as error:
             print(f"GAVO synchronous request failed: {error}",flush=True)
             if radius<=10:
                 raise
-            return gavo_async(sql,**limits)
-    raw=get(select)
+            return gavo_async(sql,**limits),GAVO+"async"
+    raw,endpoint=get(select)
+    id_check,id_endpoint=get(count_sql)
     cols,rows=csv_dict(raw)
     ids=[int(r["source_id"]) for r in rows]
-    check_ids=[int(r["source_id"]) for r in csv_dict(get(count_sql))[1]]
+    check_ids=[int(r["source_id"]) for r in csv_dict(id_check)[1]]
     expected=len(check_ids)
     if check_ids!=ids:
         raise ValueError("The independent identifier export disagrees with the full export")
@@ -238,8 +239,8 @@ def run(output,radius,max_g):
     save(output/"gaia-reference.csv",g,GAIA_COLUMNS)
     save(output/"distance-reference.csv",d,DISTANCE_COLUMNS)
     (output/"galactic-reference.json").write_text(json.dumps(vectors,indent=2)+"\n",encoding="utf8",newline="\n")
-    receipt={"table":TABLE,"endpoint":GAVO+"async","capturedAt":datetime.now(timezone.utc).isoformat(),
-             "query":select,"idCheckQuery":count_sql,"idCheckRows":expected,"radius":radius,"maxG":max_g,"rows":len(rows),
+    receipt={"table":TABLE,"endpoint":endpoint,"capturedAt":datetime.now(timezone.utc).isoformat(),
+             "query":select,"idCheckEndpoint":id_endpoint,"idCheckQuery":count_sql,"idCheckRows":expected,"radius":radius,"maxG":max_g,"rows":len(rows),
              "bytes":len(raw),"sha256":digest(raw),"reference":{"gaia":g_meta,"distances":d_meta,"astropy":astropy.__version__,"ids":source_ids},
              "inputs":{name:digest((output/name).read_bytes()) for name in
                        ("gaia-reference.csv","distance-reference.csv","galactic-reference.json")}}
