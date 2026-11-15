@@ -6,13 +6,14 @@ import hashlib
 import io
 import json
 import math
+import re
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen, build_opener, HTTPRedirectHandler
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode, urljoin, urlsplit
 
 import astropy
 from astropy import units as u
@@ -73,12 +74,14 @@ def gavo_async(query, row_cap, byte_cap):
     except HTTPError as error:
         if error.code not in (302,303) or not error.headers.get("Location"):
             raise
-        job = urljoin(endpoint,error.headers["Location"]).rstrip("/")
+        location = urlsplit(urljoin(endpoint,error.headers["Location"]))
         error.close()
     else:
         raise RuntimeError("No UWS job location")
-    if not job.startswith(GAVO+"async/"):
-        raise RuntimeError("Unexpected GAVO job resource")
+    match = re.fullmatch(r"/tap/async/([A-Za-z0-9_-]+)/?",location.path)
+    if not match:
+        raise RuntimeError(f"Unexpected GAVO UWS location path: {location.path.rsplit('/',1)[0]}")
+    job = GAVO+"async/"+match[1]
     deadline = time.monotonic()+280
     while time.monotonic() < deadline:
         state = read(request(job+"/phase"),512).decode().strip()
