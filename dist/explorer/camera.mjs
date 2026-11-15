@@ -1,6 +1,7 @@
 import {skyCoordinates} from './foundation/tiles.mjs';
 
 export const MAX_ZOOM = 5;
+export const SKY_FRAME = [0, 0, 360, 180];
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 export const project = (ra, dec) => {
   const [u, v] = skyCoordinates(ra, dec);
@@ -8,29 +9,29 @@ export const project = (ra, dec) => {
 };
 export const unproject = (x, y) => [x, Math.asin(clamp(1 - y / 90, -1, 1)) * 180 / Math.PI];
 export const homeCamera = () => ({x: 180, y: 90, zoom: 0});
-export function cameraScale(camera, width, height) {
-  return Math.max(.01, Math.min((width - 48) / 360, (height - 56) / 180)) * 10 ** camera.zoom;
+export function cameraScale(camera, width, height, frame = SKY_FRAME) {
+  return Math.max(.01, Math.min((width - 48) / (frame[2] - frame[0]), (height - 56) / (frame[3] - frame[1]))) * 10 ** camera.zoom;
 }
-export function screenPoint(point, camera, width, height) {
-  const scale = cameraScale(camera, width, height);
+export function screenPoint(point, camera, width, height, frame) {
+  const scale = cameraScale(camera, width, height, frame);
   return [(point[0] - camera.x) * scale + width / 2, (point[1] - camera.y) * scale + height / 2];
 }
-export function worldPoint(point, camera, width, height) {
-  const scale = cameraScale(camera, width, height);
+export function worldPoint(point, camera, width, height, frame) {
+  const scale = cameraScale(camera, width, height, frame);
   return [(point[0] - width / 2) / scale + camera.x, (point[1] - height / 2) / scale + camera.y];
 }
-function bounded(camera) {
-  return {...camera, x: clamp(camera.x, 0, 360), y: clamp(camera.y, 0, 180)};
+function bounded(camera, frame = SKY_FRAME) {
+  return {...camera, x: clamp(camera.x, frame[0], frame[2]), y: clamp(camera.y, frame[1], frame[3])};
 }
-export function zoomAt(camera, zoom, anchor, width, height) {
+export function zoomAt(camera, zoom, anchor, width, height, frame) {
   const next = {...camera, zoom: clamp(zoom, 0, MAX_ZOOM)};
-  const before = worldPoint(anchor, camera, width, height);
-  const after = worldPoint(anchor, next, width, height);
-  return bounded({...next, x: camera.x + before[0] - after[0], y: camera.y + before[1] - after[1]});
+  const before = worldPoint(anchor, camera, width, height, frame);
+  const after = worldPoint(anchor, next, width, height, frame);
+  return bounded({...next, x: camera.x + before[0] - after[0], y: camera.y + before[1] - after[1]}, frame);
 }
-export function panBy(camera, dx, dy, width, height) {
-  const scale = cameraScale(camera, width, height);
-  return bounded({...camera, x: camera.x - dx / scale, y: camera.y - dy / scale});
+export function panBy(camera, dx, dy, width, height, frame) {
+  const scale = cameraScale(camera, width, height, frame);
+  return bounded({...camera, x: camera.x - dx / scale, y: camera.y - dy / scale}, frame);
 }
 export function skyViewport(camera, width, height) {
   const [left, top] = worldPoint([0, 0], camera, width, height);
