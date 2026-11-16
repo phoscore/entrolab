@@ -107,6 +107,9 @@ test('long selected catalogue names are shortened within a 320 px map without ch
   assert.equal(placed[0].marker.label,full);
   assert.ok(placed[0].label.endsWith('…'));
   assert.ok(placed[0].left>=6&&placed[0].right<=314);
+  const framed=placeLabels([{x:250,y:105,label:'Galaxien',radius:10,priority:5}],text=>text.length*8,320,240,{left:28,right:270,top:8,bottom:232});
+  assert.equal(framed.length,1);
+  assert.ok(framed[0].left>=28&&framed[0].right<=270);
 });
 
 test('host lookup is pinned to the proven identity and sample while Gaia names require classification', () => {

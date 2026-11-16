@@ -356,6 +356,7 @@ export function mountExplorer(root) {
     if (selectedDesiLabel) labels.push(selectedDesiLabel);
     ctx.font = '12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(labels,label=>ctx.measureText(label).width,width,height,{
+      left:Math.max(6,left+5),right:Math.min(width-6,right-5),
       top:Math.max(8,top+12),bottom:Math.min(height-59,bottom-26),limit:width<420?5:10,
     }));
     ctx.restore();

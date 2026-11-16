@@ -154,6 +154,7 @@ test('Home & Systems: observer context, proven star names and pinned system memb
     assert.equal(await p.evaluate(()=>performance.getEntriesByType('resource').some(r=>r.name.endsWith('/solar-model.mjs'))),false);
     await p.locator('#exSearch').fill('Proxima');
     await p.locator('#exList button').filter({hasText:'Proxima Centauri'}).press('Enter');
+    await p.locator('#exInspector .ex-technical > summary').click();
     assert.match(await p.locator('#exInspector').innerText(),/5853498713190525696/);
     for (const [name,planets] of [['51 Peg b',1],['TRAPPIST-1 b',7],['HR 8799 b',4]]) {
       await p.locator('#exSearch').fill(name);

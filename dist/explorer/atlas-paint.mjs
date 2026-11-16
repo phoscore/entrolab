@@ -48,7 +48,19 @@ export function densityBitmap(index) {
   if (!ctx) return null;
   const image=ctx.createImageData(resolution,resolution), pixels=image.data;
   const denom = Math.log1p(index.max)||1;
-  const levels=Float32Array.from(index.values,v=>Math.log1p(v)/denom);
+  const raw=Float32Array.from(index.values,v=>Math.log1p(v)/denom);
+  const horizontal=new Float32Array(raw.length),levels=new Float32Array(raw.length);
+  const weights=[1,4,6,4,1];
+  for(let y=0;y<SIDE;y++)for(let x=0;x<SIDE;x++) {
+    let sum=0;
+    for(let k=-2;k<=2;k++)sum+=raw[y*SIDE+Math.max(0,Math.min(SIDE-1,x+k))]*weights[k+2];
+    horizontal[y*SIDE+x]=sum/16;
+  }
+  for(let y=0;y<SIDE;y++)for(let x=0;x<SIDE;x++) {
+    let sum=0;
+    for(let k=-2;k<=2;k++)sum+=horizontal[Math.max(0,Math.min(SIDE-1,y+k))*SIDE+x]*weights[k+2];
+    levels[y*SIDE+x]=sum/16;
+  }
   for (let y=0;y<resolution;y++) for (let x=0;x<resolution;x++) {
     const sx=Math.max(0,Math.min(SIDE-1,(x+.5)/3-.5));
     const sy=Math.max(0,Math.min(SIDE-1,(resolution-y-.5)/3-.5));

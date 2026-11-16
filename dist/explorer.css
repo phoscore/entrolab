@@ -228,7 +228,8 @@
   #explorer .sn-map{height:clamp(340px,90vw,440px)}
 }
 @media(max-width:370px){
-  #explorer .ex-mode-bar #exNeighborhoodMode{flex-basis:0}
+  #explorer .ex-mode-bar #exNeighborhoodMode{flex-basis:100%}
+  #explorer .ex-heading p:not(.ex-kicker){display:none}
   #explorer .ex-map-head .ex-controls{width:100%}
   #explorer .ex-map-head .ex-controls button{flex:1}
   #explorer .ex-atlas-controls{align-items:start}

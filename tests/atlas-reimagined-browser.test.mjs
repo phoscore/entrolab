@@ -40,15 +40,17 @@ async function capture(which,site,width){
   const context=await browser.newContext({viewport:{width,height:mobile?900:1100},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:mobile?2:1,reducedMotion:'reduce',locale:'de-DE'});
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
   const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(site.url);await page.locator('[data-tab=explorer]').click();
+  await page.goto(site.url);
+  const startupBegan=Date.now();await page.locator('[data-tab=explorer]').click();
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.atlas.status==='density'&&s.atlas.visible===50635&&s.objectCount===22;});
+  const startupMs=Date.now()-startupBegan;
   const image=async name=>page.locator('#explorer').screenshot({path:join(out,`${which}-${name}-${width}.png`)});
   await image('gaia');
   await page.locator('#exDesiEnabled').check();
   await page.waitForFunction(()=>window.entrolabExplorer?.inspect().desi.total===32392);
   await image('combined');
-  const metrics={width,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),cold:{...await page.evaluate(()=>({atlas:window.entrolabExplorer.inspect().atlas,desi:window.entrolabExplorer.inspect().desi}))}};
+  const metrics={width,startupMs,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),cold:{...await page.evaluate(()=>({atlas:window.entrolabExplorer.inspect().atlas,desi:window.entrolabExplorer.inspect().desi}))}};
   assert.equal(metrics.overflow,false);
   if(!mobile){
     await page.locator('#exIn').click();await page.locator('#exIn').click();
