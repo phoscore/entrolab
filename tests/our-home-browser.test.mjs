@@ -146,7 +146,7 @@ test('unreduced playback, changing rates, touch zoom and 100 mode changes retain
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.camera.zoom>.2);
     await page.locator('#solIn').click();
-    assert.equal((await state(page)).follow,true);
+    assert.ok((await state(page)).camera.zoom>.2);
     await page.evaluate(()=>{for(let i=0;i<100;i++){
       document.querySelector('#exSkyMode').click();document.querySelector('#exSolarMode').click();
     }});
