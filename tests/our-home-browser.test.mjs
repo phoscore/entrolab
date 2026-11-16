@@ -46,7 +46,7 @@ async function open(site,width,reduced=true){
 }
 const state=p=>p.evaluate(()=>window.entrolabExplorer.inspect().solar);
 test('P3 screenshots compare frozen main and corrected Gaia alone and with DESI at 1440 and 320',async()=>{
-  const shots=[];
+  const shots=[],solarMeasurements=[];
   for(const [revision,site] of [['before',before],['after',after]])for(const width of [1440,320]){
     const {page,context,errors}=await open(site,width);
     try{
@@ -59,10 +59,19 @@ test('P3 screenshots compare frozen main and corrected Gaia alone and with DESI 
         const path=join(output,`${revision}-${layer}-${width}.png`);
         await page.locator('#explorer').screenshot({path});shots.push(path);
       }
+      const opened=Date.now();await page.locator('#exSolarMode').click();
+      await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+      await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar?.markers.length>0);
+      const readyMs=Date.now()-opened;
+      const solar=await page.evaluate(()=>window.entrolabExplorer.inspect().solar);
+      const path=join(output,`${revision}-solar-overview-${width}.png`);
+      await page.locator('#explorer').screenshot({path});shots.push(path);
+      solarMeasurements.push({revision,width,readyMs,drawMs:solar.drawMs,draws:solar.draws,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)});
+      assert.equal(solarMeasurements.at(-1).overflow,false);
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
-  await writeFile(join(output,'screenshots.json'),JSON.stringify({baseline,head:process.env.GITHUB_SHA??'working tree',shots},null,2)+'\n');
+  await writeFile(join(output,'screenshots.json'),JSON.stringify({baseline,head:process.env.GITHUB_SHA??'working tree',shots,solarMeasurements},null,2)+'\n');
 });
 test('comparison, camera tracking, reference, time, keyboard, mobile, language and idle work',async()=>{
   for(const width of [1440,390,320]){
@@ -84,6 +93,10 @@ test('comparison, camera tracking, reference, time, keyboard, mobile, language a
       await page.locator('#solFollow').click();
       assert.equal((await state(page)).follow,true);
       await page.locator('#solNext').click();
+      await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+      await page.waitForFunction(({x,y})=>{
+        const c=window.entrolabExplorer.inspect().solar.camera;return c.x!==x||c.y!==y;
+      },centered.camera);
       s=await state(page);
       assert.notEqual(s.day,centered.day);
       assert.notDeepEqual(s.camera,centered.camera);
@@ -96,6 +109,10 @@ test('comparison, camera tracking, reference, time, keyboard, mobile, language a
       assert.equal(await page.locator('#solPairValues').isVisible(),false);
       await page.locator('#solTarget').selectOption('saturn');
       await page.locator('#explorer').screenshot({path:join(output,`after-solar-${width}.png`)});
+      await page.locator('[data-language=en]').click();
+      assert.match(await page.locator('#solPairTitle').innerText(),/Earth–Moon barycentre/);
+      assert.match(await page.locator('#solCompareTitle').innerText(),/Distance & motion/);
+      assert.equal((await state(page)).reference,'earth');
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
       await page.locator('#exSkyMode').click();await page.locator('#exSolarMode').click();
       assert.equal((await state(page)).reference,'earth');
@@ -115,13 +132,19 @@ test('unreduced playback, changing rates, touch zoom and 100 mode changes retain
     await page.locator('#solTarget').selectOption('jupiter');
     await page.locator('#solReference').selectOption('saturn');
     await page.locator('#solFollow').click();
-    await page.locator('#solPlay').click();
+    await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+    await page.evaluate(()=>document.querySelector('#solPlay').click());
     await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.day>2451545);
-    await page.locator('#solRate').selectOption({index:0});
-    await page.locator('#solPlay').click();
+    await page.evaluate(()=>{const rate=document.querySelector('#solRate');rate.value='1';rate.dispatchEvent(new Event('change',{bubbles:true}));});
+    await page.evaluate(()=>document.querySelector('#solPlay').click());
     assert.equal((await state(page)).playing,false);
     const canvas=page.locator('#solCanvas'),box=await canvas.boundingBox();
-    await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);
+    const cdp=await context.newCDPSession(page);
+    const points=span=>[-1,1].map((d,id)=>({id,x:box.x+box.width/2+span*d,y:box.y+box.height/2}));
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:points(30)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:points(60)});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.camera.zoom>.2);
     await page.locator('#solIn').click();
     assert.equal((await state(page)).follow,true);
     await page.evaluate(()=>{for(let i=0;i<100;i++){
