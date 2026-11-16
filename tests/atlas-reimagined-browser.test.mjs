@@ -59,7 +59,7 @@ async function capture(which,site,width){
     assert.equal(alpha[1],0,'an empty neighbouring cell remains transparent despite smoothing');
   }
   await page.locator('#exDesiEnabled').check();
-  await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392;});
+  try {await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392;},null,{timeout:12000});}\n  catch(error) {console.error('Atlas DESI state',which,width,JSON.stringify(await page.evaluate(()=>window.entrolabExplorer?.inspect())),errors);throw error;}
   await image('combined');
   const metrics={width,startupMs,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),cold:{...await page.evaluate(()=>({atlas:window.entrolabExplorer.inspect().atlas,desi:window.entrolabExplorer.inspect().desi}))}};
   assert.equal(metrics.overflow,false);
