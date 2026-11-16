@@ -21,18 +21,18 @@ export function paintNeighborhood(ctx,{width,height,camera,plane,unit,data,detai
   const pixelsPerRing=ringStep*scale/unitFactor;
   for(let ring=Math.max(1,Math.ceil(nearest/pixelsPerRing));ring<=Math.floor(farthest/pixelsPerRing);ring++) {
     const r=ring*pixelsPerRing;
-    ctx.strokeStyle='rgba(133,166,175,.20)';
+    ctx.strokeStyle='rgba(137,189,190,.24)';
     ctx.beginPath();ctx.arc(sx,sy,r,0,2*Math.PI);ctx.stroke();
     const lx=sx+r*.707+4, ly=sy-r*.707-4;
     if(lx>6 && lx<width-64 && ly>15 && ly<height-8) {
       const label=labels.number(ring*ringStep)+' '+labels.unit;
-      ctx.fillStyle='#93abb6';ctx.fillText(label,lx,ly);
+      ctx.fillStyle='#b0d1cf';ctx.fillText(label,lx,ly);
     }
   }
-  ctx.setLineDash([3,6]);ctx.strokeStyle='rgba(166,199,199,.27)';
+  ctx.setLineDash([3,6]);ctx.strokeStyle='rgba(184,215,200,.42)';
   ctx.beginPath();ctx.arc(sx,sy,NEIGHBORHOOD_RADIUS*scale,0,2*Math.PI);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.strokeStyle='rgba(141,185,195,.18)';
+  ctx.strokeStyle='rgba(141,185,195,.22)';
   ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(width,sy);ctx.moveTo(sx,0);ctx.lineTo(sx,height);ctx.stroke();
 
   const marks=[];
@@ -40,7 +40,7 @@ export function paintNeighborhood(ctx,{width,height,camera,plane,unit,data,detai
   if(data) {
     const grid=5, columns=Math.ceil(width/grid), budget=width<500?1050:2200;
     const slots=new Uint8Array(columns*Math.ceil(height/grid));
-    ctx.fillStyle='#7fa4af';
+    ctx.fillStyle='#b0cbd1';
     const vertical=plane==='xz'?2:1;
     for(const row of data.order) {
       const x=sx+data.xyz[3*row]*scale,y=sy-data.xyz[3*row+vertical]*scale;
@@ -50,7 +50,7 @@ export function paintNeighborhood(ctx,{width,height,camera,plane,unit,data,detai
       const key=Math.floor(y/grid)*columns+Math.floor(x/grid);
       if(slots[key]) continue;
       slots[key]=1;
-      const r=data.magnitude[row]<10?1.45:1;
+      const r=data.magnitude[row]<10?1.65:1.15;
       ctx.fillRect(x-r,y-r,2*r,2*r);
       marks.push({row,x,y});
     }
@@ -58,6 +58,9 @@ export function paintNeighborhood(ctx,{width,height,camera,plane,unit,data,detai
 
   const originInView=sx>=0 && sx<width && sy>=0 && sy<height;
   if(originInView) {
+    const halo=ctx.createRadialGradient(sx,sy,2,sx,sy,34);
+    halo.addColorStop(0,'#ffdda877');halo.addColorStop(1,'#ffdda800');
+    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(sx,sy,34,0,2*Math.PI);ctx.fill();
     ctx.strokeStyle='#ffc286';ctx.fillStyle='#ffe2a5';ctx.lineWidth=1;
     ctx.beginPath();ctx.arc(sx,sy,10,0,2*Math.PI);ctx.stroke();
     ctx.beginPath();ctx.arc(sx,sy,3.7,0,2*Math.PI);ctx.fill();

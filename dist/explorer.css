@@ -151,3 +151,87 @@
   #explorer .sn-toolbar button,#explorer .sn-toolbar select{min-height:42px}
 }
 @media(max-width:370px){#explorer .ex-mode-bar #exNeighborhoodMode{flex-basis:100%}}
+
+/* Atlas Reimagined: the canvas is the primary surface; controls remain in
+   document order and all catalogue counts remain visible and selectable. */
+#explorer{--ex-line:#304858;--ex-muted:#b5c8cf;--ex-ice:#a2e8dc}
+#explorer .ex-heading{margin:4px 0 14px}
+#explorer .ex-heading h1{font-size:clamp(32px,4vw,52px);line-height:1.08}
+#explorer .ex-heading p:not(.ex-kicker){max-width:740px}
+#explorer .ex-mode-bar{gap:4px;width:max-content;max-width:100%;padding:4px;margin-bottom:12px;background:#0d1c29;border:1px solid #294353;border-radius:12px}
+#explorer .ex-mode-bar button{border:0;background:transparent;color:#c3d7df;border-radius:8px;font-size:13px}
+#explorer .ex-mode-bar button[aria-pressed=true]{background:#264b50;color:#f2fffb;box-shadow:inset 0 0 0 1px #648b8a,0 3px 12px #0005}
+#explorer .ex-orientation{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px;padding:8px 14px;border-color:#33505b;background:#132832b8;color:#d9f5ed}
+#explorer .ex-orientation details{margin:0}
+#explorer .ex-orientation summary{color:#9bdacb}
+#explorer .ex-orientation details[open]{flex-basis:100%}
+#explorer .ex-layout{grid-template-columns:minmax(0,1fr) 294px;border-color:#375565;border-radius:18px;background:#091824;box-shadow:0 18px 58px #02070e80}
+#explorer .ex-left{position:relative;background:#0b1b28}
+#explorer .ex-map-head{padding:11px 16px;background:#0e2331;border-color:#36515e}
+#explorer .ex-map-head strong{font-size:14px;color:#e4f5f3}
+#explorer .ex-map-head p{margin:2px 0;color:#a8c2cb}
+#explorer .ex-map{height:clamp(430px,53vw,650px);background:radial-gradient(ellipse at 50% 40%,#16344a 0%,#0b1d30 49%,#07121f 100%)}
+#explorer #exSkyPanel .ex-map{background:radial-gradient(ellipse at 45% 40%,#1c3b52 0%,#10283d 40%,#091827 76%,#07121f 100%)}
+#explorer .ex-map::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 70px 12px #06131f6b}
+#explorer .ex-solar-map{background:radial-gradient(ellipse at center,#293d4d 0%,#11243a 50%,#081626 100%)}
+#explorer .ex-atlas-controls{padding:7px 16px;gap:12px;border-color:#314c5b;background:#102533}
+#explorer .ex-atlas-controls label{font-size:12px;line-height:1.35}
+#explorer .ex-atlas-controls select{background:#152f3d;border-color:#466571}
+#explorer .ex-desi-controls{background:#152533}
+#explorer .ex-desi-controls select{background:#28323e;border-color:#6b6871}
+#explorer .ex-atlas-summary{padding:8px 16px;border-color:#2e4a57;background:#122b38;color:#dceeea;font-size:11px;line-height:1.5}
+#explorer .ex-desi-summary{background:#252b37;border-color:#4f525f;color:#f2e2d3}
+#explorer #exAtlasCounts,#explorer #exDesiCounts{font-size:12px;color:#f4fafa}
+#explorer #exAtlasStatus,#explorer #exDesiStatus{color:#b5d0d1}
+#explorer .ex-desi-key{color:#d9c9c6}
+#explorer .ex-desi-patch{background:#79676b;border-color:#b99e99}
+#explorer .ex-desi-dot{border-color:#f5d5b2;width:9px;height:9px}
+#explorer .ex-dot[data-kind=atlasDensityLegend]{background:linear-gradient(90deg,#315e73,#70b9bd,#b8dbdb)}
+#explorer .ex-map-foot{padding:8px 16px;border-color:#2f4a57}
+#explorer .ex-zoom{padding:9px 16px}
+#explorer .ex-legend{padding:2px 16px 12px;gap:7px 15px;line-height:1.5}
+#explorer .ex-aside{padding:18px;border-color:#314c59;background:linear-gradient(180deg,#132b39,#101f2e 58%,#0e1c29);max-height:none}
+#explorer .ex-aside h2{font-size:14px;margin:0 0 10px;color:#edf9f5}
+#explorer .ex-aside h3{color:#b4e1dc}
+#explorer .ex-aside input[type=search]{background:#0c1c28;border-color:#4b6a74}
+#explorer .ex-list{margin:9px 0 16px;max-height:180px}
+#explorer .ex-list button{border-color:#344e5b;border-radius:8px}
+#explorer .ex-list button:hover,#explorer .ex-list button:focus-visible{background:#244051}
+#explorer .ex-inspector{padding-top:16px;border-color:#405e68}
+#explorer .ex-selected{font-family:'Space Grotesk',sans-serif;font-size:21px;line-height:1.2;color:#f6f7e7;margin:0 0 8px}
+#explorer .ex-inspector dl{margin:10px 0 14px}
+#explorer .ex-inspector dt{color:#aac1c8}
+#explorer .ex-inspector dd{font-size:13px;color:#e8f5f1}
+#explorer .ex-inspector details{border-color:#3a5663}
+#explorer .ex-inspector details summary{color:#a8dfd7;font-size:12px}
+#explorer .ex-inspector .ex-fact{padding:10px 12px;border:1px solid #45646c;border-radius:9px;background:#1c3841;color:#edf8ee;font-size:13px;line-height:1.5}
+#explorer .ex-notes{padding:8px 16px}
+#explorer .sn-head{padding:8px 2px 14px}
+#explorer .sn-head h2{color:#f2f6e9}
+#explorer .sn-layout{border-color:#426267}
+#explorer .sn-map{background:radial-gradient(circle at center,#1c3d46 0%,#112833 46%,#081824 100%)}
+#explorer .sn-caption{background:#102833}
+#explorer .sn-caption #snHow{color:#cfe2de}
+#explorer .sn-aside{background:linear-gradient(180deg,#173039,#10212c)}
+@media(max-width:760px){
+  #explorer .ex-layout{grid-template-columns:1fr}
+  #explorer .ex-map{height:clamp(340px,90vw,440px)}
+  #explorer .ex-aside{padding:15px;border-left:0;border-top:1px solid #385561}
+  #explorer .ex-mode-bar{width:100%}
+  #explorer .ex-mode-bar button{flex:1 1 0;padding:9px 5px;font-size:12px;min-height:42px}
+  #explorer .ex-map-head{flex-direction:row;align-items:center;flex-wrap:wrap;padding:10px 12px}
+  #explorer .ex-map-head p{font-size:10px}
+  #explorer .ex-controls{gap:4px}
+  #explorer .ex-controls button{padding:6px 9px;min-height:42px}
+  #explorer .ex-atlas-controls{padding:7px 12px}
+  #explorer .ex-atlas-summary{padding:7px 12px}
+  #explorer .sn-map{height:clamp(340px,90vw,440px)}
+}
+@media(max-width:370px){
+  #explorer .ex-mode-bar #exNeighborhoodMode{flex-basis:100%}
+  #explorer .ex-heading p:not(.ex-kicker){display:none}
+  #explorer .ex-map-head .ex-controls{width:100%}
+  #explorer .ex-map-head .ex-controls button{flex:1}
+  #explorer .ex-atlas-controls{align-items:start}
+  #explorer .ex-atlas-controls label{flex-wrap:wrap}
+}

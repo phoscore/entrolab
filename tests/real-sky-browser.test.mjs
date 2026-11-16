@@ -80,6 +80,7 @@ test('Real Sky overview, separate scope, lazy details, 64-bit search and distinc
     assert.ok((await resources(page)).every(e=>!e.url.includes('/details/')));
     await choose(page,negative);
     assert.match(await page.locator('#exInspector').innerText(),new RegExp(negative));
+    await page.locator('#exInspector .ex-technical > summary').click();
     assert.match(await page.locator('#exInspector').innerText(),/-0,5032136 mas/);
     assert.match(await page.locator('#exInspector').innerText(),/J2016\.0 \(TCB\)/);
     assert.match(await page.locator('#exInspector').innerText(),/Entfernung unbekannt/);
@@ -97,6 +98,7 @@ test('Real Sky overview, separate scope, lazy details, 64-bit search and distinc
     await page.waitForFunction(id=>window.entrolabExplorer.inspect().atlas.selected===id,point.id);
 
     await choose(page,position);
+    await page.locator('#exInspector .ex-technical > summary').click();
     assert.match(await page.locator('#exInspector').innerText(),/Parallaxe\s+unbekannt/);
     await zoom(page,5);
     await page.locator('#exAtlasFilter').selectOption('parallax');

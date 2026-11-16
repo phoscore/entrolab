@@ -39,21 +39,46 @@ export function densityCounts(index, [left,bottom,right,top]) {
 
 export function densityBitmap(index) {
   const canvas=document.createElement('canvas');
-  canvas.width=canvas.height=SIDE;
+  // The source grid and every count stay untouched. A larger display raster
+  // interpolates neighbouring cell intensities so the overview reads as a
+  // continuous selection map instead of 128 square source symbols.
+  const resolution=SIDE*3;
+  canvas.width=canvas.height=resolution;
   const ctx=canvas.getContext('2d');
   if (!ctx) return null;
-  const image=ctx.createImageData(SIDE,SIDE), pixels=image.data;
+  const image=ctx.createImageData(resolution,resolution), pixels=image.data;
   const denom = Math.log1p(index.max)||1;
-  for (let y=0;y<SIDE;y++) for (let x=0;x<SIDE;x++) {
-    const count=index.values[y*SIDE+x];
-    if (!count) continue;
-    const offset=4*((SIDE-1-y)*SIDE+x);
-    const level=Math.log1p(count)/denom;
-    const warm=Math.max(0,(level-.54)/.46);
-    pixels[offset]=24+Math.round(level*53+warm*141);
-    pixels[offset+1]=48+Math.round(level*142+warm*11);
-    pixels[offset+2]=88+Math.round(level*122-warm*77);
-    pixels[offset+3]=Math.round(35+210*level);
+  const raw=Float32Array.from(index.values,v=>Math.log1p(v)/denom);
+  const horizontal=new Float32Array(raw.length),levels=new Float32Array(raw.length);
+  const weights=[1,4,6,4,1];
+  for(let y=0;y<SIDE;y++)for(let x=0;x<SIDE;x++) {
+    let sum=0;
+    for(let k=-2;k<=2;k++)sum+=raw[y*SIDE+Math.max(0,Math.min(SIDE-1,x+k))]*weights[k+2];
+    horizontal[y*SIDE+x]=sum/16;
+  }
+  for(let y=0;y<SIDE;y++)for(let x=0;x<SIDE;x++) {
+    let sum=0;
+    for(let k=-2;k<=2;k++)sum+=horizontal[Math.max(0,Math.min(SIDE-1,y+k))*SIDE+x]*weights[k+2];
+    levels[y*SIDE+x]=sum/16;
+  }
+  for (let y=0;y<resolution;y++) for (let x=0;x<resolution;x++) {
+    // An empty catalogue cell stays empty at every display resolution. This
+    // also keeps the visible density and the exact-cell zoom hit consistent.
+    if(!index.values[(SIDE-1-Math.floor(y/3))*SIDE+Math.floor(x/3)])continue;
+    const sx=Math.max(0,Math.min(SIDE-1,(x+.5)/3-.5));
+    const sy=Math.max(0,Math.min(SIDE-1,(resolution-y-.5)/3-.5));
+    const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(SIDE-1,x0+1),y1=Math.min(SIDE-1,y0+1);
+    const fx=sx-x0,fy=sy-y0;
+    const a=levels[y0*SIDE+x0]*(1-fx)+levels[y0*SIDE+x1]*fx;
+    const b=levels[y1*SIDE+x0]*(1-fx)+levels[y1*SIDE+x1]*fx;
+    const level=a*(1-fy)+b*fy;
+    if(level<.025)continue;
+    const offset=4*(y*resolution+x);
+    const highlight=Math.max(0,(level-.62)/.38);
+    pixels[offset]=Math.round(47+level*73+highlight*43);
+    pixels[offset+1]=Math.round(99+level*95+highlight*26);
+    pixels[offset+2]=Math.round(122+level*91+highlight*18);
+    pixels[offset+3]=Math.round(6+121*level);
   }
   ctx.putImageData(image,0,0);
   return canvas;
