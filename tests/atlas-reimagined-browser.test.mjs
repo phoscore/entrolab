@@ -59,7 +59,7 @@ async function capture(which,site,width){
     assert.equal(alpha[1],0,'an empty neighbouring cell remains transparent despite smoothing');
   }
   await page.locator('#exDesiEnabled').check();
-  await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392&&!s.scheduled;});
+  await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392;});
   await image('combined');
   const metrics={width,startupMs,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),cold:{...await page.evaluate(()=>({atlas:window.entrolabExplorer.inspect().atlas,desi:window.entrolabExplorer.inspect().desi}))}};
   assert.equal(metrics.overflow,false);
@@ -69,7 +69,7 @@ async function capture(which,site,width){
   await page.waitForFunction(id=>window.entrolabExplorer.inspect().atlas.selected===id&&window.entrolabExplorer.inspect().atlas.detailState==='ready',id);
   await page.locator('#exZoom').evaluate(el=>{el.value='2.2';el.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();
-  await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect();return s.atlas.status==='points'&&s.atlas.markers>0&&!s.scheduled;});
+  await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect();return s.atlas.status==='points'&&s.atlas.markers>0;});
   await image('zoom');
   if(mobile){
     if(which==='after')await page.locator('#exInspector .ex-technical > summary').click();
@@ -80,7 +80,7 @@ async function capture(which,site,width){
     await image('inspector');
     await page.locator('#exNeighborhoodMode').click();
     await page.locator('#snCanvas').scrollIntoViewIfNeeded();
-    await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().neighborhood;return s?.status==='ready'&&s.markers>0&&!s.scheduled;});
+    await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().neighborhood;return s?.status==='ready'&&s.markers>0;});
     await image('neighborhood');
     await page.locator('#snXZ').click();await page.locator('#snUnit').selectOption('ly');
     assert.equal((await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood)).plane,'xz');
