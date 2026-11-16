@@ -1,51 +1,25 @@
-name: ENTROLAB tests
+name: ENTROLAB integration
 on:
-  push:
-    branches: ['**']
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
-  correction-evidence:
-    name: v0.8 existing preview audit
-    if: github.ref_name == 'feature/v0.8-learning-foundation' || github.head_ref == 'feature/v0.8-learning-foundation'
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - name: Read-only audit of the existing public preview
-        run: node scripts/audit-v08-preview.mjs
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      # The bounded causes study is retained for explicit manual repetition.
-      # Normal pushes still run the complete original rendering comparison below.
-      - name: Controlled reviewed/current and exploratory rendering comparisons
-        if: github.event_name == 'workflow_dispatch'
-        run: node scripts/measure-v08-causes.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v08-correction-evidence
-          path: browser-results/
-          if-no-files-found: error
-
   physics-and-original:
-    name: Physics and v0.1 integrity
+    name: Physics and data integrity
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -64,21 +38,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
-      - name: Real browser sizing, drafts, language, focus and pulsar regressions
+      - name: Full Chromium regression suite
         run: npm run test:browser
-      - name: Verify existing v0.8 production bytes (read-only)
-        if: github.ref_name == 'feature/v0.8.5-lab-upgrades' || github.head_ref == 'feature/v0.8.5-lab-upgrades'
-        run: node scripts/verify-v085-production.mjs
-      - name: Compare v0.8 and baseline rendering on the same runner
-        if: github.ref_name != 'feature/v0.8.5-lab-upgrades' && github.head_ref != 'feature/v0.8.5-lab-upgrades'
-        run: node scripts/measure-v08-browser.mjs
-      - name: Package private downloadable review source
+      - name: Package review evidence
         if: always()
         run: node scripts/package-review.mjs
       - uses: actions/upload-artifact@v4
@@ -87,65 +56,4 @@ jobs:
           name: chromium-review-measurements
           path: browser-results/
           if-no-files-found: ignore
-
-  v085-performance:
-    name: v0.8.5 released-baseline performance
-    # Record a full comparison on code pushes, without duplicating it for
-    # evidence-only docs or pull_request jobs. Manual repetition is available.
-    if: >-
-      github.ref_name == 'feature/v0.8.5-lab-upgrades' &&
-      (github.event_name == 'workflow_dispatch' ||
-       (github.event_name == 'push' && !startsWith(github.event.head_commit.message, '[CF-Pages-Skip] docs(')))
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - name: Black-hole audit comparison against reviewed v0.8.5
-        run: node scripts/measure-v085-browser.mjs --bh-audit
-      - name: Released v0.8 comparison, new scenes and 4x CPU mobile emulation
-        run: node scripts/measure-v085-browser.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v085-performance
-          path: browser-results/
-          if-no-files-found: error
-
-  v09-performance:
-    name: v0.9 scoped rendering comparison
-    if: >-
-      github.ref_name == 'feature/v0.9-physics-reimagined' &&
-      (github.event_name == 'workflow_dispatch' ||
-       (github.event_name == 'push' && !startsWith(github.event.head_commit.message, '[CF-Pages-Skip] docs(')))
-    runs-on: ubuntu-latest
-    timeout-minutes: 9
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - run: node scripts/measure-v09-browser.mjs
-      - run: node scripts/verify-v09-production.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v09-performance
-          path: |
-            browser-results/v09-performance.json
-            browser-results/v09-production.json
-          if-no-files-found: error
+          retention-days: 7

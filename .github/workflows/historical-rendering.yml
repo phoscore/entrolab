@@ -1,0 +1,60 @@
+name: Historical rendering comparisons
+on:
+  workflow_dispatch:
+    inputs:
+      comparison:
+        description: Historical comparison to run
+        required: true
+        type: choice
+        options:
+          - v0.8
+          - v0.8.5
+          - v0.9
+          - v0.8-correction
+permissions:
+  contents: read
+concurrency:
+  group: historical-${{ github.ref }}-${{ inputs.comparison }}
+  cancel-in-progress: true
+jobs:
+  historical-rendering:
+    name: Historical rendering comparison
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: v0.8 released baseline
+        if: inputs.comparison == 'v0.8'
+        run: node scripts/measure-v08-browser.mjs
+      - name: v0.8.5 released baseline and black hole audit
+        if: inputs.comparison == 'v0.8.5'
+        run: |
+          node scripts/measure-v085-browser.mjs --bh-audit
+          node scripts/measure-v085-browser.mjs
+          node scripts/verify-v085-production.mjs
+      - name: v0.9 scoped comparison and production check
+        if: inputs.comparison == 'v0.9'
+        run: |
+          node scripts/measure-v09-browser.mjs
+          node scripts/verify-v09-production.mjs
+      - name: v0.8 correction evidence
+        if: inputs.comparison == 'v0.8-correction'
+        run: |
+          node scripts/audit-v08-preview.mjs
+          node scripts/measure-v08-causes.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: historical-rendering-${{ inputs.comparison }}
+          path: browser-results/
+          if-no-files-found: ignore
+          retention-days: 7
