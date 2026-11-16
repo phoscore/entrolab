@@ -62,6 +62,9 @@ export function densityBitmap(index) {
     levels[y*SIDE+x]=sum/16;
   }
   for (let y=0;y<resolution;y++) for (let x=0;x<resolution;x++) {
+    // An empty catalogue cell stays empty at every display resolution. This
+    // also keeps the visible density and the exact-cell zoom hit consistent.
+    if(!index.values[(SIDE-1-Math.floor(y/3))*SIDE+Math.floor(x/3)])continue;
     const sx=Math.max(0,Math.min(SIDE-1,(x+.5)/3-.5));
     const sy=Math.max(0,Math.min(SIDE-1,(resolution-y-.5)/3-.5));
     const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(SIDE-1,x0+1),y1=Math.min(SIDE-1,y0+1);

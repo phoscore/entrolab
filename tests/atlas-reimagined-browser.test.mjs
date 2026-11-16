@@ -47,22 +47,40 @@ async function capture(which,site,width){
   const startupMs=Date.now()-startupBegan;
   const image=async name=>page.locator('#explorer').screenshot({path:join(out,`${which}-${name}-${width}.png`)});
   await image('gaia');
+  if(which==='after'&&width===1440) {
+    const alpha=await page.evaluate(async()=>{
+      const {densityBitmap}=await import('./explorer/atlas-paint.mjs');
+      const values=new Uint32Array(128*128);values[64*128+64]=8;
+      const canvas=densityBitmap({values,max:8});
+      const ctx=canvas.getContext('2d');
+      return [ctx.getImageData(64*3+1,(127-64)*3+1,1,1).data[3],ctx.getImageData(63*3+1,(127-64)*3+1,1,1).data[3]];
+    });
+    assert.ok(alpha[0]>0,'a counted cell remains visible');
+    assert.equal(alpha[1],0,'an empty neighbouring cell remains transparent despite smoothing');
+  }
   await page.locator('#exDesiEnabled').check();
-  await page.waitForFunction(()=>window.entrolabExplorer?.inspect().desi.total===32392);
+  await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392&&!s.scheduled;});
   await image('combined');
   const metrics={width,startupMs,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),cold:{...await page.evaluate(()=>({atlas:window.entrolabExplorer.inspect().atlas,desi:window.entrolabExplorer.inspect().desi}))}};
   assert.equal(metrics.overflow,false);
-  if(!mobile){
-    await page.locator('#exIn').click();await page.locator('#exIn').click();
-    await page.waitForFunction(()=>window.entrolabExplorer.inspect().camera.zoom>=.5);
-    await image('zoom');
-    await page.locator('#exSearch').fill('5853498713190525696');
-    await page.locator('#exList button').first().click();
-    await page.waitForFunction(()=>window.entrolabExplorer.inspect().selected!==null);
+  const id='251170104086974336';
+  await page.locator('#exSearch').fill(id);
+  await page.locator(`#exAtlasResults [data-gaia="${id}"]`).click();
+  await page.waitForFunction(id=>window.entrolabExplorer.inspect().atlas.selected===id&&window.entrolabExplorer.inspect().atlas.detailState==='ready',id);
+  await page.locator('#exZoom').evaluate(el=>{el.value='2.2';el.dispatchEvent(new Event('input',{bubbles:true}));});
+  await page.locator('#exCanvas').scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect();return s.atlas.status==='points'&&s.atlas.markers>0&&!s.scheduled;});
+  await image('zoom');
+  if(mobile){
+    if(which==='after')await page.locator('#exInspector .ex-technical > summary').click();
+    await image('mobile-detail');
+    await page.locator('#exHome').click();
+  }else{
+    await page.locator('#exInspector .ex-technical > summary').click();
     await image('inspector');
     await page.locator('#exNeighborhoodMode').click();
     await page.locator('#snCanvas').scrollIntoViewIfNeeded();
-    await page.waitForFunction(()=>window.entrolabExplorer.inspect().neighborhood?.total===2753);
+    await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().neighborhood;return s?.status==='ready'&&s.markers>0&&!s.scheduled;});
     await image('neighborhood');
     await page.locator('#snXZ').click();await page.locator('#snUnit').selectOption('ly');
     assert.equal((await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood)).plane,'xz');
