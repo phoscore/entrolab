@@ -53,10 +53,11 @@ async function capture(which,site,width){
       const values=new Uint32Array(128*128);values[64*128+64]=8;
       const canvas=densityBitmap({values,max:8});
       const ctx=canvas.getContext('2d');
-      return [ctx.getImageData(64*3+1,(127-64)*3+1,1,1).data[3],ctx.getImageData(63*3+1,(127-64)*3+1,1,1).data[3]];
+      return [ctx.getImageData(64*3+1,(127-64)*3+1,1,1).data[3],ctx.getImageData(63*3+1,(127-64)*3+1,1,1).data[3],ctx.getImageData(64*3,(127-64)*3+1,1,1).data[3]];
     });
     assert.ok(alpha[0]>0,'a counted cell remains visible');
     assert.equal(alpha[1],0,'an empty neighbouring cell remains transparent despite smoothing');
+    assert.ok(alpha[0]>alpha[2]&&alpha[2]>0,'only the occupied side of an empty boundary fades');
   }
   await page.locator('#exDesiEnabled').check();
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();

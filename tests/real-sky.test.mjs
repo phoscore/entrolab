@@ -7,7 +7,7 @@ import {ATLAS_RELEASE,DENSITY_SIDE,atlasRow,atlasLines,decodeAtlasTile,decodeAtl
 import {frozenExport,capture,atlasSha256} from '../cosmic-explorer/atlas-build.mjs';
 import {skyCoordinates} from '../cosmic-explorer/tiles.mjs';
 import {ATLAS_URL,loadAtlasManifest,makeAtlasLoader,planAtlas,loadAtlasTiles,loadDensity,searchAtlas,atlasDetail} from '../dist/explorer/atlas-data.mjs';
-import {densityIndex,densityCounts} from '../dist/explorer/atlas-paint.mjs';
+import {densityIndex,densityCounts,densityBitmap} from '../dist/explorer/atlas-paint.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const dataDir=fileURLToPath(ATLAS_URL);
@@ -20,6 +20,27 @@ const signal=new AbortController().signal;
 const manifest=await loadAtlasManifest(signal,localFetch);
 const original=await frozenExport(dataDir);
 const rows=atlasLines(original).map(atlasRow);
+
+test('Gaia display feathers occupied edges without painting any empty catalogue cells',async()=>{
+  const loader=makeAtlasLoader(manifest,{fetcher:localFetch});
+  try {
+    const counts=await loadDensity(manifest,loader),resolution=DENSITY_SIDE*3;
+    for(const [filter,occupiedCount] of [['all',15134],['position',727],['parallax',15088]]) {
+      const index=densityIndex(counts,filter);
+      let image;
+      const canvas={getContext:()=>({createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)}),putImageData:value=>{image=value;}})};
+      densityBitmap(index,canvas);
+      let visible=0,empty=0;
+      for(let y=0;y<DENSITY_SIDE;y++)for(let x=0;x<DENSITY_SIDE;x++) {
+        const alpha=image.data[4*((DENSITY_SIDE-1-y)*3+1)*resolution+4*(x*3+1)+3];
+        if(index.values[y*DENSITY_SIDE+x]) {assert.ok(alpha>0,`invisible ${filter} ${x},${y}`);visible++;}
+        else {assert.equal(alpha,0,`painted empty ${filter} ${x},${y}`);empty++;}
+      }
+      assert.equal(visible,occupiedCount);
+      assert.equal(visible+empty,DENSITY_SIDE**2);
+    }
+  }finally{loader.dispose();}
+});
 
 test('shipped Gaia licence and package digests match, and the historical First Light sample is byte-identical',async()=>{
   const credits=await file('CREDITS.md');
