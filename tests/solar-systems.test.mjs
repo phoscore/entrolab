@@ -99,6 +99,16 @@ test('labels prefer selection and stay clear of markers, each other and edges', 
   assert.ok(a.right<=b.left || a.left>=b.right || a.bottom<=b.top || a.top>=b.bottom);
 });
 
+test('long selected catalogue names are shortened within a 320 px map without changing their identity', () => {
+  const full='Gaia DR3 1234567890123456789 · a long catalogue label';
+  const marker={x:162,y:105,label:full,radius:10,priority:12,selected:true};
+  const placed=placeLabels([marker],text=>text.length*8,320,240,{top:8,bottom:232,limit:5});
+  assert.equal(placed.length,1);
+  assert.equal(placed[0].marker.label,full);
+  assert.ok(placed[0].label.endsWith('…'));
+  assert.ok(placed[0].left>=6&&placed[0].right<=314);
+});
+
 test('host lookup is pinned to the proven identity and sample while Gaia names require classification', () => {
   const {objects} = json(`../dist/explorer/data/${RELEASE}/objects.json`);
   const planets = objects.filter(o=>o.kind==='exoplanet');

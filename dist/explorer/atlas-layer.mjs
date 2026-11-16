@@ -230,7 +230,7 @@ export function mountAtlas(root,{listen,t,n,invalidate,onSelect,onInspector,onCe
       node.textContent=value;if (cls) node.className=cls;
       return node;
     };
-    inspector.append(el('p',labelFor(ref.id),'ex-selected'),el('p',`${t('source')} · ${ATLAS_RELEASE}`,'ex-small'));
+    inspector.append(el('p',labelFor(ref.id),'ex-selected'),el('p',t('source'),'ex-small'),el('p',t('atlasIdentity'),'ex-small'));
     if (!detail) {
       inspector.append(el('p',t(state==='error'?'atlasError':'atlasDetailLoading')));
       if (state==='error') {
@@ -242,6 +242,9 @@ export function mountAtlas(root,{listen,t,n,invalidate,onSelect,onInspector,onCe
     const dl=document.createElement('dl');
     const add=(label,value)=>dl.append(el('dt',label),el('dd',value));
     const format=(val,unit)=>val===null?t('unknown'):n(val)+(unit?' '+unit:'');
+    inspector.append(el('p',`${t('atlasMagnitude')} · ${format(detail.g,'mag')}`,'ex-fact'),el('p',t('noDistance'),'ex-small'));
+    const technical=document.createElement('details');technical.className='ex-technical';technical.dataset.record=ref.id;
+    technical.append(el('summary',t('explorerTechnical')),el('p',`${t('source')} · ${ATLAS_RELEASE}`,'ex-small'));
     add(t('direction'),`RA ${n(detail.ra)}° · Dec ${n(detail.dec)}°`);
     add(t('frame'),'ICRS · J2016.0 (TCB)');
     add(t('atlasMagnitude'),format(detail.g,'mag'));
@@ -251,12 +254,12 @@ export function mountAtlas(root,{listen,t,n,invalidate,onSelect,onInspector,onCe
     add(t('atlasDecError'),format(detail.decError,'mas'));
     add(t('quality'),`astrometric_params_solved ${detail.mask} · RUWE ${format(detail.ruwe,'')}`);
     add(t('distance'),t('noDistance'));
-    inspector.append(dl);
+    technical.append(dl);
     const refs=document.createElement('details');
     refs.append(el('summary',t('provenance')),el('p',`ESA/Gaia/DPAC · gaia.dr3lite (GAVO) · ${manifest?.source.capturedAt??''}`,'ex-small'),
       el('p',`source_id ${ref.id}`,'ex-small'));
     const a=el('a',t('atlasCredits'));a.href=new URL('CREDITS.md',ATLAS_URL);refs.append(a);
-    inspector.append(refs);
+    technical.append(refs);inspector.append(technical);
   }
 
   listen(checkbox,'change',()=>{stop();if (checkbox.checked) void start();summary();draw();});

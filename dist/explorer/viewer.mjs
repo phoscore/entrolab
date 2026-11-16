@@ -158,53 +158,62 @@ export function mountExplorer(root) {
   }
 
   function showInspector() {
-    const inspector = $('exInspector'); inspector.replaceChildren();
+    const inspector = $('exInspector');
+    const openedRecord=inspector.querySelector('.ex-technical[open]')?.dataset.record;
+    inspector.replaceChildren();
     if (desi.selection) {
       $('exCenter').disabled=!desi.selection.detail;
       desi.renderDetail(inspector);
+      if(inspector.querySelector('.ex-technical'))inspector.querySelector('.ex-technical').open=openedRecord===inspector.querySelector('.ex-technical').dataset.record;
       return;
     }
     if (atlas.selection) {
       $('exCenter').disabled=!atlas.selection.detail;
       atlas.renderDetail(inspector);
+      if(inspector.querySelector('.ex-technical'))inspector.querySelector('.ex-technical').open=openedRecord===inspector.querySelector('.ex-technical').dataset.record;
       return;
     }
     const object = data?.objects.find(o => o.id === selected);
     $('exCenter').disabled = !object?.direction;
     if (!object) { inspector.append(node('p', t('choose'), 'ex-selected'), node('p', t('chooseHint'), 'ex-small')); return; }
-    inspector.append(node('p', starName(object) ?? objectName(object), 'ex-selected'), node('p', t(object.kind), 'ex-small'), node('p', object.id, 'ex-small'));
-    evidence(inspector, {evidence: object.identity.evidence});
-    if (object.classificationEvidence) evidence(inspector,{evidence:object.classificationEvidence});
+    inspector.append(node('p', starName(object) ?? objectName(object), 'ex-selected'), node('p', t(object.kind), 'ex-small'), node('p', t('firstLightIdentity'), 'ex-small'));
+    if (object.distances[0]) inspector.append(node('p', `${t('distance')} · ${measurement(object.distances[0].measurement,language())}`, 'ex-fact'));
+    else if (object.redshift) inspector.append(node('p', `${t('redshift')} · ${measurement(object.redshift.measurement,language())}`, 'ex-fact'));
+    else inspector.append(node('p', t('noDistance'), 'ex-fact'));
     showSystem(inspector,object);
+    const technical=node('details');technical.className='ex-technical';technical.dataset.record=object.id;technical.append(node('summary',t('explorerTechnical')),node('p',object.id,'ex-small'));
+    evidence(technical, {evidence: object.identity.evidence});
+    if (object.classificationEvidence) evidence(technical,{evidence:object.classificationEvidence});
     if (object.aliases.length) {
-      const aliases = node('details'); aliases.append(node('summary', t('aliases')), node('p', object.aliases.map(a => a.name).join(' · '), 'ex-small')); inspector.append(aliases);
+      const aliases = node('details'); aliases.append(node('summary', t('aliases')), node('p', object.aliases.map(a => a.name).join(' · '), 'ex-small')); technical.append(aliases);
     }
-    inspector.append(node('h3', t('direction')));
+    technical.append(node('h3', t('direction')));
     if (object.direction) {
-      quantity(inspector, 'RA', object.direction.ra); quantity(inspector, 'Dec', object.direction.dec);
-      inspector.append(node('p', `${t('frame')} · ${object.direction.frame} · ${object.direction.role}`, 'ex-small'));
-      if (object.direction.epoch) inspector.append(node('p', `${t('epoch')} · ${object.direction.epoch.value} ${object.direction.epoch.system}`, 'ex-small'));
-    } else inspector.append(node('p', t('noPosition'), 'ex-small'));
-    if (object.parallax) { inspector.append(node('h3', t('parallax'))); quantity(inspector, t('catalog'), object.parallax); }
-    inspector.append(node('h3', t('distance')));
-    if (!object.distances.length) inspector.append(node('p', t('noDistance'), 'ex-small'));
+      quantity(technical, 'RA', object.direction.ra); quantity(technical, 'Dec', object.direction.dec);
+      technical.append(node('p', `${t('frame')} · ${object.direction.frame} · ${object.direction.role}`, 'ex-small'));
+      if (object.direction.epoch) technical.append(node('p', `${t('epoch')} · ${object.direction.epoch.value} ${object.direction.epoch.system}`, 'ex-small'));
+    } else technical.append(node('p', t('noPosition'), 'ex-small'));
+    if (object.parallax) { technical.append(node('h3', t('parallax'))); quantity(technical, t('catalog'), object.parallax); }
+    technical.append(node('h3', t('distance')));
+    if (!object.distances.length) technical.append(node('p', t('noDistance'), 'ex-small'));
     for (const d of object.distances) {
-      quantity(inspector, t(d.method), d.measurement);
-      inspector.append(node('p', `${t(d.measurement.status)} · ${d.kind} · ${d.origin}`, 'ex-small'));
+      quantity(technical, t(d.method), d.measurement);
+      technical.append(node('p', `${t(d.measurement.status)} · ${d.kind} · ${d.origin}`, 'ex-small'));
     }
     if (object.redshift) {
-      inspector.append(node('h3', t('redshift'))); quantity(inspector, object.redshift.frame, object.redshift.measurement);
+      technical.append(node('h3', t('redshift'))); quantity(technical, object.redshift.frame, object.redshift.measurement);
     }
     for (const orbit of object.orbits) {
-      inspector.append(node('h3', t('orbit')), node('p', t('orbitNote'), 'ex-small'));
-      for (const [key, q] of Object.entries(orbit.elements)) quantity(inspector, t(key), q);
-      if (orbit.phase) quantity(inspector, `${t('phase')} · ${orbit.phase.kind} · ${orbit.phase.timeSystem ?? t('unknown')}`, orbit.phase.epoch);
+      technical.append(node('h3', t('orbit')), node('p', t('orbitNote'), 'ex-small'));
+      for (const [key, q] of Object.entries(orbit.elements)) quantity(technical, t(key), q);
+      if (orbit.phase) quantity(technical, `${t('phase')} · ${orbit.phase.kind} · ${orbit.phase.timeSystem ?? t('unknown')}`, orbit.phase.epoch);
     }
     if (object.quality) {
       const details = node('details'); details.append(node('summary', t('quality')));
       for (const [key, value] of Object.entries(object.quality)) details.append(node('p', `${key} · ${value === null ? t('unknown') : value}`, 'ex-small'));
-      inspector.append(details);
+      technical.append(details);
     }
+    technical.open=openedRecord===object.id;inspector.append(technical);
   }
 
   function select(object, center = true) {
@@ -283,8 +292,8 @@ export function mountExplorer(root) {
     ctx.save();
     ctx.beginPath(); ctx.rect(left, top, right - left, bottom - top); ctx.clip();
     ctx.fillStyle = '#12263866'; ctx.fillRect(left, top, right - left, bottom - top);
-    desi.paintFootprint(ctx,bounds);
     atlas.paint(ctx,bounds);
+    desi.paintFootprint(ctx,bounds);
     desi.paint(ctx,bounds);
     ctx.lineWidth = 1; ctx.strokeStyle = '#81b2c021';
     const scale = cameraScale(camera, width, height);

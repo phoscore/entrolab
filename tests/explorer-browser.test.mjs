@@ -63,6 +63,7 @@ test('Explorer browser: lazy loading, real source selection, aliases and unchang
     await p.locator('#exList button').filter({hasText:'5853498713190525696'}).waitFor();
     await p.locator('#exList button').click();
     assert.equal(await p.locator('#exCenter').isDisabled(),false);
+    await p.locator('#exInspector .ex-technical > summary').click();
     assert.match(await p.locator('#exInspector').innerText(),/1,3019114/);
     await p.waitForFunction(()=>{
       const state=window.entrolabExplorer.inspect();

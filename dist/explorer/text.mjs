@@ -1,6 +1,10 @@
 export const text = {
   subtitle: ['Real Sky · Kosmischer Atlas', 'Real Sky · Cosmic atlas'],
   intro: ['Entdecke den Himmel rund um unser Sonnensystem oder schau dir die Planetenbahnen aus der Nähe an.', 'Explore the sky around our Solar System or look closer at the planetary orbits.'],
+  explorerTechnical: ['Alle Messwerte, Unsicherheiten & Quellen', 'All measurements, uncertainties & sources'],
+  atlasIdentity: ['Ein Eintrag im Gaia-Katalog; seine Objektklasse ist hier nicht bestimmt. Die Karte zeigt seine Richtung, nicht seinen Abstand.', 'An entry in the Gaia catalogue; its object class is not established here. The map shows its direction, not its distance.'],
+  desiIdentity: ['Spektroskopisch als Galaxie klassifiziert. Die gemessene Rotverschiebung ist keine direkte Entfernung.', 'Spectroscopically classified as a galaxy. Measured redshift is not a direct distance.'],
+  firstLightIdentity: ['Ein Objekt aus der kuratierten First-Light-Probe. Die Messwerte hängen vom jeweiligen Katalog ab.', 'An object from the curated First Light sample. Measurements depend on its source catalogue.'],
   skyMode: ['Himmelskarte', 'Sky map'],
   solarMode: ['Sonnensystem', 'Solar System'],
   observer: ['Beobachter: Sonnensystem · Blickrichtungen rundum', 'Observer: Solar System · directions all around'],

@@ -19,7 +19,7 @@ export function coverageRaster(coverage) {
     if (!samples) return [0,0,0,0];
     const edge = samples < 4 || x === 0 || x === SIDE-1 || y === 0 || y === SIDE-1 ||
       !coverage[i-1] || !coverage[i+1] || !coverage[i-SIDE] || !coverage[i+SIDE];
-    return edge ? [208,158,111,38+13*samples] : [142,101,69,45];
+    return edge ? [178,151,139,24+8*samples] : [121,104,112,22];
   });
 }
 
@@ -29,7 +29,7 @@ export function densityRaster({low,high},filter) {
   return raster(i=>{
     if (!counts[i]) return [0,0,0,0];
     const k = Math.log1p(counts[i])/max;
-    return [206+Math.round(49*k),107+Math.round(115*k),88+Math.round(65*k),Math.round(52+179*k)];
+    return [159+Math.round(67*k),111+Math.round(64*k),143+Math.round(31*k),Math.round(16+104*k)];
   });
 }
 
@@ -55,8 +55,8 @@ export function paintDesiPoints(ctx,tiles,frame,filter) {
   const slots = new Uint8Array(pitch*Math.ceil(height/grid));
   const markers = [];
   let total = 0, selected = 0;
-  ctx.strokeStyle = '#ffd39e';
-  ctx.lineWidth = 1.25;
+  ctx.strokeStyle = '#f5d5b2';
+  ctx.lineWidth = 1.6;
   ctx.beginPath();
   for (const {bounds:[u,v,span],xy,rows,ids,flags} of tiles) {
     for (let i=0;i<rows.length;i++) {
@@ -70,7 +70,7 @@ export function paintDesiPoints(ctx,tiles,frame,filter) {
       if (slots[key]) continue;
       slots[key] = 1;
       markers.push({id:ids[i],row:rows[i],band:flags[i],x,y});
-      diamond(ctx,x,y,2.5);
+      diamond(ctx,x,y,3.4);
     }
   }
   ctx.stroke();

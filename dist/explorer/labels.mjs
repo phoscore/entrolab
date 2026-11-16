@@ -10,13 +10,25 @@ export function placeLabels(markers, measure, width, height, {top=8,bottom=heigh
   const placed = [];
   for (const marker of markers.filter(m=>m.label).sort((a,b)=>b.priority-a.priority)) {
     if (placed.length >= limit) break;
-    const {x,y,radius,label} = marker, gap = radius+9, w = Math.ceil(measure(label))+12, h = 21;
+    const {x,y,radius} = marker, gap = radius+9, h = 21;
+    const maxTextWidth = Math.max(12,Math.min(width-34,width<420?Math.floor(width*.64):width-34));
+    let label=marker.label;
+    if(measure(label)>maxTextWidth) {
+      let low=0,high=label.length;
+      while(low<high) {
+        const mid=Math.ceil((low+high)/2);
+        if(measure(label.slice(0,mid)+'…')<=maxTextWidth)low=mid;
+        else high=mid-1;
+      }
+      label=label.slice(0,low)+'…';
+    }
+    const w = Math.ceil(measure(label))+12;
     for (const [left,upper] of [[x+gap,y-h/2],[x-w-gap,y-h/2],[x-w/2,y-gap-h],[x-w/2,y+gap]]) {
       const rect = {left,right:left+w,top:upper,bottom:upper+h};
       if (left < 6 || rect.right > width-6 || upper < top || rect.bottom > bottom) continue;
       if (occupied.some(other=>overlaps(rect,other))) continue;
       occupied.push(rect);
-      placed.push({marker,...rect});
+      placed.push({marker,label,...rect});
       break;
     }
   }
@@ -25,12 +37,12 @@ export function placeLabels(markers, measure, width, height, {top=8,bottom=heigh
 
 export function drawLabels(ctx, labels) {
   ctx.textBaseline = 'middle';
-  for (const {marker,left,right,top,bottom} of labels) {
+  for (const {marker,label,left,right,top,bottom} of labels) {
     ctx.fillStyle = marker.selected ? '#223747' : '#0a1526eb';
     ctx.beginPath(); ctx.roundRect(left,top,right-left,bottom-top,5); ctx.fill();
     if (marker.selected) {ctx.strokeStyle = '#b6f1e8';ctx.stroke();}
     ctx.fillStyle = '#edf6fa';
-    ctx.fillText(marker.label,left+6,(top+bottom)/2);
+    ctx.fillText(label,left+6,(top+bottom)/2);
   }
   ctx.textBaseline = 'alphabetic';
 }

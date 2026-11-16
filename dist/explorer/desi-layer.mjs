@@ -200,7 +200,7 @@ export function mountDesi(root,{listen,t,n,invalidate,project,onSelect,onInspect
         counts={covered:counts.covered,total:points.total,selected:points.selected};
         drawn=markers.length;
       } else if (status!=='error') {
-        ctx.imageSmoothingEnabled=false;
+        ctx.imageSmoothingEnabled=true;
         ctx.drawImage(density,frame.left,frame.top,frame.right-frame.left,frame.bottom-frame.top);
       }
     }
@@ -213,23 +213,25 @@ export function mountDesi(root,{listen,t,n,invalidate,project,onSelect,onInspect
     const el=(tag,value,cls)=>{
       const node=document.createElement(tag);node.textContent=value;if (cls) node.className=cls;return node;
     };
-    inspector.append(el('p',detail?.name??desiLabel(ref.id),'ex-selected'),el('p',t('desiGalaxy'),'ex-small'));
+    inspector.append(el('p',detail?.name??desiLabel(ref.id),'ex-selected'),el('p',t('desiGalaxy'),'ex-small'),el('p',t('desiIdentity'),'ex-small'));
     if (!detail) {
       inspector.append(el('p',t(state==='error'?'desiError':'desiLoadingDetail')));
       return;
     }
+    inspector.append(el('p',`z = ${n(detail.z)} · ${t('redshift')}`,'ex-fact'),el('p',t('desiNoDistance'),'ex-small'));
+    const technical=document.createElement('details');technical.className='ex-technical';technical.dataset.record=ref.id;technical.append(el('summary',t('explorerTechnical')));
     const fields=document.createElement('dl');
     const add=(label,value)=>fields.append(el('dt',label),el('dd',value));
     add(t('direction'),`RA ${n(detail.ra)}° · Dec ${n(detail.dec)}°`);
     add(t('redshift'),`z = ${n(detail.z)} · σ ${n(detail.zerr)}`);
     add(t('distance'),t('desiNoDistance'));
     add(t('quality'),`ZWARN ${detail.zwarn} · Δχ² ${n(detail.deltachi2)}`);
-    inspector.append(fields);
+    technical.append(fields);
     const details=el('details','');
     const a=el('a','DESI DR1'); a.href='https://data.desi.lbl.gov/doc/releases/dr1/';a.target='_blank';a.rel='noopener';
     details.append(el('summary',t('provenance')),el('p',t('desiDirection'),'ex-small'),
       el('p',`TARGETID ${ref.id} · HEALPix ${detail.healpix} · Redrock · ${DESI_RELEASE}`,'ex-small'),a);
-    inspector.append(details);
+    technical.append(details);inspector.append(technical);
   }
 
   listen(toggle,'change',()=>{
@@ -259,7 +261,7 @@ export function mountDesi(root,{listen,t,n,invalidate,project,onSelect,onInspect
     localize() {summarize();showBrowse();},
     hasContent:()=>Boolean(counts?.selected || counts?.covered),
     paintFootprint(ctx,{left,top,right,bottom}) {
-      if (footprint) {ctx.imageSmoothingEnabled=false;ctx.drawImage(footprint,left,top,right-left,bottom-top);}
+      if (footprint && toggle.checked) {ctx.imageSmoothingEnabled=true;ctx.drawImage(footprint,left,top,right-left,bottom-top);}
     },
     selectedLabel:(ctx,frame)=>selection?.detail && toggle.checked ? paintDesiSelection(ctx,selection.detail,frame,project):null,
     hit(x,y,frame) {
