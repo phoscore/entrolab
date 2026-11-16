@@ -76,7 +76,7 @@ async function capture(which,site,width){
     await image('mobile-detail');
     await page.locator('#exHome').click();
   }else{
-    await page.locator('#exInspector .ex-technical > summary').click();
+    if(which==='after')await page.locator('#exInspector .ex-technical > summary').click();
     await image('inspector');
     await page.locator('#exNeighborhoodMode').click();
     await page.locator('#snCanvas').scrollIntoViewIfNeeded();
