@@ -185,14 +185,26 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       assert.deepEqual(three.space.focus,[0,0,0]);
       const beforeTop=three.draws;
       await page.locator('#solTop').click();
-      await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+      const canvas=page.locator('#solCanvas');
+      await canvas.evaluate(element=>element.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
       await page.waitForFunction(previous=>{
         const s=window.entrolabExplorer.inspect().solar;
         return s.pose==='top'&&s.draws>previous&&!s.scheduled&&s.markers.some(m=>m.id==='neptune');
       },beforeTop);
       const target=(await state(page)).markers.find(m=>m.id==='neptune');
-      await page.locator('#solCanvas').click({position:{x:target.x,y:target.y}});
-      assert.equal((await state(page)).selected,'neptune');
+      const point=await canvas.evaluate((element,marker)=>{
+        const rect=element.getBoundingClientRect();
+        const x=rect.left+marker.x,y=rect.top+marker.y;
+        for(const type of ['pointerdown','pointerup','pointercancel'])element.addEventListener(type,event=>{
+          const relative=element.getBoundingClientRect();
+          element.dataset.testPointer=(element.dataset.testPointer??'')+`${type}:${event.pointerType},${event.button},${(event.clientX-relative.left).toFixed(1)},${(event.clientY-relative.top).toFixed(1)} `;
+        },{capture:true,once:true});
+        return {x,y,hit:document.elementFromPoint(x,y)?.id};
+      },target);
+      assert.equal(point.hit,'solCanvas',`Neptune must be in the clickable canvas at ${width} px: ${JSON.stringify(point)}`);
+      if(width<500)await page.touchscreen.tap(point.x,point.y);
+      else await page.mouse.click(point.x,point.y);
+      assert.equal((await state(page)).selected,'neptune',`Select Neptune on the ${width} px canvas at (${target.x}, ${target.y}); ${await canvas.getAttribute('data-test-pointer')}`);
       await page.locator('#solTarget').selectOption('saturn');
       await page.locator('#solJump').click();
       const focused=await state(page);
