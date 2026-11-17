@@ -57,3 +57,28 @@ jobs:
           path: browser-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  horizons-capture:
+    name: Reconstruct official Horizons data
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/v0.9.5-our-home-new-worlds'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/new-worlds.mjs --capture
+      - run: node scripts/new-worlds.mjs --build
+      - run: node scripts/new-worlds.mjs --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: new-worlds-reconstruction
+          path: |
+            cosmic-explorer/data/raw/v0.9.5-horizons-2025-2030.1/
+            dist/explorer/data/v0.9.5-horizons-2025-2030.1/
+          if-no-files-found: warn
+          retention-days: 7
