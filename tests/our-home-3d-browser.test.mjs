@@ -35,6 +35,103 @@ async function open(width,reduced=true){
   return {context,page,errors};
 }
 const state=page=>page.evaluate(()=>window.entrolabExplorer.inspect().solar);
+test('the three Horizons system views load on demand and remain usable at 1440, 390 and 320 px',async()=>{
+  const measurements=[];
+  const requests=[];
+  const cases=[['earth','moon',2],['jupiter','io',5],['pluto','charon',2]];
+  for(const width of [1440,390,320]){
+    const {page,context,errors}=await open(width);
+    requests.length=0;
+    page.on('request',request=>{if(/horizons-2025-2030.*\.bin$/.test(request.url()))requests.push(request.url().split('/').at(-1));});
+    try{
+      await page.locator('[data-system=earth]').click();
+      assert.match(await page.locator('#solWorldMessage').innerText(),/01\.01\.2025/);
+      assert.equal((await state(page)).pair,null);
+      assert.deepEqual(requests,[]);
+      await page.locator('#solFirstWorldDay').click();
+      await page.locator('#solDate').fill('2026-11-17');
+      const time=(await state(page)).day;
+      for(const [system,selected,count] of cases){
+        const started=Date.now();
+        const trigger=page.locator(`[data-system=${system}]`);
+        if(system!=='earth')await trigger.click();
+        await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+        await page.waitForFunction(([id,n])=>{
+          const s=window.entrolabExplorer.inspect().solar;
+          return s.system===id&&s.markers.length===n&&s.pair&&s.trailPoints>0&&!s.scheduled;
+        },[system,count]);
+        const solar=await state(page);
+        assert.equal(solar.day,time);
+        assert.equal(solar.selected,selected);
+        assert.equal(solar.pair.source,'horizons');
+        assert.equal(await page.locator('#solPlay').isDisabled(),true);
+        assert.match(await page.locator('#solPairDistance').innerText(),/km/);
+        assert.match(await page.locator('#solPairLight').innerText(),/d\/c/);
+        assert.ok(solar.pair.distanceKm>10000);
+        const network=await page.evaluate(id=>{
+          const e=performance.getEntriesByType('resource').find(e=>e.name.endsWith(`/${id}.bin`)&&e.name.includes('horizons-2025-2030'));
+          return e?{bodyBytes:e.decodedBodySize,transferMs:e.duration}:null;
+        },system);
+        assert.ok(network?.bodyBytes>0);
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+        measurements.push({width,system,readyMs:Date.now()-started,drawMs:solar.drawMs,trailPoints:solar.trailPoints,...network});
+        await page.locator('#exSolarPanel').screenshot({path:join(output,`new-worlds-${system}-${width}.png`)});
+      }
+      assert.deepEqual(requests,['earth.bin','jupiter.bin','pluto.bin']);
+      await page.locator('[data-system=jupiter]').click();
+      await page.locator('#solReference').selectOption('europa');
+      assert.equal((await state(page)).pair.source,'horizons');
+      await page.locator('#solReference').selectOption('sun');
+      assert.equal((await state(page)).pair.source,'hybrid');
+      assert.match(await page.locator('#solPairEpoch').innerText(),/Hybridmodell/);
+      await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+      await page.locator('#solCanvas').focus();
+      const yaw=(await state(page)).space.yaw;
+      await page.keyboard.press('ArrowLeft');
+      assert.notEqual((await state(page)).space.yaw,yaw);
+      if(width!==1440){
+        const box=await page.locator('#solCanvas').boundingBox();
+        const cdp=await context.newCDPSession(page);
+        const p=(id,dx)=>({id,x:box.x+box.width/2+dx,y:box.y+box.height/2});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p(0,-20),p(1,20)]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p(0,-48),p(1,48)]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        assert.ok((await state(page)).space.zoom>0);
+      }
+      await page.locator('[data-language=en]').click();
+      assert.match(await page.locator('#solPairEpoch').innerText(),/Hybrid model/);
+      await page.locator('#solDate').fill('2030-01-01');
+      assert.ok((await state(page)).pair);
+      await page.locator('#solNext').click();
+      assert.equal((await state(page)).pair,null);
+      assert.match(await page.locator('#solWorldMessage').innerText(),/through 1 Jan 2030/);
+      await page.locator('#solDate').fill('2026-11-17');
+      await page.locator('#solGlobal').click();
+      assert.equal((await state(page)).view,'2d');
+      await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+      await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.some(m=>m.id==='pluto'));
+      if(width===320){
+        await page.evaluate(()=>{
+          for(let i=0;i<100;i++){
+            document.querySelector(`[data-system=${['earth','jupiter','pluto'][i%3]}]`).click();
+            document.querySelector('#solTop').click();
+            document.querySelector('#solGlobal').click();
+          }
+        });
+        await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+        await page.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.scheduled);
+        const idle=(await state(page)).draws;
+        await page.waitForTimeout(180);
+        assert.equal((await state(page)).draws,idle);
+        assert.deepEqual(requests,['earth.bin','jupiter.bin','pluto.bin']);
+        assert.equal((await state(page)).day,time);
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+  console.log('NEW_WORLDS_MEASUREMENTS '+JSON.stringify(measurements));
+  await writeFile(join(output,'new-worlds-measurements.json'),JSON.stringify({browser:browser.version(),measurements,cycles:100},null,2)+'\n');
+});
 test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/320',async()=>{
   const measurements=[];
   for(const width of [1440,390,320]){

@@ -57,30 +57,3 @@ jobs:
           path: browser-results/
           if-no-files-found: ignore
           retention-days: 7
-
-  horizons-release:
-    name: Store the verified Horizons release
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v0.9.5-our-home-new-worlds'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: new-worlds-reconstruction
-          run-id: 44169053408
-          github-token: ${{ github.token }}
-      - name: Verify and commit the versioned source and packages
-        run: |
-          node scripts/new-worlds.mjs --check
-          git add -- cosmic-explorer/data/raw/v0.9.5-horizons-2025-2030.1 dist/explorer/data/v0.9.5-horizons-2025-2030.1
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m '[CF-Pages-Skip] Archive verified Horizons data and three Moon-system packages'
-          git push origin HEAD:refs/heads/feature/v0.9.5-our-home-new-worlds

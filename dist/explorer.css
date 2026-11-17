@@ -266,3 +266,7 @@
 @media(max-width:760px){#explorer .ex-solar-viewbar{padding:8px 12px}#explorer .ex-solar-viewbar button{min-height:42px}}
 
 #explorer .ex-solar-caption{margin:0;padding:8px 16px;background:#102936;color:#c9dedb;font-size:12px;line-height:1.5}
+#explorer #solSystems{background:#11202d}
+#explorer #solGlobal{border-color:#71959b}
+#explorer #solWorldState button{min-height:36px;margin:4px 0 0 4px;white-space:normal}
+#explorer #solWorldSource{display:inline-block;margin-top:6px;font-size:12px}
