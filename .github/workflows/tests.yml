@@ -57,3 +57,20 @@ jobs:
           path: browser-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  solar-pointer-diagnostic:
+    name: Focused solar pointer diagnostic
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/v0.9.5-our-home-new-worlds'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node --test --test-name-pattern 'local 3D uses' tests/our-home-3d-browser.test.mjs

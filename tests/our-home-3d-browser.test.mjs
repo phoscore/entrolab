@@ -195,16 +195,24 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       const point=await canvas.evaluate((element,marker)=>{
         const rect=element.getBoundingClientRect();
         const x=rect.left+marker.x,y=rect.top+marker.y;
-        for(const type of ['pointerdown','pointerup','pointercancel'])element.addEventListener(type,event=>{
-          const relative=element.getBoundingClientRect();
-          element.dataset.testPointer=(element.dataset.testPointer??'')+`${type}:${event.pointerType},${event.button},${(event.clientX-relative.left).toFixed(1)},${(event.clientY-relative.top).toFixed(1)} `;
-        },{capture:true,once:true});
+        const events=[];
+        window.solarPointerTrace=events;
+        for(const type of ['pointerdown','pointerup','pointercancel','lostpointercapture','click'])for(const capture of [true,false])element.addEventListener(type,event=>{
+          const relative=element.getBoundingClientRect(),s=window.entrolabExplorer.inspect().solar;
+          const x=event.clientX-relative.left,y=event.clientY-relative.top;
+          events.push({type,capture,x,y,view:s.view,active:s.active,selected:s.selected,scheduled:s.scheduled,interacting:element.dataset.interacting,
+            pageScroll:scrollY,captured:element.hasPointerCapture(event.pointerId),marker:s.markers.find(m=>m.id==='neptune')});
+        },{capture,once:true});
         return {x,y,hit:document.elementFromPoint(x,y)?.id};
       },target);
       assert.equal(point.hit,'solCanvas',`Neptune must be in the clickable canvas at ${width} px: ${JSON.stringify(point)}`);
       if(width<500)await page.touchscreen.tap(point.x,point.y);
       else await page.mouse.click(point.x,point.y);
-      assert.equal((await state(page)).selected,'neptune',`Select Neptune on the ${width} px canvas at (${target.x}, ${target.y}); ${await canvas.getAttribute('data-test-pointer')}`);
+      try{
+        await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.selected==='neptune',null,{timeout:1200});
+      }catch{
+        assert.fail(`Select Neptune on the ${width} px canvas; ${JSON.stringify({errors,point,trace:await page.evaluate(()=>window.solarPointerTrace)})}`);
+      }
       await page.locator('#solTarget').selectOption('saturn');
       await page.locator('#solJump').click();
       const focused=await state(page);
