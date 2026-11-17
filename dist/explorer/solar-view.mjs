@@ -100,7 +100,7 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
-        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView"></button><button type="button" id="solAngle" data-solar="angleView"></button><button type="button" id="solSide" data-solar="sideView"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
+        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
         <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
         <div class="ex-solar-quick">
           <label><span data-solar="target"></span><select id="solTarget"></select></label>
@@ -159,7 +159,7 @@ export function mountSolar(root) {
   const listen = (el,type,fn,opts={}) => el.addEventListener(type,fn,{...opts,signal:abort.signal});
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false, visible = false, raf = null, clock = null;
-  let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, selected = 'sun', reference = 'sun', follow = false, enlarged = true;
+  let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, pose='angle', selected = 'sun', reference = 'sun', follow = false, enlarged = true;
   const trailCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
@@ -492,11 +492,16 @@ export function mountSolar(root) {
       if (hit) select(hit[0].body.id,false);
     },
   });
+  const markPose=value=>{
+    pose=value;
+    for(const [id,kind] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
+      $(id).setAttribute('aria-pressed',String(pose===kind));
+  };
   const zoomBy=delta=>{if(view==='3d'){space=zoomSpace(space,delta);invalidate();}
     else gestures.zoomBy(delta);};
   const fitView=()=>{
     follow=false;$('solFollow').setAttribute('aria-pressed','false');
-    if(view==='3d'){space=spaceCamera();invalidate();}
+    if(view==='3d'){space=spaceCamera();markPose('angle');invalidate();}
     else setCamera(fit());
   };
   listen($('solIn'),'click',()=>zoomBy(.25));
@@ -508,7 +513,7 @@ export function mountSolar(root) {
   });
   listen($('solFit'),'click',fitView);
   listen($('solInner'),'click',()=>{
-    if(view==='3d'){space={...spaceCamera(),zoom:1.2};invalidate();}
+    if(view==='3d'){space={...spaceCamera(),zoom:1.2};markPose('angle');invalidate();}
     else setCamera({...fit(),zoom:1.2});
   });
   listen($('solCenter'),'click',center);
@@ -539,6 +544,7 @@ export function mountSolar(root) {
     const mid=points.length===2?[(points[0][0]+points[1][0])/2,(points[0][1]+points[1][1])/2]:points[0];
     const dx=mid[0]-spaceGesture.point[0],dy=mid[1]-spaceGesture.point[1];
     if(Math.hypot(dx,dy)>4)spaceMoved=true;
+    if(points.length===1&&Math.hypot(dx,dy)>4)markPose(null);
     space=points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
       rotateSpace(spaceGesture.camera,dx,-dy);
     invalidate();
@@ -562,7 +568,7 @@ export function mountSolar(root) {
   listen(canvas,'keydown',event=>{
     if(view!=='3d')return;
     const arrows={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,25],ArrowDown:[0,-25]};
-    if(Object.hasOwn(arrows,event.key)){event.preventDefault();space=rotateSpace(space,...arrows[event.key]);invalidate();}
+    if(Object.hasOwn(arrows,event.key)){event.preventDefault();space=rotateSpace(space,...arrows[event.key]);markPose(null);invalidate();}
     else if(['+','=','-','Home','Escape'].includes(event.key)){
       event.preventDefault();
       if(event.key==='Home')fitView();
@@ -585,7 +591,7 @@ export function mountSolar(root) {
   listen($('sol3d'),'click',()=>switchView('3d'));
   listen($('solSun'),'click',()=>select('sun',true));
   for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
-    listen($(id),'click',()=>{space={...space,...ORBIT_POSES[pose]};invalidate();});
+    listen($(id),'click',()=>{space={...space,...ORBIT_POSES[pose]};markPose(pose);invalidate();});
   listen($('solTrails'),'click',()=>{
     trails=!trails;$('solTrails').setAttribute('aria-pressed',String(trails));
     $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');invalidate();
@@ -625,7 +631,7 @@ export function mountSolar(root) {
       active=value;
       if (active) resize(); else suspend();
     },
-    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},trails,trailPoints:[...trailCache.values()].reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
+    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,trailPoints:[...trailCache.values()].reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
       markers:markers.map(({body,x,y,radius,depth})=>({id:body.id,x,y,radius,depth}))}),
     dispose() {active=false;suspend();abort.abort();unsubscribe();resizeObserver.disconnect();visibilityObserver.disconnect();root.replaceChildren();},
   };

@@ -42,6 +42,7 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
     try{
       await page.locator('#solTarget').selectOption('mars');
       await page.locator('#solReference').selectOption('earth');
+      assert.equal(await page.locator('#sol3dControls').isHidden(),true);
       const two=await state(page);
       await page.locator('#solCanvas').scrollIntoViewIfNeeded();
       await page.locator('#explorer').screenshot({path:join(output,`2d-before-${width}.png`)});
@@ -49,6 +50,7 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       await page.locator('#sol3d').click();
       await page.locator('#solCanvas').scrollIntoViewIfNeeded();
       await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().solar;return s.view==='3d'&&s.trailPoints>100&&!s.scheduled;});
+      assert.equal(await page.locator('#sol3dControls').isVisible(),true);
       let three=await state(page);
       const readyMs=Date.now()-started;
       assert.equal(three.day,two.day);
@@ -61,6 +63,7 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       for(const [id,view] of [['solTop','top'],['solAngle','angle'],['solSide','side']]){
         const previous=(await state(page)).draws;
         await page.locator('#'+id).click();
+        assert.equal(await page.locator('#'+id).getAttribute('aria-pressed'),'true');
         await page.locator('#solCanvas').scrollIntoViewIfNeeded();
         await page.waitForFunction(before=>window.entrolabExplorer.inspect().solar.draws>before,previous);
         await page.locator('#explorer').screenshot({path:join(output,`${view}-${width}.png`)});
@@ -74,11 +77,13 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       await page.locator('#solCanvas').focus();
       await page.keyboard.press('ArrowRight');
       assert.notEqual((await state(page)).space.yaw,shown.space.yaw);
+      assert.equal((await state(page)).pose,null);
       await page.keyboard.press('+');
       assert.ok((await state(page)).space.zoom>0);
       await page.locator('#solFit').click();
       three=await state(page);
       assert.equal(three.space.zoom,0);
+      assert.equal(three.pose,'angle');
       assert.deepEqual(three.space.focus,[0,0,0]);
       await page.locator('#solTop').click();
       await page.locator('#solCanvas').scrollIntoViewIfNeeded();
@@ -91,6 +96,7 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       const focused=await state(page);
       assert.notDeepEqual(focused.space.focus,[0,0,0]);
       await page.locator('#sol2d').click();
+      assert.equal(await page.locator('#sol3dControls').isHidden(),true);
       assert.equal((await state(page)).selected,'saturn');
       await page.locator('#sol3d').click();
       assert.equal((await state(page)).reference,'earth');
@@ -156,7 +162,7 @@ test('touch rotation/pinch and model-time trails at 100 days per second are fram
       trailPoints:s.trailPoints,pausedDay,drawMs:playbackDrawMs,
       p95DrawMs:[...playbackDrawMs].sort((a,b)=>a-b)[Math.ceil(playbackDrawMs.length*.95)-1],
       idleDrawDelta,cycles:100,
-    },null,2)+'\\n');
+    },null,2)+'\n');
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
