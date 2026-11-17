@@ -5,6 +5,9 @@ import {placeLabels, drawLabels} from './labels.mjs';
 import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, vectorOnOrbit, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
 import {solarComparison} from './solar-motion.mjs';
 import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,spaceProjector,trailSamples} from './solar-space.mjs';
+import {START,SYSTEMS} from './new-worlds-spec.mjs';
+import {loadEphemeris,supportsEpoch} from './new-worlds-ephemeris.mjs';
+import {localOrbitPath,pluto,systemBodies,worldComparison,worldNotes,worldTrail,worldVector} from './new-worlds.mjs';
 
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
@@ -78,6 +81,30 @@ const copy = {
   limit3d:['Perspektivische Projektion auf einen flachen Bildschirm: Bildnähe ist keine räumliche Nähe. Die Sonne ist der Ursprung; die Erdposition ist der Erde–Mond-Schwerpunkt.','Perspective projection onto a flat screen: screen proximity is not spatial proximity. The Sun is the origin; Earth’s position is the Earth–Moon barycentre.'],
   scene3d:['Frei wählbare Perspektive auf vereinfachte JPL-Bahnpositionen. Ekliptikebene J2000, TDB 1800–2050. Symbole sind standardmäßig vergrößert.','Adjustable view of approximate JPL orbital positions. J2000 ecliptic, TDB 1800–2050. Symbols are enlarged by default.'],
   focusScale:['AU am Kamerazentrum','AU at camera focus'],
+  focusScaleKm:['km am Kamerazentrum','km at camera focus'],
+  systems:['Mondsysteme','Moon systems'],
+  overview:['Zur Sonnensystemübersicht','Back to Solar System overview'],
+  localFit:['System einpassen','Fit system'],
+  baryFrame:['Koordinatenursprung: gemeinsamer Schwerpunkt · J2000-Ekliptik','Origin: system barycentre · J2000 ecliptic'],
+  localScene:['JPL Horizons · feine Linien zeigen ein Bahnfenster, leuchtende Spuren den zurückgelegten Abschnitt.','JPL Horizons · faint lines show an orbital window and bright trails show past motion.'],
+  localLimit:['Die Achsen schneiden sich im Systemschwerpunkt. Der Linienabschnitt im Bild ist eine Projektion.','The axes meet at the system barycentre. The line drawn on screen is a projection.'],
+  moon:['Mond','Moon'],
+  dwarf:['Zwergplanet','Dwarf planet'],
+  horizons:['NASA/JPL Horizons · numerische Ephemeride','NASA/JPL Horizons · numerical ephemeris'],
+  hybrid:['Hybridmodell · Sonnenbezug mit JPL-Näherung','Hybrid model · solar reference uses JPL approximation'],
+  hybridNote:['Bei Sonnenbezug nutzt das Erd- oder Jupitersystem den bisherigen Näherungsanker. Die größte geprüfte Positionsabweichung lag bei rund 15.500 km für die Erde und 618.000 km für Jupiter.','Sun-relative values for the Earth and Jupiter systems use the existing approximate anchor. The largest sampled position differences were about 15,500 km for Earth and 618,000 km for Jupiter.'],
+  unavailable:['Ephemeriden verfügbar vom 01.01.2025 bis 01.01.2030 (00:00 TDB).','Ephemeris available from 1 Jan 2025 through 1 Jan 2030 (00:00 TDB).'],
+  startRange:['Zum Start der Ephemeride','Go to start of ephemeris'],
+  loading:['Ephemeride wird geladen …','Loading ephemeris …'],
+  loadError:['Ephemeridendaten konnten nicht geladen oder geprüft werden. Bitte erneut versuchen.','Ephemeris data could not be loaded or verified. Please try again.'],
+  retry:['Erneut laden','Retry'],
+  invalidPair:['Für dieses Körperpaar ist kein gemeinsames geprüftes Modell verfügbar.','No common validated model is available for this pair.'],
+  unavailableValue:['Nicht verfügbar','Unavailable'],
+  geometryUnavailable:['Zustandsvektoren sind gerade nicht verfügbar.','State vectors are currently unavailable.'],
+  bodySource:['NASA-Quelle','NASA source'],
+  localBodies:['Körper im System','System bodies'],
+  overviewBodies:['Körper im Sonnensystem','Solar System bodies'],
+  ephemHelp:['Lokale Zustände verwenden denselben Systemschwerpunkt. Bei Sonnenbezug wird der heliozentrische Schwerpunktzustand addiert.','Local states use the same barycentre. Sun-relative states add the heliocentric barycentre state.'],
   pairProjection3d:['Abstand in der J2000-Ekliptikebene (X/Y), nicht im Bild','J2000 ecliptic-plane separation (X/Y), not on screen'],
   whyBody3d:['Geschwindigkeit braucht einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Ziels ab. Drehen und Zoomen verändern nur das Bild. Der X/Y-Wert gehört zur Ekliptikebene, der 3D-Abstand enthält auch Z. Die projizierte Linie ist keine maßstäbliche Distanzangabe. Lichtlaufzeit ist Abstand durch c bei festgehaltener Geometrie.','Speed needs a reference body: subtract its model velocity from the target’s. Rotating and zooming change only the image. X/Y belongs to the ecliptic plane; 3D separation also includes Z. The projected line is not a distance scale. Light time is distance divided by c for frozen geometry.'],
 };
@@ -86,9 +113,11 @@ export function mountSolar(root) {
   const lang = () => language() === 'en' ? 1 : 0;
   const t = key => copy[key][lang()];
   const name = body => body.names[lang()];
-  const comparisonName=body=>body.id==='earth'?t('earthBary'):name(body);
+  const comparisonName=body=>body.id==='earth'&&!system?t('earthBary'):name(body);
   const format = [new Intl.NumberFormat('de-DE',{maximumSignificantDigits:4}),new Intl.NumberFormat('en-GB',{maximumSignificantDigits:4})];
   const n = value => format[lang()].format(value);
+  const coarse = [new Intl.NumberFormat('de-DE',{maximumSignificantDigits:3}),new Intl.NumberFormat('en-GB',{maximumSignificantDigits:3})];
+  const rough = value => coarse[lang()].format(value);
   root.innerHTML = `
     <div class="ex-layout ex-solar">
       <div class="ex-left">
@@ -102,6 +131,8 @@ export function mountSolar(root) {
         </div>
         <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
         <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
+        <div class="ex-solar-viewbar" role="group" id="solSystems"><button type="button" id="solGlobal" data-solar="overview" hidden></button></div>
+        <div class="ex-solar-caption" id="solWorldState" hidden><span id="solWorldMessage" role="status"></span> <button type="button" id="solFirstWorldDay" data-solar="startRange" hidden></button> <button type="button" id="solWorldRetry" data-solar="retry" hidden></button></div>
         <div class="ex-solar-quick">
           <label><span data-solar="target"></span><select id="solTarget"></select></label>
           <label><span data-solar="reference"></span><select id="solReference"></select></label>
@@ -129,13 +160,14 @@ export function mountSolar(root) {
           <ul><li><a href="${ORBIT_SOURCE}" data-solar="elements"></a></li><li><a href="${RADIUS_SOURCE}" data-solar="radii"></a></li><li><a href="${SUN_SOURCE}" data-solar="iau"></a></li></ul>
         </details></div>
       </div>
-      <aside class="ex-aside"><h2 data-solar="bodies"></h2><div id="solList" class="ex-body-list"></div>
+      <aside class="ex-aside"><h2 id="solBodiesTitle" data-solar="bodies"></h2><div id="solList" class="ex-body-list"></div>
         <label class="ex-symbol-option"><input type="checkbox" id="solSymbols" checked><span data-solar="symbols"></span></label>
         <div class="ex-inspector"><h2 data-solar="selected"></h2><p id="solName" class="ex-selected" aria-live="polite"></p><p id="solKind" class="ex-small"></p>
           <dl><dt data-solar="distance"></dt><dd id="solDistance"></dd>
             <dt id="solRadiusLabel"></dt><dd id="solRadius"></dd>
             <dt id="solAxisLabel" data-solar="axis" hidden></dt><dd id="solAxis" hidden></dd></dl>
           <p id="solEarth" class="ex-small" data-solar="earth" hidden></p>
+          <p id="solWorldNote" class="ex-small" hidden></p><a id="solWorldSource" data-solar="bodySource" hidden></a>
         </div>
         <section class="ex-compare" aria-labelledby="solCompareTitle">
           <h2 id="solCompareTitle" data-solar="comparison"></h2>
@@ -149,7 +181,7 @@ export function mountSolar(root) {
             <dt data-solar="pairRadial"></dt><dd id="solPairRadial"></dd>
           </dl>
           <p id="solPairEpoch" class="ex-small"></p>
-          <details><summary data-solar="why"></summary><p data-solar="whyBody"></p><p data-solar="method"></p></details>
+          <details><summary data-solar="why"></summary><p data-solar="whyBody"></p><p id="solPairMethod" data-solar="method"></p></details>
         </section>
       </aside>
     </div>`;
@@ -160,28 +192,112 @@ export function mountSolar(root) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false, visible = false, raf = null, clock = null;
   let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, pose='angle', selected = 'sun', reference = 'sun', follow = false, enlarged = true;
-  const trailCache=new Map(),spacePointers=new Map();
+  let system = null, overview = null, buttons = [];
+  const ephemerides = new Map(), pending = new Set(), failures = new Set();
+  const globalBodies = [...bodies, pluto];
+  const listedBodies = () => system ? systemBodies(system) : globalBodies;
+  const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
+  const distance = () => system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : 85;
+  const trailCache=new Map(),pathCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
   let draws = 0, drawMs = 0, lastReadout = null;
-  const buttons = bodies.map(body => {
+  const systemButtons = Object.entries(SYSTEMS).map(([id, info]) => {
     const button = document.createElement('button');
-    button.type = 'button';
-    button.dataset.body = body.id;
-    button.style.setProperty('--body-color',body.color);
-    $('solList').append(button);
-    listen(button,'click',()=>select(body.id,true));
-    return {body,button};
+    button.type = 'button'; button.dataset.system = id;
+    $('solSystems').append(button);
+    listen(button,'click',()=>enterSystem(id));
+    return {id, info, button};
   });
-  for(const body of bodies)for(const id of ['solTarget','solReference']) {
-    const option=document.createElement('option');option.value=body.id;$(id).append(option);
+  listen($('solList'),'click',event=>{
+    const button = event.target.closest('button[data-body]');
+    if(button)select(button.dataset.body,true);
+  });
+  function rebuildBodies() {
+    const list = listedBodies();
+    buttons = list.map(body => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.body = body.id;
+      button.style.setProperty('--body-color',body.color);
+      return {body,button};
+    });
+    $('solList').replaceChildren(...buttons.map(({button})=>button));
+    for(const id of ['solTarget','solReference']) {
+      const allowed = system && id === 'solReference' ? [bodies[0], ...list] : list;
+      $(id).replaceChildren(...allowed.map(body=>new Option(name(body), body.id)));
+    }
+  }
+
+  function loadSystem(id, retry = false) {
+    if (!supportsEpoch(day) || ephemerides.has(id) || pending.has(id) || (!retry && failures.has(id))) return;
+    failures.delete(id); pending.add(id);
+    loadEphemeris(id, abort.signal).then(data => {
+      ephemerides.set(id, data);
+      stateDay = null;
+    }).catch(error => {
+      if (error.name !== 'AbortError') failures.add(id);
+    }).finally(() => {
+      pending.delete(id);
+      if (!abort.signal.aborted) {updateInspector(); invalidate();}
+    });
+  }
+
+  function loadVisibleData() {
+    if (active) loadSystem(system ?? 'pluto');
+  }
+
+  function enterSystem(id) {
+    if (system === id) return;
+    if (!system) overview = {selected,reference,follow,space,pose,view};
+    system = id;
+    const [parent, moon] = systemBodies(id);
+    selected = moon.id; reference = parent.id;
+    markers = [];
+    stateDay = null;
+    trailCache.clear();
+    rebuildBodies();
+    fitView();
+    switchView('3d');
+    loadVisibleData();
+    localize();
+  }
+
+  function exitSystem(next = overview?.view) {
+    if (!system) return;
+    ({selected,reference,follow,space,pose} = overview);
+    system = null;
+    overview = null;
+    markers = [];
+    stateDay = null;
+    trailCache.clear();
+    rebuildBodies();
+    markPose(pose);
+    $('solFollow').setAttribute('aria-pressed',String(follow));
+    switchView(next);
+    loadVisibleData();
+    localize();
   }
 
   function current() {
-    if (stateDay !== day) {state = solarState(day);stateDay = day;}
+    if (stateDay !== day) {
+      state = system ? [] : solarState(day);
+      const id = system ?? 'pluto';
+      const visibleBodies = system ? systemBodies(system) : [pluto];
+      const data = ephemerides.get(id);
+      for (const body of visibleBodies) {
+        const vector = worldVector(data,id,body.id,day,Boolean(system));
+        if (vector) state.push({body,vector,orbit:null,distanceAU:Math.hypot(...vector)});
+      }
+      stateDay = day;
+    }
     return state;
   }
   function selectedBody() { return current().find(entry=>entry.body.id === selected); }
+  function comparison() {
+    if (selected === reference) return null;
+    const id = relevantSystem();
+    return id ? worldComparison(ephemerides.get(id),id,day,selected,reference) : solarComparison(day,selected,reference);
+  }
   function invalidate() {
     if (active && visible && !document.hidden && raf === null) raf = requestAnimationFrame(draw);
   }
@@ -202,7 +318,8 @@ export function mountSolar(root) {
     invalidate();
   }
   function center() {
-    const vector=selectedBody().vector;
+    const vector=selectedBody()?.vector;
+    if (!vector) return;
     if(view==='3d')space={...space,focus:[...vector]};
     else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     invalidate();
@@ -215,35 +332,63 @@ export function mountSolar(root) {
     invalidate();
   }
   function updateInspector() {
-    const {body,distanceAU,orbit} = selectedBody();
+    const entry = selectedBody();
+    const body = listedBodies().find(item=>item.id===selected);
+    const orbit = entry?.orbit;
+    const notes = worldNotes[selected];
+    const id = relevantSystem();
+    const pair = comparison();
+    const formatValue = pair?.source ? rough : n;
+    const solar = system ? worldComparison(ephemerides.get(system),system,day,selected,'sun') : null;
+    const distanceAU = system ? solar?.distanceAU : entry?.distanceAU;
+    const fmtDistance = id ? rough : n;
     $('solName').textContent = name(body);
-    $('solKind').textContent = t(orbit?'planet':'star');
-    $('solDistance').textContent = `${orbit ? '≈ ' : ''}${n(distanceAU)} AU · ${n(distanceAU*AU_KM)} km`;
-    $('solRadiusLabel').textContent = t(orbit?'radius':'sunRadius');
+    $('solKind').textContent = t(body.id === 'sun' ? 'star' : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
+    $('solDistance').textContent = distanceAU === undefined ? t('unavailableValue') :
+      `${body.id === 'sun' ? '' : '~ '}${fmtDistance(distanceAU)} AU · ${fmtDistance(distanceAU*AU_KM)} km${solar?.source === 'hybrid' ? ' · '+t('hybrid') : ''}`;
+    $('solRadiusLabel').textContent = t(body.id === 'sun' ? 'sunRadius' : 'radius');
     $('solRadius').textContent = n(body.radiusKm)+' km';
     $('solAxis').hidden = $('solAxisLabel').hidden = !orbit;
     $('solAxis').textContent = orbit ? n(orbit.a)+' AU' : '';
-    $('solEarth').hidden = body.id !== 'earth';
+    $('solEarth').hidden = body.id !== 'earth' || Boolean(system);
+    $('solWorldNote').hidden = $('solWorldSource').hidden = !notes;
+    if (notes) {
+      $('solWorldNote').textContent = notes[0][lang()];
+      $('solWorldSource').href = notes[1];
+    }
+    const status = !id ? null : !supportsEpoch(day) ? 'unavailable' : failures.has(id) ? 'loadError' :
+      !ephemerides.has(id) ? 'loading' : null;
+    $('solWorldState').hidden = !status;
+    $('solWorldMessage').textContent = status ? t(status) : '';
+    $('solWorldRetry').hidden = status !== 'loadError';
+    $('solFirstWorldDay').hidden = status !== 'unavailable';
+    $('solCenter').disabled = $('solJump').disabled = $('solFollow').disabled = !entry;
     for (const {body,button} of buttons) {
       button.setAttribute('aria-pressed',String(body.id===selected));
       button.dataset.reference=String(body.id===reference&&reference!==selected);
     }
     $('solReference').value=reference;
-    const pair=selected!==reference?solarComparison(day,selected,reference):null;
-    $('solPairEmpty').hidden=Boolean(pair);$('solPairValues').hidden=!pair;
-    $('solPairTitle').textContent=pair?`${comparisonName(body)} ↔ ${comparisonName(bodies.find(b=>b.id===reference))}`:'';
+    $('solPairEmpty').hidden=Boolean(pair);
+    $('solPairValues').hidden=!pair;
+    $('solPairEmpty').textContent=t(status ? 'geometryUnavailable' : id&&selected!==reference?'invalidPair':'choosePair');
+    $('solPairTitle').textContent=pair?`${comparisonName(body)} ↔ ${comparisonName(listedBodies().find(b=>b.id===reference)??bodies[0])}`:'';
     $('solPairSummary').hidden=!pair;
-    if(pair)$('solPairSummary').textContent=`${$('solPairTitle').textContent} · ≈ ${n(pair.distanceAU)} AU · ≈ ${n(pair.speedKmS)} km/s`;
     $('solPairProjectionLabel').textContent=t(view==='3d'?'pairProjection3d':'pairProjection');
-    $('solPairEpoch').textContent=`${t('comparisonEpoch')}: ${formatModelDay(day).replace('T',' ')} TDB · ${t('model')}`;
+    const source = pair?.source ?? (id ? 'horizons' : 'model');
+    $('solPairEpoch').textContent=`${t('comparisonEpoch')}: ${formatModelDay(day).replace('T',' ')} TDB · ${t(source)}`;
+    $('solPairMethod').textContent = t(id ? 'ephemHelp' : 'method') + (system && system !== 'pluto' ? ' '+t('hybridNote') : '');
     if(pair) {
-      $('solPairDistance').textContent=`≈ ${n(pair.distanceAU)} AU · ${n(pair.distanceKm)} km`;
-      $('solPairProjection').textContent=`≈ ${n(pair.projectedAU)} AU`;
-      const light=pair.lightSeconds<120?`${n(pair.lightSeconds)} s`:
-        pair.lightSeconds<7200?`${n(pair.lightSeconds/60)} min`:`${n(pair.lightSeconds/3600)} h`;
-      $('solPairLight').textContent=`≈ ${light} (d/c)`;
-      $('solPairSpeed').textContent=`≈ ${n(pair.speedKmS)} km/s`;
-      $('solPairRadial').textContent=`${pair.radialKmS>=0?'+':''}${n(pair.radialKmS)} km/s · ${t(pair.radialKmS>0?'receding':pair.radialKmS<0?'approaching':'steady')}`;
+      const localPair = system && reference !== 'sun';
+      const sep = localPair ? formatValue(pair.distanceKm)+' km' : formatValue(pair.distanceAU)+' AU';
+      $('solPairSummary').textContent=`${$('solPairTitle').textContent} · ~ ${sep} · ~ ${formatValue(pair.speedKmS)} km/s`;
+      $('solPairDistance').textContent=`~ ${localPair?'':formatValue(pair.distanceAU)+' AU · '}${formatValue(pair.distanceKm)} km`;
+      $('solPairProjection').textContent=`~ ${localPair?formatValue(pair.projectedAU*AU_KM)+' km':formatValue(pair.projectedAU)+' AU'}`;
+      const light=pair.lightSeconds<120?`${formatValue(pair.lightSeconds)} s`:
+        pair.lightSeconds<7200?`${formatValue(pair.lightSeconds/60)} min`:`${formatValue(pair.lightSeconds/3600)} h`;
+      $('solPairLight').textContent=`~ ${light} (d/c)`;
+      $('solPairSpeed').textContent=`~ ${formatValue(pair.speedKmS)} km/s`;
+      $('solPairRadial').textContent=pair.radialKmS===null||pair.source==='hybrid'?t('unavailableValue'):
+        `${pair.radialKmS>=0?'+':''}${formatValue(pair.radialKmS)} km/s · ${t(pair.radialKmS>0?'receding':pair.radialKmS<0?'approaching':'steady')}`;
     }
   }
   function updateClock(force = false) {
@@ -259,16 +404,28 @@ export function mountSolar(root) {
   function localize() {
     for (const el of root.querySelectorAll('[data-solar]')) el.textContent = t(el.dataset.solar);
     for (const {body,button} of buttons) button.textContent = name(body);
-    for(const id of ['solTarget','solReference'])for(const option of $(id).options) option.textContent=name(bodies.find(body=>body.id===option.value));
+    for(const id of ['solTarget','solReference'])for(const option of $(id).options) option.textContent=name(listedBodies().find(body=>body.id===option.value)??bodies[0]);
+    for(const {id,info,button} of systemButtons) {
+      button.textContent = name(info);
+      button.setAttribute('aria-pressed',String(system===id));
+    }
     $('solTarget').value=selected;$('solReference').value=reference;
     for (const [id,key] of [['solIn','zoomIn'],['solOut','zoomOut'],['solPrev','prev'],['solNext','next']]) {
       $(id).setAttribute('aria-label',t(key)); $(id).title=t(key);
     }
-    canvas.setAttribute('aria-label',t(view==='3d'?'view3d':'title'));
+    canvas.setAttribute('aria-label',system?name(SYSTEMS[system]):t(view==='3d'?'view3d':'title'));
     $('solViewBar').setAttribute('aria-label',t('viewGroup'));
-    root.querySelector('[data-solar="frame"]').textContent=t(view==='3d'?'frame3d':'frame');
+    $('solSystems').setAttribute('aria-label',t('systems'));
+    $('solGlobal').hidden = !system;
+    $('solInner').hidden = Boolean(system);
+    $('solFit').textContent=t(system?'localFit':'fit');
+    $('solBodiesTitle').textContent=t(system?'localBodies':'overviewBodies');
+    root.querySelector('[data-solar="title"]').textContent=system?name(SYSTEMS[system]):t('title');
+    root.querySelector('[data-solar="frame"]').textContent=t(system?'baryFrame':view==='3d'?'frame3d':'frame');
+    root.querySelector('[data-solar="model"]').textContent=t(system?'horizons':'model');
+    $('solScene3d').textContent=t(system?'localScene':'scene3d');
     $('solHelp').textContent=t(view==='3d'?'help3d':'help');
-    $('solLimit').textContent=t(view==='3d'?'limit3d':'limit');
+    $('solLimit').textContent=t(system?'localLimit':view==='3d'?'limit3d':'limit');
     root.querySelector('[data-solar="whyBody"]').textContent=t(view==='3d'?'whyBody3d':'whyBody');
     $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');
     $('solScaleNote').textContent = t(enlarged?'schematic':'scale');
@@ -283,8 +440,9 @@ export function mountSolar(root) {
       day = advanceModelDay(clock.day,Math.max(0,time-clock.start)/1000,clock.rate);
       if (day === MAX_DAY) clock = null;
     }
-    if(follow) {
-      const vector=selectedBody().vector;
+    loadVisibleData();
+    const vector=follow?selectedBody()?.vector:null;
+    if(vector) {
       if(view==='3d')space={...space,focus:[...vector]};
       else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     }
@@ -320,7 +478,15 @@ export function mountSolar(root) {
     // The marker and the path use the same fitted elements at the displayed TDB epoch.
     const entries = current();
     for (const {body,orbit} of entries) {
-      if (!orbit) continue;
+      if (!orbit) {
+        if(body.id==='pluto'&&trails) {
+          const points = ephemerisTrail(body).samples;
+          ctx.beginPath();
+          points.forEach(({vector},i)=>{const p=screen(eclipticToMap(vector));if(i)ctx.lineTo(...p);else ctx.moveTo(...p);});
+          ctx.strokeStyle=body.color+'99';ctx.lineWidth=1.4;ctx.stroke();
+        }
+        continue;
+      }
       const {a,e,p,q} = orbit, b = a*Math.sqrt(1-e*e);
       const [x,y] = screen([-a*e*p[0],a*e*p[1]]);
       ctx.beginPath();
@@ -368,9 +534,21 @@ export function mountSolar(root) {
     $('solOut').disabled = camera.zoom === 0;
   }
 
+  function ephemerisTrail(body) {
+    let cached = trailCache.get(body.id);
+    if (!cached || cached.day!==day) {
+      const id = system ?? 'pluto';
+      const points = worldTrail(ephemerides.get(id),id,body,day,Boolean(system));
+      cached={day,samples:points.filter(Boolean).map(vector=>({vector}))};
+      trailCache.set(body.id,cached);
+    }
+    return cached;
+  }
+
   function renderSpace() {
     ctx.clearRect(0,0,width,height);
-    const screen=spaceProjector(space,width,height);
+    const baseDistance=distance();
+    const screen=spaceProjector(space,width,height,baseDistance);
     const strokePath=(vectors,color,lineWidth=1)=>{
       ctx.beginPath();let drawing=false;
       for(const vector of vectors){
@@ -382,24 +560,36 @@ export function mountSolar(root) {
       ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.stroke();
     };
     // Geometric reference rings in the J2000 ecliptic, not sources.
-    for(const radius of [1,5,10,20,30]){
+    const extent = system ? SYSTEMS[system].scaleKm/AU_KM : 32;
+    const rings = system ? [.25,.5,1].map(r=>r*extent) : [1,5,10,20,30];
+    for(const radius of rings){
       const ring=Array.from({length:97},(_,i)=>{
         const a=2*Math.PI*i/96;return [radius*Math.cos(a),radius*Math.sin(a),0];
       });
       strokePath(ring,'#7093a724');
     }
-    strokePath([[-32,0,0],[32,0,0]],'#88afba40',1);
-    strokePath([[0,-32,0],[0,32,0]],'#88afba40',1);
+    strokePath([[-extent,0,0],[extent,0,0]],'#88afba40',1);
+    strokePath([[0,-extent,0],[0,extent,0]],'#88afba40',1);
     const entries=current();
     for(const {body,orbit} of entries){
-      if(!orbit)continue;
-      strokePath(Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144)),
-        body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
+      let vectors;
+      if (orbit) vectors = Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144));
+      else if (system && body.period) {
+        // The display path changes only when the model crosses a TDB hour. Markers and trails use the exact model epoch.
+        const epoch = Math.floor(day*24)/24;
+        let cached = pathCache.get(body.id);
+        if (!cached || cached.epoch!==epoch) {
+          cached = {epoch, vectors:localOrbitPath(ephemerides.get(system),system,body,epoch)};
+          pathCache.set(body.id,cached);
+        }
+        vectors = cached.vectors;
+      }
+      if (vectors) strokePath(vectors,body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
     }
     if(trails)for(const {body,orbit} of entries){
-      if(!orbit)continue;
-      let cached=trailCache.get(body.id);
-      if(!cached||cached.day!==day){
+      if(!orbit&&!body.period)continue;
+      let cached=orbit?trailCache.get(body.id):ephemerisTrail(body);
+      if(orbit&&(!cached||cached.day!==day)){
         cached=trailSamples(day,body);trailCache.set(body.id,cached);
       }
       const points=cached.samples;
@@ -413,7 +603,7 @@ export function mountSolar(root) {
     }
     markers=entries.map(({body,vector})=>{
       const p=screen(vector);if(!p)return null;
-      const radius=enlarged?Math.min(52,Math.max(2,body.size*85/p.depth)):
+      const radius=enlarged?Math.min(system?28:52,Math.max(2,body.size*baseDistance/p.depth)):
         radiusAU(body)*p.pixelsPerAU;
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
@@ -432,14 +622,14 @@ export function mountSolar(root) {
     for(const marker of markers)drawBody(marker);
     ctx.font='12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(markers,label=>ctx.measureText(label).width,width,height,{bottom:height-52}));
-    const pixelsAtFocus=height*.9/(85/10**space.zoom);
+    const pixelsAtFocus=height*.9/(baseDistance/10**space.zoom);
     const bar=niceStep(46/pixelsAtFocus);
     ctx.strokeStyle=ctx.fillStyle='#cde4e5';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(17,height-25);ctx.lineTo(17+bar*pixelsAtFocus,height-25);
     ctx.moveTo(17,height-28);ctx.lineTo(17,height-22);
     ctx.moveTo(17+bar*pixelsAtFocus,height-28);ctx.lineTo(17+bar*pixelsAtFocus,height-22);
     ctx.stroke();
-    ctx.fillText(`${n(bar)} ${t('focusScale')}`,17,height-34);
+    ctx.fillText(`${n(system?bar*AU_KM:bar)} ${t(system?'focusScaleKm':'focusScale')}`,17,height-34);
     $('solZoom').value=String(space.zoom);
     $('solZoomValue').textContent=n(10**space.zoom)+'×';
     $('solIn').disabled=space.zoom===MAX_ZOOM;
@@ -476,7 +666,7 @@ export function mountSolar(root) {
   }
   function changeDay(value) {
     clock = null;day = value;lastReadout = null;
-    updateClock(true);updateInspector();invalidate();
+    loadVisibleData();updateClock(true);updateInspector();invalidate();
   }
   function beginClock() {
     if (!active || !visible || document.hidden || reduced.matches || day>=MAX_DAY) return;
@@ -587,9 +777,12 @@ export function mountSolar(root) {
     if(follow)center();
     localize();invalidate();
   }
-  listen($('sol2d'),'click',()=>switchView('2d'));
+  listen($('sol2d'),'click',()=>{if(system)exitSystem('2d');else switchView('2d');});
   listen($('sol3d'),'click',()=>switchView('3d'));
-  listen($('solSun'),'click',()=>select('sun',true));
+  listen($('solSun'),'click',()=>{exitSystem();select('sun',true);});
+  listen($('solGlobal'),'click',()=>{const previous=system;exitSystem();systemButtons.find(item=>item.id===previous)?.button.focus();});
+  listen($('solFirstWorldDay'),'click',()=>{changeDay(START);$('solDate').focus({preventScroll:true});});
+  listen($('solWorldRetry'),'click',()=>{const id=relevantSystem();if(id)loadSystem(id,true);updateInspector();});
   for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
     listen($(id),'click',()=>{space={...space,...ORBIT_POSES[pose]};markPose(pose);invalidate();});
   listen($('solTrails'),'click',()=>{
@@ -624,14 +817,15 @@ export function mountSolar(root) {
   });
   visibilityObserver.observe(canvas);
   const unsubscribe = onLanguageChange(localize);
+  rebuildBodies();
   localize();
   return {
     setActive(value) {
       if (value === active) return;
       active=value;
-      if (active) resize(); else suspend();
+      if (active) {loadVisibleData();resize();} else suspend();
     },
-    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,trailPoints:[...trailCache.values()].reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
+    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,system,loadedWorlds:[...ephemerides.keys()],trailPoints:[...trailCache.values()].filter(v=>v.day===day).reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:comparison(),enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
       markers:markers.map(({body,x,y,radius,depth})=>({id:body.id,x,y,radius,depth}))}),
     dispose() {active=false;suspend();abort.abort();unsubscribe();resizeObserver.disconnect();visibilityObserver.disconnect();root.replaceChildren();},
   };

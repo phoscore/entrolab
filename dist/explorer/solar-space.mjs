@@ -17,11 +17,11 @@ export function rotateSpace(camera,dx,dy){
 export function zoomSpace(camera,delta){
   return {...camera,zoom:clamp(camera.zoom+delta,0,5)};
 }
-export function spaceProjector(camera,width,height){
+export function spaceProjector(camera,width,height,baseDistance=85){
   const {yaw,pitch,focus,zoom}=camera;
   const c=Math.cos(yaw),s=Math.sin(yaw),u=Math.cos(pitch),v=Math.sin(pitch);
   const right=[-s,c,0],up=[-v*c,-v*s,u],toward=[u*c,u*s,v];
-  const distance=85/10**zoom,focal=height*.9,near=Math.max(.00001,distance*.025);
+  const distance=baseDistance/10**zoom,focal=height*.9,near=distance*.025;
   return vector=>{
     const dx=vector[0]-focus[0],dy=vector[1]-focus[1],dz=vector[2]-focus[2];
     const depth=distance-(dx*toward[0]+dy*toward[1]+dz*toward[2]);

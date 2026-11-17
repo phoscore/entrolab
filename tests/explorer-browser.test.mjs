@@ -182,7 +182,9 @@ test('Home & Systems: shared camera, model date, scaled radii, playback and sepa
     const physical=()=>p.evaluate(()=>({b:window.entrolab.inspect().bodies,t:window.entrolabThermal.inspect(),e:window.entrolabEntropy.inspect()}));
     const before=await physical();
     await openSolar(p);
-    assert.equal(await p.locator('#solList button').count(),9);
+    assert.deepEqual(await p.locator('#solList button').evaluateAll(buttons=>buttons.map(button=>button.dataset.body)),
+      ['sun','mercury','venus','earth','mars','jupiter','saturn','uranus','neptune','pluto']);
+    assert.equal((await inspect(p)).solar.markers.some(m=>m.id==='pluto'),false); // J2000 is outside the new ephemeris window.
     assert.match(await p.locator('#solTimestamp').innerText(),/2000-01-01 12:00 TDB/);
     assert.match(await p.locator('#solScaleNote').innerText(),/Symbole vergrößert/);
     assert.equal((await inspect(p)).active,false);
