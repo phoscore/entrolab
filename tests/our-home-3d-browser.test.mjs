@@ -120,6 +120,7 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
   }
+  console.log('3D_BROWSER_MEASUREMENTS '+JSON.stringify(measurements));
   await writeFile(join(output,'measurements.json'),JSON.stringify({head:process.env.GITHUB_SHA??'working tree',browser:browser.version(),measurements},null,2)+'\n');
 });
 test('touch rotation/pinch and model-time trails at 100 days per second are frame-independent',async()=>{
@@ -160,6 +161,7 @@ test('touch rotation/pinch and model-time trails at 100 days per second are fram
     await page.evaluate(()=>{for(let i=0;i<100;i++){document.querySelector('#sol2d').click();document.querySelector('#sol3d').click();}});
     s=await state(page);
     assert.equal(s.view,'3d');assert.equal(s.playing,false);assert.equal(s.day,pausedDay);
+    console.log('3D_PLAYBACK_METRICS '+JSON.stringify({width:320,rateModelDaysPerSecond:100,trailPoints:s.trailPoints,drawMs:playbackDrawMs,p95DrawMs:[...playbackDrawMs].sort((a,b)=>a-b)[Math.ceil(playbackDrawMs.length*.95)-1],idleDrawDelta,cycles:100}));
     await writeFile(join(output,'playback-100x.json'),JSON.stringify({
       browser:browser.version(),width:320,rateModelDaysPerSecond:100,
       trailPoints:s.trailPoints,pausedDay,drawMs:playbackDrawMs,
