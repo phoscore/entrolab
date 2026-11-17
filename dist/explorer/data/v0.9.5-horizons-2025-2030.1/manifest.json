@@ -1,0 +1,182 @@
+{
+  "release": "v0.9.5-horizons-2025-2030.1",
+  "frame": "ICRF / Ecliptic of J2000.0 / TDB / KM-S / geometric",
+  "start": 2460676.5,
+  "end": 2462502.5,
+  "files": [
+    {
+      "name": "earth.bin",
+      "bytes": 701288,
+      "sha256": "573e6e5eee46196f5b8f0d710e281f565528e5617303a61e2beaef2572590461"
+    },
+    {
+      "name": "jupiter.bin",
+      "bytes": 3769112,
+      "sha256": "a44bc090ab569ff10453f9ca3a4063dc2585b366db9270b73909bb8283f25270"
+    },
+    {
+      "name": "pluto.bin",
+      "bytes": 438392,
+      "sha256": "998b4159f956134e4626906327166408931c074b2ae2e3c09675aaf2ef8e8c96"
+    }
+  ],
+  "series": [
+    {
+      "id": "earth",
+      "target": 399,
+      "centre": 3,
+      "hours": 6,
+      "samples": 7305
+    },
+    {
+      "id": "moon",
+      "target": 301,
+      "centre": 3,
+      "hours": 6,
+      "samples": 7305
+    },
+    {
+      "id": "jupiter",
+      "target": 599,
+      "centre": 5,
+      "hours": 12,
+      "samples": 3653
+    },
+    {
+      "id": "io",
+      "target": 501,
+      "centre": 5,
+      "hours": 1,
+      "samples": 43825
+    },
+    {
+      "id": "europa",
+      "target": 502,
+      "centre": 5,
+      "hours": 3,
+      "samples": 14609
+    },
+    {
+      "id": "ganymede",
+      "target": 503,
+      "centre": 5,
+      "hours": 4,
+      "samples": 10957
+    },
+    {
+      "id": "callisto",
+      "target": 504,
+      "centre": 5,
+      "hours": 8,
+      "samples": 5479
+    },
+    {
+      "id": "pluto",
+      "target": 999,
+      "centre": 9,
+      "hours": 12,
+      "samples": 3653
+    },
+    {
+      "id": "charon",
+      "target": 901,
+      "centre": 9,
+      "hours": 12,
+      "samples": 3653
+    },
+    {
+      "id": "pluto-anchor",
+      "target": 9,
+      "centre": 10,
+      "hours": 24,
+      "samples": 1827
+    }
+  ],
+  "sources": {
+    "sha256": "047f82a2eb4a8cbdc569ca9cb9ce3946303999aa40e9ecb590ffb5bf94caec95",
+    "replies": 31,
+    "originalBytes": 20182413,
+    "archivedBytes": 6822970
+  },
+  "interpolation": {
+    "earth": {
+      "count": 32,
+      "maxPositionKm": 0.00020814570093855413,
+      "maxVelocityKmS": 3.291752594545977e-8
+    },
+    "moon": {
+      "count": 32,
+      "maxPositionKm": 0.016922363732251845,
+      "maxVelocityKmS": 0.000002676213562737338
+    },
+    "jupiter": {
+      "count": 32,
+      "maxPositionKm": 0.5247690272425373,
+      "maxVelocityKmS": 0.00003726672842139499
+    },
+    "io": {
+      "count": 32,
+      "maxPositionKm": 0.5319064002567876,
+      "maxVelocityKmS": 0.0004637490408154781
+    },
+    "europa": {
+      "count": 32,
+      "maxPositionKm": 4.431146684065626,
+      "maxVelocityKmS": 0.0012803565005858435
+    },
+    "ganymede": {
+      "count": 32,
+      "maxPositionKm": 1.2986272211114056,
+      "maxVelocityKmS": 0.0002781867038693792
+    },
+    "callisto": {
+      "count": 32,
+      "maxPositionKm": 1.2563015576613457,
+      "maxVelocityKmS": 0.00013738800958292664
+    },
+    "pluto": {
+      "count": 32,
+      "maxPositionKm": 0.32396061021049133,
+      "maxVelocityKmS": 0.000023093262019247828
+    },
+    "charon": {
+      "count": 32,
+      "maxPositionKm": 2.6543300636512974,
+      "maxVelocityKmS": 0.00018921175188221204
+    },
+    "pluto-anchor": {
+      "count": 32,
+      "maxPositionKm": 0.000002729476247276142,
+      "maxVelocityKmS": 1.287725269622382e-10
+    }
+  },
+  "directPairs": {
+    "moon": {
+      "count": 32,
+      "maxPositionKm": 0.017130509405949155,
+      "maxVelocityKmS": 0.0000027091310887012875
+    },
+    "io": {
+      "count": 32,
+      "maxPositionKm": 0.918182268168476,
+      "maxVelocityKmS": 0.0004721328274493009
+    },
+    "charon": {
+      "count": 32,
+      "maxPositionKm": 2.9782906738558506,
+      "maxVelocityKmS": 0.0002123050139014632
+    }
+  },
+  "approximateAnchors": {
+    "earth": {
+      "count": 32,
+      "maxPositionKm": 15485.277396337506,
+      "maxVelocityKmS": 0.0021966326397407387
+    },
+    "jupiter": {
+      "count": 32,
+      "maxPositionKm": 617656.2801632601,
+      "maxVelocityKmS": 0.008353065761417321
+    }
+  }
+}
