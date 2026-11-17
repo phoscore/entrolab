@@ -156,3 +156,26 @@ test('unreduced playback, changing rates, touch zoom and 100 mode changes retain
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
+
+test('320 px solar toolbar shows every complete label inside its panel',async()=>{
+  const {page,context,errors}=await open(after,320);
+  try{
+    await page.locator('#exSolarMode').click();
+    const boxes=await page.locator('#exSolarPanel .ex-map-head .ex-controls').evaluate(group=>{
+      const panel=group.getBoundingClientRect();
+      return [...group.querySelectorAll('button')].map(button=>{
+        const range=document.createRange();range.selectNodeContents(button);
+        const text=[...range.getClientRects()].map(r=>({left:r.left,right:r.right,top:r.top,bottom:r.bottom}));
+        const b=button.getBoundingClientRect();
+        return {label:button.textContent,button:{left:b.left,right:b.right,top:b.top,bottom:b.bottom},text,panel:{left:panel.left,right:panel.right}};
+      });
+    });
+    assert.equal(boxes.length,5);
+    for(const b of boxes){
+      assert.ok(b.text.length>0,b.label);
+      assert.ok(b.button.left>=b.panel.left-1&&b.button.right<=b.panel.right+1,b.label);
+      for(const line of b.text)assert.ok(line.left>=b.button.left-1&&line.right<=b.button.right+1,b.label);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});

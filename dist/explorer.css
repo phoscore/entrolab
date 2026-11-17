@@ -251,3 +251,18 @@
 #explorer #solPairEpoch{line-height:1.5}
 @media(max-width:1050px){#explorer .ex-solar-quick{grid-template-columns:repeat(2,minmax(0,1fr))}#explorer .ex-solar-quick button{width:100%}}
 @media(max-width:760px){#explorer .ex-solar-quick{padding:10px 12px}#explorer .ex-compare{margin-top:14px}}
+
+/* The 320 px solar toolbar must wrap complete labels inside its own panel. */
+@media(max-width:370px){
+  #explorer .ex-solar .ex-map-head .ex-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  #explorer .ex-solar .ex-map-head .ex-controls button{min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+}
+
+/* One Canvas hosts the original map and an optional perspective orbit view. */
+#explorer .ex-solar-viewbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 16px;background:#0e2331;border-bottom:1px solid #36515e}
+#explorer .ex-solar-viewbar button{min-height:38px;font-size:12px;padding:7px 10px;white-space:normal}
+#explorer .ex-solar-viewbar button[aria-pressed=true]{background:#28504b;border-color:#8bd5c5}
+#explorer #sol3dControls{display:flex;flex-wrap:wrap;gap:6px}
+@media(max-width:760px){#explorer .ex-solar-viewbar{padding:8px 12px}#explorer .ex-solar-viewbar button{min-height:42px}}
+
+#explorer .ex-solar-caption{margin:0;padding:8px 16px;background:#102936;color:#c9dedb;font-size:12px;line-height:1.5}
