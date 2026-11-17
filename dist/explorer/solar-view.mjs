@@ -3,6 +3,7 @@ import {cameraScale, screenPoint, worldPoint, niceStep, MAX_ZOOM} from './camera
 import {mapGestures} from './gestures.mjs';
 import {placeLabels, drawLabels} from './labels.mjs';
 import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
+import {solarComparison} from './solar-motion.mjs';
 
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
@@ -43,12 +44,32 @@ const copy = {
   elements:['JPL-Bahnparameter und Modellfehler','JPL orbital elements and model errors'],
   radii:['JPL-Planetenradien','JPL planetary radii'],
   iau:['IAU-Nominalradius der Sonne','IAU nominal solar radius'],
+  earthBary:['Erde–Mond-Schwerpunkt','Earth–Moon barycentre'],
+  target:['Zielkörper','Target body'],
+  reference:['Bezugskörper','Reference body'],
+  jump:['Zu Objekt springen','Jump to body'],
+  follow:['Auswahl verfolgen','Follow selection'],
+  comparison:['Abstand & Bewegung','Distance & motion'],
+  choosePair:['Wähle zwei verschiedene Körper für einen Vergleich.','Choose two different bodies to compare.'],
+  pairDistance:['Räumlicher 3D-Abstand','Spatial 3D separation'],
+  pairProjection:['Abstand in der Kartenebene (X/Y)','Separation in the map plane (X/Y)'],
+  pairLight:['Einfache Lichtlaufzeit','Simple light travel time'],
+  pairSpeed:['Geschwindigkeit relativ zum Bezugskörper','Speed relative to the reference body'],
+  pairRadial:['Radialer Anteil','Radial component'],
+  approaching:['Annäherung','approaching'],
+  receding:['Entfernung','receding'],
+  steady:['momentan weder näher noch ferner','instantaneously neither nearer nor farther'],
+  why:['Wie lese ich diesen Vergleich?','How do I read this comparison?'],
+  whyBody:['Geschwindigkeit braucht immer einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Zielkörpers ab. Der Abstand ändert sich, weil beide Körper ihre Bahnen durchlaufen. Die Linie und der X/Y-Wert zeigen nur die Draufsicht; der 3D-Abstand enthält auch die Höhe über der Bahnebene. Lichtlaufzeit ist hier Abstand geteilt durch c bei festgehaltener Geometrie – keine lichtzeitkorrigierte Signalrechnung.','Speed always needs a reference body: we subtract its model velocity from the target’s. Distance changes as both bodies move on their orbits. The line and X/Y value show only the top-down view; 3D separation also includes height above the orbital plane. Light time here is distance divided by c for a frozen geometry, not a light-time-corrected signal calculation.'],
+  method:['Geschwindigkeiten: numerische Ableitung der JPL-Näherungspositionen, keine NASA-Zustandsvektoren. 0,01 TDB-Tag Differenzschritt; an den Grenzen einseitig zweiter Ordnung. Alle Werte heliozentrischer J2000-Ekliptikrahmen. Die Erdposition ist der Erde–Mond-Schwerpunkt.','Velocities: numerical derivatives of the approximate JPL positions, not NASA state vectors. Difference step 0.01 TDB day; second-order one-sided at the bounds. All values share the heliocentric J2000 ecliptic frame. Earth’s position is the Earth–Moon barycentre.'],
+  comparisonEpoch:['Modellzeit','Model time'],
 };
 
 export function mountSolar(root) {
   const lang = () => language() === 'en' ? 1 : 0;
   const t = key => copy[key][lang()];
   const name = body => body.names[lang()];
+  const comparisonName=body=>body.id==='earth'?t('earthBary'):name(body);
   const format = [new Intl.NumberFormat('de-DE',{maximumSignificantDigits:4}),new Intl.NumberFormat('en-GB',{maximumSignificantDigits:4})];
   const n = value => format[lang()].format(value);
   root.innerHTML = `
@@ -62,8 +83,14 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
+        <div class="ex-solar-quick">
+          <label><span data-solar="target"></span><select id="solTarget"></select></label>
+          <label><span data-solar="reference"></span><select id="solReference"></select></label>
+          <button type="button" id="solJump" data-solar="jump"></button>
+          <button type="button" id="solFollow" data-solar="follow" aria-pressed="false"></button>
+        </div>
         <div class="ex-map ex-solar-map"><canvas id="solCanvas" tabindex="0" aria-describedby="solHelp solLimit"></canvas></div>
-        <div class="ex-map-foot"><span data-solar="model"></span><span id="solScaleNote"></span></div>
+        <div class="ex-map-foot"><span data-solar="model"></span><span id="solScaleNote"></span><strong id="solPairSummary" hidden></strong></div>
         <div class="ex-zoom"><label for="solZoom" data-solar="zoom"></label><input id="solZoom" type="range" min="0" max="${MAX_ZOOM}" step="0.01" value="0"><output id="solZoomValue"></output></div>
         <div class="ex-time">
           <div class="ex-time-title"><strong data-solar="time"></strong><span id="solTimestamp"></span></div>
@@ -91,6 +118,20 @@ export function mountSolar(root) {
             <dt id="solAxisLabel" data-solar="axis" hidden></dt><dd id="solAxis" hidden></dd></dl>
           <p id="solEarth" class="ex-small" data-solar="earth" hidden></p>
         </div>
+        <section class="ex-compare" aria-labelledby="solCompareTitle">
+          <h2 id="solCompareTitle" data-solar="comparison"></h2>
+          <p id="solPairTitle" class="ex-selected" aria-live="polite"></p>
+          <p id="solPairEmpty" data-solar="choosePair"></p>
+          <dl id="solPairValues" hidden>
+            <dt data-solar="pairDistance"></dt><dd id="solPairDistance"></dd>
+            <dt data-solar="pairProjection"></dt><dd id="solPairProjection"></dd>
+            <dt data-solar="pairLight"></dt><dd id="solPairLight"></dd>
+            <dt data-solar="pairSpeed"></dt><dd id="solPairSpeed"></dd>
+            <dt data-solar="pairRadial"></dt><dd id="solPairRadial"></dd>
+          </dl>
+          <p id="solPairEpoch" class="ex-small"></p>
+          <details><summary data-solar="why"></summary><p data-solar="whyBody"></p><p data-solar="method"></p></details>
+        </section>
       </aside>
     </div>`;
   const $ = id => root.querySelector('#'+id);
@@ -99,7 +140,7 @@ export function mountSolar(root) {
   const listen = (el,type,fn,opts={}) => el.addEventListener(type,fn,{...opts,signal:abort.signal});
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false, visible = false, raf = null, clock = null;
-  let day = J2000, camera = fit(), selected = 'sun', enlarged = true;
+  let day = J2000, camera = fit(), selected = 'sun', reference = 'sun', follow = false, enlarged = true;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
   let draws = 0, drawMs = 0, lastReadout = null;
   const buttons = bodies.map(body => {
@@ -111,6 +152,9 @@ export function mountSolar(root) {
     listen(button,'click',()=>select(body.id,true));
     return {body,button};
   });
+  for(const body of bodies)for(const id of ['solTarget','solReference']) {
+    const option=document.createElement('option');option.value=body.id;$(id).append(option);
+  }
 
   function current() {
     if (stateDay !== day) {state = solarState(day);stateDay = day;}
@@ -120,7 +164,12 @@ export function mountSolar(root) {
   function invalidate() {
     if (active && visible && !document.hidden && raf === null) raf = requestAnimationFrame(draw);
   }
-  function setCamera(next) {camera = next;invalidate();}
+  function setCamera(next) {
+    if(follow && (next.x!==camera.x || next.y!==camera.y)) {
+      follow=false;$('solFollow').setAttribute('aria-pressed','false');
+    }
+    camera = next;invalidate();
+  }
   function resize() {
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
@@ -133,11 +182,12 @@ export function mountSolar(root) {
   }
   function center() {
     const [x,y] = eclipticToMap(selectedBody().vector);
-    setCamera({...camera,x,y});
+    camera={...camera,x,y};invalidate();
   }
   function select(id, recenter) {
     selected = id;
-    if (recenter) center();
+    $('solTarget').value=id;
+    if (recenter || follow) center();
     updateInspector();
     invalidate();
   }
@@ -151,7 +201,26 @@ export function mountSolar(root) {
     $('solAxis').hidden = $('solAxisLabel').hidden = !orbit;
     $('solAxis').textContent = orbit ? n(orbit.a)+' AU' : '';
     $('solEarth').hidden = body.id !== 'earth';
-    for (const {body,button} of buttons) button.setAttribute('aria-pressed',String(body.id===selected));
+    for (const {body,button} of buttons) {
+      button.setAttribute('aria-pressed',String(body.id===selected));
+      button.dataset.reference=String(body.id===reference&&reference!==selected);
+    }
+    $('solReference').value=reference;
+    const pair=selected!==reference?solarComparison(day,selected,reference):null;
+    $('solPairEmpty').hidden=Boolean(pair);$('solPairValues').hidden=!pair;
+    $('solPairTitle').textContent=pair?`${comparisonName(body)} ↔ ${comparisonName(bodies.find(b=>b.id===reference))}`:'';
+    $('solPairSummary').hidden=!pair;
+    if(pair)$('solPairSummary').textContent=`${$('solPairTitle').textContent} · ≈ ${n(pair.distanceAU)} AU · ≈ ${n(pair.speedKmS)} km/s`;
+    $('solPairEpoch').textContent=`${t('comparisonEpoch')}: ${formatModelDay(day).replace('T',' ')} TDB · ${t('model')}`;
+    if(pair) {
+      $('solPairDistance').textContent=`≈ ${n(pair.distanceAU)} AU · ${n(pair.distanceKm)} km`;
+      $('solPairProjection').textContent=`≈ ${n(pair.projectedAU)} AU`;
+      const light=pair.lightSeconds<120?`${n(pair.lightSeconds)} s`:
+        pair.lightSeconds<7200?`${n(pair.lightSeconds/60)} min`:`${n(pair.lightSeconds/3600)} h`;
+      $('solPairLight').textContent=`≈ ${light} (d/c)`;
+      $('solPairSpeed').textContent=`≈ ${n(pair.speedKmS)} km/s`;
+      $('solPairRadial').textContent=`${pair.radialKmS>=0?'+':''}${n(pair.radialKmS)} km/s · ${t(pair.radialKmS>0?'receding':pair.radialKmS<0?'approaching':'steady')}`;
+    }
   }
   function updateClock(force = false) {
     const time = formatModelDay(day);
@@ -166,6 +235,8 @@ export function mountSolar(root) {
   function localize() {
     for (const el of root.querySelectorAll('[data-solar]')) el.textContent = t(el.dataset.solar);
     for (const {body,button} of buttons) button.textContent = name(body);
+    for(const id of ['solTarget','solReference'])for(const option of $(id).options) option.textContent=name(bodies.find(body=>body.id===option.value));
+    $('solTarget').value=selected;$('solReference').value=reference;
     for (const [id,key] of [['solIn','zoomIn'],['solOut','zoomOut'],['solPrev','prev'],['solNext','next']]) {
       $(id).setAttribute('aria-label',t(key)); $(id).title=t(key);
     }
@@ -181,6 +252,10 @@ export function mountSolar(root) {
     if (clock) {
       day = advanceModelDay(clock.day,Math.max(0,time-clock.start)/1000,clock.rate);
       if (day === MAX_DAY) clock = null;
+    }
+    if(follow) {
+      const [x,y]=eclipticToMap(selectedBody().vector);
+      camera={...camera,x,y};
     }
     if (ctx) render();
     // DOM readouts are refreshed at most five times per second during playback.
@@ -231,8 +306,16 @@ export function mountSolar(root) {
       const [x,y] = screen(eclipticToMap(vector));
       const radius = enlarged ? body.size : radiusAU(body)*scale;
       const chosen = selected === body.id;
-      return {body,x,y,radius,selected:chosen,priority:chosen?20:body.id==='sun'?10:1,label:name(body)};
+      const isReference=reference===body.id&&reference!==selected;
+      return {body,x,y,radius,selected:chosen,reference:isReference,priority:chosen?20:isReference?15:body.id==='sun'?10:1,label:name(body)};
     }).filter(m=>m.x+m.radius>=0&&m.x-m.radius<=width&&m.y+m.radius>=0&&m.y-m.radius<=height);
+    if(selected!==reference) {
+      const a=markers.find(m=>m.body.id===selected),b=markers.find(m=>m.body.id===reference);
+      if(a&&b) {
+        ctx.strokeStyle='#9de4dd8c';ctx.lineWidth=1.2;ctx.setLineDash([4,5]);
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+      }
+    }
     markers.sort((a,b)=>Number(a.selected)-Number(b.selected));
     for (const marker of markers) drawBody(marker);
     ctx.font = '12px "DM Sans", sans-serif';
@@ -253,7 +336,7 @@ export function mountSolar(root) {
     $('solOut').disabled = camera.zoom === 0;
   }
 
-  function drawBody({body,x,y,radius,selected:chosen}) {
+  function drawBody({body,x,y,radius,selected:chosen,reference:isReference}) {
     if (enlarged && body.id === 'saturn') {
       ctx.strokeStyle = '#e8d6a1a8';ctx.lineWidth=2;
       ctx.beginPath();ctx.ellipse(x,y,radius*1.85,radius*.55,-.43,0,Math.PI*2);ctx.stroke();
@@ -270,6 +353,9 @@ export function mountSolar(root) {
     if (chosen) {
       ctx.strokeStyle='#d8f8f0';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
       ctx.beginPath();ctx.arc(x,y,Math.max(9,radius+5),0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    } else if(isReference) {
+      ctx.strokeStyle='#f8c68f';ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.arc(x,y,Math.max(9,radius+5),0,Math.PI*2);ctx.stroke();
     }
   }
 
@@ -297,9 +383,16 @@ export function mountSolar(root) {
   listen($('solIn'),'click',()=>gestures.zoomBy(.25));
   listen($('solOut'),'click',()=>gestures.zoomBy(-.25));
   listen($('solZoom'),'input',()=>gestures.zoomTo(Number($('solZoom').value)));
-  listen($('solFit'),'click',()=>setCamera(fit()));
+  listen($('solFit'),'click',()=>{follow=false;$('solFollow').setAttribute('aria-pressed','false');setCamera(fit());});
   listen($('solInner'),'click',()=>setCamera({...fit(),zoom:1.2}));
   listen($('solCenter'),'click',center);
+  listen($('solTarget'),'change',()=>select($('solTarget').value,false));
+  listen($('solReference'),'change',()=>{reference=$('solReference').value;updateInspector();invalidate();});
+  listen($('solJump'),'click',center);
+  listen($('solFollow'),'click',()=>{
+    follow=!follow;$('solFollow').setAttribute('aria-pressed',String(follow));
+    if(follow)center();invalidate();
+  });
   listen($('solSymbols'),'change',()=>{
     enlarged=$('solSymbols').checked;$('solScaleNote').textContent=t(enlarged?'schematic':'scale');invalidate();
   });
@@ -328,7 +421,7 @@ export function mountSolar(root) {
       active=value;
       if (active) resize(); else suspend();
     },
-    inspect:()=>({active,day,camera:{...camera},selected,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
+    inspect:()=>({active,day,camera:{...camera},selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
       markers:markers.map(({body,x,y,radius})=>({id:body.id,x,y,radius}))}),
     dispose() {active=false;suspend();abort.abort();unsubscribe();resizeObserver.disconnect();visibilityObserver.disconnect();root.replaceChildren();},
   };

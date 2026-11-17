@@ -37,8 +37,7 @@ export function densityCounts(index, [left,bottom,right,top]) {
   };
 }
 
-export function densityBitmap(index) {
-  const canvas=document.createElement('canvas');
+export function densityBitmap(index,canvas=document.createElement('canvas')) {
   // The source grid and every count stay untouched. A larger display raster
   // interpolates neighbouring cell intensities so the overview reads as a
   // continuous selection map instead of 128 square source symbols.
@@ -61,10 +60,12 @@ export function densityBitmap(index) {
     for(let k=-2;k<=2;k++)sum+=horizontal[Math.max(0,Math.min(SIDE-1,y+k))*SIDE+x]*weights[k+2];
     levels[y*SIDE+x]=sum/16;
   }
+  const occupied=(cx,cy)=>cx>=0&&cx<SIDE&&cy>=0&&cy<SIDE&&index.values[cy*SIDE+cx]>0;
   for (let y=0;y<resolution;y++) for (let x=0;x<resolution;x++) {
     // An empty catalogue cell stays empty at every display resolution. This
     // also keeps the visible density and the exact-cell zoom hit consistent.
-    if(!index.values[(SIDE-1-Math.floor(y/3))*SIDE+Math.floor(x/3)])continue;
+    const cellX=Math.floor(x/3), cellY=SIDE-1-Math.floor(y/3);
+    if(!index.values[cellY*SIDE+cellX])continue;
     const sx=Math.max(0,Math.min(SIDE-1,(x+.5)/3-.5));
     const sy=Math.max(0,Math.min(SIDE-1,(resolution-y-.5)/3-.5));
     const x0=Math.floor(sx),y0=Math.floor(sy),x1=Math.min(SIDE-1,x0+1),y1=Math.min(SIDE-1,y0+1);
@@ -78,7 +79,15 @@ export function densityBitmap(index) {
     pixels[offset]=Math.round(47+level*73+highlight*43);
     pixels[offset+1]=Math.round(99+level*95+highlight*26);
     pixels[offset+2]=Math.round(122+level*91+highlight*18);
-    pixels[offset+3]=Math.round(6+121*level);
+    // Feather only the inside edge of an occupied cell next to an empty one.
+    // Empty cells retain zero alpha, so the painted footprint and hit grid agree.
+    const inX=x%3,inY=y%3;
+    let edge=1;
+    if(!occupied(cellX-1,cellY))edge=Math.min(edge,(inX+.5)/2);
+    if(!occupied(cellX+1,cellY))edge=Math.min(edge,(2.5-inX)/2);
+    if(!occupied(cellX,cellY+1))edge=Math.min(edge,(inY+.5)/2);
+    if(!occupied(cellX,cellY-1))edge=Math.min(edge,(2.5-inY)/2);
+    pixels[offset+3]=Math.round((6+121*level)*edge);
   }
   ctx.putImageData(image,0,0);
   return canvas;

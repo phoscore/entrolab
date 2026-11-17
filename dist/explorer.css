@@ -235,3 +235,19 @@
   #explorer .ex-atlas-controls{align-items:start}
   #explorer .ex-atlas-controls label{flex-wrap:wrap}
 }
+
+/* Our Home: comparison appears only for two distinct model bodies. */
+#explorer .ex-solar-quick{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr)) auto auto;gap:8px;align-items:end;padding:10px 16px;background:#132a39;border-bottom:1px solid var(--ex-line)}
+#explorer .ex-solar-quick label{display:grid;gap:4px;color:#bdd2d5;font-size:11px}
+#explorer .ex-solar-quick select{width:100%;min-height:42px;padding:7px;color:#f0f8f6;background:#102432;border:1px solid #53727b;border-radius:7px}
+#explorer .ex-solar-quick button{min-height:42px;white-space:normal}
+#explorer .ex-solar-quick button[aria-pressed=true]{background:#28504b;border-color:#8bd5c5}
+#explorer .ex-body-list button[data-reference=true]{border-color:#d6ab7d;background:#3c302e;color:#ffe8d2}
+#explorer .ex-compare{margin-top:18px;border-top:1px solid #45606b;padding-top:16px}
+#explorer .ex-compare h2{margin-bottom:8px}
+#explorer .ex-compare dl{margin:12px 0}
+#explorer .ex-compare dd{font-variant-numeric:tabular-nums}
+#explorer #solPairSummary{flex-basis:100%;font-size:12px;font-weight:500;color:#b9f0e4}
+#explorer #solPairEpoch{line-height:1.5}
+@media(max-width:1050px){#explorer .ex-solar-quick{grid-template-columns:repeat(2,minmax(0,1fr))}#explorer .ex-solar-quick button{width:100%}}
+@media(max-width:760px){#explorer .ex-solar-quick{padding:10px 12px}#explorer .ex-compare{margin-top:14px}}

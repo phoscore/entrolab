@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {AU_KM, J2000, MIN_DAY, MAX_DAY, bodies, advanceModelDay, formatModelDay, parseModelDate, eccentricAnomaly, orbitAt, vectorOnOrbit, solarState, eclipticToMap, radiusAU} from '../dist/explorer/solar-model.mjs';
+import {solarComparison,solarVelocities,LIGHT_KM_S,VELOCITY_STEP_DAYS} from '../dist/explorer/solar-motion.mjs';
 import {screenPoint, worldPoint, zoomAt, panBy} from '../dist/explorer/camera.mjs';
 import {placeLabels} from '../dist/explorer/labels.mjs';
 import {preferredStarName, systemFor} from '../dist/explorer/identities.mjs';
@@ -9,6 +10,55 @@ import {RELEASE} from '../dist/explorer/release.mjs';
 
 const json = path => JSON.parse(readFileSync(new URL(path, import.meta.url)));
 const close = (a,b,tol=1e-10) => assert.ok(Math.abs(a-b)<=tol,`${a} differs from ${b}`);
+
+test('3D solar pair distances, frame subtraction and frozen light time use one TDB epoch',()=>{
+  assert.equal(LIGHT_KM_S,299792.458);assert.equal(VELOCITY_STEP_DAYS,.01);
+  for(const day of [MIN_DAY,J2000,2460000,MAX_DAY]) {
+    const states=solarState(day);
+    for(const [a,b] of [['mars','sun'],['earth','mars'],['jupiter','saturn']]) {
+      const pair=solarComparison(day,a,b),reverse=solarComparison(day,b,a);
+      const x=states.find(s=>s.body.id===a).vector,y=states.find(s=>s.body.id===b).vector;
+      const diff=x.map((v,i)=>v-y[i]);
+      close(pair.distanceAU,Math.hypot(...diff));
+      close(pair.projectedAU,Math.hypot(diff[0],diff[1]));
+      assert.ok(pair.projectedAU<=pair.distanceAU);
+      close(pair.distanceKm,pair.distanceAU*AU_KM,1e-5);
+      close(pair.lightSeconds,pair.distanceKm/LIGHT_KM_S,1e-9);
+      close(pair.speedKmS,reverse.speedKmS,1e-10);
+      close(pair.radialKmS,reverse.radialKmS,1e-10);
+      pair.velocityKmS.forEach((v,i)=>close(v,-reverse.velocityKmS[i],1e-10));
+      assert.ok(Math.abs(pair.radialKmS)<=pair.speedKmS+1e-10);
+    }
+    const same=solarComparison(day,'earth','earth');
+    assert.equal(same.distanceAU,0);assert.equal(same.speedKmS,0);assert.equal(same.radialKmS,null);
+  }
+  for(const bad of [MIN_DAY-1,MAX_DAY+1,NaN])assert.throws(()=>solarComparison(bad,'earth','sun'),RangeError);
+  assert.throws(()=>solarComparison(J2000,'pluto','sun'),RangeError);
+});
+
+test('independent five-point derivatives match model velocities in the interior and at both boundaries',()=>{
+  const h=.02,scale=AU_KM/86400;
+  const sampled=(day,id)=>solarState(day).find(s=>s.body.id===id).vector;
+  for(const day of [MIN_DAY,MIN_DAY+.001,J2000,2460000,MAX_DAY-.001,MAX_DAY]) {
+    const computed=solarVelocities(day);
+    assert.equal(computed.scheme,day-MIN_DAY<.01?'forward':MAX_DAY-day<.01?'backward':'centered');
+    for(const id of ['mercury','earth','mars','jupiter','neptune']) {
+      const f0=sampled(day,id), velocity=solarComparison(day,id,'sun').velocityKmS;
+      let reference;
+      if(day-MIN_DAY<2*h) {
+        const [f1,f2,f3]=[1,2,3].map(k=>sampled(day+k*h,id));
+        reference=f0.map((v,i)=>(-11*v+18*f1[i]-9*f2[i]+2*f3[i])/(6*h));
+      }else if(MAX_DAY-day<2*h) {
+        const [f1,f2,f3]=[1,2,3].map(k=>sampled(day-k*h,id));
+        reference=f0.map((v,i)=>(11*v-18*f1[i]+9*f2[i]-2*f3[i])/(6*h));
+      }else{
+        const [fm2,fm1,fp1,fp2]=[-2,-1,1,2].map(k=>sampled(day+k*h,id));
+        reference=f0.map((_,i)=>(fm2[i]-8*fm1[i]+8*fp1[i]-fp2[i])/(12*h));
+      }
+      assert.ok(Math.hypot(...reference.map((v,i)=>v*scale-velocity[i]))<1e-4,`${id} at ${day}`);
+    }
+  }
+});
 
 test('JPL fit agrees with independent VSOP87A heliocentric vectors at two TDB epochs', () => {
   const {rows} = json('./fixtures/solar-vsop87a.json');
