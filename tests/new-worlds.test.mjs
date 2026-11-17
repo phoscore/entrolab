@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import test from 'node:test';
-import {decodeSystem,encodeSystem,sampleCount,supportsEpoch} from '../dist/explorer/new-worlds-ephemeris.mjs';
+import {decodeSystem,encodeSystem,loadEphemeris,sampleCount,supportsEpoch} from '../dist/explorer/new-worlds-ephemeris.mjs';
 import {END,RELEASE,SECONDS_PER_DAY,START,SYSTEMS,seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
 import {localOrbitPath,worldComparison,worldTrail,worldVector} from '../dist/explorer/new-worlds.mjs';
 import {AU_KM,solarState} from '../dist/explorer/solar-model.mjs';
 import {LIGHT_KM_S} from '../dist/explorer/solar-motion.mjs';
 import {spaceCamera,spaceProjector} from '../dist/explorer/solar-space.mjs';
 
+const readPackageBytes = id => readFile(new URL(`../dist/explorer/data/${RELEASE}/${id}.bin`, import.meta.url));
 const readPackage = async id => {
-  const bytes = await readFile(new URL(`../dist/explorer/data/${RELEASE}/${id}.bin`, import.meta.url));
+  const bytes = await readPackageBytes(id);
   return decodeSystem(id, bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
 };
 
@@ -36,6 +37,76 @@ test('cubic Hermite interpolation keeps position and velocity in matching units'
     assert.equal(eph.sample('moon',invalid),null);
   }
   assert.equal(eph.sample('charon',START),null);
+});
+
+test('the runtime loader accepts only the pinned original release bytes', async t => {
+  const originals = new Map(await Promise.all(Object.keys(SYSTEMS).map(async id=>[id,await readPackageBytes(id)])));
+  let payload;
+  const request = t.mock.method(globalThis,'fetch',async (url, options)=>{
+    assert.equal(url.pathname.split('/').at(-2),RELEASE);
+    assert.equal(options.cache,'no-store');
+    return new Response(payload);
+  });
+  for (const [id, bytes] of originals) {
+    payload = bytes;
+    const loaded = await loadEphemeris(id);
+    assert.deepEqual(loaded.sample(id,START),(await readPackage(id)).sample(id,START));
+  }
+  const original = originals.get('earth');
+  const shiftedY = Buffer.from(original);
+  // Reproduce W-01 by shifting every Earth-centre Y by 100 million km. The Moon series and header are untouched.
+  const earthRows = sampleCount(SYSTEMS.earth.bodies[0].hours);
+  for (let offset = 16; offset < 8 + earthRows*48; offset += 48) {
+    shiftedY.writeDoubleLE(shiftedY.readDoubleLE(offset)+100_000_000,offset);
+  }
+  const oneCoordinate = Buffer.from(original);
+  oneCoordinate.writeDoubleLE(oneCoordinate.readDoubleLE(8)+1,8);
+  const stale = Buffer.from(original);
+  stale.copyWithin(8+48,8,8+48);
+  const invalidState = Buffer.from(original);
+  invalidState.writeDoubleLE(Infinity,invalidState.length-8);
+  const badMagic = Buffer.from(original);
+  badMagic[0] ^= 1;
+  for (const [description, bytes] of [
+    ['audit reproduction',shiftedY],['one changed coordinate',oneCoordinate],['same-format stale state',stale],
+    ['another system',originals.get('pluto')],['non-finite state',invalidState],['invalid header',badMagic],
+    ['truncated stream',original.subarray(0,-1)],
+  ]) {
+    payload = bytes;
+    await assert.rejects(loadEphemeris('earth'),/Data integrity mismatch/,description);
+  }
+  payload = original;
+  assert.ok((await loadEphemeris('earth')).sample('moon',START));
+  assert.equal(request.mock.callCount(),11);
+});
+
+test('over-budget bodies are cancelled even without a reliable Content-Length', async t => {
+  const original = await readPackageBytes('earth');
+  let response;
+  t.mock.method(globalThis,'fetch',async ()=>response);
+  for (const headers of [{},{'Content-Length':String(original.length)}]) {
+    let reads = 0, cancelled = false;
+    response = new Response(new ReadableStream({
+      pull(controller) {
+        reads++;
+        controller.enqueue(reads===1?original:Uint8Array.of(0));
+        if (reads===3) controller.close();
+      },
+      cancel() {cancelled=true;},
+    },{highWaterMark:0}),{headers});
+    await assert.rejects(loadEphemeris('earth'),/Data exceeds byte budget/);
+    assert.equal(reads,2);
+    assert.equal(cancelled,true);
+  }
+});
+
+test('the decoder rejects non-finite position and velocity values throughout a package', async () => {
+  const original = await readPackageBytes('earth');
+  for (const [offset,value] of [[8,NaN],[40,-Infinity],[original.length-8,Infinity]]) {
+    const bytes = new Uint8Array(original);
+    new DataView(bytes.buffer).setFloat64(offset,value,true);
+    assert.throws(()=>decodeSystem('earth',bytes.buffer),/Non-finite state value/);
+  }
 });
 
 test('versioned Horizons packages preserve barycentric geometry at both endpoints', async () => {

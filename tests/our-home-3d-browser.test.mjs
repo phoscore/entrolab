@@ -4,6 +4,8 @@ import {createServer} from 'node:http';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {resolve,relative,extname,sep,join} from 'node:path';
+import {RELEASE,SYSTEMS} from '../dist/explorer/new-worlds-spec.mjs';
+import {sampleCount} from '../dist/explorer/new-worlds-ephemeris.mjs';
 const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
 const dist=fileURLToPath(new URL('../dist/',import.meta.url));
 const output=fileURLToPath(new URL('../browser-results/our-home-3d/',import.meta.url));
@@ -35,6 +37,85 @@ async function open(width,reduced=true){
   return {context,page,errors};
 }
 const state=page=>page.evaluate(()=>window.entrolabExplorer.inspect().solar);
+test('W-01 rejects the shifted Earth Y values without exposing geometry and retries with verified bytes',async()=>{
+  const data=new URL(`../dist/explorer/data/${RELEASE}/`,import.meta.url);
+  const shifted=await readFile(new URL('earth.bin',data));
+  const otherSystem=await readFile(new URL('pluto.bin',data));
+  const rows=sampleCount(SYSTEMS.earth.bodies[0].hours);
+  for(let offset=16;offset<8+rows*48;offset+=48){
+    shifted.writeDoubleLE(shifted.readDoubleLE(offset)+100_000_000,offset);
+  }
+  const {page,context,errors}=await open(1440);
+  const earthRequests=[],plutoRequests=[];
+  try{
+    page.on('request',request=>{
+      if(request.url().endsWith(`/${RELEASE}/pluto.bin`))plutoRequests.push(request.url());
+    });
+    await page.route(`**/${RELEASE}/earth.bin`,route=>{
+      earthRequests.push(route.request().url());
+      const body=[shifted,otherSystem][earthRequests.length-1];
+      return body ? route.fulfill({body,contentType:'application/octet-stream',headers:{'Cache-Control':'public, max-age=3600'}}) : route.continue();
+    });
+
+    await page.locator('[data-system=pluto]').click();
+    await page.locator('#solFirstWorldDay').click();
+    await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+    await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.length===2);
+    const validPluto=await state(page);
+    assert.equal(validPluto.pair.source,'horizons');
+
+    async function verifyFailure(message, unavailable){
+      await page.locator('#solWorldState').getByText(message,{exact:true}).waitFor();
+      const failed=await state(page);
+      assert.equal(failed.system,'earth');
+      assert.equal(failed.pair,null);
+      assert.deepEqual(failed.loadedWorlds,['pluto']);
+      assert.deepEqual(failed.markers,[]);
+      assert.equal(failed.trailPoints,0);
+      assert.equal(await page.locator('#solPairValues').isHidden(),true);
+      assert.equal(await page.locator('#solPairSummary').isHidden(),true);
+      assert.equal(await page.locator('#solDistance').textContent(),unavailable);
+      assert.equal(await page.locator('#solWorldRetry').isVisible(),true);
+    }
+
+    await page.locator('[data-system=earth]').click();
+    await verifyFailure('Ephemeridendaten konnten nicht geladen oder geprüft werden. Bitte erneut versuchen.','Nicht verfügbar');
+    assert.equal(earthRequests.length,1);
+    await page.locator('[data-language=en]').click();
+    const verifyEnglish=()=>verifyFailure('Ephemeris data could not be loaded or verified. Please try again.','Unavailable');
+    await verifyEnglish();
+
+    await page.locator('[data-system=pluto]').click();
+    await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+    await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.length===2);
+    const returned=await state(page);
+    assert.equal(returned.day,validPluto.day);
+    assert.deepEqual(returned.pair,validPluto.pair);
+    assert.deepEqual(returned.markers.map(m=>m.id),validPluto.markers.map(m=>m.id));
+    assert.equal(plutoRequests.length,1);
+
+    await page.locator('[data-system=earth]').click();
+    await verifyEnglish();
+    assert.equal(earthRequests.length,1);
+    await page.locator('#solWorldRetry').click();
+    await verifyEnglish();
+    assert.equal(earthRequests.length,2);
+
+    await page.locator('#solWorldRetry').click();
+    await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+    await page.waitForFunction(()=>{
+      const s=window.entrolabExplorer.inspect().solar;
+      return s.system==='earth'&&s.markers.length===2&&s.pair?.source==='horizons';
+    });
+    const restored=await state(page);
+    assert.deepEqual(restored.loadedWorlds,['pluto','earth']);
+    assert.ok(restored.pair.distanceKm>350_000&&restored.pair.distanceKm<410_000);
+    assert.equal(await page.locator('#solPairValues').isVisible(),true);
+    assert.equal(await page.locator('#solWorldRetry').isHidden(),true);
+    assert.equal(earthRequests.length,3);
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
 test('the three Horizons system views load on demand and remain usable at 1440, 390 and 320 px',async()=>{
   const measurements=[];
   const requests=[];

@@ -1,4 +1,5 @@
-import {END, RELEASE, SECONDS_PER_DAY, START, SYSTEMS, seriesFor} from './new-worlds-spec.mjs';
+import {checkedBytes} from './catalog.mjs';
+import {END, EPHEMERIS_PACKAGES, RELEASE, SECONDS_PER_DAY, START, SYSTEMS, seriesFor} from './new-worlds-spec.mjs';
 
 const VALUES = 6;
 const BYTES_PER_STATE = VALUES * Float64Array.BYTES_PER_ELEMENT;
@@ -33,6 +34,9 @@ export function decodeSystem(system, bytes) {
   if (bytes.byteLength !== length || data.getUint32(0) !== PACKAGE_MAGIC || data.getUint32(4) !== SYSTEMS[system].centre) {
     throw new Error(`Invalid ${system} ephemeris package`);
   }
+  for (let offset = 8; offset < length; offset += Float64Array.BYTES_PER_ELEMENT) {
+    if (!Number.isFinite(data.getFloat64(offset, true))) throw new Error(`Non-finite state value in ${system} ephemeris package`);
+  }
   let offset = 8;
   const sources = new Map(series.map(s => {
     const start = offset;
@@ -64,9 +68,10 @@ export function decodeSystem(system, bytes) {
 }
 
 export function loadEphemeris(system, signal) {
-  if (!Object.hasOwn(SYSTEMS, system)) throw new RangeError('Unknown lunar system');
-  return fetch(new URL(`./data/${RELEASE}/${system}.bin`, import.meta.url), {signal}).then(response => {
-    if (!response.ok) throw new Error(`Ephemeris request failed (${response.status})`);
-    return response.arrayBuffer();
-  }).then(bytes => decodeSystem(system, bytes));
+  if (!Object.hasOwn(EPHEMERIS_PACKAGES, system)) throw new RangeError('Unknown lunar system');
+  const url = new URL(`./data/${RELEASE}/${system}.bin`, import.meta.url);
+  // The view caches verified systems. A retry must bypass cached HTTP errors or unverified bytes.
+  return checkedBytes(url, EPHEMERIS_PACKAGES[system], signal ?? new AbortController().signal,
+    (url, options) => fetch(url, {...options, cache: 'no-store'}))
+    .then(bytes => decodeSystem(system, bytes.buffer));
 }

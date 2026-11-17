@@ -96,7 +96,7 @@ const copy = {
   unavailable:['Ephemeriden verfügbar vom 01.01.2025 bis 01.01.2030 (00:00 TDB).','Ephemeris available from 1 Jan 2025 through 1 Jan 2030 (00:00 TDB).'],
   startRange:['Zum Start der Ephemeride','Go to start of ephemeris'],
   loading:['Ephemeride wird geladen …','Loading ephemeris …'],
-  loadError:['Ephemeride konnte nicht geladen werden.','Ephemeris could not be loaded.'],
+  loadError:['Ephemeridendaten konnten nicht geladen oder geprüft werden. Bitte erneut versuchen.','Ephemeris data could not be loaded or verified. Please try again.'],
   retry:['Erneut laden','Retry'],
   invalidPair:['Für dieses Körperpaar ist kein gemeinsames geprüftes Modell verfügbar.','No common validated model is available for this pair.'],
   unavailableValue:['Nicht verfügbar','Unavailable'],

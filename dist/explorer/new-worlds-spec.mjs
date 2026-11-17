@@ -1,6 +1,12 @@
 import {parseModelDate} from './solar-model.mjs';
 
 export const RELEASE = 'v0.9.5-horizons-2025-2030.1';
+// Update these pins together with RELEASE when publishing new package bytes.
+export const EPHEMERIS_PACKAGES = Object.freeze({
+  earth: Object.freeze({bytes: 701288, sha256: '573e6e5eee46196f5b8f0d710e281f565528e5617303a61e2beaef2572590461'}),
+  jupiter: Object.freeze({bytes: 3769112, sha256: 'a44bc090ab569ff10453f9ca3a4063dc2585b366db9270b73909bb8283f25270'}),
+  pluto: Object.freeze({bytes: 438392, sha256: '998b4159f956134e4626906327166408931c074b2ae2e3c09675aaf2ef8e8c96'}),
+});
 export const START = parseModelDate('2025-01-01');
 export const END = parseModelDate('2030-01-01');
 export const SECONDS_PER_DAY = 86400;

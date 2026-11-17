@@ -67,3 +67,11 @@ node --test tests/new-worlds.test.mjs
 ```
 
 Use `--capture` only when acquiring a new source snapshot. It queries the official service serially, caches validated responses and records their SHA-256 hashes. A recapture can differ because the upstream source updates its ephemerides and includes generation timestamps. The archived bodies and manifest define the exact input for this release.
+
+### Browser integrity contract
+
+`dist/explorer/new-worlds-spec.mjs` pins the asset release, the exact byte length, and the SHA-256 digest of each system package in application code. A release update must change the pins together with the versioned assets. The offline manifest documents provenance and reproduction. The browser uses its application pins directly.
+
+The loader uses the Explorer’s bounded streaming reader. It rejects a response that exceeds its pinned size based on bytes read, including bodies with absent or inaccurate `Content-Length`. It requires the exact size and a matching Web Crypto SHA-256 digest before passing bytes to the decoder. The decoder validates the EPM1 magic, the system ID, the expected layout, and the finiteness of every Float64. Web Crypto requires a compatible secure browser context, such as HTTPS or a loopback preview.
+
+Only decoded and verified systems enter the view cache. The request bypasses HTTP caching so a retry can obtain fresh data. A failed load leaves the affected system without ephemeris geometry or comparison values and shows a localized retry control. Verified systems retain their own state. The regression suite repeats the audited 100-million-kilometre Earth Y shift against the genuine release package.
