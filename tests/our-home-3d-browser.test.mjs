@@ -150,6 +150,9 @@ test('touch rotation/pinch and model-time trails at 100 days per second are fram
     let s=await state(page);
     assert.ok(s.trailDay>old);
     assert.ok(s.trailPoints>100&&s.trailPoints<=776);
+    await page.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.scheduled);
+    await page.waitForTimeout(80);
+    s=await state(page);
     const paused=s.draws,pausedDay=s.day;
     await page.waitForTimeout(190);
     const idleDrawDelta=(await state(page)).draws-paused;
