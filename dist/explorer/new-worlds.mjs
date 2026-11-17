@@ -1,6 +1,7 @@
 import {AU_KM, bodies} from './solar-model.mjs';
 import {LIGHT_KM_S, solarVelocities} from './solar-motion.mjs';
-import {START, SYSTEMS, SECONDS_PER_DAY} from './new-worlds-spec.mjs';
+import {supportsEpoch} from './new-worlds-ephemeris.mjs';
+import {END, START, SYSTEMS, SECONDS_PER_DAY} from './new-worlds-spec.mjs';
 
 const kmToAU = value => value / AU_KM;
 const zero = [0, 0, 0];
@@ -47,10 +48,17 @@ export function worldComparison(ephemeris, system, day, target, reference) {
 }
 
 export function worldTrail(ephemeris, system, body, day, local) {
-  if (!body.period || !ephemeris) return [];
+  if (!body.period || !ephemeris || !supportsEpoch(day)) return [];
   const first = Math.max(START, day - (local ? body.period * .65 : 365));
   return Array.from({length: first === day ? 1 : 49}, (_, i) =>
     worldVector(ephemeris, system, body.id, first + (day - first) * i / 48, local));
+}
+
+export function localOrbitPath(ephemeris, system, body, day) {
+  if (!body.period || !ephemeris || !supportsEpoch(day)) return [];
+  const first = Math.max(START, Math.min(END-body.period, day-body.period/2));
+  const span = Math.min(body.period, END-first);
+  return Array.from({length: 65}, (_, i) => worldVector(ephemeris, system, body.id, first + span*i/64, true));
 }
 
 export const worldNotes = {

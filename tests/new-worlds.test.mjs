@@ -3,7 +3,7 @@ import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import {decodeSystem,encodeSystem,sampleCount,supportsEpoch} from '../dist/explorer/new-worlds-ephemeris.mjs';
 import {END,RELEASE,SECONDS_PER_DAY,START,SYSTEMS,seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
-import {worldComparison,worldTrail,worldVector} from '../dist/explorer/new-worlds.mjs';
+import {localOrbitPath,worldComparison,worldTrail,worldVector} from '../dist/explorer/new-worlds.mjs';
 import {AU_KM,solarState} from '../dist/explorer/solar-model.mjs';
 import {LIGHT_KM_S} from '../dist/explorer/solar-motion.mjs';
 import {spaceCamera,spaceProjector} from '../dist/explorer/solar-space.mjs';
@@ -64,6 +64,12 @@ test('versioned Horizons packages preserve barycentric geometry at both endpoint
     assert.equal(worldComparison(data,id,END+1,satellite.id,parent.id),null);
     assert.deepEqual(worldTrail(data,id,satellite,START,true),[worldVector(data,id,satellite.id,START,true)]);
     assert.ok(worldTrail(data,id,satellite,START+.2,true).every(v=>v?.every(Number.isFinite)));
+    assert.equal(localOrbitPath(data,id,satellite,END+.01).length,0);
+    for (const day of [START,END]) {
+      const path = localOrbitPath(data,id,satellite,day);
+      assert.equal(path.length,65);
+      assert.ok(path.every(v=>v?.every(Number.isFinite)));
+    }
     const front = spaceProjector(spaceCamera(),320,360,3.1*SYSTEMS[id].scaleKm/AU_KM);
     assert.ok(Number.isFinite(front(worldVector(data,id,satellite.id,START,true)).depth));
   }

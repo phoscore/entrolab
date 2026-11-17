@@ -7,7 +7,7 @@ import {solarComparison} from './solar-motion.mjs';
 import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,spaceProjector,trailSamples} from './solar-space.mjs';
 import {START,SYSTEMS} from './new-worlds-spec.mjs';
 import {loadEphemeris,supportsEpoch} from './new-worlds-ephemeris.mjs';
-import {pluto,systemBodies,worldComparison,worldNotes,worldTrail,worldVector} from './new-worlds.mjs';
+import {localOrbitPath,pluto,systemBodies,worldComparison,worldNotes,worldTrail,worldVector} from './new-worlds.mjs';
 
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
@@ -86,7 +86,7 @@ const copy = {
   overview:['Zur Sonnensystemübersicht','Back to Solar System overview'],
   localFit:['System einpassen','Fit system'],
   baryFrame:['Koordinatenursprung: gemeinsamer Schwerpunkt · J2000-Ekliptik','Origin: system barycentre · J2000 ecliptic'],
-  localScene:['JPL Horizons · räumliche Modellpositionen und vergangene Bahnsegmente','JPL Horizons · spatial model positions and past orbital segments'],
+  localScene:['JPL Horizons · feine Linien zeigen ein Bahnfenster, leuchtende Spuren den zurückgelegten Abschnitt.','JPL Horizons · faint lines show an orbital window and bright trails show past motion.'],
   localLimit:['Die Achsen schneiden sich im Systemschwerpunkt. Der Linienabschnitt im Bild ist eine Projektion.','The axes meet at the system barycentre. The line drawn on screen is a projection.'],
   moon:['Mond','Moon'],
   dwarf:['Zwergplanet','Dwarf planet'],
@@ -100,7 +100,7 @@ const copy = {
   retry:['Erneut laden','Retry'],
   invalidPair:['Für dieses Körperpaar ist kein gemeinsames geprüftes Modell verfügbar.','No common validated model is available for this pair.'],
   unavailableValue:['Nicht verfügbar','Unavailable'],
-  geometryUnavailable:['Für diese Modellzeit sind keine Zustandsvektoren verfügbar.','State vectors are unavailable for this model epoch.'],
+  geometryUnavailable:['Zustandsvektoren sind gerade nicht verfügbar.','State vectors are currently unavailable.'],
   bodySource:['NASA-Quelle','NASA source'],
   localBodies:['Körper im System','System bodies'],
   overviewBodies:['Körper im Sonnensystem','Solar System bodies'],
@@ -198,7 +198,7 @@ export function mountSolar(root) {
   const listedBodies = () => system ? systemBodies(system) : globalBodies;
   const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
   const distance = () => system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : 85;
-  const trailCache=new Map(),spacePointers=new Map();
+  const trailCache=new Map(),pathCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
   let draws = 0, drawMs = 0, lastReadout = null;
@@ -338,10 +338,10 @@ export function mountSolar(root) {
     const notes = worldNotes[selected];
     const id = relevantSystem();
     const pair = comparison();
-    const formatValue = pair?.source === 'hybrid' ? rough : n;
+    const formatValue = pair?.source ? rough : n;
     const solar = system ? worldComparison(ephemerides.get(system),system,day,selected,'sun') : null;
     const distanceAU = system ? solar?.distanceAU : entry?.distanceAU;
-    const fmtDistance = solar?.source === 'hybrid' ? rough : n;
+    const fmtDistance = id ? rough : n;
     $('solName').textContent = name(body);
     $('solKind').textContent = t(body.id === 'sun' ? 'star' : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
     $('solDistance').textContent = distanceAU === undefined ? t('unavailableValue') :
@@ -379,10 +379,10 @@ export function mountSolar(root) {
     $('solPairMethod').textContent = t(id ? 'ephemHelp' : 'method') + (system && system !== 'pluto' ? ' '+t('hybridNote') : '');
     if(pair) {
       const localPair = system && reference !== 'sun';
-      const sep = localPair ? n(pair.distanceKm)+' km' : formatValue(pair.distanceAU)+' AU';
+      const sep = localPair ? formatValue(pair.distanceKm)+' km' : formatValue(pair.distanceAU)+' AU';
       $('solPairSummary').textContent=`${$('solPairTitle').textContent} · ~ ${sep} · ~ ${formatValue(pair.speedKmS)} km/s`;
       $('solPairDistance').textContent=`~ ${localPair?'':formatValue(pair.distanceAU)+' AU · '}${formatValue(pair.distanceKm)} km`;
-      $('solPairProjection').textContent=`~ ${localPair?n(pair.projectedAU*AU_KM)+' km':formatValue(pair.projectedAU)+' AU'}`;
+      $('solPairProjection').textContent=`~ ${localPair?formatValue(pair.projectedAU*AU_KM)+' km':formatValue(pair.projectedAU)+' AU'}`;
       const light=pair.lightSeconds<120?`${formatValue(pair.lightSeconds)} s`:
         pair.lightSeconds<7200?`${formatValue(pair.lightSeconds/60)} min`:`${formatValue(pair.lightSeconds/3600)} h`;
       $('solPairLight').textContent=`~ ${light} (d/c)`;
@@ -572,9 +572,19 @@ export function mountSolar(root) {
     strokePath([[0,-extent,0],[0,extent,0]],'#88afba40',1);
     const entries=current();
     for(const {body,orbit} of entries){
-      if(!orbit)continue;
-      strokePath(Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144)),
-        body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
+      let vectors;
+      if (orbit) vectors = Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144));
+      else if (system && body.period) {
+        // The display path changes only when the model crosses a TDB hour. Markers and trails use the exact model epoch.
+        const epoch = Math.floor(day*24)/24;
+        let cached = pathCache.get(body.id);
+        if (!cached || cached.epoch!==epoch) {
+          cached = {epoch, vectors:localOrbitPath(ephemerides.get(system),system,body,epoch)};
+          pathCache.set(body.id,cached);
+        }
+        vectors = cached.vectors;
+      }
+      if (vectors) strokePath(vectors,body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
     }
     if(trails)for(const {body,orbit} of entries){
       if(!orbit&&!body.period)continue;

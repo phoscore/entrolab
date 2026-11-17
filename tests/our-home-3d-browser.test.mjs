@@ -48,11 +48,12 @@ test('the three Horizons system views load on demand and remain usable at 1440, 
       assert.match(await page.locator('#solWorldMessage').innerText(),/01\.01\.2025/);
       assert.equal((await state(page)).pair,null);
       assert.deepEqual(requests,[]);
+      const earthStarted=Date.now();
       await page.locator('#solFirstWorldDay').click();
       await page.locator('#solDate').fill('2026-11-17');
       const time=(await state(page)).day;
       for(const [system,selected,count] of cases){
-        const started=Date.now();
+        const started=system==='earth'?earthStarted:Date.now();
         const trigger=page.locator(`[data-system=${system}]`);
         if(system!=='earth')await trigger.click();
         await page.locator('#solCanvas').scrollIntoViewIfNeeded();
@@ -182,9 +183,13 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
       assert.equal(three.space.zoom,0);
       assert.equal(three.pose,'angle');
       assert.deepEqual(three.space.focus,[0,0,0]);
+      const beforeTop=three.draws;
       await page.locator('#solTop').click();
       await page.locator('#solCanvas').scrollIntoViewIfNeeded();
-      await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.some(m=>m.id==='neptune'));
+      await page.waitForFunction(previous=>{
+        const s=window.entrolabExplorer.inspect().solar;
+        return s.pose==='top'&&s.draws>previous&&!s.scheduled&&s.markers.some(m=>m.id==='neptune');
+      },beforeTop);
       const target=(await state(page)).markers.find(m=>m.id==='neptune');
       await page.locator('#solCanvas').click({position:{x:target.x,y:target.y}});
       assert.equal((await state(page)).selected,'neptune');
