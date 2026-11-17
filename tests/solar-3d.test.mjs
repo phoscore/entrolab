@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {bodies,solarState,MIN_DAY,MAX_DAY,J2000,orbitAt,eccentricAnomaly,vectorOnOrbit} from '../dist/explorer/solar-model.mjs';
-import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,projectSpace,trailSamples} from '../dist/explorer/solar-space.mjs';
+import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,spaceProjector,projectSpace,trailSamples} from '../dist/explorer/solar-space.mjs';
 
 const near=(a,b,eps=1e-9)=>assert.ok(Math.abs(a-b)<eps,`${a} ≠ ${b}`);
 test('perspective uses actual J2000 X/Y/Z and sun remains origin in every pose',()=>{
@@ -13,6 +13,9 @@ test('perspective uses actual J2000 X/Y/Z and sun remains origin in every pose',
       assert.ok(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.depth>0);
     }
   }
+  const lens=spaceProjector(spaceCamera('angle'),900,600);
+  for(const vector of solarState(J2000).map(s=>s.vector))
+    assert.deepEqual(lens(vector),projectSpace(vector,spaceCamera('angle'),900,600));
   const top=spaceCamera('top');
   const x=projectSpace([1,0,0],top,900,600),y=projectSpace([0,1,0],top,900,600);
   assert.ok(x.x>450&&Math.abs(x.y-300)<.01);

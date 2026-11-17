@@ -137,6 +137,8 @@ test('touch rotation/pinch and model-time trails at 100 days per second are fram
     const old=(await state(page)).day;
     await page.evaluate(()=>{document.querySelector('#solRate').value='100';document.querySelector('#solPlay').click();});
     await page.waitForFunction(old=>window.entrolabExplorer.inspect().solar.day>old+1,old);
+    const playbackDrawMs=[];
+    for(let i=0;i<12;i++){await page.waitForTimeout(30);playbackDrawMs.push((await state(page)).drawMs);}
     await page.evaluate(()=>document.querySelector('#solPlay').click());
     await page.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.playing);
     let s=await state(page);
@@ -144,10 +146,17 @@ test('touch rotation/pinch and model-time trails at 100 days per second are fram
     assert.ok(s.trailPoints>100&&s.trailPoints<=776);
     const paused=s.draws,pausedDay=s.day;
     await page.waitForTimeout(190);
-    assert.equal((await state(page)).draws,paused);
+    const idleDrawDelta=(await state(page)).draws-paused;
+    assert.equal(idleDrawDelta,0);
     await page.evaluate(()=>{for(let i=0;i<100;i++){document.querySelector('#sol2d').click();document.querySelector('#sol3d').click();}});
     s=await state(page);
     assert.equal(s.view,'3d');assert.equal(s.playing,false);assert.equal(s.day,pausedDay);
+    await writeFile(join(output,'playback-100x.json'),JSON.stringify({
+      browser:browser.version(),width:320,rateModelDaysPerSecond:100,
+      trailPoints:s.trailPoints,pausedDay,drawMs:playbackDrawMs,
+      p95DrawMs:[...playbackDrawMs].sort((a,b)=>a-b)[Math.ceil(playbackDrawMs.length*.95)-1],
+      idleDrawDelta,cycles:100,
+    },null,2)+'\\n');
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });

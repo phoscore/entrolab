@@ -4,7 +4,7 @@ import {mapGestures} from './gestures.mjs';
 import {placeLabels, drawLabels} from './labels.mjs';
 import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, vectorOnOrbit, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
 import {solarComparison} from './solar-motion.mjs';
-import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,projectSpace,trailSamples} from './solar-space.mjs';
+import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,spaceProjector,trailSamples} from './solar-space.mjs';
 
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
@@ -64,6 +64,7 @@ const copy = {
   whyBody:['Geschwindigkeit braucht immer einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Zielkörpers ab. Der Abstand ändert sich, weil beide Körper ihre Bahnen durchlaufen. Die Linie und der X/Y-Wert zeigen nur die Draufsicht; der 3D-Abstand enthält auch die Höhe über der Bahnebene. Lichtlaufzeit ist hier Abstand geteilt durch c bei festgehaltener Geometrie – keine lichtzeitkorrigierte Signalrechnung.','Speed always needs a reference body: we subtract its model velocity from the target’s. Distance changes as both bodies move on their orbits. The line and X/Y value show only the top-down view; 3D separation also includes height above the orbital plane. Light time here is distance divided by c for a frozen geometry, not a light-time-corrected signal calculation.'],
   method:['Geschwindigkeiten: numerische Ableitung der JPL-Näherungspositionen, keine NASA-Zustandsvektoren. 0,01 TDB-Tag Differenzschritt; an den Grenzen einseitig zweiter Ordnung. Alle Werte heliozentrischer J2000-Ekliptikrahmen. Die Erdposition ist der Erde–Mond-Schwerpunkt.','Velocities: numerical derivatives of the approximate JPL positions, not NASA state vectors. Difference step 0.01 TDB day; second-order one-sided at the bounds. All values share the heliocentric J2000 ecliptic frame. Earth’s position is the Earth–Moon barycentre.'],
   comparisonEpoch:['Modellzeit','Model time'],
+  viewGroup:['Ansicht des Sonnensystems','Solar System view'],
   view2d:['2D · Draufsicht','2D · top view'],
   view3d:['3D · Raumansicht','3D · spatial view'],
   topView:['Von oben','From above'],
@@ -99,7 +100,7 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
-        <div class="ex-solar-viewbar" role="group" aria-label="Solar view"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView"></button><button type="button" id="solAngle" data-solar="angleView"></button><button type="button" id="solSide" data-solar="sideView"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
+        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView"></button><button type="button" id="solAngle" data-solar="angleView"></button><button type="button" id="solSide" data-solar="sideView"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
         <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
         <div class="ex-solar-quick">
           <label><span data-solar="target"></span><select id="solTarget"></select></label>
@@ -264,6 +265,7 @@ export function mountSolar(root) {
       $(id).setAttribute('aria-label',t(key)); $(id).title=t(key);
     }
     canvas.setAttribute('aria-label',t(view==='3d'?'view3d':'title'));
+    $('solViewBar').setAttribute('aria-label',t('viewGroup'));
     root.querySelector('[data-solar="frame"]').textContent=t(view==='3d'?'frame3d':'frame');
     $('solHelp').textContent=t(view==='3d'?'help3d':'help');
     $('solLimit').textContent=t(view==='3d'?'limit3d':'limit');
@@ -368,7 +370,7 @@ export function mountSolar(root) {
 
   function renderSpace() {
     ctx.clearRect(0,0,width,height);
-    const screen=vector=>projectSpace(vector,space,width,height);
+    const screen=spaceProjector(space,width,height);
     const strokePath=(vectors,color,lineWidth=1)=>{
       ctx.beginPath();let drawing=false;
       for(const vector of vectors){
