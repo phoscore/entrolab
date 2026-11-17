@@ -191,28 +191,33 @@ test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/
         const s=window.entrolabExplorer.inspect().solar;
         return s.pose==='top'&&s.draws>previous&&!s.scheduled&&s.markers.some(m=>m.id==='neptune');
       },beforeTop);
-      const target=(await state(page)).markers.find(m=>m.id==='neptune');
-      const point=await canvas.evaluate((element,marker)=>{
-        const rect=element.getBoundingClientRect();
-        const x=rect.left+marker.x,y=rect.top+marker.y;
-        const events=[];
-        window.solarPointerTrace=events;
-        for(const type of ['pointerdown','pointerup','pointercancel','lostpointercapture','click'])for(const capture of [true,false])element.addEventListener(type,event=>{
-          const relative=element.getBoundingClientRect(),s=window.entrolabExplorer.inspect().solar;
-          const x=event.clientX-relative.left,y=event.clientY-relative.top;
-          events.push({type,capture,x,y,view:s.view,active:s.active,selected:s.selected,scheduled:s.scheduled,interacting:element.dataset.interacting,
-            pageScroll:scrollY,captured:element.hasPointerCapture(event.pointerId),marker:s.markers.find(m=>m.id==='neptune')});
-        },{capture,once:true});
-        return {x,y,hit:document.elementFromPoint(x,y)?.id};
-      },target);
-      assert.equal(point.hit,'solCanvas',`Neptune must be in the clickable canvas at ${width} px: ${JSON.stringify(point)}`);
+      const point=await canvas.evaluate(async element=>{
+        const [{spaceProjector},{solarState}]=await Promise.all([
+          import('/explorer/solar-space.mjs'),import('/explorer/solar-model.mjs'),
+        ]);
+        let last = null, stable = 0;
+        // Mobile screenshot capture can briefly resize the viewport. Wait for the actual painted marker and layout to agree.
+        for(let frame=0;frame<90;frame++){
+          await new Promise(done=>requestAnimationFrame(done));
+          const rect=element.getBoundingClientRect(),s=window.entrolabExplorer.inspect().solar;
+          const body=solarState(s.day).find(({body})=>body.id==='neptune');
+          const expected=spaceProjector(s.space,rect.width,rect.height)(body.vector);
+          const marker=s.markers.find(m=>m.id==='neptune');
+          if(!expected||!marker||s.scheduled||Math.hypot(marker.x-expected.x,marker.y-expected.y)>.25){
+            last=null;stable=0;continue;
+          }
+          const x=rect.left+marker.x,y=rect.top+marker.y;
+          if(document.elementFromPoint(x,y)!==element){last=null;stable=0;continue;}
+          stable=last&&Math.hypot(last.x-x,last.y-y)<.25?stable+1:1;
+          last={x,y};
+          if(stable===8)return last;
+        }
+        return null;
+      });
+      assert.ok(point,`Neptune must settle inside the clickable canvas at ${width} px`);
       if(width<500)await page.touchscreen.tap(point.x,point.y);
       else await page.mouse.click(point.x,point.y);
-      try{
-        await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.selected==='neptune',null,{timeout:1200});
-      }catch{
-        assert.fail(`Select Neptune on the ${width} px canvas; ${JSON.stringify({errors,point,trace:await page.evaluate(()=>window.solarPointerTrace)})}`);
-      }
+      await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.selected==='neptune');
       await page.locator('#solTarget').selectOption('saturn');
       await page.locator('#solJump').click();
       const focused=await state(page);
