@@ -2,8 +2,9 @@ import {language, onLanguageChange} from '../i18n.mjs';
 import {cameraScale, screenPoint, worldPoint, niceStep, MAX_ZOOM} from './camera.mjs';
 import {mapGestures} from './gestures.mjs';
 import {placeLabels, drawLabels} from './labels.mjs';
-import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
+import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, vectorOnOrbit, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
 import {solarComparison} from './solar-motion.mjs';
+import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,projectSpace,trailSamples} from './solar-space.mjs';
 
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
@@ -63,6 +64,21 @@ const copy = {
   whyBody:['Geschwindigkeit braucht immer einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Zielkörpers ab. Der Abstand ändert sich, weil beide Körper ihre Bahnen durchlaufen. Die Linie und der X/Y-Wert zeigen nur die Draufsicht; der 3D-Abstand enthält auch die Höhe über der Bahnebene. Lichtlaufzeit ist hier Abstand geteilt durch c bei festgehaltener Geometrie – keine lichtzeitkorrigierte Signalrechnung.','Speed always needs a reference body: we subtract its model velocity from the target’s. Distance changes as both bodies move on their orbits. The line and X/Y value show only the top-down view; 3D separation also includes height above the orbital plane. Light time here is distance divided by c for a frozen geometry, not a light-time-corrected signal calculation.'],
   method:['Geschwindigkeiten: numerische Ableitung der JPL-Näherungspositionen, keine NASA-Zustandsvektoren. 0,01 TDB-Tag Differenzschritt; an den Grenzen einseitig zweiter Ordnung. Alle Werte heliozentrischer J2000-Ekliptikrahmen. Die Erdposition ist der Erde–Mond-Schwerpunkt.','Velocities: numerical derivatives of the approximate JPL positions, not NASA state vectors. Difference step 0.01 TDB day; second-order one-sided at the bounds. All values share the heliocentric J2000 ecliptic frame. Earth’s position is the Earth–Moon barycentre.'],
   comparisonEpoch:['Modellzeit','Model time'],
+  view2d:['2D · Draufsicht','2D · top view'],
+  view3d:['3D · Raumansicht','3D · spatial view'],
+  topView:['Von oben','From above'],
+  angleView:['Schräg','Angled'],
+  sideView:['Von der Seite','From the side'],
+  sunHome:['Zur Sonne','To the Sun'],
+  trailsOn:['Trails an','Trails on'],
+  trailsOff:['Trails aus','Trails off'],
+  frame3d:['Heliozentrischer J2000-Raum · frei drehbare Kameraperspektive','Heliocentric J2000 space · rotatable camera perspective'],
+  help3d:['Ziehen dreht die Kamera, Pinch oder +/− zoomt. Pfeiltasten drehen; Home zeigt alles. Die Spur zeigt vergangene Modellpositionen, keine Lichtspur.','Drag to rotate the camera, pinch or +/− to zoom. Arrow keys rotate; Home fits the system. Trails show past model positions, not observed light.'],
+  limit3d:['Perspektivische Projektion auf einen flachen Bildschirm: Bildnähe ist keine räumliche Nähe. Die Sonne ist der Ursprung; die Erdposition ist der Erde–Mond-Schwerpunkt.','Perspective projection onto a flat screen: screen proximity is not spatial proximity. The Sun is the origin; Earth’s position is the Earth–Moon barycentre.'],
+  scene3d:['Frei wählbare Perspektive auf vereinfachte JPL-Bahnpositionen. Ekliptikebene J2000, TDB 1800–2050. Symbole sind standardmäßig vergrößert.','Adjustable view of approximate JPL orbital positions. J2000 ecliptic, TDB 1800–2050. Symbols are enlarged by default.'],
+  focusScale:['AU am Kamerazentrum','AU at camera focus'],
+  pairProjection3d:['Abstand in der J2000-Ekliptikebene (X/Y), nicht im Bild','J2000 ecliptic-plane separation (X/Y), not on screen'],
+  whyBody3d:['Geschwindigkeit braucht einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Ziels ab. Drehen und Zoomen verändern nur das Bild. Der X/Y-Wert gehört zur Ekliptikebene, der 3D-Abstand enthält auch Z. Die projizierte Linie ist keine maßstäbliche Distanzangabe. Lichtlaufzeit ist Abstand durch c bei festgehaltener Geometrie.','Speed needs a reference body: subtract its model velocity from the target’s. Rotating and zooming change only the image. X/Y belongs to the ecliptic plane; 3D separation also includes Z. The projected line is not a distance scale. Light time is distance divided by c for frozen geometry.'],
 };
 
 export function mountSolar(root) {
@@ -83,6 +99,8 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
+        <div class="ex-solar-viewbar" role="group" aria-label="Solar view"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView"></button><button type="button" id="solAngle" data-solar="angleView"></button><button type="button" id="solSide" data-solar="sideView"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
+        <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
         <div class="ex-solar-quick">
           <label><span data-solar="target"></span><select id="solTarget"></select></label>
           <label><span data-solar="reference"></span><select id="solReference"></select></label>
@@ -124,7 +142,7 @@ export function mountSolar(root) {
           <p id="solPairEmpty" data-solar="choosePair"></p>
           <dl id="solPairValues" hidden>
             <dt data-solar="pairDistance"></dt><dd id="solPairDistance"></dd>
-            <dt data-solar="pairProjection"></dt><dd id="solPairProjection"></dd>
+            <dt id="solPairProjectionLabel" data-solar="pairProjection"></dt><dd id="solPairProjection"></dd>
             <dt data-solar="pairLight"></dt><dd id="solPairLight"></dd>
             <dt data-solar="pairSpeed"></dt><dd id="solPairSpeed"></dd>
             <dt data-solar="pairRadial"></dt><dd id="solPairRadial"></dd>
@@ -140,7 +158,9 @@ export function mountSolar(root) {
   const listen = (el,type,fn,opts={}) => el.addEventListener(type,fn,{...opts,signal:abort.signal});
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false, visible = false, raf = null, clock = null;
-  let day = J2000, camera = fit(), selected = 'sun', reference = 'sun', follow = false, enlarged = true;
+  let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, selected = 'sun', reference = 'sun', follow = false, enlarged = true;
+  const trailCache=new Map(),spacePointers=new Map();
+  let spaceGesture=null,spaceMoved=false;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
   let draws = 0, drawMs = 0, lastReadout = null;
   const buttons = bodies.map(body => {
@@ -181,8 +201,10 @@ export function mountSolar(root) {
     invalidate();
   }
   function center() {
-    const [x,y] = eclipticToMap(selectedBody().vector);
-    camera={...camera,x,y};invalidate();
+    const vector=selectedBody().vector;
+    if(view==='3d')space={...space,focus:[...vector]};
+    else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
+    invalidate();
   }
   function select(id, recenter) {
     selected = id;
@@ -211,6 +233,7 @@ export function mountSolar(root) {
     $('solPairTitle').textContent=pair?`${comparisonName(body)} ↔ ${comparisonName(bodies.find(b=>b.id===reference))}`:'';
     $('solPairSummary').hidden=!pair;
     if(pair)$('solPairSummary').textContent=`${$('solPairTitle').textContent} · ≈ ${n(pair.distanceAU)} AU · ≈ ${n(pair.speedKmS)} km/s`;
+    $('solPairProjectionLabel').textContent=t(view==='3d'?'pairProjection3d':'pairProjection');
     $('solPairEpoch').textContent=`${t('comparisonEpoch')}: ${formatModelDay(day).replace('T',' ')} TDB · ${t('model')}`;
     if(pair) {
       $('solPairDistance').textContent=`≈ ${n(pair.distanceAU)} AU · ${n(pair.distanceKm)} km`;
@@ -240,7 +263,12 @@ export function mountSolar(root) {
     for (const [id,key] of [['solIn','zoomIn'],['solOut','zoomOut'],['solPrev','prev'],['solNext','next']]) {
       $(id).setAttribute('aria-label',t(key)); $(id).title=t(key);
     }
-    canvas.setAttribute('aria-label',t('title'));
+    canvas.setAttribute('aria-label',t(view==='3d'?'view3d':'title'));
+    root.querySelector('[data-solar="frame"]').textContent=t(view==='3d'?'frame3d':'frame');
+    $('solHelp').textContent=t(view==='3d'?'help3d':'help');
+    $('solLimit').textContent=t(view==='3d'?'limit3d':'limit');
+    root.querySelector('[data-solar="whyBody"]').textContent=t(view==='3d'?'whyBody3d':'whyBody');
+    $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');
     $('solScaleNote').textContent = t(enlarged?'schematic':'scale');
     updateClock();updateInspector();invalidate();
   }
@@ -254,8 +282,9 @@ export function mountSolar(root) {
       if (day === MAX_DAY) clock = null;
     }
     if(follow) {
-      const [x,y]=eclipticToMap(selectedBody().vector);
-      camera={...camera,x,y};
+      const vector=selectedBody().vector;
+      if(view==='3d')space={...space,focus:[...vector]};
+      else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     }
     if (ctx) render();
     // DOM readouts are refreshed at most five times per second during playback.
@@ -268,6 +297,7 @@ export function mountSolar(root) {
   }
 
   function render() {
+    if(view==='3d'){renderSpace();return;}
     ctx.clearRect(0,0,width,height);
     const scale = cameraScale(camera,width,height,SOLAR_FRAME);
     const screen = point => screenPoint(point,camera,width,height,SOLAR_FRAME);
@@ -336,6 +366,84 @@ export function mountSolar(root) {
     $('solOut').disabled = camera.zoom === 0;
   }
 
+  function renderSpace() {
+    ctx.clearRect(0,0,width,height);
+    const screen=vector=>projectSpace(vector,space,width,height);
+    const strokePath=(vectors,color,lineWidth=1)=>{
+      ctx.beginPath();let drawing=false;
+      for(const vector of vectors){
+        const p=screen(vector);
+        if(!p){drawing=false;continue;}
+        if(drawing)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);
+        drawing=true;
+      }
+      ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.stroke();
+    };
+    // Geometric reference rings in the J2000 ecliptic, not sources.
+    for(const radius of [1,5,10,20,30]){
+      const ring=Array.from({length:97},(_,i)=>{
+        const a=2*Math.PI*i/96;return [radius*Math.cos(a),radius*Math.sin(a),0];
+      });
+      strokePath(ring,'#7093a724');
+    }
+    strokePath([[-32,0,0],[32,0,0]],'#88afba40',1);
+    strokePath([[0,-32,0],[0,32,0]],'#88afba40',1);
+    const entries=current();
+    for(const {body,orbit} of entries){
+      if(!orbit)continue;
+      strokePath(Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144)),
+        body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
+    }
+    if(trails)for(const {body,orbit} of entries){
+      if(!orbit)continue;
+      let cached=trailCache.get(body.id);
+      if(!cached||cached.day!==day){
+        cached=trailSamples(day,body);trailCache.set(body.id,cached);
+      }
+      const points=cached.samples;
+      for(let i=1;i<points.length;i++){
+        const a=screen(points[i-1].vector),b=screen(points[i].vector);
+        if(!a||!b)continue;
+        ctx.strokeStyle=body.color+Math.round(20+180*(i/points.length)**2).toString(16).padStart(2,'0');
+        ctx.lineWidth=selected===body.id?2.6:1.8;
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      }
+    }
+    markers=entries.map(({body,vector})=>{
+      const p=screen(vector);if(!p)return null;
+      const radius=enlarged?Math.min(52,Math.max(2,body.size*85/p.depth)):
+        radiusAU(body)*p.pixelsPerAU;
+      const chosen=selected===body.id;
+      return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
+        reference:reference===body.id&&reference!==selected,
+        priority:chosen?20:body.id===reference?15:body.id==='sun'?10:1,label:name(body)};
+    }).filter(m=>m&&m.x+m.radius>=0&&m.x-m.radius<=width&&m.y+m.radius>=0&&m.y-m.radius<=height);
+    if(selected!==reference){
+      const a=markers.find(m=>m.body.id===selected),b=markers.find(m=>m.body.id===reference);
+      if(a&&b){
+        ctx.strokeStyle='#9de4dd88';ctx.lineWidth=1.2;ctx.setLineDash([4,5]);
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+      }
+    }
+    // Painter's order: far bodies first. Hit testing below reverses this order.
+    markers.sort((a,b)=>b.depth-a.depth);
+    for(const marker of markers)drawBody(marker);
+    ctx.font='12px "DM Sans", sans-serif';
+    drawLabels(ctx,placeLabels(markers,label=>ctx.measureText(label).width,width,height,{bottom:height-52}));
+    const pixelsAtFocus=height*.9/(85/10**space.zoom);
+    const bar=niceStep(46/pixelsAtFocus);
+    ctx.strokeStyle=ctx.fillStyle='#cde4e5';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(17,height-25);ctx.lineTo(17+bar*pixelsAtFocus,height-25);
+    ctx.moveTo(17,height-28);ctx.lineTo(17,height-22);
+    ctx.moveTo(17+bar*pixelsAtFocus,height-28);ctx.lineTo(17+bar*pixelsAtFocus,height-22);
+    ctx.stroke();
+    ctx.fillText(`${n(bar)} ${t('focusScale')}`,17,height-34);
+    $('solZoom').value=String(space.zoom);
+    $('solZoomValue').textContent=n(10**space.zoom)+'×';
+    $('solIn').disabled=space.zoom===MAX_ZOOM;
+    $('solOut').disabled=space.zoom===0;
+  }
+
   function drawBody({body,x,y,radius,selected:chosen,reference:isReference}) {
     if (enlarged && body.id === 'saturn') {
       ctx.strokeStyle = '#e8d6a1a8';ctx.lineWidth=2;
@@ -360,6 +468,7 @@ export function mountSolar(root) {
   }
 
   function suspend() {
+    cancelSpace();
     if (raf !== null) cancelAnimationFrame(raf);
     raf = null; clock = null; gestures.cancel(); updateClock();
   }
@@ -373,6 +482,7 @@ export function mountSolar(root) {
     lastReadout = null;updateClock();invalidate();
   }
   const gestures = mapGestures(canvas, listen, {
+    enabled:()=>view==='2d',
     getCamera:()=>camera, setCamera, size:()=>[width,height], frame:SOLAR_FRAME,
     fit:()=>setCamera(fit()), exit:()=>$('solFit').focus(),
     tap(x,y) {
@@ -380,12 +490,104 @@ export function mountSolar(root) {
       if (hit) select(hit[0].body.id,false);
     },
   });
-  listen($('solIn'),'click',()=>gestures.zoomBy(.25));
-  listen($('solOut'),'click',()=>gestures.zoomBy(-.25));
-  listen($('solZoom'),'input',()=>gestures.zoomTo(Number($('solZoom').value)));
-  listen($('solFit'),'click',()=>{follow=false;$('solFollow').setAttribute('aria-pressed','false');setCamera(fit());});
-  listen($('solInner'),'click',()=>setCamera({...fit(),zoom:1.2}));
+  const zoomBy=delta=>{if(view==='3d'){space=zoomSpace(space,delta);invalidate();}
+    else gestures.zoomBy(delta);};
+  const fitView=()=>{
+    follow=false;$('solFollow').setAttribute('aria-pressed','false');
+    if(view==='3d'){space=spaceCamera();invalidate();}
+    else setCamera(fit());
+  };
+  listen($('solIn'),'click',()=>zoomBy(.25));
+  listen($('solOut'),'click',()=>zoomBy(-.25));
+  listen($('solZoom'),'input',()=>{
+    const value=Number($('solZoom').value);
+    if(view==='3d'){space=zoomSpace(space,value-space.zoom);invalidate();}
+    else gestures.zoomTo(value);
+  });
+  listen($('solFit'),'click',fitView);
+  listen($('solInner'),'click',()=>{
+    if(view==='3d'){space={...spaceCamera(),zoom:1.2};invalidate();}
+    else setCamera({...fit(),zoom:1.2});
+  });
   listen($('solCenter'),'click',center);
+  function cancelSpace(){
+    for(const id of spacePointers.keys())if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+    spacePointers.clear();spaceGesture=null;canvas.dataset.interacting='false';
+  }
+  function spacePoint(event){
+    const r=canvas.getBoundingClientRect();
+    return [event.clientX-r.left,event.clientY-r.top];
+  }
+  function resetSpaceGesture(){
+    const points=[...spacePointers.values()];
+    const mid=points.length===2?[(points[0][0]+points[1][0])/2,(points[0][1]+points[1][1])/2]:points[0];
+    spaceGesture=mid?{point:mid,span:points.length===2?Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]):0,camera:space}:null;
+  }
+  listen(canvas,'pointerdown',event=>{
+    if(view!=='3d'||event.button!==0||spacePointers.size>=2)return;
+    canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);
+    spacePointers.set(event.pointerId,spacePoint(event));
+    spaceMoved=spacePointers.size>1;resetSpaceGesture();
+    canvas.dataset.interacting='true';
+  });
+  listen(canvas,'pointermove',event=>{
+    if(view!=='3d'||!spacePointers.has(event.pointerId)||!spaceGesture)return;
+    spacePointers.set(event.pointerId,spacePoint(event));
+    const points=[...spacePointers.values()];
+    const mid=points.length===2?[(points[0][0]+points[1][0])/2,(points[0][1]+points[1][1])/2]:points[0];
+    const dx=mid[0]-spaceGesture.point[0],dy=mid[1]-spaceGesture.point[1];
+    if(Math.hypot(dx,dy)>4)spaceMoved=true;
+    space=points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
+      rotateSpace(spaceGesture.camera,dx,-dy);
+    invalidate();
+  });
+  for(const eventName of ['pointerup','pointercancel','lostpointercapture'])listen(canvas,eventName,event=>{
+    if(view!=='3d'||!spacePointers.has(event.pointerId))return;
+    if(eventName==='pointerup'&&!spaceMoved&&spacePointers.size===1){
+      const [x,y]=spacePoint(event);
+      const hit=[...markers].sort((a,b)=>a.depth-b.depth).find(m=>Math.hypot(m.x-x,m.y-y)<=Math.max(13,m.radius+3));
+      if(hit)select(hit.body.id,false);
+    }
+    spacePointers.delete(event.pointerId);resetSpaceGesture();
+    if(!spacePointers.size)canvas.dataset.interacting='false';
+  });
+  listen(canvas,'wheel',event=>{
+    if(view!=='3d'||document.activeElement!==canvas)return;
+    event.preventDefault();
+    space=zoomSpace(space,-Math.max(-.4,Math.min(.4,event.deltaY*.001)));
+    invalidate();
+  },{passive:false});
+  listen(canvas,'keydown',event=>{
+    if(view!=='3d')return;
+    const arrows={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,25],ArrowDown:[0,-25]};
+    if(Object.hasOwn(arrows,event.key)){event.preventDefault();space=rotateSpace(space,...arrows[event.key]);invalidate();}
+    else if(['+','=','-','Home','Escape'].includes(event.key)){
+      event.preventDefault();
+      if(event.key==='Home')fitView();
+      else if(event.key==='Escape')$('solFit').focus();
+      else zoomBy(event.key==='-'?-.25:.25);
+    }
+  });
+  function switchView(next){
+    if(view===next)return;
+    if(next==='3d')gestures.cancel();else cancelSpace();
+    view=next;
+    $('sol2d').setAttribute('aria-pressed',String(view==='2d'));
+    $('sol3d').setAttribute('aria-pressed',String(view==='3d'));
+    $('sol3dControls').hidden=view!=='3d';
+    $('solScene3d').hidden=view!=='3d';
+    if(follow)center();
+    localize();invalidate();
+  }
+  listen($('sol2d'),'click',()=>switchView('2d'));
+  listen($('sol3d'),'click',()=>switchView('3d'));
+  listen($('solSun'),'click',()=>select('sun',true));
+  for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
+    listen($(id),'click',()=>{space={...space,...ORBIT_POSES[pose]};invalidate();});
+  listen($('solTrails'),'click',()=>{
+    trails=!trails;$('solTrails').setAttribute('aria-pressed',String(trails));
+    $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');invalidate();
+  });
   listen($('solTarget'),'change',()=>select($('solTarget').value,false));
   listen($('solReference'),'change',()=>{reference=$('solReference').value;updateInspector();invalidate();});
   listen($('solJump'),'click',center);
@@ -421,8 +623,8 @@ export function mountSolar(root) {
       active=value;
       if (active) resize(); else suspend();
     },
-    inspect:()=>({active,day,camera:{...camera},selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
-      markers:markers.map(({body,x,y,radius})=>({id:body.id,x,y,radius}))}),
+    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},trails,trailPoints:[...trailCache.values()].reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:selected!==reference?solarComparison(day,selected,reference):null,enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
+      markers:markers.map(({body,x,y,radius,depth})=>({id:body.id,x,y,radius,depth}))}),
     dispose() {active=false;suspend();abort.abort();unsubscribe();resizeObserver.disconnect();visibilityObserver.disconnect();root.replaceChildren();},
   };
 }

@@ -1,7 +1,7 @@
 import {panBy, zoomAt, MAX_ZOOM} from './camera.mjs';
 
 // Both maps use the same CSS-pixel pan, zoom anchors and keyboard controls.
-export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, maxZoom=MAX_ZOOM, fit, exit, tap}) {
+export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, maxZoom=MAX_ZOOM, fit, exit, tap, enabled=()=>true}) {
   const pointers = new Map();
   let gesture = null;
   let moved = false;
@@ -33,6 +33,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
   }
 
   listen(canvas, 'pointerdown', event => {
+    if (!enabled()) return;
     if (event.button !== 0 || pointers.size >= 2) return;
     canvas.focus({preventScroll:true});
     canvas.setPointerCapture(event.pointerId);
@@ -42,6 +43,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
     reset();
   });
   listen(canvas, 'pointermove', event => {
+    if (!enabled()) return;
     if (!pointers.has(event.pointerId) || !gesture) return;
     pointers.set(event.pointerId, point(event));
     const {midpoint,span} = geometry();
@@ -63,6 +65,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
   }
   for (const type of ['pointerup','pointercancel','lostpointercapture']) listen(canvas,type,release);
   listen(canvas, 'wheel', event => {
+    if (!enabled()) return;
     if (document.activeElement !== canvas) return;
     event.preventDefault();
     const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? size()[1] : 1);
@@ -70,6 +73,7 @@ export function mapGestures(canvas, listen, {getCamera, setCamera, size, frame, 
   }, {passive:false});
   const arrows = {ArrowLeft:[48,0],ArrowRight:[-48,0],ArrowUp:[0,48],ArrowDown:[0,-48]};
   listen(canvas, 'keydown', event => {
+    if (!enabled()) return;
     if (Object.hasOwn(arrows,event.key)) {
       event.preventDefault();
       const [w,h] = size(), [dx,dy] = arrows[event.key];
