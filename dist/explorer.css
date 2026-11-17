@@ -251,3 +251,9 @@
 #explorer #solPairEpoch{line-height:1.5}
 @media(max-width:1050px){#explorer .ex-solar-quick{grid-template-columns:repeat(2,minmax(0,1fr))}#explorer .ex-solar-quick button{width:100%}}
 @media(max-width:760px){#explorer .ex-solar-quick{padding:10px 12px}#explorer .ex-compare{margin-top:14px}}
+
+/* The 320 px solar toolbar must wrap complete labels inside its own panel. */
+@media(max-width:370px){
+  #explorer .ex-solar .ex-map-head .ex-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  #explorer .ex-solar .ex-map-head .ex-controls button{min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+}
