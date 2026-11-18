@@ -57,6 +57,9 @@ test('Stellar Neighborhood loads lazily, centres the Sun and opens a matching sp
     assert.ok(overview.markers<=2200 && overview.visible===rows.length);
     assert.equal(await p.locator('#snXY,#snXZ').count(),0);
     assert.match(await p.locator('#snTitle').locator('..').innerText(),/J2016\.0/);
+    await p.locator('#snCanvas').click({position:{x:overview.origin[0],y:overview.origin[1]}});
+    assert.equal((await state(p)).neighborhood.selected,null);
+    assert.deepEqual((await state(p)).neighborhood.camera.focus,[0,0,0]);
     const point=overview.overlapSample[0];
     assert.ok(point,'catalogue has screen overlaps at the overview scale');
     await p.locator('#snCanvas').click({position:{x:point.x,y:point.y}});
@@ -189,6 +192,7 @@ test('Stellar Neighborhood is usable at 320 and 390 px under Reduced Motion, wit
         assert.ok((await state(p)).neighborhood.camera.zoom>0);
       }
       const zoom=p.locator('#snZoom');
+      let detailCacheBytesAfterSelect=0;
       await zoom.focus();await zoom.press('End');
       assert.equal((await state(p)).neighborhood.camera.zoom,2.4);
       await p.locator('#snCanvas').press('+');
@@ -198,13 +202,16 @@ test('Stellar Neighborhood is usable at 320 and 390 px under Reduced Motion, wit
       assert.equal((await state(p)).neighborhood.camera.zoom,0);
       if(profile.width===320){
         await select(p,source.id,source.id);
+        detailCacheBytesAfterSelect=(await state(p)).neighborhood.cacheBytes;
+        assert.ok(detailCacheBytesAfterSelect>0&&detailCacheBytesAfterSelect<=256*1024);
         const startDistance=await p.locator('#snDistance').innerText();
         await p.evaluate(async()=>{
           for(let i=0;i<100;i++){
             document.querySelector('#snCenter').click();
             document.querySelector('#snCanvas').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
             document.querySelector('#snHome').click();
-            if(i%10===0){document.querySelector('#exSkyMode').click();document.querySelector('#exNeighborhoodMode').click();}
+            document.querySelector('#exSkyMode').click();
+            document.querySelector('#exNeighborhoodMode').click();
             await new Promise(done=>requestAnimationFrame(done));
           }
         });
@@ -220,8 +227,8 @@ test('Stellar Neighborhood is usable at 320 and 390 px under Reduced Motion, wit
       assert.equal((await state(p)).neighborhood.scheduled,false);
       times.sort((a,b)=>a-b);
       metrics.push({profile,cpuThrottle:mobile?4:1,activationMs,overviewBytes,drawMsP50:times[9],drawMsP95:times[18],samples:times.length,
-        positionBytes:initial.positionBytes,canvasBytes:initial.canvasBytes,detailCacheBytes:initial.cacheBytes,
-        visible:initial.visible,markers:initial.markers,overlap:initial.overlap,limited:initial.limited,modeCycles:profile.width===320?100:0});
+        positionBytes:initial.positionBytes,canvasBytes:initial.canvasBytes,idleDetailCacheBytes:initial.cacheBytes,detailCacheBytesAfterSelect,
+        visible:initial.visible,markers:initial.markers,overlap:initial.overlap,limited:initial.limited,modeRoundTrips:profile.width===320?100:0});
     } finally {await context.close();}
   }
   console.log('Stellar Neighborhood measurement '+JSON.stringify(metrics));

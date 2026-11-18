@@ -25,8 +25,8 @@ const copy={
   outside:['Sonne außerhalb des Bilds','Sun outside the view'],
   scale:['am Kamerafokus','at camera focus'],
   axes:['+X zum galaktischen Zentrum, +Y zur galaktischen Länge 90°, +Z zum galaktischen Nordpol.','+X toward the Galactic centre, +Y toward Galactic longitude 90°, +Z toward the north Galactic pole.'],
-  overlap:['durch Überlagerung','overlap'],
-  limited:['durch Markerbudget','marker budget'],
+  overlap:['überlagert','overlap'],
+  limited:['wegen Markerbudget ausgeblendet','hidden by marker budget'],
   groups:['Quellen am gewählten Punkt','Sources at the selected point'],
   aliases:['Auch bekannt als','Also known as'],
   spectral:['Veröffentlichter Spektraltyp','Published spectral type'],
@@ -40,7 +40,7 @@ const copy={
   science:['Gaia misst Parallaxe über die scheinbare jährliche Verschiebung einer Quelle. Bailer-Jones kombiniert Parallaxe, Messfehler und ein Modell der räumlichen Verteilung zu einer Entfernungsschätzung. Das asymmetrische Intervall steht unter den Quelldetails.','Gaia measures parallax from a source’s apparent annual shift. Bailer-Jones combines parallax, measurement uncertainty and a spatial model to estimate distance. The asymmetric interval is in the source details.'],
   epoch:['J2016.0 ist die Referenzepoche der ICRS-Richtungen. Die Karte verwendet diese Richtungen im galaktischen Koordinatensystem und schreibt keine Eigenbewegung fort.','J2016.0 is the reference epoch of the ICRS directions. The map uses those directions in Galactic coordinates and does not propagate proper motion.'],
   how:['Punkte nebeneinander können räumlich weit getrennt sein. Drehe die Karte und wähle eine Quelle, um ihren Abstand zur Sonne zu sehen.','Points that appear next to each other can be far apart in space. Rotate the map and select a source to see its distance from the Sun.'],
-  markers:['Markergröße und Leuchten helfen bei der Orientierung. Gaia G beschreibt gemessene Helligkeit im G-Band. Die Linie zur Sonne ist eine Orientierungshilfe.','Marker size and glow aid orientation. Gaia G measures apparent brightness in the G band. The line to the Sun is a guide.'],
+  markers:['Die Marker sind symbolisch, ohne maßstabsgetreue Sternradien. Gaia G beschreibt gemessene Helligkeit im G-Band. Die Linie zur Sonne ist eine Orientierungshilfe.','Markers are symbolic and omit true-scale stellar radii. Gaia G measures apparent brightness in the G band. The line to the Sun is a guide.'],
   loading:['Gaia-Katalog wird geladen …','Loading the Gaia catalogue …'],
   failure:['Katalogdaten fehlen oder konnten nicht verifiziert werden.','Catalogue data are missing or did not pass verification.'],
   detailLoading:['Quellenkarte wird geladen …','Loading the source details …'],
@@ -109,7 +109,7 @@ export function mountNeighborhood(root,{onSky}) {
   const listen=(target,type,callback,options={})=>target.addEventListener(type,callback,{...options,signal:controller.signal});
   let active=false,disposed=false,seen=true,job=null,loader=null,data=null,status='loading',frame=null,detailRev=0;
   let width=1,height=1,camera=neighborhoodHome(),unit='ly',selected=-1,pivot=-1,detail=null,detailState='idle';
-  let visible=0,overlap=0,limited=0,marks=[],origin=null,sunVisible=true,draws=0,duration=0,shown=[],listKey=null;
+  let visible=0,overlap=0,limited=0,marks=[],origin=null,sunVisible=false,draws=0,duration=0,shown=[],listKey=null;
   let names=new Map(),groupRows=[];
 
   const known=(id)=>neighborhoodName(id,language());
@@ -177,7 +177,7 @@ export function mountNeighborhood(root,{onSky}) {
       el('p',t('distance'),'ex-small'),estimate);
     const {interval}=roundedDistance(selected);
     if(interval)inspector.append(el('p',`≈ ${interval.map(n).join('–')} ${unitName()}`,'ex-small'));
-    if(verified)inspector.append(el('p',annotation?.spectral?`${t('spectral')} · ${annotation.spectral}`:t('spectralUnknown'),'ex-small'));
+    inspector.append(el('p',annotation?.spectral?`${t('spectral')} · ${annotation.spectral}`:t('spectralUnknown'),'ex-small'));
     if(!detail) {
       inspector.append(el('p',t(detailState==='error'?'detailFailure':'detailLoading'),'ex-small'));
       if(detailState==='error') {
@@ -299,6 +299,7 @@ export function mountNeighborhood(root,{onSky}) {
   }
   const setCamera=next=>{camera=next;invalidate();};
   const fit=()=>{pivot=-1;setCamera(neighborhoodHome());};
+  const centerSun=()=>{pivot=-1;setCamera({...camera,focus:[0,0,0]});};
   const zoomTo=zoom=>setCamera(neighborhoodZoom(camera,zoom));
   const zoomBy=delta=>zoomTo(camera.zoom+delta);
   const pointers=new Map();
@@ -334,8 +335,12 @@ export function mountNeighborhood(root,{onSky}) {
   for(const type of ['pointerup','pointercancel','lostpointercapture'])listen(canvas,type,event=>{
     if(!pointers.has(event.pointerId))return;
     if(type==='pointerup'&&!moved&&pointers.size===1){
-      const {left,top}=canvas.getBoundingClientRect(),mark=neighborhoodHit(marks,event.clientX-left,event.clientY-top);
-      if(mark){groupRows=mark.members;search.value='';void choose(mark.row,false);}
+      const {left,top}=canvas.getBoundingClientRect(),x=event.clientX-left,y=event.clientY-top;
+      if(sunVisible&&Math.hypot(x-origin[0],y-origin[1])<=8)centerSun();
+      else {
+        const mark=neighborhoodHit(marks,x,y);
+        if(mark){groupRows=mark.members;search.value='';void choose(mark.row,false);}
+      }
     }
     pointers.delete(event.pointerId);resetOrbit();
     if(!pointers.size)canvas.dataset.interacting='false';
@@ -360,7 +365,7 @@ export function mountNeighborhood(root,{onSky}) {
   listen($('snIn'),'click',()=>zoomBy(.25));listen($('snOut'),'click',()=>zoomBy(-.25));
   listen($('snZoom'),'input',()=>zoomTo(Number($('snZoom').value)));
   listen($('snHome'),'click',fit);listen($('snCenter'),'click',center);listen($('snRetry'),'click',()=>void start());
-  listen($('snSun'),'click',()=>{pivot=-1;setCamera({...camera,focus:[0,0,0]});});
+  listen($('snSun'),'click',centerSun);
   listen($('snUnit'),'change',()=>{unit=$('snUnit').value;showDetail();showList();invalidate();});
   listen($('snConnection'),'change',invalidate);
   listen(search,'input',()=>{groupRows=[];showList();});
@@ -384,8 +389,9 @@ export function mountNeighborhood(root,{onSky}) {
   localize();
   return {setActive,inspect:()=>({active,status,unit,origin,sunVisible,pivot,camera:{...camera,focus:[...camera.focus]},total:data?.ids.length??0,visible,overlap,limited,markers:marks.length,
     sample:data?marks.slice(0,12).map(({row,x,y,depth,members})=>({id:idAt(row),x,y,depth,members:members.map(idAt)})):[],
-    overlapSample:data?marks.filter(m=>m.members.length>1&&m.x>20&&m.x<width-20&&m.y>50&&m.y<height-40).slice(0,4)
-      .map(({row,x,y,members})=>({id:idAt(row),x,y,members:members.map(idAt)})):[],
+    overlapSample:data?marks.filter(m=>m.members.length>1&&m.x>20&&m.x<width-20&&m.y>50&&m.y<height-40&&
+      (!sunVisible||Math.hypot(m.x-origin[0],m.y-origin[1])>8)).slice(0,4)
+      .map(({row,x,y})=>({id:idAt(row),x,y,members:neighborhoodHit(marks,x,y).members.map(idAt)})):[],
     selected:selected>=0?idAt(selected):null,detailState,
     positionBytes:data?data.xyz.byteLength+data.ids.byteLength+data.magnitude.byteLength+data.order.byteLength:0,canvasBytes:canvas.width*canvas.height*4,
     draws,duration,scheduled:frame!==null,requests:loader?.active??0,cacheBytes:loader?.cache.byteLength??0}),

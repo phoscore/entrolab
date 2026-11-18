@@ -30,6 +30,9 @@ export const neighborhoodDirection = ({yaw,pitch}) => ({
 });
 
 export function distanceDisplay(median, lo, hi, unit) {
+  if (![median,lo,hi].every(Number.isFinite) || !(0<lo && lo<=median && median<=hi) || !['pc','ly'].includes(unit)) {
+    throw new RangeError('Invalid neighborhood distance');
+  }
   const factor = unit==='ly' ? PC_TO_LY : 1;
   const value = median*factor;
   const width = (hi-lo)*factor;
@@ -70,5 +73,10 @@ export function neighborhoodHit(marks,x,y) {
     const point=marks[i], delta=(point.x-x)**2+(point.y-y)**2;
     if (delta<distance) {distance=delta;nearest=point;}
   }
-  return nearest;
+  if (!nearest) return null;
+  const members=[...nearest.members];
+  for (const mark of marks) {
+    if (mark!==nearest && (mark.x-nearest.x)**2+(mark.y-nearest.y)**2<=25) members.push(...mark.members);
+  }
+  return {...nearest,members};
 }

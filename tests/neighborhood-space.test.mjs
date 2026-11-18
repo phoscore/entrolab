@@ -49,6 +49,11 @@ test('equal aim directions have independent distances, depth order and selectabl
   assert.equal(Math.hypot(...xyz.subarray(0,3)),2);
   assert.equal(Math.hypot(...xyz.subarray(3,6)),20);
   assert.ok(project([2,3,0]).x<project([20,3,0]).x);
+  const adjacent=[
+    {row:3,x:163.9,y:180,depth:18,members:[3]},
+    {row:4,x:164.1,y:180,depth:17,members:[4]},
+  ];
+  assert.deepEqual(neighborhoodHit(adjacent,163.9,180).members,[3,4]);
 });
 
 test('focus and camera rotations use every original packed coordinate without mutating it',async()=>{
@@ -83,4 +88,5 @@ test('focus and camera rotations use every original packed coordinate without mu
 test('display precision follows uncertainty without changing measurements',()=>{
   assert.deepEqual(distanceDisplay(1.302,1.300,1.305,'ly'),{value:4.2,interval:null});
   assert.deepEqual(distanceDisplay(18.9,17.4,20.6,'pc'),{value:19,interval:[17,21]});
+  assert.throws(()=>distanceDisplay(Infinity,1,2,'ly'),/Invalid/);
 });
