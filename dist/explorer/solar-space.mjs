@@ -46,6 +46,41 @@ export function spaceProjector(camera,width,height,baseDistance=85){
     const edge=project(a.map((value,i)=>value+(b[i]-value)*fraction),near);
     return depthA<=near?[edge,project(b,depthB)]:[project(a,depthA),edge];
   };
+  const halfWidth=width/2+2, halfHeight=height/2+2;
+  const horizontal=halfWidth/focal,vertical=halfHeight/focal;
+  const horizontalNormal=Math.hypot(1,horizontal),verticalNormal=Math.hypot(1,vertical);
+  const pixelFactor=Math.hypot(focal,halfWidth,halfHeight);
+  const dot=([x,y,z],[a,b,c])=>x*a+y*b+z*c;
+  // A curve within radius of its world-space chord can only appear where
+  // that chord intersects the viewport frustum expanded by radius.
+  screen.trailError=(from,to,radius)=>{
+    const a=offset(from),b=offset(to),da=depthAt(a),db=depthAt(b);
+    let first=0,last=1;
+    function overlaps(start,end,margin){
+      start+=margin;end+=margin;
+      if(start<0&&end<0)return false;
+      if(start<0)first=Math.max(first,start/(start-end));
+      if(end<0)last=Math.min(last,start/(start-end));
+      return first<=last;
+    }
+    if(!overlaps(da-near,db-near,radius))return null;
+    const ax=dot(a,right), bx=dot(b,right), ay=dot(a,up), by=dot(b,up);
+    const xa=da*horizontal,xb=db*horizontal,ya=da*vertical,yb=db*vertical;
+    if(!overlaps(xa-ax,xb-bx,radius*horizontalNormal)||
+       !overlaps(xa+ax,xb+bx,radius*horizontalNormal)||
+       !overlaps(ya-ay,yb-by,radius*verticalNormal)||
+       !overlaps(ya+ay,yb+by,radius*verticalNormal))return null;
+    const depth=da+(db-da)*(db>=da?first:last);
+    // A visible curve point's screen radius is bounded by the viewport. Its
+    // projected difference from its chord point is bounded by radius*pixelFactor/depth.
+    if(depth<=0)return Infinity;
+    const error=radius*pixelFactor/depth;
+    if(depth>=near)return error;
+    if(Math.max(da,db)<=near)return Infinity;
+    // A visible arc can extend past the chord's near-plane intersection.
+    // Include the maximum retreat along the chord inside the radius slab.
+    return error*(1+Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2])/Math.abs(db-da));
+  };
   return screen;
 }
 export const projectSpace=(vector,camera,width,height)=>spaceProjector(camera,width,height)(vector);

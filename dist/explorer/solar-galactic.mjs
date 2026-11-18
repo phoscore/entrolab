@@ -53,8 +53,14 @@ export function schematicPosition(position, sun) {
   return position.map((v, i) => sun[i] + 3 * (v - sun[i]));
 }
 
-function sampleStep(body) {
-  if (!body.base) return MAX_SAMPLE_STEP;
+export function flightPosition(body, day) {
+  const orbit = orbitAt(body, day);
+  const relative = orbit ? vectorOnOrbit(orbit,eccentricAnomaly(orbit.mean,orbit.e)) : [0,0,0];
+  return galacticPosition(day,relative);
+}
+
+function trailSampling(body) {
+  if (!body.base) return {step:MAX_SAMPLE_STEP, chordFactor:0};
   const orbits = [orbitAt(body, GALACTIC_MIN_DAY), orbitAt(body, GALACTIC_MAX_DAY)];
   const period = 360 * 36525 / (body.rate[3] - body.rate[4]);
   const e = Math.max(...orbits.map(orbit => orbit.e));
@@ -63,29 +69,28 @@ function sampleStep(body) {
   const peakAngularRate = meanRate * Math.sqrt(1 + e) / (1 - e)**1.5;
   const peakAcceleration = meanRate**2 * a / (1 - e)**2;
   const chordStep = .98 * Math.sqrt(8 * CHORD_TARGET_AU / peakAcceleration);
-  return Math.min(MAX_SAMPLE_STEP, MAX_TRUE_SWEEP / peakAngularRate, chordStep);
+  return {
+    step:Math.min(MAX_SAMPLE_STEP, MAX_TRUE_SWEEP / peakAngularRate, chordStep),
+    // Chord radius scales with duration squared. Allow for secular element rates.
+    chordFactor:1.05 * peakAcceleration / 8,
+  };
 }
 
-const steps = bodies.map(sampleStep);
-export const MAX_TRAIL_POINTS = steps.reduce((sum, step) => sum + Math.ceil(TRAIL_DAYS.at(-1) / step) + 2, 0);
+const sampling = bodies.map(trailSampling);
+export const flightChordFactor = body => sampling[bodies.indexOf(body)].chordFactor;
+export const MAX_TRAIL_POINTS = sampling.reduce((sum, {step}) => sum + Math.ceil(TRAIL_DAYS.at(-1) / step) + 2, 0);
 
 export function flightTrails(day, duration, previous = []) {
   if (!supportsGalacticDay(day) || !TRAIL_DAYS.includes(duration)) throw new RangeError('Invalid flight trail interval');
   const start = Math.max(GALACTIC_MIN_DAY, day - duration);
   return bodies.map((body, index) => {
-    const step = steps[index];
+    const {step} = sampling[index];
     const samples = [], existing = previous[index]?.samples ?? [];
     let cursor = 0;
     function sample(epoch) {
       while (cursor < existing.length && existing[cursor].day < epoch) cursor++;
       const hit = existing[cursor];
-      let vector;
-      if (hit?.day === epoch) vector = hit.vector;
-      else {
-        const orbit = orbitAt(body, epoch);
-        const relative = orbit ? vectorOnOrbit(orbit,eccentricAnomaly(orbit.mean,orbit.e)) : [0,0,0];
-        vector = galacticPosition(epoch,relative);
-      }
+      const vector = hit?.day === epoch ? hit.vector : flightPosition(body,epoch);
       return {day:epoch,vector,age:(day-epoch)/duration};
     }
     // Align interior samples to a model-time lattice. The clipped start and

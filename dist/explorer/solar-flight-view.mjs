@@ -1,4 +1,4 @@
-import {SUN_KM_S, schematicPosition, sunDisplacement} from './solar-galactic.mjs';
+import {SUN_KM_S, flightChordFactor, flightPosition, schematicPosition, sunDisplacement} from './solar-galactic.mjs';
 import {spaceBasis} from './solar-space.mjs';
 
 const magnitude = Math.hypot(...SUN_KM_S);
@@ -48,26 +48,40 @@ const palette = {
   jupiter:'#f1ab7e', saturn:'#d8cf98', uranus:'#71c9aa', neptune:'#879af6',
 };
 
-export function paintFlights(ctx, screen, tracks, markers, width, height, selected, drawBody) {
+const TRAIL_PIXEL_TARGET = .65;
+export const MAX_FLIGHT_REFINEMENTS = 192;
+export const MAX_FLIGHT_REFINEMENT_DEPTH = 10;
+
+export function paintFlights(ctx, screen, tracks, markers, width, height, selected, drawBody, schematic = false) {
   const layers = [...markers];
+  let refinements = 0, limited = 0;
   for (const {body, samples} of tracks) {
-    let previous = null;
-    for (const sample of samples) {
-      const p = screen(sample.vector);
-      if (previous) {
-        const projected = previous.p && p ? [previous.p, p] :
-          screen.segment(previous.sample.vector, sample.vector);
-        if (projected) {
-          const [a, b] = projected;
-          if (Math.max(a.x,b.x)>=0 && Math.min(a.x,b.x)<=width &&
-              Math.max(a.y,b.y)>=0 && Math.min(a.y,b.y)<=height) {
-            const live = 1 - (previous.sample.age + sample.age) / 2;
-            layers.push({a,b,body,depth:(a.depth+b.depth)/2,alpha:live**1.3});
-          }
+    const chordFactor = flightChordFactor(body) * (schematic ? 3 : 1);
+    function addSegment(from,to,level) {
+      const radius = chordFactor * (to.day-from.day)**2;
+      const error = radius ? screen.trailError(from.vector,to.vector,radius) : 0;
+      if (error === null) return;
+      if (error > TRAIL_PIXEL_TARGET) {
+        if (level < MAX_FLIGHT_REFINEMENT_DEPTH && refinements < MAX_FLIGHT_REFINEMENTS) {
+          const day = (from.day+to.day)/2;
+          const vector = flightDisplayPoint(flightPosition(body,day),day,schematic);
+          const middle = {day,vector,age:(from.age+to.age)/2};
+          refinements++;
+          addSegment(from,middle,level+1);
+          addSegment(middle,to,level+1);
+          return;
         }
+        limited++;
       }
-      previous = {p,sample};
+      const projected = screen.segment(from.vector,to.vector);
+      if (!projected) return;
+      const [a,b] = projected;
+      if (Math.max(a.x,b.x)<0 || Math.min(a.x,b.x)>width ||
+          Math.max(a.y,b.y)<0 || Math.min(a.y,b.y)>height) return;
+      const live = 1 - (from.age + to.age) / 2;
+      layers.push({a,b,body,depth:(a.depth+b.depth)/2,alpha:live**1.3});
     }
+    for (let i=1;i<samples.length;i++) addSegment(samples[i-1],samples[i],0);
   }
   layers.sort((a,b)=>b.depth-a.depth);
   ctx.save();
@@ -87,4 +101,5 @@ export function paintFlights(ctx, screen, tracks, markers, width, height, select
     ctx.stroke();
   }
   ctx.restore();
+  return {refinements,limited,segments:layers.length-markers.length};
 }

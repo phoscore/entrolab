@@ -711,7 +711,7 @@ export function mountSolar(root) {
     }
     // Painter's order: far bodies first. Hit testing below reverses this order.
     markers.sort((a,b)=>b.depth-a.depth);
-    if (galactic) paintFlights(ctx,screen,getFlightTracks(),markers,width,height,selected,drawBody);
+    if (galactic) paintFlights(ctx,screen,getFlightTracks(),markers,width,height,selected,drawBody,galactic.schematic);
     else for(const marker of markers)drawBody(marker);
     ctx.font='12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(markers,label=>ctx.measureText(label).width,width,height,{bottom:height-52}));

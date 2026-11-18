@@ -619,3 +619,105 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
     await writeFile(join(output,'galactic-clock.json'),JSON.stringify({browser:browser.version(),metrics,cycles:100,idleDraws:0,heapBefore,heapAfter},null,2)+'\n');
   } finally {await context.close();}
 });
+
+test('D-01 actual Mercury strokes stay within a CSS pixel at 100× on desktop and mobile',async()=>{
+  const report=[];
+  for(const width of [1440,320]){
+    const {page,context,errors}=await open(width);
+    try {
+      await page.evaluate(()=>{
+        const ctx=document.querySelector('#solCanvas').getContext('2d');
+        let path=[];
+        window.d01Mercury=[];
+        for(const name of ['clearRect','beginPath','moveTo','lineTo','stroke']){
+          const original=ctx[name];
+          ctx[name]=function(...args){
+            if(name==='clearRect')window.d01Mercury=[];
+            if(name==='beginPath')path=[];
+            if(name==='moveTo'||name==='lineTo')path.push(args);
+            if(name==='stroke'&&this.strokeStyle==='#aab6d1'&&path.length===2)window.d01Mercury.push(path);
+            return original.apply(this,args);
+          };
+        }
+      });
+      await page.locator('#sol3d').click();
+      await page.locator('#solGalactic').click();
+      await page.locator('#solEpoch').click();
+      const physicalPair=await page.evaluate(()=>{
+        const reference=document.querySelector('#solReference');
+        reference.value='earth';
+        reference.dispatchEvent(new Event('change'));
+        const target=document.querySelector('#solTarget');
+        target.value='mercury';
+        target.dispatchEvent(new Event('change'));
+        return window.entrolabExplorer.inspect().solar.pair;
+      });
+
+      for(const schematic of [false,true]){
+        if(schematic)await page.locator('#solFlightScale').selectOption('schematic');
+        await page.locator('#solInner').click();
+        await page.locator('#solJump').click();
+        await page.locator('#solAlong').click();
+        await page.locator('#solZoom').evaluate(el=>{el.value='2';el.dispatchEvent(new Event('input'));});
+        const before=await flightReady(page);
+        assert.equal(before.space.zoom,2);
+        assert.equal(before.pose,'along');
+        assert.equal(before.day,2451545);
+        assert.deepEqual(before.pair,physicalPair);
+        const measured=await page.evaluate(async({space,galactic,day})=>{
+          const {solarState}=await import('/explorer/solar-model.mjs');
+          const {flightTrails,galacticPosition,sunDisplacement}=await import('/explorer/solar-galactic.mjs');
+          const {spaceProjector}=await import('/explorer/solar-space.mjs');
+          const {width,height}=document.querySelector('#solCanvas').getBoundingClientRect();
+          const project=spaceProjector(space,width,height,galactic.distance);
+          const vector=epoch=>{
+            const v=galacticPosition(epoch,solarState(epoch)[1].vector),s=sunDisplacement(epoch);
+            return galactic.schematic ? v.map((x,i)=>3*x-2*s[i]) : v;
+          };
+          const distance=({x,y},[[ax,ay],[bx,by]])=>{
+            const dx=bx-ax,dy=by-ay,length2=dx*dx+dy*dy;
+            const t=length2?Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/length2)):0;
+            return Math.hypot(x-ax-dx*t,y-ay-dy*t);
+          };
+          const [a,b]=flightTrails(day,180)[1].samples.slice(-2);
+          const baseline=project.segment(vector(a.day),vector(b.day)).map(p=>[p.x,p.y]);
+          const audit=project(vector(2451544.6880322825));
+          const lines=window.d01Mercury;
+          let count=0,maximumCSS=0;
+          for(let i=0;i<401;i++){
+            const p=project(vector(a.day+(b.day-a.day)*i/400));
+            if(!p||p.x<0||p.x>width||p.y<0||p.y>height)continue;
+            maximumCSS=Math.max(maximumCSS,Math.min(...lines.map(l=>distance(p,l))));
+            count++;
+          }
+          return {canvasCSS:[width,height],count,maximumCSS,baselineCSS:distance(audit,baseline),auditCSS:Math.min(...lines.map(l=>distance(audit,l)))};
+        },before);
+        assert.ok(measured.count>70);
+        assert.ok(measured.maximumCSS<=1&&measured.auditCSS<=1,JSON.stringify(measured));
+        if(width===1440&&!schematic) assert.ok(measured.baselineCSS>6&&measured.baselineCSS<6.2);
+        const canvas=page.locator('#solCanvas');
+        await canvas.screenshot({path:join(output,`d01-mercury-${width}-${schematic?'schematic':'physical'}.png`)});
+        const p95=await canvas.evaluate(async el=>{
+          const samples=[];
+          for(let i=0;i<24;i++){
+            el.dispatchEvent(new KeyboardEvent('keydown',{key:i%2?'ArrowRight':'ArrowLeft'}));
+            await new Promise(done=>requestAnimationFrame(done));
+            samples.push(window.entrolabExplorer.inspect().solar.drawMs);
+          }
+          samples.sort((a,b)=>a-b);
+          return samples[Math.ceil(samples.length*.95)-1];
+        });
+        assert.ok(p95<40,`D-01 paused camera draw p95 ${p95} ms`);
+        const after=await flightReady(page);
+        assert.equal(after.day,before.day);
+        assert.deepEqual(after.pair,before.pair);
+        await page.waitForTimeout(180);
+        assert.equal((await getFlight(page)).draws,after.draws);
+        report.push({width,schematic,p95DrawMs:p95,...measured});
+      }
+      assert.deepEqual(errors,[]);
+    }finally{await context.close();}
+  }
+  console.log('D01_MERCURY '+JSON.stringify(report));
+  await writeFile(join(output,'d01-mercury.json'),JSON.stringify({browser:browser.version(),report},null,2)+'\n');
+});

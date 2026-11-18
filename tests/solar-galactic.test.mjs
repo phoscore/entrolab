@@ -155,3 +155,95 @@ test('flight segment crossing the near plane is clipped in 3D before projection'
   assert.equal(edge.x,400+2.25*540/.5);
   assert.equal(edge.y,300-.625*540/.5);
 });
+
+function screenDistance(p,[a,b]) {
+  const dx=b.x-a.x,dy=b.y-a.y;
+  const lengthSquared=dx**2+dy**2;
+  const fraction=lengthSquared?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/lengthSquared)):0;
+  return Math.hypot(p.x-a.x-dx*fraction,p.y-a.y-dy*fraction);
+}
+
+function captureFlightStrokes() {
+  const strokes=[];
+  return {
+    strokes,color:null,path:null,
+    save(){},restore(){},beginPath(){this.path=[];},
+    moveTo(x,y){this.path.push({x,y});},
+    lineTo(x,y){this.path.push({x,y});},
+    stroke(){strokes.push({points:this.path,color:this.strokeStyle});},
+  };
+}
+
+test('D-01 Mercury at 100× follows independent model checkpoints in both display scales', async () => {
+  const {FLIGHT_POSES,flightDisplayPoint,paintFlights}=await import('../dist/explorer/solar-flight-view.mjs');
+  const {spaceProjector}=await import('../dist/explorer/solar-space.mjs');
+  const width=1058,height=650,track=flightTrails(J2000,180)[1];
+  const [start,end]=track.samples.slice(-2);
+  assert.equal(start.day,2451544.054643281);
+  assert.equal(end.day,J2000);
+  const auditDay=2451544.6880322825;
+
+  for(const schematic of [false,true]){
+    // Independent of the renderer's refinement evaluator and its choice of epochs.
+    const reference=day=>{
+      const r=galacticPosition(day,solarState(day)[1].vector),sun=sunDisplacement(day);
+      return schematic ? r.map((v,i)=>3*v-2*sun[i]) : r;
+    };
+    const screen=spaceProjector({...FLIGHT_POSES.along,focus:reference(J2000),zoom:2},width,height,schematic?18:6);
+    const samples=track.samples.map(p=>({...p,vector:flightDisplayPoint(p.vector,p.day,schematic)}));
+    const before=screen.segment(samples.at(-2).vector,samples.at(-1).vector);
+    if(!schematic)assert.ok(Math.abs(screenDistance(screen(reference(auditDay)),before)-6.07615)<.0001);
+
+    const ctx=captureFlightStrokes();
+    const stats=paintFlights(ctx,screen,[{...track,samples}],[],width,height,'mercury',()=>{},schematic);
+    assert.ok(stats.refinements>0);
+    assert.equal(stats.limited,0);
+    const lines=ctx.strokes.map(({points})=>points);
+    let worst=0, count=0;
+    const epochs=Array.from({length:799},(_,i)=>start.day+(end.day-start.day)*(i+.4)/799);
+    for(const epoch of [auditDay,...epochs]){
+      const p=screen(reference(epoch));
+      if(!p||p.x<0||p.x>width||p.y<0||p.y>height)continue;
+      worst=Math.max(worst,Math.min(...lines.map(line=>screenDistance(p,line))));
+      count++;
+    }
+    assert.ok(count>200);
+    assert.ok(worst<=1,`display scale ${schematic}: ${worst} CSS px`);
+    console.log('D-01 Mercury '+JSON.stringify({schematic,checks:count,worstCSS:worst,...stats}));
+  }
+});
+
+test('D-01 rejects offscreen work and bounds both refinement depth and total model evaluations', async () => {
+  const {FLIGHT_POSES,fitFlight,paintFlights,MAX_FLIGHT_REFINEMENTS,MAX_FLIGHT_REFINEMENT_DEPTH}=await import('../dist/explorer/solar-flight-view.mjs');
+  const {spaceProjector}=await import('../dist/explorer/solar-space.mjs');
+  const width=1058,height=650,tracks=flightTrails(J2000,365),pose=FLIGHT_POSES.angle;
+  const {focus,distance}=fitFlight(tracks.flatMap(t=>t.samples.map(p=>p.vector)),pose,width,height);
+  const overview=spaceProjector({...pose,focus,zoom:0},width,height,distance);
+  const ctx=captureFlightStrokes();
+  const normal=paintFlights(ctx,overview,tracks,[],width,height,'sun',()=>{});
+  assert.equal(normal.refinements,0);
+  assert.ok(normal.segments>700);
+
+  const offscreen=spaceProjector({...FLIGHT_POSES.along,focus:[10000,0,0],zoom:0},width,height,distance);
+  assert.deepEqual(paintFlights(ctx,offscreen,tracks,[],width,height,'sun',()=>{}),
+    {refinements:0,limited:0,segments:0});
+
+  // Stress the implementation independently of the current view or real chord errors.
+  let probes=0,smallest=Infinity,rootRadius=null;
+  const stress=Object.assign(()=>null,{
+    segment:()=>[{x:5,y:5,depth:1},{x:10,y:10,depth:1}],
+    trailError:(_a,_b,radius)=>{
+      probes++;
+      rootRadius??=radius;
+      smallest=Math.min(smallest,radius);
+      return Infinity;
+    },
+  });
+  const mercury=tracks[1], segment={...mercury,samples:mercury.samples.slice(-2)};
+  const worst=paintFlights(ctx,stress,[segment],[],width,height,'mercury',()=>{});
+  assert.equal(worst.refinements,MAX_FLIGHT_REFINEMENTS);
+  assert.equal(worst.segments,MAX_FLIGHT_REFINEMENTS+1);
+  assert.equal(probes,2*MAX_FLIGHT_REFINEMENTS+1);
+  assert.ok(smallest/rootRadius>=.999*4**(-MAX_FLIGHT_REFINEMENT_DEPTH));
+  assert.ok(worst.limited>0);
+});

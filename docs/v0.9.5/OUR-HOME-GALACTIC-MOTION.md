@@ -75,3 +75,20 @@ Headless Chromium 153.0.8010.0, one measured opening per viewport. Readiness is 
 | 320 px | 251 ms | 5.8 ms | 377 / 756 | 0.38 MiB |
 
 In one-second playback samples at 1440 px, draw-time p95 was 4.4 ms at 1 day/s, 4.8 ms at 10 days/s and 7.2 ms at 100 days/s. The first two cases used a 180-day window and the last used 365 days, reaching 760 points. Chromium reported 4.83 MB of exposed JS heap before and 5.01 MB after 100 cycles and forced collection in the same page state. That sample includes unrelated page code and does not measure GPU allocations. The final 200 ms of paused observation added zero draws. No binary data was requested by the Galactic mode tests. The test archives repeat these measurements in CI.
+
+### Close-up trail resolution · D-01
+
+The base samples and their AU cadence stay the same. For each planetary chord the renderer estimates a world-space curve envelope from the same peak acceleration with a 5% margin. It expands the perspective frustum by that envelope to avoid refining segments that cannot be seen. The projected bound uses the nearest relevant depth, with additional allowance for near-plane clipping. Schematic view triples the envelope alongside the planet's orbit offset. Chords that can exceed 0.65 CSS px are bisected at exact model epochs. New vertices use the same position calculation as the base samples. Fading still uses model age and visible strokes are still sorted by depth.
+
+The renderer allows at most 192 extra position evaluations per frame and 10 bisection levels per base segment. Extra samples exist only for that draw. Once a limit is reached the renderer draws the remaining clipped chords at the available resolution. The pixel target is an estimate for rendered curvature within the model.
+
+Local Chromium measurements at J2000.0, following the audited Mercury selection, along-motion camera and 100× zoom. Each error is the distance from a directly computed visible model point to the nearest emitted Mercury stroke, in CSS pixels. The audited 1440 px checkpoint (JD 2451544.6880322825 TDB) fell from **6.076 to 0.099 CSS px**. The per-view maximum samples additional points over the last base segment.
+
+| Viewport | Display | Maximum checked error | Paused camera draw p95 |
+| --- | --- | ---: | ---: |
+| 1440 px | Physical | 0.099 CSS px | 1.0 ms |
+| 1440 px | Schematic ×3 | 0.139 CSS px | 0.9 ms |
+| 320 px | Physical | 0.072 CSS px | 1.9 ms |
+| 320 px | Schematic ×3 | 0.110 CSS px | 0.8 ms |
+
+The ordinary 365-day overview test needs zero extra vertices. The focused tests cover clipping, deliberately exhausted budgets, paused camera changes, time acceleration and unchanged comparison values. The browser evidence is archived under `our-home-3d/d01-mercury*` in the regular Chromium check.
