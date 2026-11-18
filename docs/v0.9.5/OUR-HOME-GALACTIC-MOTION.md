@@ -4,7 +4,7 @@ In **Solar System → 3D spatial view**, choose **Galactic motion**. The default
 
 - **Oblique**, **Across motion** and **Along motion** change the camera direction. Drag or use arrows to rotate, and pinch or use +/− to zoom. **Fit flight trails** frames the plotted interval and fixes the camera centre. **Follow Sun** tracks the Sun while the trails still depict earlier model positions in a fixed frame. **Inner planets** follows the Sun from a closer distance. **To the Sun** centres it once.
 - The existing TDB clock offers pause, playback at 1/10/100 model days per real second, ±1-day steps and J2000.0 reset. Playback stops at the upper boundary and when the map loses visibility. Reduced Motion offers manual time controls. Direct calendar changes and reset translate the camera with the new solar position, preserving the framing across large date jumps. Switching frames pauses. Within the common window the date is preserved. Entering from an out-of-range date opens at J2000.0 with a notice. Returning at that epoch restores the previous date.
-- Trails cover 30, 90, 180 or 365 model days (default 90). The beginning is clipped to the supported window. The Sun advances about 52 AU per Julian year transverse to much of the planetary orbital geometry. A few inner-planet tracks look almost coincident at full-system scale. Zoom in or select the inner planets to resolve them.
+- Trails cover 30, 90, 180 or 365 model days (default 180). The beginning is clipped to the supported window. The Sun advances about 52 AU per Julian year transverse to much of the planetary orbital geometry. A few inner-planet tracks look almost coincident at full-system scale. Zoom in or select the inner planets to resolve them.
 - **Schematic · planetary displacement ×3** triples all three displayed Sun-relative components at each sample epoch. The Sun's trajectory, the actual model and the inspector values keep their original scale. The scale bar is available in physical view and applies at camera focus depth. Body symbols are enlarged by default.
 
 ## Adopted frame and epoch
@@ -41,7 +41,7 @@ This local view concerns distances of tens of AU over a trail window. The Galact
 
 ## Sampling, drawing and verification
 
-Interior nodes are anchored to J2000.0 on one fixed cadence per body. The faster of three cadences governs each body: 14 days, 6° of estimated peak orbital motion, and a 0.001 AU chord-deviation target using the peak Kepler acceleration and a 2% timestep margin for the slowly changing fit. Window start and current epoch are evaluated directly. The renderer clips segments against the near plane, orders strokes and body symbols by camera depth, and fades from the present to the configured trail age. It keeps one window in memory and reuses it on paused camera interaction. Changing the display scale changes only the rendering coordinates. At 365 days the nine trails have a mathematical cap of 765 vectors. In 72,018 off-node checks at one-quarter, half and three-quarters of segments across 32 epochs, the largest measured chord deviation was 0.000961 AU (about 144,000 km). This is a rendering error within the approximation, distinct from physical uncertainty.
+Interior nodes are anchored to J2000.0 on one fixed cadence per body. The fastest of three cadences governs each body: 14 days, 6° of estimated peak orbital motion, and a 0.001 AU chord-deviation target using the peak Kepler acceleration and a 2% timestep margin for the slowly changing fit. Window start and current epoch are evaluated directly. The renderer clips segments against the near plane, orders strokes and body symbols by camera depth, and fades from the present to the configured trail age. It keeps one window in memory, reuses unchanged time nodes during playback and reprojects the same world points during paused camera interaction. Changing the display scale changes only the rendering coordinates. At 365 days the nine trails have a mathematical cap of 765 vectors. In 72,018 off-node checks at one-quarter, half and three-quarters of segments across 32 epochs, the largest measured chord deviation was 0.000961 AU (about 144,000 km). This is a rendering error within the approximation, distinct from physical uncertainty.
 
 `tests/solar-galactic.test.mjs` compares the transform against Astropy 7.2.0, checks coordinate handedness, all body-pair distances and relative velocities, and differentiates composed positions independently. It checks sample identity, intermediate chord deviations, clipping, fitting and the effect of schematic view. Regenerate the reference vectors with Python and `astropy==7.2.0`:
 
@@ -63,3 +63,15 @@ with galactocentric_frame_defaults.set("v4.0"):
 ```
 
 `tests/our-home-3d-browser.test.mjs` exercises Galactic mode at 1440/390/320 px, camera inputs, Reduced Motion, DE/EN, time controls, all playback rates, the date boundary, switching into a Horizons system and back, 100 mode/camera cycles, and zero paused redraws. The Chromium CI archive contains PNG screenshots (sun-centred references plus oblique, across, along and schematic views), observed readiness times, draw times, maximum sample counts and canvas backing-store byte estimates.
+
+### Local Chromium sample
+
+Headless Chromium 153.0.8010.0, one measured opening per viewport. Readiness is the click-to-settled-frame time, not a cold site load. Canvas bytes are width × height × 4 for one RGBA8 backing store.
+
+| Viewport | Ready | Single draw | Stored samples, 180 / 365 days | Canvas |
+| --- | ---: | ---: | ---: | ---: |
+| 1440 px | 288 ms | 5.1 ms | 377 / 756 | 2.62 MiB |
+| 390 px | 149 ms | 4.0 ms | 377 / 756 | 0.48 MiB |
+| 320 px | 251 ms | 5.8 ms | 377 / 756 | 0.38 MiB |
+
+In one-second playback samples at 1440 px, draw-time p95 was 4.4 ms at 1 day/s, 4.8 ms at 10 days/s and 7.2 ms at 100 days/s. The first two cases used a 180-day window and the last used 365 days, reaching 760 points. Chromium reported 4.83 MB of exposed JS heap before and 5.01 MB after 100 cycles and forced collection in the same page state. That sample includes unrelated page code and does not measure GPU allocations. The final 200 ms of paused observation added zero draws. No binary data was requested by the Galactic mode tests. The test archives repeat these measurements in CI.

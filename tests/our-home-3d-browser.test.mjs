@@ -441,16 +441,27 @@ test('Galactic motion projects nine bodies at 1440/390/320 and preserves compari
       } else {
         const cdp=await context.newCDPSession(page);
         const p=(id,dx)=>({id,x:midX+dx,y:midY});
+        const yaw=(await getFlight(page)).space.yaw;
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p(0,0)]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p(0,30)]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        assert.notEqual((await getFlight(page)).space.yaw,yaw);
         await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p(0,-18),p(1,18)]});
         await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[p(0,-42),p(1,42)]});
         await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
         assert.ok((await getFlight(page)).space.zoom>0);
       }
 
+      if(width===1440){
+        await page.locator('#solFlightAngle').click();
+        await page.locator('#solInner').click();
+        await flightReady(page);
+        await canvas.screenshot({path:join(output,'galactic-physical-inner-1440.png')});
+      }
       await page.locator('#solFlightWindow').selectOption('365');
       await page.locator('#solFit').click();
       const fitted=await flightReady(page);
-      assert.ok(fitted.galactic.samples<=920&&fitted.galactic.samples>first.galactic.samples);
+      assert.ok(fitted.galactic.samples<=765&&fitted.galactic.samples>first.galactic.samples);
       assert.equal(fitted.space.zoom,0);
       await page.locator('#solTrails').click();
       assert.equal((await flightReady(page)).galactic.samples,0);
@@ -485,6 +496,10 @@ test('Galactic motion projects nine bodies at 1440/390/320 and preserves compari
   console.log('GALACTIC_VIEW '+JSON.stringify(measurements));
   await writeFile(join(output,'galactic-views.json'),JSON.stringify({browser:browser.version(),measurements},null,2)+'\n');
 });
+
+function flightFrameSettled(page) {
+  return page.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.scheduled);
+}
 
 test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay consistent',async()=>{
   const {context,page,errors}=await open(1440,false);
@@ -526,6 +541,8 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
       const before=await flightReady(page);
       assert.equal(before.galactic.followSun,true);
       await page.locator('#solPlay').click();
+      // Exclude the cold start, then sample real playback for a full second.
+      await page.waitForFunction(beforeDay=>window.entrolabExplorer.inspect().solar.day>beforeDay,before.day);
       const points=await page.evaluate(async()=>{
         const result=[];
         const start=performance.now();
@@ -537,7 +554,7 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
               result.push({day:s.day,drawMs:s.drawMs,samples:s.galactic.samples,draws:s.draws});
               draws=s.draws;
             }
-            if(time-start>=300) resolve(); else requestAnimationFrame(frame);
+            if(time-start>=1000) resolve(); else requestAnimationFrame(frame);
           }
           requestAnimationFrame(frame);
         });
@@ -546,9 +563,9 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
       await page.locator('#solPlay').click();
       const result=await flightReady(page);
       const elapsedDays=result.day-before.day;
-      assert.ok(elapsedDays>.21*rate&&elapsedDays<1.25*rate,`rate ${rate}: ${elapsedDays}`);
+      assert.ok(elapsedDays>.9*rate&&elapsedDays<2.0*rate,`rate ${rate}: ${elapsedDays}`);
       assert.notDeepEqual(result.space.focus,before.space.focus);
-      assert.ok(points.length>=4);
+      assert.ok(points.length>=10);
       const timings=points.map(p=>p.drawMs).sort((a,b)=>a-b);
       const p95=timings[Math.ceil(timings.length*.95)-1];
       assert.ok(p95<40,`p95 ${p95} ms at ${rate}`);
@@ -569,16 +586,28 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
     await page.locator('#solGlobal').click();
     assert.equal((await getFlight(page)).view,'3d');
     await page.locator('#solCanvas').scrollIntoViewIfNeeded();
+    await flightFrameSettled(page);
+    const cdp=await context.newCDPSession(page);
+    await cdp.send('Performance.enable');
+    const heapBytes=async()=>{
+      await cdp.send('HeapProfiler.collectGarbage');
+      return (await cdp.send('Performance.getMetrics')).metrics.find(m=>m.name==='JSHeapUsedSize').value;
+    };
+    const heapBefore=await heapBytes();
     await page.evaluate(async()=>{
+      const frame=()=>new Promise(done=>requestAnimationFrame(done));
       for(let i=0;i<100;i++){
         document.querySelector('#solGalactic').click();
         document.querySelector(i%2?'#solAcross':'#solAlong').click();
         document.querySelector('#solSun').click();
-        if(i%10===0) await new Promise(done=>requestAnimationFrame(done));
+        await frame();
         document.querySelector('#solHelio').click();
+        await frame();
       }
     });
     assert.equal((await getFlight(page)).galactic,null);
+    const heapAfter=await heapBytes();
+    assert.ok(heapAfter-heapBefore<4*1024*1024);
     await page.locator('#solGalactic').click();
     const idle=await flightReady(page);
     await page.waitForTimeout(200);
@@ -587,6 +616,6 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
     assert.equal((await getFlight(page)).scheduled,false);
     assert.deepEqual(errors,[]);
     console.log('GALACTIC_CLOCK '+JSON.stringify(metrics));
-    await writeFile(join(output,'galactic-clock.json'),JSON.stringify({browser:browser.version(),metrics,cycles:100,idleDraws:0},null,2)+'\n');
+    await writeFile(join(output,'galactic-clock.json'),JSON.stringify({browser:browser.version(),metrics,cycles:100,idleDraws:0,heapBefore,heapAfter},null,2)+'\n');
   } finally {await context.close();}
 });

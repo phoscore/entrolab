@@ -159,20 +159,12 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
-        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><span class="ex-solar-pose-buttons" id="solOrbitPoses"><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button></span><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
-        <div class="ex-solar-viewbar ex-flight-frames" role="group" id="solFrames" hidden>
+        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><span class="ex-solar-pose-buttons" id="solOrbitPoses"><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button></span><button type="button" id="solTrails" aria-pressed="true"></button></span>
+        <span class="ex-flight-frames" role="group" id="solFrames" hidden>
           <button type="button" id="solHelio" data-solar="heliocentric" aria-pressed="true"></button>
           <button type="button" id="solGalactic" data-solar="galactic" aria-pressed="false"></button>
-        </div>
+        </span></div>
         <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
-        <div class="ex-solar-viewbar ex-flight-controls" role="group" id="solFlightControls" hidden>
-          <button type="button" id="solFlightAngle" data-solar="flightAngle" aria-pressed="true"></button>
-          <button type="button" id="solAcross" data-solar="flightAcross" aria-pressed="false"></button>
-          <button type="button" id="solAlong" data-solar="flightAlong" aria-pressed="false"></button>
-          <button type="button" id="solFollowSun" data-solar="followSun" aria-pressed="true"></button>
-          <label><span data-solar="flightWindow"></span><select id="solFlightWindow">${TRAIL_DAYS.map(d=>`<option value="${d}"${d===90?' selected':''}></option>`).join('')}</select></label>
-          <label><select id="solFlightScale"><option value="scale" data-solar="physical"></option><option value="schematic" data-solar="flightSchematic"></option></select></label>
-        </div>
         <p id="solGalacticScale" class="ex-solar-caption" data-solar="schematicScale" hidden></p>
         <p id="solGalacticStatus" class="ex-solar-caption" role="status" hidden></p>
         <div class="ex-solar-viewbar" role="group" id="solSystems"><button type="button" id="solGlobal" data-solar="overview" hidden></button></div>
@@ -186,6 +178,14 @@ export function mountSolar(root) {
         <div class="ex-map ex-solar-map"><canvas id="solCanvas" tabindex="0" aria-describedby="solHelp solLimit"></canvas></div>
         <div class="ex-map-foot"><span data-solar="model"></span><span id="solScaleNote"></span><strong id="solPairSummary" hidden></strong></div>
         <div class="ex-zoom"><label for="solZoom" data-solar="zoom"></label><input id="solZoom" type="range" min="0" max="${MAX_ZOOM}" step="0.01" value="0"><output id="solZoomValue"></output></div>
+        <div class="ex-solar-viewbar ex-flight-controls" role="group" id="solFlightControls" hidden>
+          <button type="button" id="solFlightAngle" data-solar="flightAngle" aria-pressed="true"></button>
+          <button type="button" id="solAcross" data-solar="flightAcross" aria-pressed="false"></button>
+          <button type="button" id="solAlong" data-solar="flightAlong" aria-pressed="false"></button>
+          <button type="button" id="solFollowSun" data-solar="followSun" aria-pressed="true"></button>
+          <label><span data-solar="flightWindow"></span><select id="solFlightWindow">${TRAIL_DAYS.map(d=>`<option value="${d}"${d===180?' selected':''}></option>`).join('')}</select></label>
+          <label><select id="solFlightScale"><option value="scale" data-solar="physical"></option><option value="schematic" data-solar="flightSchematic"></option></select></label>
+        </div>
         <div class="ex-time">
           <div class="ex-time-title"><strong data-solar="time"></strong><span id="solTimestamp"></span></div>
           <div class="ex-controls">
@@ -372,7 +372,10 @@ export function mountSolar(root) {
   function center() {
     const vector=selectedBody()?.vector;
     if (!vector) return;
-    if (galactic) setSunFollow(false);
+    if (galactic) {
+      setSunFollow(false);
+      galactic.fitted = false;
+    }
     if(view==='3d')space={...space,focus:[...displayedVector(vector)]};
     else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     invalidate();
@@ -621,11 +624,12 @@ export function mountSolar(root) {
     if (!galactic || !trails) return [];
     const {duration,schematic,cache} = galactic;
     if (cache?.day === day && cache.duration === duration && cache.schematic === schematic) return cache.tracks;
-    const tracks = flightTrails(day,duration);
-    if (schematic) for (const {samples} of tracks) for (const sample of samples) {
-      sample.vector = flightDisplayPoint(sample.vector,sample.day,true);
-    }
-    galactic.cache = {day,duration,schematic,tracks};
+    const model = cache?.day === day && cache.duration === duration ? cache.model :
+      flightTrails(day,duration,cache?.model);
+    const tracks = schematic ? model.map(({body,samples})=>({
+      body, samples:samples.map(sample=>({...sample,vector:flightDisplayPoint(sample.vector,sample.day,true)})),
+    })) : model;
+    galactic.cache = {day,duration,schematic,model,tracks};
     return tracks;
   }
 
@@ -789,6 +793,7 @@ export function mountSolar(root) {
     galactic.followSun = value;
     $('solFollowSun').setAttribute('aria-pressed',String(value));
     if (value) {
+      galactic.fitted = false;
       follow = false;
       $('solFollow').setAttribute('aria-pressed','false');
       space = {...space,focus:sunDisplacement(day)};
@@ -801,7 +806,8 @@ export function mountSolar(root) {
       setSunFollow(false);
       const points = current().map(({vector})=>displayedVector(vector));
       for (const {samples} of getFlightTracks()) for (const {vector} of samples) points.push(vector);
-      const fitted = fitFlight(points,width,height);
+      const fitted = fitFlight(points,space,width,height);
+      galactic.fitted = true;
       galactic.distance = fitted.distance;
       space = {...space,focus:fitted.focus,zoom:0};
       invalidate();
@@ -938,7 +944,11 @@ export function mountSolar(root) {
   listen($('solHelio'),'click',()=>changeFrame(false));
   listen($('solGalactic'),'click',()=>changeFrame(true));
   for(const [id,next] of [['solFlightAngle','angle'],['solAcross','across'],['solAlong','along']]) {
-    listen($(id),'click',()=>{space={...space,...FLIGHT_POSES[next]};markPose(next);invalidate();});
+    listen($(id),'click',()=>{
+      space={...space,...FLIGHT_POSES[next]};markPose(next);
+      if (galactic.fitted && !space.zoom) fitView();
+      else invalidate();
+    });
   }
   listen($('solFollowSun'),'click',()=>{setSunFollow(!galactic.followSun);invalidate();});
   listen($('solFlightWindow'),'change',()=>{

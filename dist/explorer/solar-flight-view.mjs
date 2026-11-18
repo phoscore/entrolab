@@ -1,9 +1,10 @@
 import {SUN_KM_S, schematicPosition, sunDisplacement} from './solar-galactic.mjs';
+import {spaceBasis} from './solar-space.mjs';
 
 const magnitude = Math.hypot(...SUN_KM_S);
 const drift = SUN_KM_S.map(value => value / magnitude);
-const cross = [-drift[1], drift[0], 0];
-const oblique = cross.map((value, i) => value - .48 * drift[i] + (i === 2 ? .48 : 0));
+const cross = [drift[1], -drift[0], 0];
+const oblique = cross.map((value, i) => value + .58 * drift[i] + (i === 2 ? .62 : 0));
 const facing = vector => ({
   yaw: Math.atan2(vector[1], vector[0]),
   pitch: Math.atan2(vector[2], Math.hypot(vector[0], vector[1])),
@@ -17,19 +18,29 @@ export const FLIGHT_POSES = Object.freeze({
 export const flightDisplayPoint = (vector, epoch, schematic) =>
   schematic ? schematicPosition(vector, sunDisplacement(epoch)) : vector;
 
-export function fitFlight(points, width, height) {
-  const min = [...points[0]], max = [...points[0]];
-  for (const point of points) {
+const dot = ([x,y,z],[a,b,c]) => x*a + y*b + z*c;
+
+export function fitFlight(points, camera, width, height) {
+  const axes = spaceBasis(camera);
+  const local = points.map(point=>axes.map(axis=>dot(axis,point)));
+  const min = [...local[0]], max = [...local[0]];
+  for (const point of local) {
     for (let i = 0; i < 3; i++) {
       min[i] = Math.min(min[i], point[i]);
       max[i] = Math.max(max[i], point[i]);
     }
   }
-  const focus = min.map((v, i) => (v + max[i]) / 2);
-  const radius = Math.max(1, ...points.map(point => Math.hypot(...point.map((v, i) => v - focus[i]))));
-  // A bounding sphere fits even after rotating the camera at the same zoom.
-  const margin = Math.min(width, height) * .37;
-  return {focus, distance: radius * (1 + .9 * height / margin)};
+  const middle = min.map((v,i)=>(v+max[i])/2);
+  const focus = axes[0].map((v,i)=>v*middle[0]+axes[1][i]*middle[1]+axes[2][i]*middle[2]);
+  const focal = height * .9;
+  const xScale = focal / (width * .40), yScale = focal / (height * .38);
+  let distance = 3;
+  for (const [x,y,z] of local) {
+    const inFront = z - middle[2];
+    const depthNeeded = Math.max(2, Math.abs(x-middle[0])*xScale, Math.abs(y-middle[1])*yScale);
+    distance = Math.max(distance, inFront/.95, inFront+depthNeeded);
+  }
+  return {focus,distance};
 }
 
 const palette = {

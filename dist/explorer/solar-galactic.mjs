@@ -69,16 +69,24 @@ function sampleStep(body) {
 const steps = bodies.map(sampleStep);
 export const MAX_TRAIL_POINTS = steps.reduce((sum, step) => sum + Math.ceil(TRAIL_DAYS.at(-1) / step) + 2, 0);
 
-export function flightTrails(day, duration) {
+export function flightTrails(day, duration, previous = []) {
   if (!supportsGalacticDay(day) || !TRAIL_DAYS.includes(duration)) throw new RangeError('Invalid flight trail interval');
   const start = Math.max(GALACTIC_MIN_DAY, day - duration);
   return bodies.map((body, index) => {
     const step = steps[index];
-    const samples = [];
+    const samples = [], existing = previous[index]?.samples ?? [];
+    let cursor = 0;
     function sample(epoch) {
-      const orbit = orbitAt(body, epoch);
-      const relative = orbit ? vectorOnOrbit(orbit, eccentricAnomaly(orbit.mean, orbit.e)) : [0,0,0];
-      return {day:epoch, vector:galacticPosition(epoch, relative), age:(day - epoch) / duration};
+      while (cursor < existing.length && existing[cursor].day < epoch) cursor++;
+      const hit = existing[cursor];
+      let vector;
+      if (hit?.day === epoch) vector = hit.vector;
+      else {
+        const orbit = orbitAt(body, epoch);
+        const relative = orbit ? vectorOnOrbit(orbit,eccentricAnomaly(orbit.mean,orbit.e)) : [0,0,0];
+        vector = galacticPosition(epoch,relative);
+      }
+      return {day:epoch,vector,age:(day-epoch)/duration};
     }
     // Align interior samples to a model-time lattice. The clipped start and
     // moving endpoint are exact, so no frame-history segments enter the trail.

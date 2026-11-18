@@ -110,6 +110,11 @@ test('samples are independent of playback history and the schematic transform le
   flightTrails(epoch-25,duration); // e.g. a quarter-second at 100 days/s
   flightTrails(epoch-.1,duration);
   assert.deepEqual(flightTrails(epoch,duration),at100);
+  const before=flightTrails(epoch-.111,365);
+  const reused=flightTrails(epoch,duration,before);
+  assert.deepEqual(reused,at100);
+  assert.ok(reused[1].samples.slice(1,-1).every(sample=>
+    sample.vector===before[1].samples.find(previous=>previous.day===sample.day).vector));
   assert.deepEqual(at100[1].samples.slice(1,-1).filter(p=>p.day>epoch-duration+1).map(p=>p.vector),
     flightTrails(epoch+1,duration)[1].samples.slice(1,-1).filter(p=>p.day<epoch).map(p=>p.vector));
   const sun=sunDisplacement(epoch), point=galacticPosition(epoch,solarState(epoch)[3].vector);
@@ -126,8 +131,9 @@ test('flight camera presets align to motion and the view fits all supplied point
   near(direction(FLIGHT_POSES.along),SUN_KM_S.map(v=>-v/norm(SUN_KM_S)),5e-16);
   const points = flightTrails(J2000+100,365).flatMap(({samples})=>samples.map(({vector})=>vector));
   for (const width of [300,365,940]) {
-    const height=420, {focus,distance}=fitFlight(points,width,height);
+    const height=420;
     for (const pose of Object.values(FLIGHT_POSES)) {
+      const {focus,distance}=fitFlight(points,pose,width,height);
       const screen=spaceProjector({...pose,zoom:0,focus},width,height,distance);
       for (const point of points) {
         const p=screen(point);
