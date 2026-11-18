@@ -5,6 +5,9 @@ import {placeLabels, drawLabels} from './labels.mjs';
 import {AU_KM, J2000, MIN_DAY, MAX_DAY, ORBIT_SOURCE, RADIUS_SOURCE, SUN_SOURCE, bodies, solarState, vectorOnOrbit, eclipticToMap, radiusAU, parseModelDate, formatModelDay, advanceModelDay} from './solar-model.mjs';
 import {solarComparison} from './solar-motion.mjs';
 import {ORBIT_POSES,spaceCamera,rotateSpace,zoomSpace,spaceProjector,trailSamples} from './solar-space.mjs';
+import {GALACTIC_FRAME_SOURCE,GALACTIC_MIN_DATE,GALACTIC_MAX_DATE,GALACTIC_MIN_DAY,GALACTIC_MAX_DAY,
+  TRAIL_DAYS,flightTrails,galacticPosition,sunDisplacement,supportsGalacticDay} from './solar-galactic.mjs';
+import {FLIGHT_POSES,fitFlight,flightDisplayPoint,paintFlights} from './solar-flight-view.mjs';
 import {START,SYSTEMS} from './new-worlds-spec.mjs';
 import {loadEphemeris,supportsEpoch} from './new-worlds-ephemeris.mjs';
 import {localOrbitPath,pluto,systemBodies,worldComparison,worldNotes,worldTrail,worldVector} from './new-worlds.mjs';
@@ -67,6 +70,33 @@ const copy = {
   whyBody:['Geschwindigkeit braucht immer einen Bezugskörper: Wir ziehen seine Modellgeschwindigkeit von der des Zielkörpers ab. Der Abstand ändert sich, weil beide Körper ihre Bahnen durchlaufen. Die Linie und der X/Y-Wert zeigen nur die Draufsicht; der 3D-Abstand enthält auch die Höhe über der Bahnebene. Lichtlaufzeit ist hier Abstand geteilt durch c bei festgehaltener Geometrie – keine lichtzeitkorrigierte Signalrechnung.','Speed always needs a reference body: we subtract its model velocity from the target’s. Distance changes as both bodies move on their orbits. The line and X/Y value show only the top-down view; 3D separation also includes height above the orbital plane. Light time here is distance divided by c for a frozen geometry, not a light-time-corrected signal calculation.'],
   method:['Geschwindigkeiten: numerische Ableitung der JPL-Näherungspositionen, keine NASA-Zustandsvektoren. 0,01 TDB-Tag Differenzschritt; an den Grenzen einseitig zweiter Ordnung. Alle Werte heliozentrischer J2000-Ekliptikrahmen. Die Erdposition ist der Erde–Mond-Schwerpunkt.','Velocities: numerical derivatives of the approximate JPL positions, not NASA state vectors. Difference step 0.01 TDB day; second-order one-sided at the bounds. All values share the heliocentric J2000 ecliptic frame. Earth’s position is the Earth–Moon barycentre.'],
   comparisonEpoch:['Modellzeit','Model time'],
+  frameChoice:['Bezugssystem der 3D-Ansicht','3D reference frame'],
+  heliocentric:['Sonnenzentriert','Sun-centred'],
+  galactic:['Galaktische Bewegung','Galactic motion'],
+  galacticFrame:['Galaktozentrische Achsen · lokale Tangente bei J2000.0','Galactocentric axes · local tangent at J2000.0'],
+  galacticScene:['≈ 246 km/s relativ zum galaktozentrischen Rahmen · 1970 bis 01.01.2030 TDB','≈ 246 km/s in the Galactocentric frame · 1970 to 1 January 2030 TDB'],
+  galacticModel:['Lokale Sonnenbewegung + JPL-Planetenmodell','Local solar motion + JPL planet model'],
+  galacticStar:['Zentralstern · bewegt sich im gewählten Rahmen','Central star · moves in the selected frame'],
+  galacticBounds:['Galaktischer Modus am 1. Januar 2000 (12:00 TDB) geöffnet. Das vorige Datum lag außerhalb des Modellfensters.','Galactic mode opened at 1 January 2000 (12:00 TDB). The previous date was outside the model window.'],
+  galacticLimit:['Der Ursprung ist die Sonnenposition bei J2000.0. Die Achsen zeigen ungefähr zum galaktischen Zentrum (+X), in Rotationsrichtung (+Y) und nach galaktisch Nord (+Z).','The origin is the Sun’s position at J2000.0. The axes point approximately towards the Galactic centre (+X), along rotation (+Y) and towards Galactic north (+Z).'],
+  galacticWhy:['Die Schwerkraft der Milchstraße krümmt die Bahn der Sonne um das galaktische Zentrum. Für 1970–2030 setzen wir die Sonne auf die lokale Tangente mit dem festen Geschwindigkeitsvektor aus Astropy v4.0. Der geschätzte Krümmungsbeitrag am Rand beträgt rund 100.000 km. Hinzu kommen die Unsicherheit des Sonnenvektors und die JPL-Bahnfehler. Die Bewegung der Sonne um den Sonnensystem-Schwerpunkt ist hier nicht modelliert.','The Milky Way’s gravity curves the Sun’s orbit around the Galactic centre. For 1970–2030 we use a local tangent at the fixed Astropy v4.0 solar velocity. The estimated curvature contribution at the edge is about 100,000 km. Solar velocity uncertainty and JPL orbit errors are additional. The Sun’s motion around the Solar System barycentre is omitted.'],
+  galacticGeometry:['Jeder Trail zeigt frühere Modellpositionen im gewählten Rahmen. Die Sonne legt pro Erdjahr rund 52 AU zurück. Deshalb sind die maßstäblichen Erdspuren langgezogen. Jede Bahn gehört zu einem Bezugssystem. Dieselbe Planetenbewegung ergibt im Sonnenrahmen wieder die vertrauten Bahnen. Abstände und Geschwindigkeiten zwischen Körpern hängen hier von ihrer Relativbewegung ab.','Each trail shows earlier model positions in the chosen frame. The Sun travels about 52 AU in one Earth year, stretching Earth’s track. Every path belongs to a reference frame. The same planetary motion gives the familiar orbits in the Sun-centred frame. Distances and speeds between bodies here depend on their relative motion.'],
+  galacticSymbols:['Vergrößerte Körpersymbole · Farben und Saturnring illustrativ','Enlarged body symbols · colours and Saturn ring illustrative'],
+  schematicRadii:['Körperradien in AU · Planetenabstände zur Sonne überhöht','Body radii in AU · planet offsets from the Sun enlarged'],
+  galacticScope:['Sonne und acht Planeten. Die Mondsysteme und Pluto öffnen in ihren bisherigen Ansichten. Die Erdposition ist der Erde–Mond-Schwerpunkt.','The Sun and eight planets. Moon systems and Pluto open in their existing views. Earth’s position is the Earth–Moon barycentre.'],
+  galacticSource:['Astropy: galaktozentrischer Rahmen','Astropy: Galactocentric frame'],
+  flightGroup:['Kamera und Flugspuren','Camera and flight trails'],
+  flightAngle:['Schrägblick','Oblique view'],
+  flightAcross:['Quer zur Bewegung','Across motion'],
+  flightAlong:['Entlang der Bewegung','Along motion'],
+  flightFit:['Flugspuren einpassen','Fit flight trails'],
+  followSun:['Sonne verfolgen','Follow Sun'],
+  flightWindow:['Spurlänge','Trail length'],
+  flightDay:['Modelltage','model days'],
+  flightScaleLabel:['Darstellung der Flugspuren','Trajectory scale'],
+  physical:['Maßstäbliche Flugspuren','Trajectories to scale'],
+  flightSchematic:['Schematisch · Planetenauslenkung ×3','Schematic · planetary displacement ×3'],
+  schematicScale:['Schematische Ansicht · Planetenabstände zur Sonne im Bild ×3, Sonnenweg maßstäblich. Messwerte nutzen das Originalmodell.','Schematic view · displayed planet offsets from the Sun ×3, Sun’s path to scale. Measurements use the original model.'],
   viewGroup:['Ansicht des Sonnensystems','Solar System view'],
   view2d:['2D · Draufsicht','2D · top view'],
   view3d:['3D · Raumansicht','3D · spatial view'],
@@ -129,8 +159,22 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
-        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
+        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><span id="sol3dControls" hidden><span class="ex-solar-pose-buttons" id="solOrbitPoses"><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button></span><button type="button" id="solTrails" aria-pressed="true"></button></span></div>
+        <div class="ex-solar-viewbar ex-flight-frames" role="group" id="solFrames" hidden>
+          <button type="button" id="solHelio" data-solar="heliocentric" aria-pressed="true"></button>
+          <button type="button" id="solGalactic" data-solar="galactic" aria-pressed="false"></button>
+        </div>
         <p id="solScene3d" class="ex-solar-caption" data-solar="scene3d" hidden></p>
+        <div class="ex-solar-viewbar ex-flight-controls" role="group" id="solFlightControls" hidden>
+          <button type="button" id="solFlightAngle" data-solar="flightAngle" aria-pressed="true"></button>
+          <button type="button" id="solAcross" data-solar="flightAcross" aria-pressed="false"></button>
+          <button type="button" id="solAlong" data-solar="flightAlong" aria-pressed="false"></button>
+          <button type="button" id="solFollowSun" data-solar="followSun" aria-pressed="true"></button>
+          <label><span data-solar="flightWindow"></span><select id="solFlightWindow">${TRAIL_DAYS.map(d=>`<option value="${d}"${d===90?' selected':''}></option>`).join('')}</select></label>
+          <label><select id="solFlightScale"><option value="scale" data-solar="physical"></option><option value="schematic" data-solar="flightSchematic"></option></select></label>
+        </div>
+        <p id="solGalacticScale" class="ex-solar-caption" data-solar="schematicScale" hidden></p>
+        <p id="solGalacticStatus" class="ex-solar-caption" role="status" hidden></p>
         <div class="ex-solar-viewbar" role="group" id="solSystems"><button type="button" id="solGlobal" data-solar="overview" hidden></button></div>
         <div class="ex-solar-caption" id="solWorldState" hidden><span id="solWorldMessage" role="status"></span> <button type="button" id="solFirstWorldDay" data-solar="startRange" hidden></button> <button type="button" id="solWorldRetry" data-solar="retry" hidden></button></div>
         <div class="ex-solar-quick">
@@ -157,6 +201,7 @@ export function mountSolar(root) {
         </div>
         <div class="ex-notes"><p id="solHelp" data-solar="help"></p><details><summary data-solar="science"></summary>
           <p id="solLimit" data-solar="limit"></p><p data-solar="scienceNote"></p><p data-solar="earth"></p>
+          <div id="solGalacticScience" hidden><p data-solar="galacticWhy"></p><p data-solar="galacticGeometry"></p><p data-solar="galacticScope"></p><p><a href="${GALACTIC_FRAME_SOURCE}" data-solar="galacticSource"></a></p></div>
           <ul><li><a href="${ORBIT_SOURCE}" data-solar="elements"></a></li><li><a href="${RADIUS_SOURCE}" data-solar="radii"></a></li><li><a href="${SUN_SOURCE}" data-solar="iau"></a></li></ul>
         </details></div>
       </div>
@@ -192,12 +237,15 @@ export function mountSolar(root) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = false, visible = false, raf = null, clock = null;
   let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, pose='angle', selected = 'sun', reference = 'sun', follow = false, enlarged = true;
-  let system = null, overview = null, buttons = [];
+  let system = null, overview = null, galactic = null, buttons = [];
   const ephemerides = new Map(), pending = new Set(), failures = new Set();
   const globalBodies = [...bodies, pluto];
-  const listedBodies = () => system ? systemBodies(system) : globalBodies;
+  const listedBodies = () => system ? systemBodies(system) : galactic ? bodies : globalBodies;
   const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
-  const distance = () => system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : 85;
+  const distance = () => system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : galactic?.distance ?? 85;
+  const minDay = () => galactic ? GALACTIC_MIN_DAY : MIN_DAY;
+  const maxDay = () => galactic ? GALACTIC_MAX_DAY : MAX_DAY;
+  const clampDay = value => Math.max(minDay(),Math.min(maxDay(),value));
   const trailCache=new Map(),pathCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
   let stateDay = null, state = [], markers = [], width = 1, height = 1;
@@ -243,11 +291,12 @@ export function mountSolar(root) {
   }
 
   function loadVisibleData() {
-    if (active) loadSystem(system ?? 'pluto');
+    if (active && !galactic) loadSystem(system ?? 'pluto');
   }
 
   function enterSystem(id) {
     if (system === id) return;
+    if (galactic) changeFrame(false);
     if (!system) overview = {selected,reference,follow,space,pose,view};
     system = id;
     const [parent, moon] = systemBodies(id);
@@ -282,7 +331,7 @@ export function mountSolar(root) {
     if (stateDay !== day) {
       state = system ? [] : solarState(day);
       const id = system ?? 'pluto';
-      const visibleBodies = system ? systemBodies(system) : [pluto];
+      const visibleBodies = system ? systemBodies(system) : galactic ? [] : [pluto];
       const data = ephemerides.get(id);
       for (const body of visibleBodies) {
         const vector = worldVector(data,id,body.id,day,Boolean(system));
@@ -317,10 +366,14 @@ export function mountSolar(root) {
     ctx?.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);
     invalidate();
   }
+  function displayedVector(vector) {
+    return galactic ? flightDisplayPoint(galacticPosition(day,vector),day,galactic.schematic) : vector;
+  }
   function center() {
     const vector=selectedBody()?.vector;
     if (!vector) return;
-    if(view==='3d')space={...space,focus:[...vector]};
+    if (galactic) setSunFollow(false);
+    if(view==='3d')space={...space,focus:[...displayedVector(vector)]};
     else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     invalidate();
   }
@@ -343,7 +396,7 @@ export function mountSolar(root) {
     const distanceAU = system ? solar?.distanceAU : entry?.distanceAU;
     const fmtDistance = id ? rough : n;
     $('solName').textContent = name(body);
-    $('solKind').textContent = t(body.id === 'sun' ? 'star' : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
+    $('solKind').textContent = t(body.id === 'sun' ? (galactic?'galacticStar':'star') : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
     $('solDistance').textContent = distanceAU === undefined ? t('unavailableValue') :
       `${body.id === 'sun' ? '' : '~ '}${fmtDistance(distanceAU)} AU · ${fmtDistance(distanceAU*AU_KM)} km${solar?.source === 'hybrid' ? ' · '+t('hybrid') : ''}`;
     $('solRadiusLabel').textContent = t(body.id === 'sun' ? 'sunRadius' : 'radius');
@@ -395,11 +448,15 @@ export function mountSolar(root) {
     const time = formatModelDay(day);
     $('solTimestamp').textContent = time.replace('T',' ')+' TDB';
     if (force || document.activeElement !== $('solDate')) $('solDate').value = time.slice(0,10);
-    $('solPrev').disabled = day<=MIN_DAY;
-    $('solNext').disabled = day>=MAX_DAY;
-    $('solPlay').disabled = reduced.matches || day>=MAX_DAY;
+    $('solPrev').disabled = day<=minDay();
+    $('solNext').disabled = day>=maxDay();
+    $('solPlay').disabled = reduced.matches || day>=maxDay();
     $('solPlay').textContent = t(clock ? 'pause':'play');
     $('solMotion').hidden = !reduced.matches;
+  }
+  function updateSymbolNote() {
+    $('solScaleNote').textContent = t(enlarged ? (galactic?'galacticSymbols':'schematic') :
+      galactic?.schematic ? 'schematicRadii' : 'scale');
   }
   function localize() {
     for (const el of root.querySelectorAll('[data-solar]')) el.textContent = t(el.dataset.solar);
@@ -413,22 +470,36 @@ export function mountSolar(root) {
     for (const [id,key] of [['solIn','zoomIn'],['solOut','zoomOut'],['solPrev','prev'],['solNext','next']]) {
       $(id).setAttribute('aria-label',t(key)); $(id).title=t(key);
     }
-    canvas.setAttribute('aria-label',system?name(SYSTEMS[system]):t(view==='3d'?'view3d':'title'));
+    canvas.setAttribute('aria-label',system?name(SYSTEMS[system]):t(galactic?'galactic':view==='3d'?'view3d':'title'));
     $('solViewBar').setAttribute('aria-label',t('viewGroup'));
     $('solSystems').setAttribute('aria-label',t('systems'));
     $('solGlobal').hidden = !system;
     $('solInner').hidden = Boolean(system);
-    $('solFit').textContent=t(system?'localFit':'fit');
+    $('solFrames').hidden = view!=='3d'||Boolean(system);
+    $('solOrbitPoses').hidden = Boolean(galactic);
+    $('solHelio').setAttribute('aria-pressed',String(!galactic));
+    $('solGalactic').setAttribute('aria-pressed',String(Boolean(galactic)));
+    $('solFlightControls').hidden = $('solGalacticScience').hidden = Boolean(!galactic);
+    $('solGalacticScale').hidden = !galactic?.schematic;
+    $('solGalacticStatus').hidden = !galactic?.restoredDate;
+    $('solGalacticStatus').textContent = galactic?.restoredDate ? t('galacticBounds') : '';
+    $('solFrames').setAttribute('aria-label',t('frameChoice'));
+    $('solFlightControls').setAttribute('aria-label',t('flightGroup'));
+    $('solFlightScale').setAttribute('aria-label',t('flightScaleLabel'));
+    for (const option of $('solFlightWindow').options) option.textContent = option.value+' '+t('flightDay');
+    $('solDate').min = galactic ? GALACTIC_MIN_DATE : '1800-01-01';
+    $('solDate').max = galactic ? GALACTIC_MAX_DATE : '2050-01-01';
+    $('solFit').textContent=t(system?'localFit':galactic?'flightFit':'fit');
     $('solBodiesTitle').textContent=t(system?'localBodies':'overviewBodies');
     root.querySelector('[data-solar="title"]').textContent=system?name(SYSTEMS[system]):t('title');
-    root.querySelector('[data-solar="frame"]').textContent=t(system?'baryFrame':view==='3d'?'frame3d':'frame');
-    root.querySelector('[data-solar="model"]').textContent=t(system?'horizons':'model');
-    $('solScene3d').textContent=t(system?'localScene':'scene3d');
+    root.querySelector('[data-solar="frame"]').textContent=t(system?'baryFrame':galactic?'galacticFrame':view==='3d'?'frame3d':'frame');
+    root.querySelector('[data-solar="model"]').textContent=t(system?'horizons':galactic?'galacticModel':'model');
+    $('solScene3d').textContent=t(system?'localScene':galactic?'galacticScene':'scene3d');
     $('solHelp').textContent=t(view==='3d'?'help3d':'help');
-    $('solLimit').textContent=t(system?'localLimit':view==='3d'?'limit3d':'limit');
+    $('solLimit').textContent=t(system?'localLimit':galactic?'galacticLimit':view==='3d'?'limit3d':'limit');
     root.querySelector('[data-solar="whyBody"]').textContent=t(view==='3d'?'whyBody3d':'whyBody');
     $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');
-    $('solScaleNote').textContent = t(enlarged?'schematic':'scale');
+    updateSymbolNote();
     updateClock();updateInspector();invalidate();
   }
 
@@ -437,13 +508,14 @@ export function mountSolar(root) {
     if (!active || !visible || document.hidden) return;
     const started = performance.now();
     if (clock) {
-      day = advanceModelDay(clock.day,Math.max(0,time-clock.start)/1000,clock.rate);
-      if (day === MAX_DAY) clock = null;
+      day = clampDay(advanceModelDay(clock.day,Math.max(0,time-clock.start)/1000,clock.rate));
+      if (day === maxDay()) clock = null;
     }
     loadVisibleData();
-    const vector=follow?selectedBody()?.vector:null;
-    if(vector) {
-      if(view==='3d')space={...space,focus:[...vector]};
+    const vector = follow ? selectedBody()?.vector : null;
+    if(galactic?.followSun) space={...space,focus:sunDisplacement(day)};
+    else if(vector) {
+      if(view==='3d')space={...space,focus:[...displayedVector(vector)]};
       else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     }
     if (ctx) render();
@@ -545,10 +617,19 @@ export function mountSolar(root) {
     return cached;
   }
 
-  function renderSpace() {
-    ctx.clearRect(0,0,width,height);
-    const baseDistance=distance();
-    const screen=spaceProjector(space,width,height,baseDistance);
+  function getFlightTracks() {
+    if (!galactic || !trails) return [];
+    const {duration,schematic,cache} = galactic;
+    if (cache?.day === day && cache.duration === duration && cache.schematic === schematic) return cache.tracks;
+    const tracks = flightTrails(day,duration);
+    if (schematic) for (const {samples} of tracks) for (const sample of samples) {
+      sample.vector = flightDisplayPoint(sample.vector,sample.day,true);
+    }
+    galactic.cache = {day,duration,schematic,tracks};
+    return tracks;
+  }
+
+  function paintSolarOrbits(screen, entries) {
     const strokePath=(vectors,color,lineWidth=1)=>{
       ctx.beginPath();let drawing=false;
       for(const vector of vectors){
@@ -570,7 +651,6 @@ export function mountSolar(root) {
     }
     strokePath([[-extent,0,0],[extent,0,0]],'#88afba40',1);
     strokePath([[0,-extent,0],[0,extent,0]],'#88afba40',1);
-    const entries=current();
     for(const {body,orbit} of entries){
       let vectors;
       if (orbit) vectors = Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144));
@@ -601,9 +681,17 @@ export function mountSolar(root) {
         ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
       }
     }
+  }
+
+  function renderSpace() {
+    ctx.clearRect(0,0,width,height);
+    const baseDistance=distance();
+    const screen=spaceProjector(space,width,height,baseDistance);
+    const entries=current();
+    if (!galactic) paintSolarOrbits(screen,entries);
     markers=entries.map(({body,vector})=>{
-      const p=screen(vector);if(!p)return null;
-      const radius=enlarged?Math.min(system?28:52,Math.max(2,body.size*baseDistance/p.depth)):
+      const p=screen(displayedVector(vector));if(!p)return null;
+      const radius=enlarged?Math.min(galactic?body.size:system?28:52,Math.max(2,body.size*baseDistance/p.depth)):
         radiusAU(body)*p.pixelsPerAU;
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
@@ -619,7 +707,8 @@ export function mountSolar(root) {
     }
     // Painter's order: far bodies first. Hit testing below reverses this order.
     markers.sort((a,b)=>b.depth-a.depth);
-    for(const marker of markers)drawBody(marker);
+    if (galactic) paintFlights(ctx,screen,getFlightTracks(),markers,width,height,selected,drawBody);
+    else for(const marker of markers)drawBody(marker);
     ctx.font='12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(markers,label=>ctx.measureText(label).width,width,height,{bottom:height-52}));
     const pixelsAtFocus=height*.9/(baseDistance/10**space.zoom);
@@ -628,8 +717,8 @@ export function mountSolar(root) {
     ctx.beginPath();ctx.moveTo(17,height-25);ctx.lineTo(17+bar*pixelsAtFocus,height-25);
     ctx.moveTo(17,height-28);ctx.lineTo(17,height-22);
     ctx.moveTo(17+bar*pixelsAtFocus,height-28);ctx.lineTo(17+bar*pixelsAtFocus,height-22);
-    ctx.stroke();
-    ctx.fillText(`${n(system?bar*AU_KM:bar)} ${t(system?'focusScaleKm':'focusScale')}`,17,height-34);
+    if (!galactic?.schematic) ctx.stroke();
+    if (!galactic?.schematic) ctx.fillText(`${n(system?bar*AU_KM:bar)} ${t(system?'focusScaleKm':'focusScale')}`,17,height-34);
     $('solZoom').value=String(space.zoom);
     $('solZoomValue').textContent=n(10**space.zoom)+'×';
     $('solIn').disabled=space.zoom===MAX_ZOOM;
@@ -664,12 +753,17 @@ export function mountSolar(root) {
     if (raf !== null) cancelAnimationFrame(raf);
     raf = null; clock = null; gestures.cancel(); updateClock();
   }
-  function changeDay(value) {
-    clock = null;day = value;lastReadout = null;
+  function changeDay(value, reframe = false) {
+    const next = clampDay(value);
+    if (galactic && reframe) {
+      const before = sunDisplacement(day), after = sunDisplacement(next);
+      space = {...space,focus:space.focus.map((v,i)=>v+(after[i]-before[i]))};
+    }
+    clock = null;day = next;lastReadout = null;
     loadVisibleData();updateClock(true);updateInspector();invalidate();
   }
   function beginClock() {
-    if (!active || !visible || document.hidden || reduced.matches || day>=MAX_DAY) return;
+    if (!active || !visible || document.hidden || reduced.matches || day>=maxDay()) return;
     clock = {day,start:performance.now(),rate:Number($('solRate').value)};
     lastReadout = null;updateClock();invalidate();
   }
@@ -684,16 +778,71 @@ export function mountSolar(root) {
   });
   const markPose=value=>{
     pose=value;
-    for(const [id,kind] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
+    for(const [id,kind] of [['solTop','top'],['solAngle','angle'],['solSide','side'],
+      ['solFlightAngle','angle'],['solAcross','across'],['solAlong','along']]) {
       $(id).setAttribute('aria-pressed',String(pose===kind));
+    }
   };
   const zoomBy=delta=>{if(view==='3d'){space=zoomSpace(space,delta);invalidate();}
     else gestures.zoomBy(delta);};
+  function setSunFollow(value) {
+    galactic.followSun = value;
+    $('solFollowSun').setAttribute('aria-pressed',String(value));
+    if (value) {
+      follow = false;
+      $('solFollow').setAttribute('aria-pressed','false');
+      space = {...space,focus:sunDisplacement(day)};
+    }
+  }
+
   const fitView=()=>{
     follow=false;$('solFollow').setAttribute('aria-pressed','false');
-    if(view==='3d'){space=spaceCamera();markPose('angle');invalidate();}
+    if(galactic){
+      setSunFollow(false);
+      const points = current().map(({vector})=>displayedVector(vector));
+      for (const {samples} of getFlightTracks()) for (const {vector} of samples) points.push(vector);
+      const fitted = fitFlight(points,width,height);
+      galactic.distance = fitted.distance;
+      space = {...space,focus:fitted.focus,zoom:0};
+      invalidate();
+    } else if(view==='3d'){space=spaceCamera();markPose('angle');invalidate();}
     else setCamera(fit());
   };
+
+  function changeFrame(next) {
+    if (system || view!=='3d' || Boolean(galactic)===next) return;
+    cancelSpace();
+    clock = null;
+    lastReadout = stateDay = null;
+    markers = [];
+    if (next) {
+      galactic = {
+        previous:{space,pose,follow,selected,reference},
+        restoredDate:supportsGalacticDay(day)?null:day,
+        duration:Number($('solFlightWindow').value),
+        schematic:$('solFlightScale').value==='schematic',
+        followSun:false,
+        distance:85,
+      };
+      if (galactic.restoredDate !== null) day = J2000;
+      if (selected==='pluto') selected='sun';
+      if (reference==='pluto') reference='sun';
+      space = {...spaceCamera(),...FLIGHT_POSES.angle};
+      markPose('angle');
+      fitView();
+    } else {
+      const {previous,restoredDate} = galactic;
+      galactic = null;
+      if (restoredDate !== null && day===J2000) day=restoredDate;
+      ({space,pose,follow} = previous);
+      if (previous.selected==='pluto'&&selected==='sun') selected='pluto';
+      if (previous.reference==='pluto'&&reference==='sun') reference='pluto';
+      markPose(pose);
+      $('solFollow').setAttribute('aria-pressed',String(follow));
+    }
+    rebuildBodies();loadVisibleData();
+    localize();updateClock(true);
+  }
   listen($('solIn'),'click',()=>zoomBy(.25));
   listen($('solOut'),'click',()=>zoomBy(-.25));
   listen($('solZoom'),'input',()=>{
@@ -703,7 +852,12 @@ export function mountSolar(root) {
   });
   listen($('solFit'),'click',fitView);
   listen($('solInner'),'click',()=>{
-    if(view==='3d'){space={...spaceCamera(),zoom:1.2};markPose('angle');invalidate();}
+    if(galactic){
+      galactic.distance = galactic.schematic ? 18 : 6;
+      space={...space,zoom:0};
+      setSunFollow(true);
+      invalidate();
+    } else if(view==='3d'){space={...spaceCamera(),zoom:1.2};markPose('angle');invalidate();}
     else setCamera({...fit(),zoom:1.2});
   });
   listen($('solCenter'),'click',center);
@@ -768,6 +922,7 @@ export function mountSolar(root) {
   });
   function switchView(next){
     if(view===next)return;
+    if (galactic && next==='2d') changeFrame(false);
     if(next==='3d')gestures.cancel();else cancelSpace();
     view=next;
     $('sol2d').setAttribute('aria-pressed',String(view==='2d'));
@@ -780,6 +935,21 @@ export function mountSolar(root) {
   listen($('sol2d'),'click',()=>{if(system)exitSystem('2d');else switchView('2d');});
   listen($('sol3d'),'click',()=>switchView('3d'));
   listen($('solSun'),'click',()=>{exitSystem();select('sun',true);});
+  listen($('solHelio'),'click',()=>changeFrame(false));
+  listen($('solGalactic'),'click',()=>changeFrame(true));
+  for(const [id,next] of [['solFlightAngle','angle'],['solAcross','across'],['solAlong','along']]) {
+    listen($(id),'click',()=>{space={...space,...FLIGHT_POSES[next]};markPose(next);invalidate();});
+  }
+  listen($('solFollowSun'),'click',()=>{setSunFollow(!galactic.followSun);invalidate();});
+  listen($('solFlightWindow'),'change',()=>{
+    galactic.duration=Number($('solFlightWindow').value);
+    invalidate();
+  });
+  listen($('solFlightScale'),'change',()=>{
+    galactic.schematic=$('solFlightScale').value==='schematic';
+    fitView();
+    localize();
+  });
   listen($('solGlobal'),'click',()=>{const previous=system;exitSystem();systemButtons.find(item=>item.id===previous)?.button.focus();});
   listen($('solFirstWorldDay'),'click',()=>{changeDay(START);$('solDate').focus({preventScroll:true});});
   listen($('solWorldRetry'),'click',()=>{const id=relevantSystem();if(id)loadSystem(id,true);updateInspector();});
@@ -797,16 +967,16 @@ export function mountSolar(root) {
     if(follow)center();invalidate();
   });
   listen($('solSymbols'),'change',()=>{
-    enlarged=$('solSymbols').checked;$('solScaleNote').textContent=t(enlarged?'schematic':'scale');invalidate();
+    enlarged=$('solSymbols').checked;updateSymbolNote();invalidate();
   });
   listen($('solPlay'),'click',()=>{if (clock) changeDay(day);else beginClock();});
   listen($('solRate'),'change',()=>{if (clock) beginClock();});
   listen($('solPrev'),'click',()=>changeDay(advanceModelDay(day,1,-1)));
   listen($('solNext'),'click',()=>changeDay(advanceModelDay(day,1,1)));
-  listen($('solEpoch'),'click',()=>changeDay(J2000));
+  listen($('solEpoch'),'click',()=>changeDay(J2000,true));
   listen($('solDate'),'change',()=>{
     const field=$('solDate'), next=parseModelDate(field.value);
-    if (next !== null) changeDay(next);else updateClock(true);
+    if (next !== null && next>=minDay() && next<=maxDay()) changeDay(next,true);else updateClock(true);
   });
   listen(reduced,'change',()=>{if (reduced.matches) suspend();updateClock();invalidate();});
   listen(document,'visibilitychange',()=>{if (document.hidden) suspend();else invalidate();});
@@ -825,7 +995,9 @@ export function mountSolar(root) {
       active=value;
       if (active) {loadVisibleData();resize();} else suspend();
     },
-    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,system,loadedWorlds:[...ephemerides.keys()],trailPoints:[...trailCache.values()].filter(v=>v.day===day).reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:comparison(),enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
+    inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,system,
+      galactic:galactic?{duration:galactic.duration,schematic:galactic.schematic,followSun:galactic.followSun,distance:galactic.distance,
+        samples:trails?(galactic.cache?.tracks.reduce((count,{samples})=>count+samples.length,0)??0):0}:null,loadedWorlds:[...ephemerides.keys()],trailPoints:[...trailCache.values()].filter(v=>v.day===day).reduce((n,v)=>n+v.samples.length,0),trailDay:trailCache.get('mercury')?.day??null,selected,reference,follow,pair:comparison(),enlarged,playing:clock!==null,scheduled:raf!==null,draws,drawMs,
       markers:markers.map(({body,x,y,radius,depth})=>({id:body.id,x,y,radius,depth}))}),
     dispose() {active=false;suspend();abort.abort();unsubscribe();resizeObserver.disconnect();visibilityObserver.disconnect();root.replaceChildren();},
   };

@@ -117,3 +117,35 @@ test('samples are independent of playback history and the schematic transform le
   assert.deepEqual(schematicPosition(sun,sun),sun);
   assert.deepEqual(galacticPosition(epoch,solarState(epoch)[3].vector),point);
 });
+
+test('flight camera presets align to motion and the view fits all supplied points', async () => {
+  const {FLIGHT_POSES,fitFlight} = await import('../dist/explorer/solar-flight-view.mjs');
+  const {spaceProjector} = await import('../dist/explorer/solar-space.mjs');
+  const direction = ({yaw,pitch}) => [Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];
+  assert.ok(Math.abs(dot(direction(FLIGHT_POSES.across),SUN_KM_S))<1e-12);
+  near(direction(FLIGHT_POSES.along),SUN_KM_S.map(v=>-v/norm(SUN_KM_S)),5e-16);
+  const points = flightTrails(J2000+100,365).flatMap(({samples})=>samples.map(({vector})=>vector));
+  for (const width of [300,365,940]) {
+    const height=420, {focus,distance}=fitFlight(points,width,height);
+    for (const pose of Object.values(FLIGHT_POSES)) {
+      const screen=spaceProjector({...pose,zoom:0,focus},width,height,distance);
+      for (const point of points) {
+        const p=screen(point);
+        assert.ok(p && p.x>0 && p.x<width && p.y>0 && p.y<height);
+      }
+    }
+  }
+});
+
+test('flight segment crossing the near plane is clipped in 3D before projection', async () => {
+  const {spaceProjector} = await import('../dist/explorer/solar-space.mjs');
+  const screen=spaceProjector({yaw:0,pitch:0,zoom:0,focus:[0,0,0]},800,600,20);
+  assert.equal(screen([21,3,1]),null);
+  assert.equal(screen.segment([21,3,1],[23,3,1]),null);
+  const a=[17,1,0],b=[21,3,1], edge=screen.segment(a,b)[1];
+  assert.deepEqual(screen.segment(a,b)[0],screen(a));
+  assert.deepEqual(screen.segment(b,a).reverse(),screen.segment(a,b));
+  assert.equal(edge.depth,.5);
+  assert.equal(edge.x,400+2.25*540/.5);
+  assert.equal(edge.y,300-.625*540/.5);
+});

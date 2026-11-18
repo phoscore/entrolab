@@ -22,14 +22,28 @@ export function spaceProjector(camera,width,height,baseDistance=85){
   const c=Math.cos(yaw),s=Math.sin(yaw),u=Math.cos(pitch),v=Math.sin(pitch);
   const right=[-s,c,0],up=[-v*c,-v*s,u],toward=[u*c,u*s,v];
   const distance=baseDistance/10**zoom,focal=height*.9,near=distance*.025;
-  return vector=>{
-    const dx=vector[0]-focus[0],dy=vector[1]-focus[1],dz=vector[2]-focus[2];
-    const depth=distance-(dx*toward[0]+dy*toward[1]+dz*toward[2]);
-    if(depth<=near)return null;
+  function offset(vector){
+    return [vector[0]-focus[0],vector[1]-focus[1],vector[2]-focus[2]];
+  }
+  const depthAt=([dx,dy,dz])=>distance-(dx*toward[0]+dy*toward[1]+dz*toward[2]);
+  function project([dx,dy,dz],depth){
     return {x:width/2+(dx*right[0]+dy*right[1]+dz*right[2])*focal/depth,
       y:height/2-(dx*up[0]+dy*up[1]+dz*up[2])*focal/depth,
       depth,pixelsPerAU:focal/depth};
+  }
+  const screen=vector=>{
+    const relative=offset(vector),depth=depthAt(relative);
+    return depth<=near?null:project(relative,depth);
   };
+  screen.segment=(from,to)=>{
+    const a=offset(from),b=offset(to),depthA=depthAt(a),depthB=depthAt(b);
+    if(depthA<=near&&depthB<=near)return null;
+    if(depthA>near&&depthB>near)return [project(a,depthA),project(b,depthB)];
+    const fraction=(near-depthA)/(depthB-depthA);
+    const edge=project(a.map((value,i)=>value+(b[i]-value)*fraction),near);
+    return depthA<=near?[edge,project(b,depthB)]:[project(a,depthA),edge];
+  };
+  return screen;
 }
 export const projectSpace=(vector,camera,width,height)=>spaceProjector(camera,width,height)(vector);
 export function trailSamples(day,body){

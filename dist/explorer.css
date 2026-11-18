@@ -273,3 +273,13 @@
 #explorer #solGlobal{border-color:#71959b}
 #explorer #solWorldState button{min-height:36px;margin:4px 0 0 4px;white-space:normal}
 #explorer #solWorldSource{display:inline-block;margin-top:6px;font-size:12px}
+
+#explorer .ex-solar-pose-buttons{display:flex;flex-wrap:wrap;gap:6px}
+#explorer .ex-flight-frames{background:#132c37}
+#explorer .ex-flight-controls{background:#112630}
+#explorer .ex-flight-controls label{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0;color:#c9dedb;font-size:12px;text-transform:none;letter-spacing:0;min-width:0}
+#explorer .ex-flight-controls select{color-scheme:dark;min-height:38px;max-width:100%;padding:6px;color:#e7f6f3;background:#101d2e;border:1px solid #53717a;border-radius:6px}
+#explorer #solGalacticScale{color:#ffda9e}
+@media(max-width:760px){
+  #explorer .ex-flight-controls select{min-height:42px}
+}
