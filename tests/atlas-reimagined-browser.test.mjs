@@ -85,8 +85,15 @@ async function capture(which,site,width){
     await page.locator('#snCanvas').scrollIntoViewIfNeeded();
     await page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect().neighborhood;return s?.status==='ready'&&s.markers>0;});
     await image('neighborhood');
-    await page.locator('#snXZ').click();await page.locator('#snUnit').selectOption('ly');
-    assert.equal((await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood)).plane,'xz');
+    if(which==='before'){
+      await page.locator('#snXZ').click();
+      assert.equal((await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood)).plane,'xz');
+    }else{
+      const initial=await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood.camera.yaw);
+      await page.locator('#snCanvas').press('ArrowRight');
+      assert.notEqual(await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood.camera.yaw),initial);
+    }
+    await page.locator('#snUnit').selectOption('ly');
     await page.locator('#exSkyMode').click();await page.locator('#exHome').click();
     assert.equal((await page.evaluate(()=>window.entrolabExplorer.inspect())).camera.zoom,0);
     metrics.neighborhood=await page.evaluate(()=>window.entrolabExplorer.inspect().neighborhood);
