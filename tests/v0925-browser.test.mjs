@@ -158,7 +158,7 @@ test('v0.9.25: atmosphere is non-interactive, pauses when hidden and follows Red
   assert.deepEqual(await skyState(p),['cosmic-drift','running']);
   await p.emulateMedia({reducedMotion:'reduce'});
   assert.equal((await skyState(p))[0],'none');
-  assert.equal((await p.locator('footer').textContent()).trim(),'No plot armor. Just physics.');
+  assert.equal((await p.locator('footer').textContent()).trim(),'No plot armor. Just physics?');
   assert.equal(await p.title(),'Reincarnated as a Proton');
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
@@ -187,3 +187,32 @@ test('v0.9.25: no horizontal overflow at 320, 390 or desktop widths and private 
 });
 
 test('v0.9.25: scoped v0.9 comparison measures atmosphere and canvas work',async t=>measurePhaseA(h,t));
+
+
+test('Lean polish: bilingual branding, compact controls and unnumbered panels fit desktop and mobile',async()=>{
+ for(const width of [1440,390,320]){
+  const {p,context}=await h.lab({viewport:{width,height:1000}});
+  try{
+   const original=await physical(p);
+   for(const [language,heading] of [['de','Deine Regeln? Eher nicht.'],['en','Your rules? Probably not.']]){
+    await p.locator('[data-language='+language+']').click();
+    assert.equal((await p.locator('#gravity h1').innerText()).trim(),heading);
+    assert.equal((await p.locator('footer').innerText()).trim(),'No plot armor. Just physics?');
+    assert.equal(await p.locator('#gravity .footnote i').count(),0);
+    assert.match(await p.locator('#gravity .footnote').innerText(),language==='de'?/Paarweise Gravitation in 2D/:/Pairwise gravity in 2D/);
+    assert.equal(await p.locator('.panel-heading > span').filter({hasText:/^0[1-9]$/}).count(),0);
+    const icon=await p.locator('.rules-icon').evaluate(el=>({ready:el.complete&&el.naturalWidth>0,hidden:el.getAttribute('aria-hidden'),w:el.width}));
+    assert.equal(icon.ready,true);assert.equal(icon.hidden,'true');assert.ok(icon.w>=18&&icon.w<=45);
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   }
+   await p.locator('#gravity').screenshot({path:join(h.output,'lean-gravity-'+width+'.png')});
+   await tab(p,'extreme');
+   const bounds=await p.locator('#extremePlay').boundingBox();
+   assert.ok(bounds.width<210&&bounds.height>=44&&bounds.height<=52,JSON.stringify(bounds));
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   await p.locator('.extreme-controls').screenshot({path:join(h.output,'lean-controls-'+width+'.png')});
+   assert.deepEqual(await physical(p),original);
+  }finally{await context.close()}
+ }
+ assert.deepEqual(h.errors,[]);
+});
