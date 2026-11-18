@@ -5,7 +5,6 @@ import {buildNeighborhood,readNeighborhoodSource} from '../cosmic-explorer/neigh
 import {PC_TO_LY,galacticPosition,projectNeighborhood,neighborhoodRow,neighborhoodIndex,
   NEIGHBORHOOD_RELEASE,NEIGHBORHOOD_RADIUS} from '../dist/explorer/foundation/neighborhood-format.mjs';
 import {cameraScale,screenPoint,worldPoint,zoomAt} from '../dist/explorer/camera.mjs';
-import {NEIGHBORHOOD_FRAME,neighborhoodRingStep} from '../dist/explorer/neighborhood-paint.mjs';
 import {NEIGHBORHOOD_URL,loadNeighborhood,neighborhoodLoader,neighborhoodDetails} from '../dist/explorer/neighborhood-data.mjs';
 
 const local=async (url,{signal})=>{signal.throwIfAborted();return new Response(await readFile(url));};
@@ -27,13 +26,11 @@ test('Galactic ICRS axes and parsec-to-light-year conversion preserve the radial
 test('XY and XZ projection report different plane separations and preserve zoom anchoring',()=>{
   assert.deepEqual(projectNeighborhood([3,4,12],'xy'),{point:[3,-4],radius:5,depth:12});
   assert.deepEqual(projectNeighborhood([3,4,12],'xz'),{point:[3,-12],radius:Math.hypot(3,12),depth:4});
-  const camera={x:0,y:0,zoom:0}, anchor=[220,156], frame=NEIGHBORHOOD_FRAME;
+  const camera={x:0,y:0,zoom:0}, anchor=[220,156], frame=[-25,-25,25,25];
   const initial=worldPoint(anchor,camera,640,420,frame);
   const next=zoomAt(camera,.8,anchor,640,420,frame);
   assert.ok(screenPoint(initial,next,640,420,frame).every((v,i)=>Math.abs(v-anchor[i])<1e-10));
-  const scale=cameraScale(next,640,420,frame);
-  assert.ok(neighborhoodRingStep(scale,'pc')*scale>=35);
-  assert.ok(neighborhoodRingStep(scale,'ly')*scale/PC_TO_LY>=35);
+  assert.ok(cameraScale(next,640,420,frame)>cameraScale(camera,640,420,frame));
 });
 
 test('Immutable neighborhood package reproduces all files and independent Gaia, Bailer-Jones and Astropy references',async()=>{

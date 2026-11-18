@@ -1,6 +1,6 @@
 # Cosmic Explorer · Stellar Neighborhood
 
-Im Explorer die **Sonnenumgebung** wählen. Die Sonne markiert den Ursprung. Punkte zeigen geschätzte Positionen katalogisierter Quellen. X/Y zeigt die galaktische Ebene, X/Z die Höhe darüber und darunter. Beim Wechsel bleibt die gewählte Quelle ausgewählt. Der Inspector gibt den geschätzten räumlichen Abstand zur Sonne, den Abstand in der Projektion sowie die beiden Grenzen des geometrischen Posteriorintervalls an. Die Ringe lassen sich zwischen pc und Lichtjahren umschalten. **Richtung auf der Himmelskarte** richtet die Winkelkarte auf die ursprünglichen ICRS-Koordinaten aus. Die All-Sky-Kataloge haben eigene Auswahlregeln.
+Im Explorer die **Sonnenumgebung** wählen. Sie zeigt eine statische, drehbare Perspektive auf die geschätzten Positionen rund um die Sonne. Ziehen oder Pfeiltasten drehen und neigen die Kamera. Mit zwei Fingern, +/− oder dem Mausrad auf der fokussierten Karte zoomt man. **Zur Sonne** wechselt den Drehpunkt, **Übersicht** setzt zusätzlich Blickwinkel und Zoom zurück. Die Statuszeile gibt Drehpunkt und galaktische Blickrichtung an. Bei Auswahl erscheint der geschätzte räumliche Sonnenabstand in Lj oder pc, mit einer abschaltbaren Verbindungslinie als Orientierungshilfe. **Richtung auf der Himmelskarte** richtet die Winkelkarte auf die ursprünglichen ICRS-Koordinaten aus. Die All-Sky-Kataloge haben eigene Auswahlregeln.
 
 ## Daten- und Rechteprüfung
 
@@ -18,13 +18,13 @@ Im Explorer die **Sonnenumgebung** wählen. Die Sonne markiert den Ursprung. Pun
 - Alle **2.753** eindeutigen Quell-IDs im Export mit geometrischem Median `r_med_geo ≤ 25 pc` und gemessenem Gaia `G ≤ 14 mag`. Die Zusatzauswahl in G begrenzt Übertragung und Punktmenge. Der Radius begrenzt den Median. Eine obere Intervallgrenze kann außerhalb liegen. Die [Abfrage im Capture-Beleg](../../cosmic-explorer/neighborhood/source/capture.json) enthält kein `LIMIT`. Eine eigene, vollständige ID-Abfrage und das Zeilen- und Bytebudget sichern gegen stilles Abschneiden. Die beiden Exporte enthalten dieselben sortierten IDs.
 - Gültige ICRS-Winkel und 5- oder 6-Parameter-Lösungen (Masken 31/95), mindestens zehn Sichtbarkeitsperioden, `0 < RUWE < 1,4`, Parallaxe mindestens 5 mas, positive Fehlerangabe und Parallaxen-S/N ≥ 10. Die 5 mas sind eine Plausibilitätsgrenze für die Astrometrie. Aus diesem Wert werden weder eine Entfernung noch die Grenze der Karte berechnet.
 - Die drei veröffentlichten Quantile müssen positiv geordnet sein. Die Breite `r_hi_geo − r_lo_geo` beträgt höchstens 20 % des Medians. Fehlende oder ungültige Pflichtfelder erfüllen die Abfrage nicht. Der Offline-Importer bricht bei inkonsistenten Reihen, Duplikaten und fehlgeschlagenen Integritätsprüfungen ab.
-- Die Qualitätsschnitte schließen etwa Quellen mit instabiler Fünf- oder Sechs-Parameter-Lösung oder großen Fehlern aus. Gaia erfasst unter anderem manche sehr hellen oder sehr lichtschwachen Sterne nur eingeschränkt. Mehrere Quellen können zu einem physischen System gehören. Die Karte ist eine Auswahl von Gaia-Quellen und kein vollständiges Sterninventar. Vorhandene sichere Namen werden nur für die in First Light belegten DR3-IDs in dieser Auswahl übernommen.
+- Die Qualitätsschnitte schließen etwa Quellen mit instabiler Fünf- oder Sechs-Parameter-Lösung oder großen Fehlern aus. Gaia erfasst unter anderem manche sehr hellen oder sehr lichtschwachen Sterne nur eingeschränkt. Mehrere Quellen können zu einem physischen System gehören. Die Karte ist eine Auswahl von Gaia-Quellen und kein vollständiges Sterninventar. Die Namensliste enthält nur einzelne verifizierte Zuordnungen in genau dieser Gaia-Auswahl. Die Namensliste und ihre Belege stehen unten.
 
 ## Koordinaten und Unsicherheit
 
-Für ICRS-`(α,δ)` wird `(cos δ cos α, cos δ sin α, sin δ)` mit der festen ICRS→Galactic-Rotation aus SOFA/ERFA gedreht und mit `r_med_geo` in pc multipliziert. Die Rotation verschiebt den Ursprung nicht. Die kleinen Unterschiede zwischen Sonne und Sonnensystembaryzentrum bleiben auf diesen Skalen unter der gezeigten Auflösung. +X bezeichnet `l=0°, b=0°`, +Y `l=90°, b=0°`, +Z den galaktischen Nordpol. In X/Y bzw. X/Z bleibt die jeweilige dritte Koordinate in der Quellenkarte erhalten. Die kartesischen Beträge und der Projektionsabstand `hypot(X,Y)` bzw. `hypot(X,Z)` haben unterschiedliche Bedeutungen. Für pc → Lj werden AU, Lichtgeschwindigkeit und Julianisches Jahr verwendet.
+Für ICRS-`(α,δ)` wird `(cos δ cos α, cos δ sin α, sin δ)` mit der festen ICRS→Galactic-Rotation aus SOFA/ERFA gedreht und mit `r_med_geo` in pc multipliziert. Die Rotation verschiebt den Ursprung nicht. Die kleinen Unterschiede zwischen Sonne und Sonnensystembaryzentrum bleiben auf diesen Skalen unter der gezeigten Auflösung. +X bezeichnet `l=0°, b=0°`, +Y `l=90°, b=0°`, +Z den galaktischen Nordpol. Die Orbit-Kamera projiziert die im Binärpaket gespeicherten XYZ-Vektoren direkt. Der Inspector nutzt weiterhin die vollen Werte der verifizierten Detailseite. Für pc → Lj werden AU, Lichtgeschwindigkeit und Julianisches Jahr verwendet.
 
-Das Intervall enthält die geometrischen Quantile 0,158655 und 0,841345, mit dem Median bei 0,5. Der Inspector erhält die asymmetrischen Endpunkte. Die kurze Linie auf der Karte ist das projizierte radiale Intervall bei festgehaltener Katalogrichtung. Sie enthält weder Winkelkovarianzen noch Modell- oder systematische Fehler. Der Datenstand bleibt J2016.0. Es gibt keine Eigenbewegungsfortschreibung. Punktformen und Sonnensymbol geben keine Sterndurchmesser an.
+Das Intervall enthält die geometrischen Quantile 0,158655 und 0,841345, mit dem Median bei 0,5. Der Inspector erhält die asymmetrischen Endpunkte. Die Verbindung zur Sonne zeigt den projizierten Strahl zum gewählten Median. Die Anzeige rundet den Abstand auf höchstens zwei signifikante Stellen und bei breiterer Unsicherheit gröber. Ab einer Intervallbreite von 5 % des Medians erscheint zusätzlich ein nach außen gerundeter Bereich. Die vollständigen geometrischen Quantile stehen unter den Quelldetails. Der Datenstand bleibt J2016.0. Es gibt keine Eigenbewegungsfortschreibung. Punktformen und Sonnensymbol geben keine Sterndurchmesser an.
 
 ## Unabhängige Originalgegenproben
 
@@ -44,7 +44,27 @@ Das Intervall enthält die geometrischen Quantile 0,158655 und 0,841345, mit dem
 | Größen | 21 Dateien · 440.557 B · 68.590 B Manifest und Übersicht |
 | Nachladen | Größte Detailseite 21.599 B · höchstens ein Detailrequest gleichzeitig · 256 KiB Detailcache |
 
-Das Browserpaket enthält einen festen kompakten Index mit uint64-IDs und float32-Positionen. Detailseiten laden erst bei Auswahl. ID-Suche nutzt den validierten Index und funktioniert für jede enthaltene Quelle. Hellere Quellen mit `G < 10` erhalten etwas größere Symbole. Der gestrichelte Kreis markiert den gewählten maximalen Medianradius in der Projektion. Die Karte begrenzt gezeichnete Punkte auf 1.050 mobil und 2.200 auf größeren Flächen. Sie clippt den Ausschnitt und entdichtet Überlagerungen im Bildschirmraster. Die Zahlen nennen Katalogumfang, Quellen im Ausschnitt und tatsächlich gezeichnete Punkte getrennt. Canvas zeichnet bei Kamera-, Daten- und Layoutänderungen. Im Leerlauf ist kein Zeichenloop aktiv. Astronomiearchive sind reine Akquisitionsquellen. Der Browser prüft Hashes, Versions- und Bytebudgets und setzt bei Fehlern Wiederholungsoptionen.
+Das Browserpaket enthält einen kompakten Index mit uint64-IDs und float32-Positionen. Detailseiten laden erst bei Auswahl. Die ID-Suche erreicht sämtliche enthaltenen Quellen. Die ruhige Tiefenstaffelung und die Helligkeit im G-Band beeinflussen die Symbolgröße und das Leuchten der Marker. Die Sonne ist der markierte Ursprung. Der Maßstabsbalken gilt in der Tiefe des Kamerafokus. Er lässt sich deshalb bei einer perspektivischen Ansicht nicht auf den gesamten Bildschirm übertragen.
+
+Beim Zoomen und Drehen zählt die Ansicht alle projizierbaren Quellen innerhalb des Bildausschnitts. Pro 4-CSS-Pixel-Zelle wird ein Marker gezeigt. Bei Kollisionen haben Auswahl und bekannte Namen Vorrang, danach die vordere Quelle. Ein Klick auf einen überlagerten Marker zeigt die beteiligten Gaia-IDs in der Liste. Nach Überlagerung gilt ein Zeichenbudget von 1.050 Markern für Canvas-Breiten unter 500 CSS-Pixeln, sonst 2.200. Die Legende weist beide Gründe für ausgelassene Marker getrennt aus. Die Sonne gehört zu keinem dieser Zähler. Eine Ansicht wird nur bei Änderungen von Kamera, Daten, Beschriftung oder Layout neu gezeichnet. Die Paketgröße und das Nachladen bleiben unverändert.
+
+### Versionierte Sternhinweise `neighborhood-identities.1`
+
+Die bestehenden Identitäten für Proxima Centauri, Barnards Stern und Lalande 21185 bleiben erhalten. Die Ergänzung im Quellcode enthält nur einzelne Namen, Aliase und veröffentlichte Spektraltypen mit Quellen. Sie verwendet die Gaia-DR3-ID als exakten Schlüssel. Die zusätzlichen Spektraltypen beeinflussen weder Farbe noch Markergröße. Für andere Quellen wird keine Klasse geschätzt.
+
+| Gaia DR3 | Geprüfte Ergänzung |
+| --- | --- |
+| `35227046884571776` | Teegardens Stern · M7.0 V nach Zechmeister et al. (2019) |
+| `3864972938605115520` | Wolf 359 |
+| `1872046609345556480` | 61 Cygni A |
+| `1872046574983497216` | 61 Cygni B |
+| `762815470562110464` | Lalande 21185 · Gl 411 · M2 V nach Kirkpatrick et al. (2012) |
+
+Die Namen und IDs stammen aus der ESA/Gaia/DPAC-Tabelle zu Eigenbewegungen. Ihre Zuordnung ist für diese wenigen Einträge in der bestehenden Gaia-Attribution dokumentiert. Die Spektraltypen sind einzeln referenzierte Literaturangaben. Es werden keine neuen Archivtabellen, Abbildungen oder Katalogdateien verteilt. [ESA Gaia](https://www.cosmos.esa.int/web/gaia/iow_20250513) · [Archivkopie der ESA-Tabelle](https://www.dejavu.org/cgi-bin/get.cgi?url=https%3A%2F%2Fwww.cosmos.esa.int%2Fweb%2Fgaia%2Fiow_20250513&ver=95) · [Zechmeister et al. (2019)](https://arxiv.org/abs/1906.07196) · [Kirkpatrick et al. (2012)](https://doi.org/10.1088/0004-637X/753/2/156)
+
+### Vergleich und Messung
+
+Der Chromium-Test nimmt die eingefrorenen X/Y- und X/Z-Ansichten aus `a4b1ce6` und die neue Gesamtansicht samt gedrehter Perspektive bei 1440, 390 und 320 px auf. Er ersetzt im Baseline-Browser nur die beiden tatsächlichen Kartendateien und das Stylesheet der Basisrevision. Der übrige Build und die gepinnten Katalogdaten sind bei beiden Aufnahmen gleich. Unter `neighborhood-3d/` stehen PNGs und `performance.json`. Die Messung erfasst Ladezeit, 20 Draw-Proben pro Profil, Nutzbytes der Übersicht, Speicher der Katalogarrays, den geschätzten Canvas-Pixelpuffer und den Detailcache. Das sind keine Messungen des gesamten Browser- oder GPU-Speichers. Die mobilen Messprofile sind emuliert und laufen mit vierfacher CPU-Drosselung.
 
 ```sh
 node scripts/build-neighborhood.mjs --check
@@ -59,7 +79,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-`node scripts/build-neighborhood.mjs --build` erzeugt den Release vollständig aus dem eingefrorenen CSV und den Referenzen im Repository. Unter derselben Release-ID werden Konflikte abgelehnt. Der separate erneute Archivabruf lautet `python scripts/fetch-neighborhood.py <neues-verzeichnis> 25 14` mit Astropy 7.2.0. Vor einer Übernahme sind geänderte Quelle und Auswahl zu diffen und zu versionieren. Der CI-Review veröffentlicht Screenshots und `neighborhood-performance.json` für 1440, 390 und 320 CSS-Pixel. Die Mobilprofile sind emuliert.
+`node scripts/build-neighborhood.mjs --build` erzeugt den Release vollständig aus dem eingefrorenen CSV und den Referenzen im Repository. Unter derselben Release-ID werden Konflikte abgelehnt. Der separate erneute Archivabruf lautet `python scripts/fetch-neighborhood.py <neues-verzeichnis> 25 14` mit Astropy 7.2.0. Vor einer Übernahme sind geänderte Quelle und Auswahl zu diffen und zu versionieren. Der CI-Review veröffentlicht Screenshots und `neighborhood-3d/performance.json` für 1440, 390 und 320 CSS-Pixel. Die Mobilprofile sind emuliert.
 
 ## Vorgemerkt für einen eigenen All-Sky-Designschritt
 
