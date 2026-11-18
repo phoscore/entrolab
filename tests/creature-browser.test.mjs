@@ -242,7 +242,7 @@ test('Null: quiet general preference persists and pauses the sky in DE and EN',a
   await p.locator('#physicsGuide > summary').click();
   await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1);
   assert.equal(await p.locator('.header-tools #decorativeMotion').count(),0);
-  assert.equal(await p.locator('footer').textContent(),'No plot armor. Just physics.');
+  assert.equal(await p.locator('footer').textContent(),'No plot armor. Just physics?');
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });
