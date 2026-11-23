@@ -2,6 +2,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import * as i18n from '../dist/i18n.mjs';
 import * as physics from '../dist/physics.mjs';
+import {GravityTrail,traceGravityTrail} from '../dist/gravity-trail.mjs';
 import * as display from '../dist/display.mjs';
 import * as data from '../dist/extreme-data.mjs';
 import * as stellar from '../dist/stellar-examples.mjs';
@@ -28,7 +29,7 @@ export function harness(module='app',reduce=false,startLanguage='de'){
  const motion={matches:reduce,addEventListener(k,f){this.change=f}};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;el('gravity').classes.add('active');el('comparisonMode').value='log';
  const window={addEventListener(){}};
- const scope=vm.createContext({...physics,...display,...data,...stellar,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
+ const scope=vm.createContext({...physics,GravityTrail,traceGravityTrail,...display,...data,...stellar,...i18n,onLanguageChange(fn){subscriptions.push(i18n.onLanguageChange(fn))},experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,performance,devicePixelRatio:1,document:doc,
   matchMedia:q=>q.includes('prefers-reduced-motion')?motion:{matches:false,addEventListener(){}},Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},ResizeObserver:class{observe(){}},IntersectionObserver:class{constructor(fn){observers.push(fn)}observe(){}},
   drawObject(){draws++},drawStellarExample(){draws++},drawThermal(){draws++},requestAnimationFrame:f=>{frames.set(++id,f);return id},cancelAnimationFrame:i=>frames.delete(i),setTimeout:f=>timeouts.push(f)});
  const source=readFileSync(new URL('../dist/'+(module==='app'?'app.mjs':'extreme-ui.mjs'),import.meta.url),'utf8').replace(/^import .*;\n/gm,'');new vm.Script(source).runInContext(scope);

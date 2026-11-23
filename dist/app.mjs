@@ -2,6 +2,7 @@ import {experiment,experimentInfo} from './experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from './instruments.mjs';
 import {predict} from './prediction.mjs';
 import {number,scientific,length,modelStatus} from './display.mjs';
+import {GravityTrail,traceGravityTrail} from './gravity-trail.mjs';
 import {C,G,EPS,blackHole,body,radius,scenario,step,safeStep,energy} from './physics.mjs';
 import {createSelfChecks} from './self-checks.mjs';
 import {t,tx,onLanguageChange,bodyLabel,registerBodyLabels,translateText} from './i18n.mjs';
@@ -39,7 +40,15 @@ function startPrediction(){cancelPrediction();if(!$('predictionOn').checked)retu
 function renderPrediction(){const reasons={'complete':'Horizont erreicht','step-limit':'Schrittbudget erreicht','body-limit':'Abbruch: mehr als 12 Körper','invalid-state':'Abbruch: ungültiger Zustand','invalid-budget':'Abbruch: ungültiges Budget','collision':'Abbruch vor Kontakt/Verschmelzung','numerical-limit':'Abbruch: numerisches Limit'};$('predictionNote').textContent=tx`Stand ${num(forecast.stamp)} d · ${num(forecast.days)} d voraus · ${forecast.steps} Schritte · ${t(reasons[forecast.reason])}. Numerische Modellvorhersage bei unveränderten Anfangsbedingungen; keine laufende Aktualisierung. Chaos: starke Empfindlichkeit. Tunneling bleibt möglich.`;requestGravityDraw()}
 $('referenceBody').onchange=()=>diagnostics();
 $('predictionOn').onchange=()=>{$('predictionOn').checked?startPrediction():cancelPrediction()};$('predictionRefresh').onclick=startPrediction;$('predictionHorizon').onchange=()=>cancelPrediction();
-function rebase(reason='Manueller Eingriff'){baseline=energy(bs);instrumentBase=makeBaseline(bs,reason);lastStep=null;bs.forEach(b=>b.trail=[]);cancelPrediction();$('baselineNote').textContent=t(reason)+t(' · Baseline neu gesetzt.')}
+let gravityTrails=new WeakMap();
+function observeGravityTrails(){
+ for(const b of bs){
+  let trail=gravityTrails.get(b);
+  if(!trail){trail=new GravityTrail();gravityTrails.set(b,trail)}
+  trail.observe(b,elapsed,view.scale);
+ }
+}
+function rebase(reason='Manueller Eingriff'){baseline=energy(bs);instrumentBase=makeBaseline(bs,reason);lastStep=null;gravityTrails=new WeakMap();cancelPrediction();$('baselineNote').textContent=t(reason)+t(' · Baseline neu gesetzt.')}
 function load(){numericalFault=false;updatePlayback();bs=experiment($('scenario').value);registerBodyLabels(bs);selected=bs.find(b=>b.name==='Erde')?.id??bs.find(b=>b.name==='Testkörper')?.id??bs[0]?.id;elapsed=0;collisions=0;accum=0;rebase('Reset / Szenario');list();fit();$('scenarioHint').textContent=t(experimentInfo[$('scenario').value])}
 $('zoomIn').onclick=()=>{view.scale=Math.min(1e9,view.scale*1.7);requestGravityDraw()};$('zoomOut').onclick=()=>{view.scale=Math.max(.01,view.scale/1.7);requestGravityDraw()};
 $('scenario').onchange=load;$('reset').onclick=load;$('fit').onclick=()=>{fit();requestGravityDraw()};
@@ -105,7 +114,7 @@ function draw(){let r=resizeCanvas(canvas);W=r.w;H=r.h;if(!W||!H)return;ctx.clea
 if(numericalFault||![view.x,view.y,view.scale].every(Number.isFinite)||view.scale<=0)return;
 let raw=100/view.scale,pow=10**Math.floor(Math.log10(raw)),spacing=[1,2,5,10].find(n=>n*pow>=raw)*pow,pix=spacing*view.scale;
 if($('grid').checked){ctx.strokeStyle='#77708a12';ctx.lineWidth=1;let startX=((W/2-view.x*view.scale)%pix+pix)%pix,startY=((H/2+view.y*view.scale)%pix+pix)%pix;ctx.beginPath();for(let x=startX;x<W;x+=pix){ctx.moveTo(x,0);ctx.lineTo(x,H)}for(let y=startY;y<H;y+=pix){ctx.moveTo(0,y);ctx.lineTo(W,y)}ctx.stroke();ctx.strokeStyle='#77708a28';let o=toScreen({x:0,y:0});ctx.beginPath();ctx.moveTo(o.x-8,o.y);ctx.lineTo(o.x+8,o.y);ctx.moveTo(o.x,o.y-8);ctx.lineTo(o.x,o.y+8);ctx.stroke()}
-for(let b of bs){let p=toScreen(b);if($('trails').checked&&b.trail.length>1){ctx.beginPath();b.trail.forEach((v,i)=>{let q=toScreen(v);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.strokeStyle=b.color+'65';ctx.lineWidth=.9;ctx.stroke()}let vr=b.type==='star'?8+Math.max(0,Math.log10(b.m+1))*2:b.type==='hole'?10:3.8+Math.max(0,Math.log10(b.m*C.sun/C.earth))*1.1;vr=Math.min(22,Math.max(vr,radius(b)*view.scale));if(![p.x,p.y,vr].every(Number.isFinite)||p.x< -50||p.y< -50||p.x>W+50||p.y>H+50)continue;
+for(let b of bs){let p=toScreen(b);if($('trails').checked){ctx.strokeStyle=b.color+'65';ctx.lineWidth=.9;traceGravityTrail(ctx,gravityTrails.get(b),toScreen)}let vr=b.type==='star'?8+Math.max(0,Math.log10(b.m+1))*2:b.type==='hole'?10:3.8+Math.max(0,Math.log10(b.m*C.sun/C.earth))*1.1;vr=Math.min(22,Math.max(vr,radius(b)*view.scale));if(![p.x,p.y,vr].every(Number.isFinite)||p.x< -50||p.y< -50||p.x>W+50||p.y>H+50)continue;
 let glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,vr*4);glow.addColorStop(0,b.color+'35');glow.addColorStop(1,b.color+'00');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(p.x,p.y,vr*4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,vr,0,Math.PI*2);ctx.fillStyle=b.type==='hole'?'#020206':b.color;ctx.fill();if(b.type==='hole'){ctx.strokeStyle=b.color;ctx.lineWidth=1.3;ctx.stroke()}if(b.id===selected){ctx.beginPath();ctx.arc(p.x,p.y,vr+5,0,Math.PI*2);ctx.strokeStyle=b.color+'80';ctx.lineWidth=.7;ctx.stroke()}if($('labels').checked){ctx.fillStyle=b.id===selected?'#e3d8f6':'#9993a7';ctx.font='13px system-ui';ctx.fillText(bodyLabel(b),p.x+vr+9,p.y+3)}}
 if(forecast&&forecast.id===selected&&$('predictionOn').checked){ctx.beginPath();forecast.points.forEach((b,i)=>{const p=toScreen(b);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)});ctx.strokeStyle='#e5b3ff';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([])}
 if(drag?.adding){ctx.strokeStyle='#b89af1';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(drag.sx,drag.sy);ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([]);let v=Math.hypot(drag.x-drag.sx,drag.y-drag.sy)/view.scale/30*C.AU/C.day/1000;ctx.fillStyle='#ddcaff';ctx.font='13px system-ui';ctx.fillText(num(v)+' km/s',drag.x+10,drag.y-12)}$('scaleLabel').textContent=tx`┝ ${num(spacing)} AU / Raster`}
@@ -124,9 +133,9 @@ function loop(now){
     let hit=step(bs,dt);lastStep=dt;elapsed+=dt;accum-=dt;n++;
     if(!bs.every(b=>Number.isFinite(b.m)&&b.m>0&&[b.x,b.y,b.vx,b.vy].every(Number.isFinite))){stopNumerical();break}
     if(hit){registerBodyLabels(bs);collisions+=hit;rebase('Kollision / Verschmelzung');list()}
+    else observeGravityTrails();
    }
    limited=n===800;if(limited)accum=0;
-   if(!numericalFault&&frame%3===0)bs.forEach(b=>{b.trail.push({x:b.x,y:b.y});if(b.trail.length>1600)b.trail.shift()});
   }
   if(tab==='gravity')draw();
   if(!paused&&!numericalFault&&frame%15===0)diagnostics();
@@ -156,7 +165,8 @@ function syncGravity(){if(gravityRaf!==null&&typeof cancelAnimationFrame==='func
 document.addEventListener('visibilitychange',syncGravity);
 globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches)setPaused(true)});
 onLanguageChange(()=>{for(const id of ['objectList','referenceBody'])for(const option of $(id).options??[]){const b=bs.find(b=>b.id===Number(option.value));option.textContent=b?bodyLabel(b):t('Keine Referenz')}const b=bs.find(b=>b.id===selected);$('selectedName').textContent=b?bodyLabel(b):t('Leerer Raum');$('selectedType').textContent=b?{planet:t('PLANET'),star:t('STERN'),hole:t('SCHWARZES LOCH')}[b.type]:t('KÖRPER HINZUFÜGEN');$('scenarioHint').textContent=t(experimentInfo[$('scenario').value]);for(const id of ['predictionNote','baselineNote','addHint','pointerHint','editError'])$(id).textContent=translateText($(id).textContent);if(instrumentBase&&!numericalFault)$('baselineNote').textContent=t(instrumentBase.reason)+t(' · Baseline neu gesetzt.');if(forecast)renderPrediction();setAdding(adding);renderBHValidity();updatePlayback();diagnostics(false);drawLab();renderChecks();renderCheckStatus();requestGravityDraw()});
-window.entrolab={checks:runChecks,blackHole,getBodies:()=>structuredClone(bs),renderInfo:()=>({frame,tab,scheduled:gravityRaf!==null}),inspect:()=>structuredClone({bodies:bs,selected,paused,elapsed,collisions,view,forecast,predictionGeneration})};
+const bodySnapshots=()=>bs.map(b=>({...b,trail:gravityTrails.get(b)?.snapshot()??[]}));
+window.entrolab={checks:runChecks,blackHole,getBodies:()=>structuredClone(bodySnapshots()),renderInfo:()=>({frame,tab,scheduled:gravityRaf!==null}),inspect:()=>structuredClone({bodies:bodySnapshots(),selected,paused,elapsed,collisions,view,forecast,predictionGeneration})};
 
 
 
