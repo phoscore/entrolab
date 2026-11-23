@@ -2,8 +2,9 @@
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
+import {execFileSync} from 'node:child_process';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
-import {resolve,extname} from 'node:path';
+import {resolve,extname,relative,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
 const root=fileURLToPath(new URL('../dist/',import.meta.url));
@@ -11,7 +12,7 @@ const output=fileURLToPath(new URL('../browser-results/',import.meta.url));
 let server,browser,url;const measurements=[],errors=[];
 before(async()=>{
  await mkdir(output,{recursive:true});
- server=createServer(async(req,res)=>{try{const requestURL=new URL(req.url,'http://localhost'),pathname=decodeURIComponent(requestURL.pathname);if(pathname==='/__viewport'){const width=Number(requestURL.searchParams.get('width'));if(!Number.isFinite(width)||width<250||width>2000){res.writeHead(400).end();return}res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'}).end(`<meta charset="utf-8"><style>body{margin:0}iframe{border:0;display:block;width:${width}px;height:900px}</style><iframe src="/"></iframe>`);return}const path=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(!path.startsWith(root)){res.writeHead(403).end();return}const body=await readFile(path);res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.png':'image/png'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(body)}catch{res.writeHead(404).end()}});
+ server=createServer(async(req,res)=>{try{const requestURL=new URL(req.url,'http://localhost'),pathname=decodeURIComponent(requestURL.pathname);if(pathname==='/__viewport'){const width=Number(requestURL.searchParams.get('width'));if(!Number.isFinite(width)||width<250||width>2000){res.writeHead(400).end();return}res.writeHead(200,{'Content-Type':'text/html','Cache-Control':'no-store'}).end(`<meta charset="utf-8"><style>body{margin:0}iframe{border:0;display:block;width:${width}px;height:900px}</style><iframe src="/"></iframe>`);return}const path=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(relative(root,path).split(sep).includes('..')){res.writeHead(403).end();return}const body=await readFile(path);res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(body)}catch{res.writeHead(404).end()}});
  await new Promise(done=>server.listen(0,'127.0.0.1',done));url=`http://127.0.0.1:${server.address().port}`;
  browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});
  console.log('Chromium',browser.version());
@@ -87,4 +88,108 @@ test('browser: schematic pulsar notice stays visible in focus and translates wit
 
 test('browser: real media-query emulation and application scripts produce no page errors',async()=>{
  const {page,context}=await lab();try{assert.equal(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches),true);assert.equal((await state(page)).paused,true);await page.locator('[data-tab=extreme]').click();assert.equal(await page.locator('#extreme').getAttribute('data-animating'),'false');assert.deepEqual(errors,[])}finally{await context.close()}
+});
+
+test('Gravity trail integrity at identical frame times, with real before and after Canvas screenshots',async()=>{
+ const original=execFileSync('git',['show','f77f6ae06b4e4dbc3f8c953909f622f52b9cd3ee:dist/app.mjs'],{cwd:new URL('../',import.meta.url)});
+ const records=[];
+ const physical=s=>s.bodies.map(({trail,...body})=>body);
+ for(const width of [1440,390,320]){
+  let previous;
+  for(const baseline of [true,false]){
+   const context=await browser.newContext({locale:width===390?'en-GB':'de-DE',
+    viewport:{width,height:900},reducedMotion:'reduce',deviceScaleFactor:width<500?2:1});
+   try{
+    await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,r=>r.abort());
+    if(baseline)await context.route('**/app.mjs',r=>r.fulfill({body:original,contentType:'text/javascript'}));
+    await context.addInitScript(()=>{
+     const raf=window.requestAnimationFrame.bind(window), cancel=window.cancelAnimationFrame.bind(window);
+     let gravityFrame=null,time=1000;
+     window.requestAnimationFrame=callback=>{
+      if(!String(callback).includes('gravityRaf=null;loop(now)'))return raf(callback);
+      gravityFrame=callback;
+      return -1;
+     };
+     window.cancelAnimationFrame=id=>{if(id===-1)gravityFrame=null;else cancel(id);};
+     window.gravityTestFrames=(count,ms)=>{
+      const timings=[];
+      for(let i=0;i<count;i++){
+       const callback=gravityFrame;
+       gravityFrame=null;
+       time+=ms;
+       if(!callback)continue;
+       const started=performance.now();
+       callback(time);
+       timings.push(performance.now()-started);
+      }
+      return timings;
+     };
+    });
+    const page=await context.newPage();
+    page.on('pageerror',error=>errors.push(error.message));
+    await page.goto(url);
+    await ready(page);
+    const canvas=page.locator('#universe');
+    await canvas.scrollIntoViewIfNeeded();
+    await page.waitForFunction(()=>window.entrolab.renderInfo().scheduled);
+    const result=await page.evaluate(()=>{
+     const el=id=>document.getElementById(id);
+     const speed=value=>{el('speed').value=value;el('speed').dispatchEvent(new Event('input'));};
+     const bounds=el('universe').getBoundingClientRect();
+     const {bodies:[sun],view}=window.entrolab.inspect();
+     const zoom=80/view.scale;
+     const anchorX=bounds.width/2+(sun.x-view.x)*view.scale*zoom/(zoom-1);
+     const anchorY=bounds.height/2-(sun.y-view.y)*view.scale*zoom/(zoom-1);
+     el('universe').dispatchEvent(new WheelEvent('wheel',{clientX:bounds.left+anchorX,clientY:bounds.top+anchorY,deltaY:-1000*Math.log(zoom),cancelable:true}));
+     el('labels').checked=false;
+     el('trails').checked=true;
+     speed('1.47712');
+     el('play').click();
+     window.gravityTestFrames(60,1000/60);
+     const normal=window.entrolab.inspect();
+     speed('3');
+     const timing=window.gravityTestFrames(33,1000/60);
+     const fast=window.entrolab.inspect();
+     speed('1.47712');
+     window.gravityTestFrames(6,1000/60);
+     el('play').click();
+     window.gravityTestFrames(2,1000/60);
+     const paused=window.entrolab.inspect();
+     const idleFrames=window.gravityTestFrames(12,1000/60).length;
+     return {normal,fast,paused,idleFrames,timing,drift:el('drift').textContent,status:el('status').textContent};
+    });
+    assert.ok(result.normal.elapsed>20&&result.fast.elapsed>500);
+    assert.equal(result.paused.paused,true);
+    assert.equal(result.idleFrames,0);
+    if(baseline)previous=result;
+    else for(const key of ['normal','fast','paused']){
+     assert.equal(result[key].elapsed,previous[key].elapsed);
+     assert.deepEqual(physical(result[key]),physical(previous[key]));
+    }
+    assert.ok(result.timing.length>=30);
+    assert.ok(!(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)));
+    const phase=baseline?'before':'after';
+    const maxSegment=[];
+    for(const bodyIndex of [1,2]){
+     const trail=result.fast.bodies[bodyIndex].trail;
+     assert.ok(trail.length>10&&trail.length<=1025);
+     const chords=trail.slice(1).map((p,i)=>p.breakBefore?0:Math.hypot(p.x-trail[i].x,p.y-trail[i].y));
+     maxSegment.push(Math.max(...chords));
+    }
+    if(baseline)assert.ok(maxSegment.every(length=>length>.25),JSON.stringify(maxSegment));
+    else assert.ok(maxSegment.every(length=>length<=.060001),JSON.stringify(maxSegment));
+    const times=result.timing.sort((a,b)=>a-b);
+    records.push({width,phase,elapsed:result.fast.elapsed,maxSegmentAU:maxSegment,
+     stored:result.fast.bodies.map(b=>b.trail.length),frameP95Ms:times[Math.ceil(times.length*.95)-1],
+     idleFrames:result.idleFrames,drift:result.drift,status:result.status});
+    await canvas.screenshot({path:resolve(output,'gravity-trails-'+width+'-'+phase+'.png')});
+    await page.locator('#reset').click();
+    assert.equal((await state(page)).elapsed,0);
+    assert.ok((await state(page)).bodies.every(b=>b.trail.length===0));
+   }finally{await context.close();}
+  }
+ }
+ await writeFile(resolve(output,'gravity-trails.json'),JSON.stringify(records,null,2)+'\n');
+ console.log('GRAVITY_TRAIL '+JSON.stringify(records));
+ assert.deepEqual(errors,[]);
 });

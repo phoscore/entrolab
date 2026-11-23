@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import vm from 'node:vm';
 import * as physics from '../dist/physics.mjs';
+import {GravityTrail,traceGravityTrail} from '../dist/gravity-trail.mjs';
 import * as display from '../dist/display.mjs';
 import {experiment,experimentInfo} from '../dist/experiments.mjs';
 import {baseline as makeBaseline,diagnostics as readDiagnostics} from '../dist/instruments.mjs';
@@ -29,7 +30,7 @@ function app(){
  const el=id=>{if(!elements.has(id))elements.set(id,new Element(id));return elements.get(id)};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;
  const window={addEventListener(){}};
- const scope=vm.createContext({...i18n,...physics,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
+ const scope=vm.createContext({...i18n,...physics,GravityTrail,traceGravityTrail,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
   document:{getElementById:el,createElement:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},activeElement:null},
   Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},
   ResizeObserver:class{observe(){}},requestAnimationFrame:callback=>frames.push(callback),setTimeout(){}});
@@ -37,7 +38,7 @@ function app(){
  new vm.Script(source,{filename:'dist/app.mjs'}).runInContext(scope);
  let now=100;
  return {el,window,get gradients(){return gradients},tick(){assert.equal(frames.length,1,'exactly one pending frame');frames.shift()(now);now+=16},
-  edit(index,x){el('objectList').value=window.entrolab.getBodies()[index].id;el('objectList').onchange();el('posX').value=String(x);el('editForm').handlers.input({target:el('posX')});el('editForm').onsubmit({preventDefault(){}})}};
+  edit(index,x,vy){el('objectList').value=window.entrolab.getBodies()[index].id;el('objectList').onchange();el('posX').value=String(x);if(vy!==undefined)el('velY').value=String(vy);el('editForm').handlers.input({target:el('posX')});el('editForm').onsubmit({preventDefault(){}})}};
 }
 
 test('animation: extreme coordinates stop safely and reset + play resumes without reload',()=>{
@@ -78,4 +79,28 @@ test('prediction: underflow horizons return numerical-limit, without hanging or 
   assert.equal(JSON.stringify(source),before);
  `],{timeout:3000,encoding:'utf8'});
  assert.ifError(run.error);assert.equal(run.status,0,run.stderr);
+});
+
+test('Gravity collision clears pre-merger trails and records only genuine merged states',()=>{
+ const a=app();
+ a.el('play').onclick();
+ a.edit(0,-.01,0);a.edit(1,.01,0);
+ assert.ok(a.window.entrolab.getBodies().every(b=>b.trail.length===0));
+ a.el('play').onclick();
+ a.tick();a.tick();
+ const before=a.window.entrolab.inspect();
+ assert.equal(before.bodies.length,2);
+ assert.ok(before.bodies.every(b=>b.trail.length>0));
+ for(let i=0;i<100&&a.window.entrolab.inspect().collisions===0;i++)a.tick();
+ const hit=a.window.entrolab.inspect();
+ assert.equal(hit.collisions,1);
+ assert.equal(hit.bodies.length,1);
+ assert.ok(before.bodies.every(b=>b.id!==hit.bodies[0].id));
+ a.tick();
+ const [merged]=a.window.entrolab.getBodies();
+ assert.ok(merged.trail.length>0);
+ assert.ok(merged.trail.every(p=>p.day>before.elapsed));
+ assert.equal(merged.trail[0].breakBefore,true);
+ assert.equal(merged.trail.at(-1).x,merged.x);
+ assert.equal(merged.trail.at(-1).y,merged.y);
 });
