@@ -62,7 +62,7 @@ test('extreme UI: restoring active mass clears stale error; invalid editing text
  assert(l.el('massError').textContent);assert.equal(l.el('extremeMass').value,'1e42');
  assert.equal(l.el('extremeRadius').textContent,radius);
  l.el('extremeMass').onchange();assert(l.el('massError').textContent);
- l.el('extremeQuality').value='low';l.el('extremeQuality').onchange();
+ l.el('extremePlay').onclick();
  assert.equal(Number(l.el('extremeMass').value),active);
  assert.equal(l.el('massError').textContent,'');
  l.el('extremeMass').value='1e42';l.el('extremeMass').oninput();assert(l.el('massError').textContent);

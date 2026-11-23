@@ -4,9 +4,14 @@ export function fitCanvas(canvas,quality='low'){const rect=canvas.getBoundingCli
 function circle(x,cx,cy,r,color){x.fillStyle=color;x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.fill()}
 export function drawObject(canvas,s,time){const fit=fitCanvas(canvas,s.quality);if(!fit)return;const {ctx:x,w,h}=fit,cx=w*.5,cy=h*.49,R=Math.min(w*.12,h*.16)*s.zoom; x.fillStyle='#06070d';x.fillRect(0,0,w,h);
 for(let i=0;i<110;i++){const sx=((i*1783+89)%10007)/10007*w,sy=((i*3853+127)%9967)/9967*h;circle(x,sx,sy,i%13===0?1.1:.55,`rgba(199,194,226,${.15+(i%4)*.1})`)}
-const halo=x.createRadialGradient(cx,cy,R*.8,cx,cy,R*4.8);halo.addColorStop(0,s.kind==='blackhole'?'#90602f30':'#7e81d94a');halo.addColorStop(1,'#00000000');x.fillStyle=halo;x.fillRect(0,0,w,h);
+if(!s.exhibit||s.kind!=='blackhole'||(!s.geometry&&s.disk)){
+ const halo=x.createRadialGradient(cx,cy,R*.8,cx,cy,R*4.8);
+ halo.addColorStop(0,s.kind==='blackhole'?'#90602f30':'#7e81d94a');halo.addColorStop(1,'#00000000');
+ x.fillStyle=halo;x.fillRect(0,0,w,h);
+}
 if(s.kind!=='blackhole'){drawStellar(x,w,h,cx,cy,R,s,time);return}
 if(s.geometry){for(const [factor,color,label] of [[3,'#9274d5','ISCO · 3 rₛ'],[1.5,'#e4bd89','Photonensphäre · 1,5 rₛ'],[1,'#e7e2f5','Horizont · rₛ']]){x.beginPath();x.arc(cx,cy,R*factor,0,7);x.setLineDash(factor===1?[]:[4,5]);x.strokeStyle=color;x.lineWidth=1.2;x.stroke();x.fillStyle=color;x.font='13px system-ui';x.fillText(t(label),Math.max(12,Math.min(cx+7,w-(x.measureText?.(t(label))?.width??t(label).length*7)-12)),Math.max(34,Math.min(h-28,factor===3?cy+R*factor-12:cy-R*factor-8)))}x.setLineDash([]);circle(x,cx,cy,R,'#000');return}
+if(s.exhibit){drawAccretionExhibit(x,cx,cy,R,s,time);return}
 if(s.disk){
 // Rings, brightness asymmetry and the upper arc are artistic projections only.
 const tilt=.24+.65*s.angle/90;
@@ -20,6 +25,29 @@ x.strokeStyle='#e8b58448';x.lineWidth=R*.065;x.beginPath();x.ellipse(cx,cy,R*1.6
 circle(x,cx,cy,R*1.08,'#000');
 if(s.disk){x.strokeStyle='#ffe3b3cc';x.lineWidth=1.1;x.beginPath();x.arc(cx,cy,R*1.1,0,7);x.stroke();x.save();x.beginPath();x.rect(0,cy+R*.18,w,h);x.clip();for(let i=0;i<16;i++){x.beginPath();x.ellipse(cx,cy,R*(1.2+i*.14),R*(.22+i*.025),-.12,0,Math.PI);x.strokeStyle=`rgba(255,${180+i*3},${120+i*4},${.16-i*.006})`;x.lineWidth=1.5;x.stroke()}x.restore()}
 x.fillStyle='#ada1b4';x.font='12px system-ui';x.textAlign='center';x.fillText(s.disk?t('Akkretionsscheibe & Silhouette · künstlerisch'):t('Isoliert ohne Scheibe · Silhouette illustrativ'),cx,h-22);x.textAlign='left';}
+
+// An inclined disc in the comparison exhibit. Brightness and silhouette are artistic choices.
+function drawAccretionExhibit(x,cx,cy,r,state,time){
+ if(!state.disk){circle(x,cx,cy,r*1.09,'#000');return}
+ const squash=.085+.83*Math.sin(state.angle*Math.PI/180);
+ x.save();x.translate(cx,cy);x.rotate(-.18);
+ const count=state.quality==='high'?40:26;
+ for(const near of [false,true]){
+  if(near)circle(x,0,0,r*1.09,'#000');
+  for(let i=count-1;i>=0;i--){
+   const p=i/(count-1),radius=r*(1.45+2.47*p);
+   const veil=(1-p)**2.25*(.78+.17*Math.sin(i*2.23)+.05*Math.sin(time*.47+i*.71));
+   const heat=x.createLinearGradient(-radius,0,radius,0);
+   heat.addColorStop(0,`rgba(123,50,32,${veil*.34})`);
+   heat.addColorStop(.43,`rgba(195,82,40,${veil*.61})`);
+   heat.addColorStop(.79,`rgba(238,150,76,${veil*.93})`);
+   heat.addColorStop(1,`rgba(255,${Math.round(222-82*p)},${Math.round(159-93*p)},${veil})`);
+   x.strokeStyle=heat;x.lineWidth=r*(near?.10:.09);
+   x.beginPath();x.ellipse(0,0,radius,radius*squash,0,near?0:Math.PI,near?Math.PI:2*Math.PI);x.stroke();
+  }
+ }
+ x.restore();
+}
 export function drawThermal(canvas,k,time,quality){const f=fitCanvas(canvas,quality);if(!f)return;const {ctx:x,w,h}=f;x.fillStyle='#0b0b13';x.fillRect(0,0,w,h);const fraction=k===0?0:Math.min(1,Math.max(0,(Math.log10(k)+3)/15));const hue=240-220*fraction,amount=quality==='high'?70:38;for(let i=0;i<amount;i++){const phase=time*(.08+fraction*1.9);const px=((i*.618)%1)*w+Math.sin(phase+i)*fraction*20,py=((i*.413)%1)*h+Math.cos(phase*1.3+i)*fraction*15;circle(x,(px+w)%w,(py+h)%h,1.5+(i%3)*.7,`hsla(${hue},75%,75%,${.2+(i%5)*.13})`)}x.fillStyle='#b5a9c6';x.font='12px system-ui';x.fillText(t('ABSTRAKT · keine Teilchen- oder Quantenberechnung'),12,h-12)}
 // Layered light and projected texture are artwork, not a stellar-atmosphere calculation.
 function drawStellar(x,w,h,cx,cy,R,s,time){

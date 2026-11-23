@@ -8,7 +8,7 @@ import { de,en } from '../dist/i18n.mjs';
 const close=(actual,expected,tolerance)=>assert(Math.abs(actual-expected)<=tolerance,`${actual} vs ${expected}`);
 
 test('Extreme examples preserve the three original models and classify magnetars as neutron stars',()=>{
- assert.equal(new Set(extremeKinds).size,7);
+ assert.equal(new Set(extremeKinds).size,8);
  for(const m of [1,C.sun,10*C.sun,1e41])for(const kind of ['blackhole','white','neutron']){
   assert.deepEqual(extremeExample(kind,m),compactObject(kind,m));
  }
@@ -21,6 +21,20 @@ test('Extreme examples preserve the three original models and classify magnetars
  assert.match(de[magnetar.name],/Neutronenstern/);
  assert.match(en[magnetar.name],/neutron star/);
  assert.throws(()=>extremeExample('constructor'),RangeError);
+});
+
+test('Sun provides a fixed radius and mass reference and agrees with published rounded values',()=>{
+ const sun=extremeExample('sun',1e41);
+ assert.deepEqual(sun,extremeExample('sun',1));
+ close(sun.mass,1.9884e30,1e26);
+ assert.equal(sun.radius,695700000);
+ assert.equal(sun.density,sun.mass/(4*Math.PI*sun.radius**3/3));
+ assert.equal(Math.round(sun.density/10),Math.round(1408/10));
+ assert.equal(sun.temperature,5772);
+ assert.equal(sun.luminosity,1);
+ close(sun.escapeVelocity,Math.sqrt(2*C.G*sun.mass/sun.radius)/1000,.1);
+ assert.equal(extremeExample('supergiant').radius/sun.radius,764);
+ assert.deepEqual(sun.sources.map(([,url])=>new URL(url).hostname),['nssdc.gsfc.nasa.gov','arxiv.org','nso.edu','solarscience.msfc.nasa.gov']);
 });
 
 test('Stellar references use published values and clearly defined radius conventions',()=>{
@@ -70,13 +84,13 @@ test('Log radius comparison remains ordered across the entire black-hole mass ra
  close(ratio,44292900,1);
 });
 
-test('Object descriptions in both languages distinguish all seven and the three special modes',()=>{
+test('Object descriptions in both languages distinguish all eight and the three special modes',()=>{
  const states=[
   ...extremeKinds.map(kind=>({kind,disk:true,geometry:false,pulsar:false})),
   {kind:'blackhole',disk:false},{kind:'blackhole',geometry:true},{kind:'neutron',pulsar:true},
  ];
  const keys=states.map(extremeExplanation);
- assert.equal(new Set(keys).size,10);
- for(const locale of [de,en])assert.equal(new Set(keys.map(key=>locale[key])).size,10);
+ assert.equal(new Set(keys).size,11);
+ for(const locale of [de,en])assert.equal(new Set(keys.map(key=>locale[key])).size,11);
  for(const key of keys)assert(de[key]?.length>35&&en[key]?.length>35,key);
 });

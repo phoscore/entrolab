@@ -1,4 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {drawObject,drawThermal} from '../dist/extreme-render.mjs';
+
+test('comparison accretion artwork stays finite across supported angles and zoom',()=>{
+ const gradient=()=>({addColorStop(){}});
+ const x=new Proxy({createRadialGradient:gradient,createLinearGradient:gradient},{get:(target,key)=>target[key]??((...args)=>{
+  for(const number of args.filter(arg=>typeof arg==='number'))assert(Number.isFinite(number));
+ })});
+ const canvas={getBoundingClientRect:()=>({width:280,height:360}),getContext:()=>x};
+ for(const disk of [false,true])for(const zoom of [.65,1,1.3])for(const angle of [0,22,70]){
+  drawObject(canvas,{kind:'blackhole',quality:'low',exhibit:true,disk,zoom,angle},64);
+ }
+});
 test('procedural renderer: bounded scenes remain finite; geometric labels remain within canvas',()=>{for(const [w,h] of [[940,500],[350,350]]){const labels=[];const context=new Proxy({createRadialGradient(...a){assert(a.every(Number.isFinite));return {addColorStop(){}}},fillText(text,x,y){assert(Number.isFinite(x)&&Number.isFinite(y));labels.push({text,x,y})}}, {get:(o,k)=>k in o?o[k]:(...args)=>{for(const n of args.filter(x=>typeof x==='number'))assert(Number.isFinite(n))}});const canvas={width:0,height:0,getBoundingClientRect:()=>({width:w,height:h}),getContext:()=>context};for(const kind of ['blackhole','white','neutron'])for(const quality of ['high','low'])for(const zoom of [.65,1,1.3]){drawObject(canvas,{kind,quality,zoom,disk:true,geometry:true,angle:22},3);drawObject(canvas,{kind,quality,zoom,disk:false,geometry:false,angle:70},3);drawObject(canvas,{kind,quality,zoom,disk:true,geometry:false,angle:0},3)}for(const label of labels.filter(x=>/ISCO|Photonensphäre|Horizont/.test(x.text)))assert(label.y>=0&&label.y<h);for(const k of [0,.001,.1,1e12])drawThermal(canvas,k,100,'low')}});

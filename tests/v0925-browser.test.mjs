@@ -16,16 +16,15 @@ const skyState=page=>page.evaluate(()=>{
  return [style.animationName,style.animationPlayState];
 });
 
-test('v0.9.25: all seven object descriptions update in both languages, including special modes',async()=>{
+test('v0.9.25: all eight object descriptions update in both languages, including special modes',async()=>{
  const {p,context}=await h.lab();
  try{
   const before=await physical(p);
   await tab(p,'extreme');
-  await p.locator('.stage-explanation > summary').click();
   const desc=p.locator('#objectImageDescription');
   const expected={
-   de:[/Akkretionsumgebung/,/Weißen Zwerg/,/Neutronenstern/,/Infrarotemission/,/Konvektion/,/Dipolgeometrie/,/Sternwind/],
-   en:[/accretion environment/,/white dwarf/,/neutron star/,/thermal infrared/,/convection/,/dipole geometry/,/stellar wind/],
+   de:[/Akkretionsumgebung/,/Weißen Zwerg/,/Neutronenstern/,/Infrarotemission/,/Konvektion/,/Dipolgeometrie/,/Sternwind/,/Photosphäre.*Sonnenflecken/],
+   en:[/accretion environment/,/white dwarf/,/neutron star/,/thermal infrared/,/convection/,/dipole geometry/,/stellar wind/,/photosphere.*sunspots/],
   };
   const brownSources={
    de:[/bolometrischen Leuchtkraft ab.*0,9 Jupiterradien/,/separat 1 Jupiterradius.*illustrative Leuchtkraft/],
@@ -35,6 +34,7 @@ test('v0.9.25: all seven object descriptions update in both languages, including
    await p.locator(`[data-language=${lang}]`).click();
    for(const [index,kind] of extremeKinds.entries()){
     await choose(p,kind);
+    assert.equal(await desc.isVisible(),true);
     assert.match(await desc.textContent(),expected[lang][index]);
     assert.match(await p.locator('#extremeCanvas').getAttribute('aria-label'),lang==='de'?/^Illustrative Ansicht/:/^Illustrative view/);
     assert.equal(await p.locator('#photonRadius').isVisible(),kind==='blackhole');
@@ -42,6 +42,11 @@ test('v0.9.25: all seven object descriptions update in both languages, including
     assert.equal(await p.locator('#magnetarLegend').isVisible(),kind==='magnetar');
     assert.equal(await p.locator('#objectFacts').isVisible(),index>=3);
     assert.equal(await p.locator('#objectSources a').count()>0,index>=3);
+    assert.equal(await p.locator('#extremeToBlackHole').isVisible(),kind==='blackhole');
+    if(kind==='sun'){
+     assert.match(await p.locator('#objectFacts').innerText(),lang==='de'?/5\.772 K.*Fluchtgeschwindigkeit/s:/5,772 K.*Surface escape speed/s);
+     assert.match(await p.locator('#extremeRadius').innerText(),lang==='de'?/695\.700 km/:/695,700 km/);
+    }
     if(kind==='brown'){
      const assumption=await p.locator('#objectAssumption').textContent();
      for(const expected of brownSources[lang])assert.match(assumption,expected);
@@ -55,17 +60,21 @@ test('v0.9.25: all seven object descriptions update in both languages, including
   await choose(p,'neutron');await p.locator('#pulsarOn').check();assert.match(await desc.textContent(),/Pulsarbeispiel/);
   await choose(p,'brown');assert.match(await desc.textContent(),/Infrarotemission/);
   assert.equal(await p.locator('#pulsarVisualNote').isVisible(),false);
+  await choose(p,'blackhole');
+  await p.locator('#extremeToBlackHole').press('Enter');
+  assert.equal(await p.locator('#blackhole').evaluate(el=>el.classList.contains('active')),true);
+  assert.equal(await p.locator('[data-tab=blackhole]').evaluate(el=>el===document.activeElement),true);
   assert.deepEqual(await physical(p),before);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });
 
-test('v0.9.25: sorted size comparison spans seven objects and labels the two scales',async()=>{
+test('v0.9.25: sorted size comparison spans eight objects and labels the two scales',async()=>{
  const {p,context}=await h.lab({viewport:{width:390,height:950}});
  try{
   await tab(p,'extreme');
   const cards=p.locator('#objectComparison article');
-  assert.equal(await cards.count(),7);
+  assert.equal(await cards.count(),8);
   const read=()=>cards.evaluateAll(els=>els.map(el=>({
    kind:el.dataset.kind,radius:Number(el.dataset.radius),percent:parseFloat(el.querySelector('.size-track span').style.width)
   })));
@@ -73,6 +82,12 @@ test('v0.9.25: sorted size comparison spans seven objects and labels the two sca
   assert(log.every((row,i)=>!i||row.radius>=log[i-1].radius));
   assert.equal(log[0].percent,0);
   assert.equal(log.at(-1).kind,'supergiant');assert.equal(log.at(-1).percent,100);
+  const solar=log.findIndex(row=>row.kind==='sun');
+  assert.equal(log[solar].radius,695700000);
+  assert.equal(log[solar-1].kind,'wolf');
+  assert.equal(log[solar+1].kind,'supergiant');
+  await choose(p,'sun');
+  assert.equal(await p.locator('#objectComparison article[aria-current=true]').getAttribute('data-kind'),'sun');
   assert.match(await p.locator('#comparisonNote').textContent(),/Radiusverhältnisse/);
   assert.match(await p.locator('#objectComparison [data-kind=blackhole] p').first().textContent(),/Horizont \(rₛ\)/);
   await p.locator('#comparisonMode').selectOption('linear');
@@ -96,7 +111,7 @@ test('v0.9.25: each new object paints its own moving scene and respects pause, o
   await tab(p,'extreme');
   const canvas=p.locator('#extremeCanvas'), data=()=>canvas.evaluate(e=>e.toDataURL());
   const hashes=new Set();
-  for(const kind of ['brown','supergiant','magnetar','wolf']){
+  for(const kind of ['brown','supergiant','magnetar','wolf','sun']){
    await choose(p,kind);await canvas.scrollIntoViewIfNeeded();
    await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
    const before=await data(), count=await rendered(p);
@@ -108,7 +123,7 @@ test('v0.9.25: each new object paints its own moving scene and respects pause, o
    await p.waitForTimeout(150);assert.equal(await rendered(p),still);
    await p.locator('#extremePlay').evaluate(e=>e.click());
   }
-  assert.equal(hashes.size,4);
+  assert.equal(hashes.size,5);
   for(let i=0;i<3;i++){
    await tab(p,'matter');assert.equal(await p.locator('#extreme').getAttribute('data-animating'),'false');
    await tab(p,'extreme');await canvas.scrollIntoViewIfNeeded();
@@ -169,6 +184,11 @@ test('v0.9.25: no horizontal overflow at 320, 390 or desktop widths and private 
   const {p,context}=await h.lab({viewport:{width,height:950}});
   try{
    await tab(p,'extreme');
+   assert.equal(await p.locator('#extremeQuality').count(),0);
+   for(const kind of extremeKinds){
+    await choose(p,kind);
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,kind);
+   }
    const kind=width===1440?'supergiant':'magnetar';
    await choose(p,kind);
    await p.locator('.stage-explanation > summary').click();
@@ -177,6 +197,9 @@ test('v0.9.25: no horizontal overflow at 320, 390 or desktop widths and private 
    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
    assert.equal((await skyState(p))[0],'none');
    if(width!==320)await p.locator('.object-stage').screenshot({path:join(h.output,`v0925-${kind}-${width}.png`)});
+   await choose(p,'sun');
+   await p.locator('#extremeCanvas').scrollIntoViewIfNeeded();
+   await p.locator('.object-stage').screenshot({path:join(h.output,`v0925-sun-${width}.png`)});
    if(width===1440){
     await tab(p,'matter');await p.evaluate(()=>window.scrollTo(0,0));
     await p.screenshot({path:join(h.output,'v0925-atmosphere-1440.png')});
