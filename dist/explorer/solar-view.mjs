@@ -359,9 +359,9 @@ export function mountSolar(root) {
 
   function enterSystem(id) {
     if (system === id) return;
-    if (galactic) changeFrame(false);
     suspend();
-    if (!system) overview = {selected,reference,follow,camera,space,pose,view,returnDay:null};
+    if (!system) overview = {selected,reference,follow,camera,space,pose,view,galactic,epoch:day,returnDay:null};
+    galactic = null;
     if (!supportsEpoch(day)) {
       overview.returnDay ??= day;
       const today = parseModelDate(new Date().toISOString().slice(0,10));
@@ -387,6 +387,20 @@ export function mountSolar(root) {
     suspend();
     ({selected,reference,follow,camera,space,pose} = overview);
     day = overview.returnDay ?? day;
+    if (overview.galactic) {
+      if (next==='3d' && supportsGalacticDay(day)) {
+        galactic = overview.galactic;
+        if (day!==overview.epoch) {
+          const before = sunDisplacement(overview.epoch), after = sunDisplacement(day);
+          space = {...space,focus:space.focus.map((value,i)=>value+(after[i]-before[i]))};
+        }
+      } else {
+        const {previous} = overview.galactic;
+        ({space,pose,follow} = previous);
+        if (previous.selected==='pluto' && selected==='sun') selected='pluto';
+        if (previous.reference==='pluto' && reference==='sun') reference='pluto';
+      }
+    }
     system = null;
     overview = null;
     markers = [];
@@ -395,6 +409,7 @@ export function mountSolar(root) {
     rebuildBodies();
     markPose(pose);
     $('solFollow').setAttribute('aria-pressed',String(follow));
+    $('solFollowSun').setAttribute('aria-pressed',String(Boolean(galactic?.followSun)));
     switchView(next);
     loadVisibleData();
     localize();

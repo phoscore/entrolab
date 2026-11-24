@@ -271,6 +271,24 @@ test('moon-system fallback is temporary and restores 2D and 3D cameras',async()=
     await page.locator('#solFirstWorldDay').click();
     assert.equal(await date.inputValue(),'2025-01-01');
     assert.ok((await state(page)).pair);
+    await page.locator('#solGlobal').click();
+    await date.fill('2010-04-10');
+    await page.locator('#solGalactic').click();
+    await canvas.press('ArrowRight');
+    const flight=await state(page);
+    await openSystem('jupiter',5);
+    assert.equal(await date.inputValue(),'2025-01-01');
+    await page.locator('#solGlobal').click();
+    const resumed=await state(page);
+    assert.ok(resumed.galactic);
+    assert.equal(resumed.day,flight.day);
+    assert.deepEqual(resumed.space,flight.space);
+    await openSystem('earth',2);
+    await date.fill('2040-03-01');
+    await page.locator('#solGlobal').click();
+    assert.equal(await date.inputValue(),'2040-03-01');
+    assert.equal((await state(page)).galactic,null);
+    assert.equal((await state(page)).view,'3d');
     assert.deepEqual(errors,[]);
   }finally{await context.close();}
 });
@@ -646,6 +664,8 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
     assert.equal(local.galactic,null);
     await page.locator('#solGlobal').click();
     assert.equal((await getFlight(page)).view,'3d');
+    assert.ok((await getFlight(page)).galactic);
+    await page.locator('#solHelio').click();
     await page.locator('#solCanvas').scrollIntoViewIfNeeded();
     await flightFrameSettled(page);
     const cdp=await context.newCDPSession(page);
