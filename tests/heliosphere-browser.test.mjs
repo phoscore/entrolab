@@ -1,6 +1,7 @@
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
+import {readFile,writeFile} from 'node:fs/promises';
 import {browserHarness} from './v08-browser-harness.mjs';
 import {parseModelDate} from '../dist/explorer/solar-model.mjs';
 import {RELEASE} from '../dist/explorer/voyager-data.mjs';
@@ -12,6 +13,41 @@ const solar=p=>p.evaluate(()=>window.entrolabExplorer.inspect().solar);
 const click=(p,selector)=>p.locator(selector).click();
 const canvas=p=>p.locator('#solCanvas');
 const screenshot=(p,name)=>p.locator('.ex-solar-map').screenshot({path:join(h.output,'heliosphere-'+name+'.png')});
+const reviewImages=[
+  ['overview','Overview'],['alternate','Rotated view'],['region','Heliosheath'],
+  ['both-trajectories','Voyager 1 and 2'],['crossing','Voyager 2 shock crossing'],
+  ['390','390 CSS px'],['320','320 CSS px'],['events','Published events'],
+  ['controls-390','390 px controls'],['controls-320','320 px controls'],
+];
+async function contactSheet(page){
+  const sources=await Promise.all(reviewImages.map(async ([name,label])=>({
+    label,source:'data:image/png;base64,'+
+      (await readFile(join(h.output,'heliosphere-'+name+'.png'))).toString('base64'),
+  })));
+  const encoded=await page.evaluate(async sources=>{
+    const cols=2, tileWidth=330, tileHeight=200;
+    const canvas=document.createElement('canvas');
+    canvas.width=tileWidth*cols;
+    canvas.height=tileHeight*Math.ceil(sources.length/cols);
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#0a101b';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.font='13px sans-serif';
+    for(const [i,{label,source}] of sources.entries()){
+      const img=new Image();
+      img.src=source;await img.decode();
+      const scale=Math.min((tileWidth-14)/img.width,(tileHeight-28)/img.height);
+      const x=i%cols*tileWidth+7, y=Math.floor(i/cols)*tileHeight;
+      ctx.fillStyle='#e2eaf6';ctx.fillText(label,x,y+17);
+      ctx.drawImage(img,x,y+22,img.width*scale,img.height*scale);
+    }
+    return canvas.toDataURL('image/jpeg',.78).split(',')[1];
+  },sources);
+  await writeFile(join(h.output,'heliosphere-contact-sheet.jpg'),Buffer.from(encoded,'base64'));
+  // Keep the visual check accessible when an Actions ZIP cannot be mounted.
+  if(process.env.GITHUB_ACTIONS==='true'){
+    for(let i=0;i<encoded.length;i+=1700)console.log('HELIOSPHERE_REVIEW_JPEG '+encoded.slice(i,i+1700));
+  }
+}
 const restoredKeys=['view','day','space','camera','system','selected','reference','trails','galactic'];
 async function enter(p){
   await click(p,'[data-tab=explorer]');
@@ -101,6 +137,7 @@ test('native Chromium renders a schematic heliosphere and real crossings at 1440
       }
       await click(p,'#solHeliosphere');
       assertRestored(await solar(p),baseline);
+      if(width===320)await contactSheet(p);
     }finally{await context.close();}
   }
   assert.deepEqual(h.errors,[]);

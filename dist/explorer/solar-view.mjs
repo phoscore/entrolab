@@ -295,6 +295,7 @@ export function mountSolar(root) {
   const globalBodies = [...bodies, pluto];
   const contextPlanets=bodies.filter(({id})=>id!=='sun'&&id!=='earth');
   const contextPlanet=id=>heliosphere&&contextPlanets.some(body=>body.id===id);
+  const usePlanetPanel=()=>Boolean(heliosphere&&selected!=='v1'&&selected!=='v2');
   const listedBodies = () => heliosphere ? [...landmarks,...contextPlanets] : voyager ? landmarks : system ? systemBodies(system) : galactic ? bodies : globalBodies;
   const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
   const distance = () => voyager ? voyager.distance : system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : galactic?.distance ?? 85;
@@ -557,8 +558,8 @@ export function mountSolar(root) {
     $('solTarget').value=id;
     if(voyager)updateVoyagerTimeline(root,selected,lang());
     if (recenter || follow) center();
-    $('voyPanel').hidden=!voyager||Boolean(contextPlanet(selected));
-    $('solPlanetInspector').hidden=Boolean(voyager&&!contextPlanet(selected));
+    $('voyPanel').hidden=!voyager||usePlanetPanel();
+    $('solPlanetInspector').hidden=Boolean(voyager&&!usePlanetPanel());
     updateInspector();
     invalidate();
   }
@@ -576,7 +577,7 @@ export function mountSolar(root) {
       $('voyStatus').hidden=!key;
       $('voyMessage').textContent=key?t(key):'';
       $('voyRetry').hidden=!voyError;
-      if(!contextPlanet(selected))return;
+      if(!usePlanetPanel())return;
     }
     const body = listedBodies().find(item=>item.id===selected);
     const orbit = entry?.orbit;
@@ -585,7 +586,8 @@ export function mountSolar(root) {
     const pair = comparison();
     const formatValue = pair?.source ? rough : n;
     const solar = system ? worldComparison(ephemerides.get(system),system,day,selected,'sun') : null;
-    const distanceAU = system ? solar?.distanceAU : entry?.distanceAU;
+    const distanceAU = system ? solar?.distanceAU :
+      heliosphere&&entry ? Math.hypot(...entry.vector) : entry?.distanceAU;
     const fmtDistance = id ? rough : n;
     $('solName').textContent = name(body);
     $('solKind').textContent = t(body.id === 'sun' ? (galactic?'galacticStar':'star') : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
@@ -595,7 +597,7 @@ export function mountSolar(root) {
     $('solRadius').textContent = n(body.radiusKm)+' km';
     $('solAxis').hidden = $('solAxisLabel').hidden = !orbit;
     $('solAxis').textContent = orbit ? n(orbit.a)+' AU' : '';
-    $('solEarth').hidden = body.id !== 'earth' || Boolean(system);
+    $('solEarth').hidden = body.id !== 'earth' || Boolean(system||heliosphere);
     $('solWorldNote').hidden = $('solWorldSource').hidden = !notes;
     if (notes) {
       $('solWorldNote').textContent = notes[0][lang()];
@@ -678,8 +680,8 @@ export function mountSolar(root) {
     $('helioPhase').hidden=!heliosphere;
     if(heliosphere)localizeHeliosphere(root,lang());
     $('solVoyager').setAttribute('aria-pressed',String(Boolean(voyager)));
-    $('voyPanel').hidden=!voyager||Boolean(contextPlanet(selected));
-    $('solPlanetInspector').hidden=Boolean(voyager&&!contextPlanet(selected));
+    $('voyPanel').hidden=!voyager||usePlanetPanel();
+    $('solPlanetInspector').hidden=Boolean(voyager&&!usePlanetPanel());
     if(voyager)updateVoyagerTimeline(root,selected,lang());
     else $('voyStatus').hidden=true;
     $('solEpoch').textContent=voyager?t(latestEpoch()===VOY_END?'voyagerLast':'voyagerCurrent'):system?t('localEpoch'):'J2000.0';
@@ -792,7 +794,7 @@ export function mountSolar(root) {
       const radius = enlarged ? body.size : radiusAU(body)*scale;
       const chosen = selected === body.id;
       const isReference=reference===body.id&&reference!==selected;
-      return {body,x,y,radius,selected:chosen,reference:isReference,priority:chosen?20:isReference?15:body.id==='sun'?10:1,label:planet&&!chosen?'':name(body)};
+      return {body,x,y,radius,selected:chosen,reference:isReference,priority:chosen?20:isReference?15:body.id==='sun'?10:1,label:name(body)};
     }).filter(m=>m.x+m.radius>=0&&m.x-m.radius<=width&&m.y+m.radius>=0&&m.y-m.radius<=height);
     if(selected!==reference) {
       const a=markers.find(m=>m.body.id===selected),b=markers.find(m=>m.body.id===reference);
@@ -915,7 +917,7 @@ export function mountSolar(root) {
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
         reference:reference===body.id&&reference!==selected,
-        priority:chosen?20:body.id===reference?15:body.id==='sun'?10:1,label:name(body)};
+        priority:chosen?20:body.id===reference?15:body.id==='sun'?10:1,label:planet&&!chosen?'':name(body)};
     }).filter(m=>m&&m.x+m.radius>=0&&m.x-m.radius<=width&&m.y+m.radius>=0&&m.y-m.radius<=height);
     if(!voyager&&selected!==reference){
       const a=markers.find(m=>m.body.id===selected),b=markers.find(m=>m.body.id===reference);
