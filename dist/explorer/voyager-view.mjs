@@ -76,14 +76,14 @@ export function paintVoyager(ctx,screen,tracks){
   }
 }
 
-export function updateVoyagerPanel(root,{id,day,data,lang,n}){
+export function updateVoyagerPanel(root,{id,day,data,lang,n,formatDistance}){
   const $=key=>root.querySelector('#'+key);
   const probe=probes.find(probe=>probe.id===id);
   const values=probe?voyagerMetrics(data,id,day):null;
   $('voyName').textContent=probe?.names[lang]??(id==='earth'?['Erdmittelpunkt','Earth centre'][lang]:['Sonne','Sun'][lang]);
   $('voyEpoch').textContent=formatModelDay(day).replace('T',' ')+' TDB';
   for(const [field,key,unit] of [['voySunAU','sunAU','AU'],['voyEarthAU','earthAU','AU'],['voySpeedKmS','speedKmS','km/s'],['voyLightHours','lightHours','h']])
-    $(field).textContent=values?'≈ '+n(values[key])+' '+unit:'—';
+    $(field).textContent=values?'≈ '+(unit==='AU'?formatDistance:n)(values[key])+' '+unit:'—';
 }
 export function updateVoyagerTimeline(root,id,lang){
   const links=root.querySelector('#voyEvents');

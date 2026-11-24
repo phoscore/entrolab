@@ -49,6 +49,14 @@ test('Voyager renders at 1440, 390 and 320 px with bounded model trails and came
       await canvas(p).press('+');
       assert.notEqual((await solar(p)).space.yaw,starting.space.yaw);
       assert.deepEqual(await quant(p),readings);
+      if(width===1440){
+        const manual=(await solar(p)).space;
+        const beforeWidth=await canvas(p).evaluate(el=>el.width);
+        await p.setViewportSize({width:1280,height:1000});
+        await p.waitForFunction(width=>document.getElementById('solCanvas').width!==width,beforeWidth);
+        assert.deepEqual((await solar(p)).space,manual);
+        await p.setViewportSize({width,height:1000});
+      }
       if(mobile){
         const session=await context.newCDPSession(p),rect=await canvas(p).boundingBox();
         const point={x:rect.x+rect.width/2,y:rect.y+rect.height/2};
@@ -115,4 +123,35 @@ test('Voyager refuses altered vectors, shows Retry, and never extrapolates',asyn
     assert((await solar(p)).draws<=draws+2);
   }finally{await context.close();}
   assert.deepEqual(h.errors,[]);
+});
+
+test('Voyager hides lunar status and legacy comparison values, then restores them',async()=>{
+  const {p,context}=await h.lab({viewport:{width:1440,height:1000}});
+  try{
+    await enter(p);
+    await press(p,'#solSystems [data-system=earth]');
+    assert.equal(await p.locator('#solWorldState').isVisible(),true);
+    await press(p,'#solVoyager');
+    await ready(p);
+    assert.equal(await p.locator('#solWorldState').isHidden(),true);
+    assert.equal(await p.locator('#solPairSummary').isHidden(),true);
+    await press(p,'#solVoyager');
+    assert.equal((await solar(p)).system,'earth');
+    assert.equal(await p.locator('#solWorldState').isVisible(),true);
+    await press(p,'#solGlobal');
+    await p.locator('#solTarget').selectOption('mars');
+    assert.equal(await p.locator('#solPairSummary').isVisible(),true);
+    await press(p,'#solVoyager');
+    assert.equal(await p.locator('#solPairSummary').isHidden(),true);
+    await press(p,'#solVoyager');
+    assert.equal(await p.locator('#solPairSummary').isVisible(),true);
+    await press(p,'#sol3d');
+    await press(p,'#solGalactic');
+    const prior=await solar(p);
+    await press(p,'#solVoyager');
+    assert.equal((await solar(p)).galactic,null);
+    await press(p,'#solVoyager');
+    const restored=await solar(p);
+    for(const key of ['day','space','pose','galactic','selected','reference'])assert.deepEqual(restored[key],prior[key],key);
+  }finally{await context.close();}
 });

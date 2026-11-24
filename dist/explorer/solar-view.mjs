@@ -461,7 +461,8 @@ export function mountSolar(root) {
   function updateInspector() {
     const entry = selectedBody();
     if(voyager){
-      updateVoyagerPanel(root,{id:selected,day,data:voyData,lang:lang(),n:rough});
+      $('solWorldState').hidden=$('solPairSummary').hidden=true;
+      updateVoyagerPanel(root,{id:selected,day,data:voyData,lang:lang(),n:rough,formatDistance:n});
       $('solCenter').disabled=!entry;
       for(const {body,button} of buttons)button.setAttribute('aria-pressed',String(body.id===selected));
       const key=voyError?'loadError':!voyData?'loading':!entry?'geometryUnavailable':null;
@@ -887,7 +888,11 @@ export function mountSolar(root) {
       $(id).setAttribute('aria-pressed',String(pose===kind));
     }
   };
-  const zoomBy=delta=>{if(view==='3d'){space=zoomSpace(space,delta);invalidate();}
+  function setSpace(next) {
+    if(voyager) voyager.fitted=false;
+    space=next;
+  }
+  const zoomBy=delta=>{if(view==='3d'){setSpace(zoomSpace(space,delta));invalidate();}
     else gestures.zoomBy(delta);};
   function setSunFollow(value) {
     galactic.followSun = value;
@@ -963,7 +968,7 @@ export function mountSolar(root) {
   listen($('solOut'),'click',()=>zoomBy(-.25));
   listen($('solZoom'),'input',()=>{
     const value=Number($('solZoom').value);
-    if(view==='3d'){space=zoomSpace(space,value-space.zoom);invalidate();}
+    if(view==='3d'){setSpace(zoomSpace(space,value-space.zoom));invalidate();}
     else gestures.zoomTo(value);
   });
   listen($('solFit'),'click',fitView);
@@ -1005,8 +1010,8 @@ export function mountSolar(root) {
     const dx=mid[0]-spaceGesture.point[0],dy=mid[1]-spaceGesture.point[1];
     if(Math.hypot(dx,dy)>4)spaceMoved=true;
     if(points.length===1&&Math.hypot(dx,dy)>4)markPose(null);
-    space=points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
-      rotateSpace(spaceGesture.camera,dx,-dy);
+    setSpace(points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
+      rotateSpace(spaceGesture.camera,dx,-dy));
     invalidate();
   });
   for(const eventName of ['pointerup','pointercancel','lostpointercapture'])listen(canvas,eventName,event=>{
@@ -1022,13 +1027,13 @@ export function mountSolar(root) {
   listen(canvas,'wheel',event=>{
     if(view!=='3d'||document.activeElement!==canvas)return;
     event.preventDefault();
-    space=zoomSpace(space,-Math.max(-.4,Math.min(.4,event.deltaY*.001)));
+    setSpace(zoomSpace(space,-Math.max(-.4,Math.min(.4,event.deltaY*.001))));
     invalidate();
   },{passive:false});
   listen(canvas,'keydown',event=>{
     if(view!=='3d')return;
     const arrows={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,25],ArrowDown:[0,-25]};
-    if(Object.hasOwn(arrows,event.key)){event.preventDefault();space=rotateSpace(space,...arrows[event.key]);markPose(null);invalidate();}
+    if(Object.hasOwn(arrows,event.key)){event.preventDefault();setSpace(rotateSpace(space,...arrows[event.key]));markPose(null);invalidate();}
     else if(['+','=','-','Home','Escape'].includes(event.key)){
       event.preventDefault();
       if(event.key==='Home')fitView();
@@ -1080,7 +1085,7 @@ export function mountSolar(root) {
   listen($('solFirstWorldDay'),'click',()=>{changeDay(START);$('solDate').focus({preventScroll:true});});
   listen($('solWorldRetry'),'click',()=>{const id=relevantSystem();if(id)loadSystem(id,true);updateInspector();});
   for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
-    listen($(id),'click',()=>{space={...space,...ORBIT_POSES[pose]};markPose(pose);invalidate();});
+    listen($(id),'click',()=>{setSpace({...space,...ORBIT_POSES[pose]});markPose(pose);invalidate();});
   listen($('solTrails'),'click',()=>{
     trails=!trails;$('solTrails').setAttribute('aria-pressed',String(trails));
     $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');invalidate();
