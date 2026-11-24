@@ -287,3 +287,8 @@
   #explorer .ex-flight-controls select{min-height:42px}
   #explorer .ex-flight-controls label{grid-column:1/-1}
 }
+
+.ex-voyager-events {padding-inline-start:1.2rem}
+.ex-voyager-events li {margin-block:.4rem}
+.ex-voyager-events button {text-align:start;max-width:100%;white-space:normal}
+#voyStatus span {font-size:.9rem}

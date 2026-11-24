@@ -43,8 +43,9 @@ export function decodeVoyager(id,buffer){
     while(hi-lo>1){const mid=(lo+hi)>>>1;if(day<field(mid,0))hi=mid;else lo=mid;}
     return lo;
   }
+  const inGap=day=>id==='v2'&&day>V2_GAP[0]&&day<V2_GAP[1];
   function sample(day){
-    if(!Number.isFinite(day)||day<start||day>end||id==='v2'&&day>V2_GAP[0]&&day<V2_GAP[1])return null;
+    if(!Number.isFinite(day)||day<start||day>end||inGap(day))return null;
     const i=index(day),left=field(i,0),right=field(i+1,0);
     const t=(day-left)/(right-left),dt=(right-left)*DAY_SECONDS;
     const t2=t*t,t3=t*t2,position=[],velocity=[];
@@ -56,26 +57,36 @@ export function decodeVoyager(id,buffer){
     return {position,velocity};
   }
   const encounters=(FLYBYS[id]??[]).map(parseModelDate);
-  function trail(day){
-    if(!Number.isFinite(day)||day<start||day>end)return [];
-    const stride=Math.max(1,Math.ceil((day-start)/570));
-    const epochs=new Set([start,day]);
-    // Model-time sampling with an exact endpoint. This remains bounded as the
-    // mission timeline grows and does not depend on animation/render frames.
-    for(let epoch=start+stride;epoch<day;epoch+=stride)epochs.add(epoch);
-    for(const encounter of encounters){
-      for(let step=-64;step<=64;step++){
-        const epoch=encounter+step/8;
-        if(epoch>start&&epoch<day)epochs.add(epoch);
+  let savedTrail;
+  const au=state=>state.position.map(value=>value/AU_KM);
+  function trail(epoch){
+    const day=inGap(epoch)?V2_GAP[0]:epoch;
+    const head=sample(day);
+    if(!head)return [];
+    if(!savedTrail){
+      const stride=Math.max(1,Math.ceil((end-start)/570));
+      const epochs=new Set([start]);
+      // Cache fixed model-time samples. The newest point is evaluated at the
+      // requested epoch, so the trail ends exactly at its marker.
+      for(let epoch=start+stride;epoch<end;epoch+=stride)epochs.add(epoch);
+      for(const encounter of encounters){
+        for(let step=-64;step<=64;step++){
+          const epoch=encounter+step/8;
+          if(epoch>start&&epoch<end)epochs.add(epoch);
+        }
       }
+      if(id==='v2')for(const edge of V2_GAP)epochs.add(edge);
+      savedTrail=[...epochs].sort((a,b)=>a-b).map(epoch=>({epoch,point:au(sample(epoch))}));
     }
-    if(id==='v2'&&day>=V2_GAP[1])for(const edge of V2_GAP)epochs.add(edge);
-    return [...epochs].sort((a,b)=>a-b).flatMap(epoch=>{
-      const state=sample(epoch);
-      const point=state?.position.map(value=>value/AU_KM);
-      if(!point)return [];
-      return id==='v2'&&epoch===V2_GAP[1]?[null,point]:[point];
-    });
+    const points=[];
+    for(const {epoch,point} of savedTrail){
+      if(epoch>=day)break;
+      if(id==='v2'&&epoch===V2_GAP[1])points.push(null);
+      points.push(point);
+    }
+    if(id==='v2'&&day===V2_GAP[1])points.push(null);
+    points.push(au(head));
+    return points;
   }
   return {start,end,count,sample,trail};
 }
