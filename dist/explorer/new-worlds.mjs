@@ -1,7 +1,8 @@
 import {AU_KM, bodies} from './solar-model.mjs';
 import {LIGHT_KM_S, solarVelocities} from './solar-motion.mjs';
 import {supportsEpoch} from './new-worlds-ephemeris.mjs';
-import {END, START, SYSTEMS, SECONDS_PER_DAY} from './new-worlds-spec.mjs';
+import {ephemerisSpec, SYSTEMS, SECONDS_PER_DAY} from './new-worlds-spec.mjs';
+import {outerMoonNotes} from './outer-moons-notes.mjs';
 
 const kmToAU = value => value / AU_KM;
 const zero = [0, 0, 0];
@@ -15,6 +16,7 @@ export function worldVector(ephemeris, system, id, day, local = false) {
   const state = ephemeris?.sample(id, day);
   if (!state) return null;
   if (local) return state.position.map(kmToAU);
+  if (ephemerisSpec(system).planetCentred) return null;
   return worldHeliocentric(ephemeris, system, state, day).position.map(kmToAU);
 }
 
@@ -33,6 +35,7 @@ export function worldComparison(ephemeris, system, day, target, reference) {
   let a = ephemeris?.sample(target, day), b = ephemeris?.sample(reference, day);
   if (!a && !b) return null;
   const isSolar = target === 'sun' || reference === 'sun';
+  if (isSolar && ephemerisSpec(system).planetCentred) return null;
   if (isSolar) {
     a = a ? worldHeliocentric(ephemeris, system, a, day) : {position: zero, velocity: zero};
     b = b ? worldHeliocentric(ephemeris, system, b, day) : {position: zero, velocity: zero};
@@ -48,20 +51,23 @@ export function worldComparison(ephemeris, system, day, target, reference) {
 }
 
 export function worldTrail(ephemeris, system, body, day, local) {
-  if (!body.period || !ephemeris || !supportsEpoch(day)) return [];
-  const first = Math.max(START, day - (local ? body.period * .65 : 365));
+  if (!body.period || !ephemeris || !supportsEpoch(day,system)) return [];
+  const first = Math.max(ephemerisSpec(system).start, day - (local ? body.period * .65 : 365));
   return Array.from({length: first === day ? 1 : 49}, (_, i) =>
     worldVector(ephemeris, system, body.id, first + (day - first) * i / 48, local));
 }
 
 export function localOrbitPath(ephemeris, system, body, day) {
-  if (!body.period || !ephemeris || !supportsEpoch(day)) return [];
-  const first = Math.max(START, Math.min(END-body.period, day-body.period/2));
-  const span = Math.min(body.period, END-first);
-  return Array.from({length: 65}, (_, i) => worldVector(ephemeris, system, body.id, first + span*i/64, true));
+  if (!body.period || !ephemeris || !supportsEpoch(day,system)) return [];
+  const {start,end}=ephemerisSpec(system);
+  const first = Math.max(start, Math.min(end-body.period, day-body.period/2));
+  const span = Math.min(body.period, end-first);
+  const segments=body.id==='nereid'?256:64;
+  return Array.from({length:segments+1},(_,i)=>worldVector(ephemeris,system,body.id,Math.min(end,first+span*i/segments),true));
 }
 
 export const worldNotes = {
+  ...outerMoonNotes,
   moon: [['Die Gezeitenwirkung der Erde hat die Rotation des Mondes gebunden. Deshalb sehen wir von der Erde im Mittel dieselbe Seite.', 'Earth’s tides locked the Moon’s rotation. On average, we see the same side from Earth.'], 'https://science.nasa.gov/moon/facts/'],
   io: [['Wechselnde Gezeitenkräfte verformen Io und heizen sein Inneres. Das treibt seinen starken Vulkanismus an.', 'Changing tidal forces flex Io and heat its interior, driving intense volcanism.'], 'https://science.nasa.gov/jupiter/moons/io/'],
   europa: [['Unter Europas Eiskruste gibt es starke Hinweise auf einen salzigen Ozean. Er ist ein Ziel der Suche nach lebensfreundlichen Umgebungen.', 'Strong evidence points to a salty ocean below Europa’s ice. It is a target in the search for habitable environments.'], 'https://science.nasa.gov/jupiter/moons/europa/'],

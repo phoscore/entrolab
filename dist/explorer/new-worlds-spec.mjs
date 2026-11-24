@@ -13,8 +13,7 @@ export const START = parseModelDate('2025-01-01');
 export const END = parseModelDate('2030-01-01');
 export const SECONDS_PER_DAY = 86400;
 export const FRAME = 'ICRF / Ecliptic of J2000.0 / TDB / KM-S / geometric';
-export const SYSTEMS = {
-  ...OUTER_SYSTEMS,
+export const LEGACY_SYSTEMS = {
   earth: {anchor: 'earth', centre: 3, scaleKm: 480000, names: ['Erde–Mond', 'Earth–Moon'], bodies: [
     {id: 'earth', target: 399, hours: 6},
     {id: 'moon', target: 301, hours: 6, period: 27.32, names: ['Mond', 'Moon'], radiusKm: 1737.4, color: '#c3cad8', size: 6},
@@ -31,6 +30,7 @@ export const SYSTEMS = {
     {id: 'charon', target: 901, hours: 12, period: 6.39, names: ['Charon', 'Charon'], radiusKm: 606, color: '#b0b8c5', size: 5},
   ]},
 };
+export const SYSTEMS = {...LEGACY_SYSTEMS,...OUTER_SYSTEMS};
 export const PLUTO_ANCHOR = {id: 'pluto-anchor', target: 9, centre: 10, hours: 24};
 
 export function seriesFor(system) {

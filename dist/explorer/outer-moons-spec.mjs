@@ -10,7 +10,7 @@ const moon = (id,target,hours,period,radiusKm,meanOrbitKm,name,color) =>
   ({id,target,hours,period,radiusKm,meanOrbitKm,names:[name,name],color,size:5});
 
 export const OUTER_SYSTEMS = {
-  saturn: {anchor:'saturn',centre:699,scaleKm:3800000,names:['Saturnsystem','Saturn system'],bodies:[
+  saturn: {anchor:'saturn',centre:699,scaleKm:3800000,innerKm:1480000,names:['Saturnsystem','Saturn system'],bodies:[
     {id:'saturn',target:699},
     moon('titan',606,8,15.945,2574.76,1221900,'Titan','#e9b575'),
     moon('enceladus',602,1,1.370,252.10,238000,'Enceladus','#c4e3ea'),

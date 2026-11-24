@@ -6,7 +6,7 @@ import {gzipSync, gunzipSync} from 'node:zlib';
 import {AU_KM} from '../dist/explorer/solar-model.mjs';
 import {solarVelocities} from '../dist/explorer/solar-motion.mjs';
 import {decodeSystem, encodeSystem, sampleCount} from '../dist/explorer/new-worlds-ephemeris.mjs';
-import {END, FRAME, RELEASE, SECONDS_PER_DAY, START, SYSTEMS, seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
+import {END, FRAME, RELEASE, SECONDS_PER_DAY, START, LEGACY_SYSTEMS, seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const raw = join(root, 'cosmic-explorer/data/raw', RELEASE);
@@ -14,7 +14,7 @@ const output = join(root, 'dist/explorer/data', RELEASE);
 const endpoint = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const chunk = 10000;
 const samplesPerCheck = 32;
-const systems = ['earth','jupiter','pluto'];
+const systems = Object.keys(LEGACY_SYSTEMS);
 const series = systems.flatMap(system => seriesFor(system).map(s => ({...s, system})));
 const anchors = [{id: 'earth', target: 3, centre: 10, hours: 6}, {id: 'jupiter', target: 5, centre: 10, hours: 12}];
 const pairs = [

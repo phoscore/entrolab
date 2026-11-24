@@ -8,7 +8,7 @@ import {ORBIT_POSES,spaceBasis,spaceCamera,rotateSpace,zoomSpace,spaceProjector,
 import {GALACTIC_FRAME_SOURCE,GALACTIC_MIN_DATE,GALACTIC_MAX_DATE,GALACTIC_MIN_DAY,GALACTIC_MAX_DAY,
   TRAIL_DAYS,flightTrails,galacticPosition,sunDisplacement,supportsGalacticDay} from './solar-galactic.mjs';
 import {FLIGHT_POSES,fitFlight,flightDisplayPoint,paintFlights} from './solar-flight-view.mjs';
-import {START,SYSTEMS} from './new-worlds-spec.mjs';
+import {SYSTEMS,ephemerisSpec} from './new-worlds-spec.mjs';
 import {loadEphemeris,supportsEpoch} from './new-worlds-ephemeris.mjs';
 import {localOrbitPath,pluto,systemBodies,worldComparison,worldNotes,worldTrail,worldVector} from './new-worlds.mjs';
 
@@ -123,6 +123,16 @@ const copy = {
   systems:['Mondsysteme','Moon systems'],
   overview:['Zur Sonnensystemübersicht','Back to Solar System overview'],
   localFit:['System einpassen','Fit system'],
+  planetFrame:['Ursprung: Planetenzentrum · J2000-Ekliptik','Origin: planet centre · J2000 ecliptic'],
+  outerScene:['JPL Horizons · 01.07.2026–01.07.2027 TDB · Feine Linien zeigen ein Bahnfenster.','JPL Horizons · 1 Jul 2026–1 Jul 2027 TDB · Thin curves show an orbital window.'],
+  outerLimit:['Die Achsen markieren die J2000-Ekliptik. Die Bahnkurven zeigen räumliche Positionen aus den Ephemeriden. Körpersymbole können vergrößert sein.','The axes mark the J2000 ecliptic. Orbital curves show 3D ephemeris positions. Body symbols can be enlarged.'],
+  outerFallback:['Das vorherige Datum liegt außerhalb des Ephemeridenfensters. Die Ansicht startet an einem verfügbaren Datum.','The previous date falls outside ephemeris coverage. The view opens on an available date.'],
+  outerUnavailable:['Ephemeriden verfügbar vom 01.07.2026 bis 01.07.2027 (00:00 TDB).','Ephemeris available from 1 Jul 2026 through 1 Jul 2027 (00:00 TDB).'],
+  outerPair:['Lokale Zustandsvektoren in km und km/s relativ zum Planetenzentrum.','Local state vectors in km and km/s relative to the planet centre.'],
+  planetDistance:['Abstand zum Planetenzentrum','Distance to planet centre'],
+  meanAxis:['Mittlere große Halbachse','Mean semimajor axis'],
+  moonInner:['Innere Monde','Inner moons'],
+  openSelectedSystem:['Mondsystem öffnen','Open moon system'],
   localEpoch:['Ephemeridenbeginn','Ephemeris start'],
   baryFrame:['Koordinatenursprung: gemeinsamer Schwerpunkt · J2000-Ekliptik','Origin: system barycentre · J2000 ecliptic'],
   localScene:['JPL Horizons · feine Linien zeigen ein Bahnfenster, leuchtende Spuren den zurückgelegten Abschnitt.','JPL Horizons · faint lines show an orbital window and bright trails show past motion.'],
@@ -257,11 +267,12 @@ export function mountSolar(root) {
           </details>
         </div>
         <div class="ex-inspector" id="solPlanetInspector"><h2 data-solar="selected"></h2><p id="solName" class="ex-selected" aria-live="polite"></p><p id="solKind" class="ex-small"></p>
-          <dl><dt data-solar="distance"></dt><dd id="solDistance"></dd>
+          <dl><dt id="solDistanceLabel" data-solar="distance"></dt><dd id="solDistance"></dd>
             <dt id="solRadiusLabel"></dt><dd id="solRadius"></dd>
             <dt id="solAxisLabel" data-solar="axis" hidden></dt><dd id="solAxis" hidden></dd></dl>
           <p id="solEarth" class="ex-small" data-solar="earth" hidden></p>
           <p id="solWorldNote" class="ex-small" hidden></p><a id="solWorldSource" data-solar="bodySource" hidden></a>
+          <button type="button" id="solOpenSelectedSystem" data-solar="openSelectedSystem" hidden></button>
         </div>
         <section class="ex-compare" id="solCompare" aria-labelledby="solCompareTitle">
           <h2 id="solCompareTitle" data-solar="comparison"></h2>
@@ -298,9 +309,11 @@ export function mountSolar(root) {
   const usePlanetPanel=()=>Boolean(heliosphere&&selected!=='v1'&&selected!=='v2');
   const listedBodies = () => heliosphere ? [...landmarks,...contextPlanets] : voyager ? landmarks : system ? systemBodies(system) : galactic ? bodies : globalBodies;
   const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
+  const localSpec = () => ephemerisSpec(system);
+  const outerLocal = () => system && localSpec().planetCentred;
   const distance = () => voyager ? voyager.distance : system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : galactic?.distance ?? 85;
-  const minDay = () => voyager ? VOY_START : galactic ? GALACTIC_MIN_DAY : MIN_DAY;
-  const maxDay = () => voyager ? VOY_END : galactic ? GALACTIC_MAX_DAY : MAX_DAY;
+  const minDay = () => voyager ? VOY_START : galactic ? GALACTIC_MIN_DAY : outerLocal() ? localSpec().start : MIN_DAY;
+  const maxDay = () => voyager ? VOY_END : galactic ? GALACTIC_MAX_DAY : outerLocal() ? localSpec().end : MAX_DAY;
   const clampDay = value => Math.max(minDay(),Math.min(maxDay(),value));
   const trailCache=new Map(),pathCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
@@ -327,13 +340,13 @@ export function mountSolar(root) {
     });
     $('solList').replaceChildren(...buttons.map(({button})=>button));
     for(const id of ['solTarget','solReference']) {
-      const allowed = system && id === 'solReference' ? [bodies[0], ...list] : list;
+      const allowed = system && !outerLocal() && id === 'solReference' ? [bodies[0], ...list] : list;
       $(id).replaceChildren(...allowed.map(body=>new Option(name(body), body.id)));
     }
   }
 
   function loadSystem(id, retry = false) {
-    if (!supportsEpoch(day) || ephemerides.has(id) || pending.has(id) || (!retry && failures.has(id))) return;
+    if (!supportsEpoch(day,id) || ephemerides.has(id) || pending.has(id) || (!retry && failures.has(id))) return;
     failures.delete(id); pending.add(id);
     loadEphemeris(id, abort.signal).then(data => {
       ephemerides.set(id, data);
@@ -432,10 +445,10 @@ export function mountSolar(root) {
     suspend();
     if (!system) overview = {selected,reference,follow,camera,space,pose,view,galactic,epoch:day,returnDay:null};
     galactic = null;
-    if (!supportsEpoch(day)) {
+    if (!supportsEpoch(day,id)) {
       overview.returnDay ??= day;
       const today = parseModelDate(new Date().toISOString().slice(0,10));
-      day = supportsEpoch(today) ? today : START;
+      day = supportsEpoch(today,id) ? today : ephemerisSpec(id).start;
     }
     system = id;
     follow = false;
@@ -443,7 +456,7 @@ export function mountSolar(root) {
     selected = moon.id; reference = parent.id;
     markers = [];
     stateDay = null;
-    trailCache.clear();
+    trailCache.clear();pathCache.clear();
     rebuildBodies();
     switchView('3d');
     fitView();
@@ -475,7 +488,7 @@ export function mountSolar(root) {
     overview = null;
     markers = [];
     stateDay = null;
-    trailCache.clear();
+    trailCache.clear();pathCache.clear();
     rebuildBodies();
     markPose(pose);
     $('solFollow').setAttribute('aria-pressed',String(follow));
@@ -565,6 +578,7 @@ export function mountSolar(root) {
   }
   function updateInspector() {
     const entry = selectedBody();
+    $('solOpenSelectedSystem').hidden=Boolean(system||voyager||!Object.hasOwn(SYSTEMS,selected));
     if(heliosphere)updateHeliospherePanel(root,{
       region:heliosphere.region,event:heliosphere.event,probe:selected,day,data:voyData,lang:lang(),
     });
@@ -586,29 +600,33 @@ export function mountSolar(root) {
     const pair = comparison();
     const formatValue = pair?.source ? rough : n;
     const solar = system ? worldComparison(ephemerides.get(system),system,day,selected,'sun') : null;
-    const distanceAU = system ? solar?.distanceAU :
-      heliosphere&&entry ? Math.hypot(...entry.vector) : entry?.distanceAU;
+    const local = outerLocal();
+    const distanceAU = system && !local ? solar?.distanceAU :
+      entry&&(local||heliosphere) ? Math.hypot(...entry.vector) : entry?.distanceAU;
+    $('solDistanceLabel').textContent = t(local?'planetDistance':'distance');
     const fmtDistance = id ? rough : n;
     $('solName').textContent = name(body);
     $('solKind').textContent = t(body.id === 'sun' ? (galactic?'galacticStar':'star') : body.id === 'pluto' ? 'dwarf' : notes ? 'moon' : 'planet');
     $('solDistance').textContent = distanceAU === undefined ? t('unavailableValue') :
+      local ? `${n(distanceAU*AU_KM)} km` :
       `${body.id === 'sun' ? '' : '~ '}${fmtDistance(distanceAU)} AU · ${fmtDistance(distanceAU*AU_KM)} km${solar?.source === 'hybrid' ? ' · '+t('hybrid') : ''}`;
     $('solRadiusLabel').textContent = t(body.id === 'sun' ? 'sunRadius' : 'radius');
     $('solRadius').textContent = n(body.radiusKm)+' km';
-    $('solAxis').hidden = $('solAxisLabel').hidden = !orbit;
-    $('solAxis').textContent = orbit ? n(orbit.a)+' AU' : '';
+    $('solAxis').hidden = $('solAxisLabel').hidden = !orbit&&!body.meanOrbitKm;
+    $('solAxisLabel').textContent = t(body.meanOrbitKm?'meanAxis':'axis');
+    $('solAxis').textContent = body.meanOrbitKm ? n(body.meanOrbitKm)+' km' : orbit ? n(orbit.a)+' AU' : '';
     $('solEarth').hidden = body.id !== 'earth' || Boolean(system||heliosphere);
     $('solWorldNote').hidden = $('solWorldSource').hidden = !notes;
     if (notes) {
       $('solWorldNote').textContent = notes[0][lang()];
       $('solWorldSource').href = notes[1];
     }
-    const status = !id ? null : !supportsEpoch(day) ? 'unavailable' : failures.has(id) ? 'loadError' :
+    const status = !id ? null : !supportsEpoch(day,id) ? (local?'outerUnavailable':'unavailable') : failures.has(id) ? 'loadError' :
       !ephemerides.has(id) ? 'loading' : null;
     $('solWorldState').hidden = !status;
     $('solWorldMessage').textContent = status ? t(status) : '';
     $('solWorldRetry').hidden = status !== 'loadError';
-    $('solFirstWorldDay').hidden = status !== 'unavailable';
+    $('solFirstWorldDay').hidden = status !== 'unavailable' && status !== 'outerUnavailable';
     $('solCenter').disabled = $('solJump').disabled = $('solFollow').disabled = !entry;
     for (const {body,button} of buttons) {
       button.setAttribute('aria-pressed',String(body.id===selected));
@@ -623,7 +641,7 @@ export function mountSolar(root) {
     $('solPairProjectionLabel').textContent=t(view==='3d'?'pairProjection3d':'pairProjection');
     const source = pair?.source ?? (id ? 'horizons' : 'model');
     $('solPairEpoch').textContent=`${t('comparisonEpoch')}: ${formatModelDay(day).replace('T',' ')} TDB · ${t(source)}`;
-    $('solPairMethod').textContent = t(id ? 'ephemHelp' : 'method') + (system && system !== 'pluto' ? ' '+t('hybridNote') : '');
+    $('solPairMethod').textContent = t(local?'outerPair':id?'ephemHelp':'method') + (system && !local && system !== 'pluto' ? ' '+t('hybridNote') : '');
     if(pair) {
       const localPair = system && reference !== 'sun';
       const sep = localPair ? formatValue(pair.distanceKm)+' km' : formatValue(pair.distanceAU)+' AU';
@@ -686,7 +704,8 @@ export function mountSolar(root) {
     else $('voyStatus').hidden=true;
     $('solEpoch').textContent=voyager?t(latestEpoch()===VOY_END?'voyagerLast':'voyagerCurrent'):system?t('localEpoch'):'J2000.0';
     $('solGlobal').hidden = !system;
-    $('solInner').hidden = Boolean(system||voyager);
+    $('solInner').hidden = Boolean(voyager||system&&!SYSTEMS[system].innerKm);
+    $('solInner').textContent=t(system?'moonInner':'inner');
     $('solFrames').hidden = view!=='3d'||Boolean(system||voyager);
     $('solOrbitPoses').hidden = Boolean(galactic);
     $('solHelio').setAttribute('aria-pressed',String(!galactic));
@@ -700,16 +719,18 @@ export function mountSolar(root) {
     $('solFlightControls').setAttribute('aria-label',t('flightGroup'));
     $('solFlightScale').setAttribute('aria-label',t('flightScaleLabel'));
     for (const option of $('solFlightWindow').options) option.textContent = option.value+' '+t('flightDay');
-    $('solDate').min = voyager ? '1977-08-21' : galactic ? GALACTIC_MIN_DATE : '1800-01-01';
-    $('solDate').max = voyager ? '2026-11-26' : galactic ? GALACTIC_MAX_DATE : '2050-01-01';
+    $('solDate').min = outerLocal() ? formatModelDay(localSpec().start).slice(0,10) : voyager ? '1977-08-21' : galactic ? GALACTIC_MIN_DATE : '1800-01-01';
+    $('solDate').max = outerLocal() ? formatModelDay(localSpec().end).slice(0,10) : voyager ? '2026-11-26' : galactic ? GALACTIC_MAX_DATE : '2050-01-01';
     $('solFit').textContent=t(heliosphere?'helioFit':voyager?'voyagerFit':system?'localFit':galactic?'flightFit':'fit');
     $('solBodiesTitle').textContent=t(heliosphere?'helioBodies':voyager?'voyagerBodies':system?'localBodies':'overviewBodies');
     root.querySelector('[data-solar="title"]').textContent=heliosphere?t('helioOpen'):voyager?t('voyager'):system?name(SYSTEMS[system]):t('title');
-    root.querySelector('[data-solar="frame"]').textContent=t(voyager?'voyagerFrame':system?'baryFrame':galactic?'galacticFrame':view==='3d'?'frame3d':'frame');
+    root.querySelector('[data-solar="frame"]').textContent=t(voyager?'voyagerFrame':system?(outerLocal()?'planetFrame':'baryFrame'):galactic?'galacticFrame':view==='3d'?'frame3d':'frame');
     root.querySelector('[data-solar="model"]').textContent=t(heliosphere?'helioData':voyager?'voyagerData':system?'horizons':galactic?'galacticModel':'model');
-    $('solScene3d').textContent=t(heliosphere?'helioCaption':voyager?'voyagerScene':system?'localScene':galactic?'galacticScene':'scene3d');
+    $('solScene3d').textContent=t(heliosphere?'helioCaption':voyager?'voyagerScene':
+      system?(outerLocal()?'outerScene':'localScene'):galactic?'galacticScene':'scene3d');
+    if(outerLocal()&&overview.returnDay!==null)$('solScene3d').textContent+=' '+t('outerFallback');
     $('solHelp').textContent=t(voyager?'voyagerNav':view==='3d'?'help3d':'help');
-    $('solLimit').textContent=t(voyager?'voyagerLimit':system?'localLimit':galactic?'galacticLimit':view==='3d'?'limit3d':'limit');
+    $('solLimit').textContent=t(voyager?'voyagerLimit':system?(outerLocal()?'outerLimit':'localLimit'):galactic?'galacticLimit':view==='3d'?'limit3d':'limit');
     for(const key of ['scienceNote','earth'])for(const el of root.querySelectorAll('[data-solar="'+key+'"]'))el.hidden=Boolean(voyager);
     $('voyBounds').hidden=!voyager;
     root.querySelector('[data-solar="whyBody"]').textContent=t(view==='3d'?'whyBody3d':'whyBody');
@@ -860,21 +881,21 @@ export function mountSolar(root) {
     };
     // Geometric reference rings in the J2000 ecliptic, not sources.
     const extent = system ? SYSTEMS[system].scaleKm/AU_KM : 32;
-    const rings = system ? [.25,.5,1].map(r=>r*extent) : [1,5,10,20,30];
+    const rings = outerLocal() ? [] : system ? [.25,.5,1].map(r=>r*extent) : [1,5,10,20,30];
     for(const radius of rings){
       const ring=Array.from({length:97},(_,i)=>{
         const a=2*Math.PI*i/96;return [radius*Math.cos(a),radius*Math.sin(a),0];
       });
       strokePath(ring,'#7093a724');
     }
-    strokePath([[-extent,0,0],[extent,0,0]],'#88afba40',1);
-    strokePath([[0,-extent,0],[0,extent,0]],'#88afba40',1);
+    strokePath([[-extent,0,0],[extent,0,0]],outerLocal()?'#88afba29':'#88afba40',1);
+    strokePath([[0,-extent,0],[0,extent,0]],outerLocal()?'#88afba29':'#88afba40',1);
     for(const {body,orbit} of entries){
       let vectors;
       if (orbit) vectors = Array.from({length:145},(_,i)=>vectorOnOrbit(orbit,2*Math.PI*i/144));
       else if (system && body.period) {
         // The display path changes only when the model crosses a TDB hour. Markers and trails use the exact model epoch.
-        const epoch = Math.floor(day*24)/24;
+        const epoch = Math.max(localSpec().start,Math.floor(day*24)/24);
         let cached = pathCache.get(body.id);
         if (!cached || cached.epoch!==epoch) {
           cached = {epoch, vectors:localOrbitPath(ephemerides.get(system),system,body,epoch)};
@@ -908,7 +929,7 @@ export function mountSolar(root) {
     const entries=current();
     if(heliosphere)paintHeliosphere(ctx,screen,heliosphere.shells,heliosphere.region);
     if(voyager){if(trails)paintVoyager(ctx,screen,tracksVoyager());}
-    else if (!galactic) paintSolarOrbits(screen,entries);
+    else if (!galactic && (!outerLocal() || entries.length)) paintSolarOrbits(screen,entries);
     markers=entries.map(({body,vector})=>{
       const p=screen(displayedVector(vector));if(!p)return null;
       const planet=contextPlanet(body.id);
@@ -988,7 +1009,10 @@ export function mountSolar(root) {
   }
   function changeDay(value, reframe = false, explicit = true) {
     const next = clampDay(value);
-    if (system && explicit) overview.returnDay = null;
+    if (system && explicit && overview.returnDay!==null){
+      overview.returnDay=null;
+      if(outerLocal())$('solScene3d').textContent=t('outerScene');
+    }
     if (galactic && reframe) {
       const before = sunDisplacement(day), after = sunDisplacement(next);
       space = {...space,focus:space.focus.map((v,i)=>v+(after[i]-before[i]))};
@@ -1112,7 +1136,13 @@ export function mountSolar(root) {
   });
   listen($('solFit'),'click',fitView);
   listen($('solInner'),'click',()=>{
-    if(galactic){
+    if(outerLocal()&&SYSTEMS[system].innerKm){
+      const zoom=Math.log10(SYSTEMS[system].scaleKm/SYSTEMS[system].innerKm);
+      setSpace({...space,focus:[0,0,0],zoom});
+      follow=false;
+      $('solFollow').setAttribute('aria-pressed','false');
+      invalidate();
+    } else if(galactic){
       galactic.distance = galactic.schematic ? 18 : 6;
       space={...space,zoom:0};
       setSunFollow(true);
@@ -1232,7 +1262,12 @@ export function mountSolar(root) {
     localize();
   });
   listen($('solGlobal'),'click',()=>{const previous=system;exitSystem();systemButtons.find(item=>item.id===previous)?.button.focus();});
-  listen($('solFirstWorldDay'),'click',()=>{changeDay(START);$('solDate').focus({preventScroll:true});});
+  listen($('solOpenSelectedSystem'),'click',()=>{
+    if(system||voyager||!Object.hasOwn(SYSTEMS,selected))return;
+    enterSystem(selected);
+    $('solGlobal').focus({preventScroll:true});
+  });
+  listen($('solFirstWorldDay'),'click',()=>{changeDay(ephemerisSpec(relevantSystem()).start);$('solDate').focus({preventScroll:true});});
   listen($('solWorldRetry'),'click',()=>{const id=relevantSystem();if(id)loadSystem(id,true);updateInspector();});
   for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
     listen($(id),'click',()=>{setSpace({...space,...ORBIT_POSES[pose]});markPose(pose);invalidate();});
@@ -1254,7 +1289,7 @@ export function mountSolar(root) {
   listen($('solRate'),'change',()=>{if (clock) beginClock();});
   listen($('solPrev'),'click',()=>changeDay(advanceModelDay(day,1,-1)));
   listen($('solNext'),'click',()=>changeDay(advanceModelDay(day,1,1)));
-  listen($('solEpoch'),'click',()=>changeDay(voyager?latestEpoch():system?START:J2000,true));
+  listen($('solEpoch'),'click',()=>changeDay(voyager?latestEpoch():system?localSpec().start:J2000,true));
   listen($('solDate'),'change',()=>{
     const field=$('solDate'), next=parseModelDate(field.value);
     if (next !== null && next>=minDay() && next<=maxDay()) changeDay(next,true);else updateClock(true);

@@ -81,3 +81,5 @@ Local entry now keeps any covered epoch and otherwise opens at 00:00 TDB on the 
 The loader uses the Explorer’s bounded streaming reader. It rejects a response that exceeds its pinned size based on bytes read, including bodies with absent or inaccurate `Content-Length`. It requires the exact size and a matching Web Crypto SHA-256 digest before passing bytes to the decoder. The decoder validates the EPM1 magic, the system ID, the expected layout, and the finiteness of every Float64. Web Crypto requires a compatible secure browser context, such as HTTPS or a loopback preview.
 
 Only decoded and verified systems enter the view cache. The request bypasses HTTP caching so a retry can obtain fresh data. A failed load leaves the affected system without ephemeris geometry or comparison values and shows a localized retry control. Verified systems retain their own state. The regression suite repeats the audited 100-million-kilometre Earth Y shift against the genuine release package.
+
+See [Moon Systems](MOON-SYSTEMS.md) for the separate planet-centred Saturn, Uranus and Neptune release.
