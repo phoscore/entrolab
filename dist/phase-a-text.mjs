@@ -1,4 +1,5 @@
 export const phaseA = {
+ 'v0925.nullFiction': ['Null · Fiktion','Null · Fiction'],
  'v0925.version': ['v0.9.25','v0.9.25'],
  'v0925.brown': ['Brauner Zwerg','Brown dwarf'],
  'v0925.supergiant': ['Roter Überriese','Red supergiant'],

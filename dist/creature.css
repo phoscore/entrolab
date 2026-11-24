@@ -114,3 +114,109 @@ body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-sta
 @media(prefers-reduced-motion:reduce) {
  #creature[data-sequence] * {animation:none!important}
 }
+
+/* Existing heading bands contain the entire decorative visit. */
+[data-null-anchor] {position:relative}
+.null-slot[data-place] {inset:auto}
+.null-slot[data-pose="peek"] #creature svg {
+ position:absolute;width:136%;height:auto;top:-8%;left:-18%;
+}
+
+/* Distinct actions share the same rig and the same visit clock. */
+#creature[data-sequence="peek"] .null-mass {animation-name:null-peek}
+#creature[data-sequence="peek"] .null-head {animation-name:null-peek-head}
+#creature[data-sequence="peek"] .null-right-hand {animation-name:null-peek-hand}
+#creature[data-sequence="peek"] .null-torso,
+#creature[data-sequence="peek"] .null-tail,
+#creature[data-sequence="peek"] .null-tip {animation:none}
+
+#creature[data-sequence="suspicious"] .null-mass {animation-name:null-sidestep}
+#creature[data-sequence="suspicious"] .null-head {animation-name:null-squint-head}
+#creature[data-sequence="suspicious"] .null-eyes {animation-name:null-squint}
+#creature[data-sequence="suspicious"] .null-grin {animation:null-smirk var(--null-visit) ease-in-out both}
+
+#creature[data-sequence="satisfied"] .null-mass {animation-name:null-satisfied}
+#creature[data-sequence="satisfied"] .null-head {animation-name:null-nod}
+#creature[data-sequence="satisfied"] .null-grin {animation:null-widen-grin var(--null-visit) ease-in-out both}
+#creature[data-sequence="satisfied"] .null-left {animation:null-left-settle var(--null-visit) ease-in-out both}
+
+#creature[data-sequence="disturbed"] .null-mass {animation-name:null-recover}
+#creature[data-sequence="disturbed"] .null-orbit {animation:null-unseat var(--null-visit) ease-in-out both}
+#creature[data-sequence="disturbed"] .null-shard {animation:null-displace var(--null-visit) ease-in-out both}
+.null-shard-mid {--shard-x:-27px;--shard-y:2px}
+.null-shard-low {--shard-x:19px;--shard-y:12px}
+
+.null-slot[data-pose="hero"] #creature[data-sequence="glitch"] svg {
+ position:absolute;width:114px;height:auto;top:-9px;left:15px;
+}
+.null-effect {display:none}
+.null-slot[data-pose="hero"] #creature[data-sequence="gamma"] svg {position:absolute;width:78px;height:82px;left:0;top:0}
+.null-slot[data-pose="hero"] #creature[data-sequence="gamma"] .null-effect {
+ display:block;position:absolute;left:67px;right:5px;top:31px;height:37px;
+ animation:null-gamma-mark var(--null-visit) ease-in-out both;
+}
+.null-effect::before {
+ content:"";display:block;height:8px;
+ background:linear-gradient(90deg,#b6284b,#de5363 52%,#a32b4e00);
+ clip-path:polygon(0 45%,74% 0,100% 36%,71% 80%,8% 63%);
+}
+.null-effect small {display:block;margin:3px 0 0;margin-inline-start:10px;color:#ffd4da;text-shadow:0 1px 2px #07060b;font:10px/1.2 system-ui;white-space:nowrap}
+#creature[data-sequence="gamma"] .null-mass {animation-name:null-gamma-body}
+#creature[data-sequence="gamma"] .null-head {animation-name:null-gamma-head}
+#creature[data-sequence="gamma"] .null-gaze {animation-name:null-aim}
+#creature[data-sequence="gamma"] .null-right {animation:null-aim-arm var(--null-visit) ease-in-out both}
+#creature[data-sequence="gamma"] .null-right-hand {animation-name:null-aim-wrist}
+
+@keyframes null-peek {
+ 0% {transform:translate(120px,4px) rotate(12deg);opacity:0}
+ 28%,62% {transform:translate(14px,3px) rotate(-5deg);opacity:1}
+ 76% {transform:translate(25px,10px) rotate(9deg);opacity:.95}
+ 100% {transform:translate(89px,61px) rotate(17deg);opacity:0}
+}
+@keyframes null-peek-head {0%,100%{transform:rotate(4deg)}40%,57%{transform:rotate(-8deg) translate(-6px,-2px)}}
+@keyframes null-peek-hand {0%,30%,77%,100%{transform:rotate(0)}48%,62%{transform:translate(-7px,3px) rotate(-22deg)}}
+
+@keyframes null-sidestep {
+ 0% {transform:translate(117px,12px) rotate(8deg);opacity:0}
+ 24% {transform:translate(9px,0) rotate(-2deg);opacity:1}
+ 42%,70% {transform:translate(2px,-3px);opacity:1}
+ 100% {transform:translate(65px,73px) rotate(12deg) scale(.9);opacity:0}
+}
+@keyframes null-squint-head {0%,22%,85%,100%{transform:rotate(0)}46%,67%{transform:rotate(-13deg) translate(-4px,1px)}}
+@keyframes null-squint {0%,23%,85%,100%{transform:scaleY(1)}41%,65%{transform:scaleY(.51)}}
+@keyframes null-smirk {0%,30%,84%,100%{transform:scale(1)}49%,66%{transform:translate(1px,3px) scale(.88,.67)}}
+
+@keyframes null-satisfied {
+ 0% {transform:translate(106px,10px) rotate(7deg);opacity:0}
+ 24%,45% {transform:translate(8px,2px) rotate(-4deg);opacity:1}
+ 62%,77% {transform:translate(4px,-8px) rotate(2deg);opacity:1}
+ 100% {transform:translate(34px,-64px) scale(.82);opacity:0}
+}
+@keyframes null-nod {0%,24%,78%,100%{transform:rotate(0)}43%{transform:rotate(9deg) translateY(4px)}59%{transform:rotate(-5deg) translateY(-2px)}}
+@keyframes null-widen-grin {0%,39%,89%,100%{transform:scale(1)}57%,73%{transform:scale(1.27,1.28)}}
+@keyframes null-left-settle {0%,28%,78%,100%{transform:rotate(0)}50%,63%{transform:rotate(-14deg) translateY(-4px)}}
+
+@keyframes null-recover {
+ 0% {transform:translate(93px,8px) rotate(7deg);opacity:0}
+ 25%,43% {transform:translate(4px,-1px);opacity:1}
+ 50% {transform:translate(10px,4px) scale(.92,1.09) rotate(-5deg);opacity:.70}
+ 60%,77% {transform:translate(4px,-1px);opacity:1}
+ 100% {transform:translate(132px,-28px) rotate(-8deg);opacity:0}
+}
+@keyframes null-unseat {0%,42%,63%,100%{transform:translate(0)}50%{transform:translate(-13px,-9px) rotate(8deg)}}
+@keyframes null-displace {0%,43%,62%,100%{opacity:0;transform:translate(0)}50%{opacity:.70;transform:translate(var(--shard-x),var(--shard-y))}}
+
+@keyframes null-gamma-body {
+ 0% {transform:translate(-91px,13px) rotate(-9deg);opacity:0}
+ 24%,82% {transform:translate(0,2px);opacity:1}
+ 100% {transform:translate(-67px,45px) rotate(-13deg);opacity:0}
+}
+@keyframes null-gamma-head {0%,24%,86%,100%{transform:rotate(0)}39%,66%{transform:rotate(11deg) translate(3px,0)}}
+@keyframes null-aim {0%,25%,82%,100%{transform:translate(0)}37%,70%{transform:translate(5px,-1px)}}
+@keyframes null-aim-arm {0%,21%,87%,100%{transform:rotate(0)}41%,64%{transform:rotate(16deg) translate(7px,-1px)}}
+@keyframes null-aim-wrist {0%,27%,82%,100%{transform:rotate(0)}45%,64%{transform:rotate(-19deg) translate(8px,1px)}}
+@keyframes null-gamma-mark {0%,45%,72%,100%{opacity:0;transform:scaleX(.48);transform-origin:left}52%,60%{opacity:.86;transform:scaleX(1);transform-origin:left}}
+
+@media(prefers-reduced-motion:reduce) {
+ #creature .null-effect {display:none!important}
+}
