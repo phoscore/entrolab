@@ -37,7 +37,8 @@ export function initCreature(doc=globalThis.document,options={}){
    globalOff=preference==='off';
    mode=globalOff?'off':'subtle';
   }
-  else if(validMode(legacy)){mode=legacy;globalOff=legacy==='off';}
+  // The old preference governed only Null. The shared switch governs the sky as well.
+  else if(validMode(legacy))mode=legacy;
  }catch{}
 
  const slot=doc.createElement('span'),figure=doc.createElement('span');

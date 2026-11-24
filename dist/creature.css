@@ -160,7 +160,7 @@ body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-sta
  background:linear-gradient(90deg,#b6284b,#de5363 52%,#a32b4e00);
  clip-path:polygon(0 45%,74% 0,100% 36%,71% 80%,8% 63%);
 }
-.null-effect small {display:block;margin:3px 0 0;color:#ee9caa;font:10px/1.2 system-ui;white-space:nowrap}
+.null-effect small {display:block;margin:3px 0 0;margin-inline-start:10px;color:#ffd4da;text-shadow:0 1px 2px #07060b;font:10px/1.2 system-ui;white-space:nowrap}
 #creature[data-sequence="gamma"] .null-mass {animation-name:null-gamma-body}
 #creature[data-sequence="gamma"] .null-head {animation-name:null-gamma-head}
 #creature[data-sequence="gamma"] .null-gaze {animation-name:null-aim}
