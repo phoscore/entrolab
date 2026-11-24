@@ -1,0 +1,50 @@
+{
+  "release": "v0.9.5-voyager-1977-2026.1",
+  "rawManifestSha256": "865e888c7ab5b4b0ac02b80c205033de9f7ecb907734c3112f5299c676752ec3",
+  "packages": {
+    "v1": {
+      "bytes": 252012,
+      "sha256": "821e53385f1a1e4667fe36cf0d004d5a33efd6bdf36ba63687b7e00c08d78028"
+    },
+    "v2": {
+      "bytes": 282476,
+      "sha256": "f33c36cf2be304c8ed6d24d81079eb76d425682ad3b8aa4965053cee72f4f837"
+    },
+    "earth": {
+      "bytes": 503900,
+      "sha256": "216e0906abdabb2296685c468a24e18c1528cce6bab28fb525a5b3b821b8b01e"
+    }
+  },
+  "results": {
+    "v1": {
+      "target": -31,
+      "source": "Voyager_1_ST+refit2022_m",
+      "records": 4500,
+      "offGridChecks": 62,
+      "start": 2443392.5,
+      "end": 2461370.5,
+      "maxPositionKm": 0.9841856557868441,
+      "maxVelocityKmS": 0.001031422954291995
+    },
+    "v2": {
+      "target": -32,
+      "source": "Voyager_2_ST+refit2022_m",
+      "records": 5044,
+      "offGridChecks": 104,
+      "start": 2443376.5,
+      "end": 2461370.5,
+      "maxPositionKm": 5.980448377256534,
+      "maxVelocityKmS": 0.00029310171343822607
+    },
+    "earth": {
+      "target": 399,
+      "source": "DE441",
+      "records": 8998,
+      "offGridChecks": 20,
+      "start": 2443376.5,
+      "end": 2461370.5,
+      "maxPositionKm": 1.0982728195442653,
+      "maxVelocityKmS": 0.00002115065530193251
+    }
+  }
+}
