@@ -1,0 +1,213 @@
+{
+  "release": "v0.9.5-horizons-outer-2026-2027.1",
+  "frame": "ICRF / Ecliptic of J2000.0 / TDB / KM-S / geometric",
+  "start": 2461222.5,
+  "end": 2461587.5,
+  "files": [
+    {
+      "name": "saturn.bin",
+      "bytes": 1436984,
+      "sha256": "68fc796d94db6ec20aaafef98af2bc1e28f5ab88b67a6b0db3d0fa8e7588dd79"
+    },
+    {
+      "name": "uranus.bin",
+      "bytes": 893768,
+      "sha256": "2f31a5cf63a1cc2bcba6ba3363eff77869c130693291895bfe0acb3e70ae9c88"
+    },
+    {
+      "name": "neptune.bin",
+      "bytes": 578312,
+      "sha256": "6e4dac8365d1e256900f1ada147db712fd915bfe9fe4ff3c905aa836771839ec"
+    }
+  ],
+  "series": [
+    {
+      "id": "titan",
+      "target": 606,
+      "centre": 699,
+      "hours": 8,
+      "samples": 1096
+    },
+    {
+      "id": "enceladus",
+      "target": 602,
+      "centre": 699,
+      "hours": 1,
+      "samples": 8761
+    },
+    {
+      "id": "rhea",
+      "target": 605,
+      "centre": 699,
+      "hours": 4,
+      "samples": 2191
+    },
+    {
+      "id": "dione",
+      "target": 604,
+      "centre": 699,
+      "hours": 2,
+      "samples": 4381
+    },
+    {
+      "id": "tethys",
+      "target": 603,
+      "centre": 699,
+      "hours": 2,
+      "samples": 4381
+    },
+    {
+      "id": "iapetus",
+      "target": 608,
+      "centre": 699,
+      "hours": 24,
+      "samples": 366
+    },
+    {
+      "id": "mimas",
+      "target": 601,
+      "centre": 699,
+      "hours": 1,
+      "samples": 8761
+    },
+    {
+      "id": "titania",
+      "target": 703,
+      "centre": 799,
+      "hours": 6,
+      "samples": 1461
+    },
+    {
+      "id": "oberon",
+      "target": 704,
+      "centre": 799,
+      "hours": 8,
+      "samples": 1096
+    },
+    {
+      "id": "umbriel",
+      "target": 702,
+      "centre": 799,
+      "hours": 3,
+      "samples": 2921
+    },
+    {
+      "id": "ariel",
+      "target": 701,
+      "centre": 799,
+      "hours": 2,
+      "samples": 4381
+    },
+    {
+      "id": "miranda",
+      "target": 705,
+      "centre": 799,
+      "hours": 1,
+      "samples": 8761
+    },
+    {
+      "id": "triton",
+      "target": 801,
+      "centre": 899,
+      "hours": 4,
+      "samples": 2191
+    },
+    {
+      "id": "proteus",
+      "target": 808,
+      "centre": 899,
+      "hours": 1,
+      "samples": 8761
+    },
+    {
+      "id": "nereid",
+      "target": 802,
+      "centre": 899,
+      "hours": 8,
+      "samples": 1096
+    }
+  ],
+  "sources": {
+    "sha256": "ad8ca164b633dae1b1e677ee9dffbc2c47cf3b024591735d99f4e9d415a26231",
+    "replies": 34,
+    "originalBytes": 12120495,
+    "archivedBytes": 4120673
+  },
+  "interpolation": {
+    "titan": {
+      "count": 48,
+      "maxPositionKm": 1.1872812617525537,
+      "maxVelocityKmS": 0.00012733217075371864
+    },
+    "enceladus": {
+      "count": 48,
+      "maxPositionKm": 0.8569482111783988,
+      "maxVelocityKmS": 0.0007329062691830741
+    },
+    "rhea": {
+      "count": 48,
+      "maxPositionKm": 3.9934943716024063,
+      "maxVelocityKmS": 0.000854367768320295
+    },
+    "dione": {
+      "count": 48,
+      "maxPositionKm": 1.3384696340977413,
+      "maxVelocityKmS": 0.0005730768223493339
+    },
+    "tethys": {
+      "count": 48,
+      "maxPositionKm": 4.537834302913002,
+      "maxVelocityKmS": 0.0019417676195640316
+    },
+    "iapetus": {
+      "count": 48,
+      "maxPositionKm": 0.5348239864415454,
+      "maxVelocityKmS": 0.00002177786282729443
+    },
+    "mimas": {
+      "count": 48,
+      "maxPositionKm": 3.35685209884823,
+      "maxVelocityKmS": 0.0028732917976934226
+    },
+    "titania": {
+      "count": 48,
+      "maxPositionKm": 1.2240815754663434,
+      "maxVelocityKmS": 0.00017490205233949797
+    },
+    "oberon": {
+      "count": 48,
+      "maxPositionKm": 0.9043477701830103,
+      "maxVelocityKmS": 0.0000974371204982265
+    },
+    "umbriel": {
+      "count": 48,
+      "maxPositionKm": 0.9106243859357414,
+      "maxVelocityKmS": 0.0002636743504743812
+    },
+    "ariel": {
+      "count": 48,
+      "maxPositionKm": 0.9276360525042834,
+      "maxVelocityKmS": 0.0003972630274949954
+    },
+    "miranda": {
+      "count": 48,
+      "maxPositionKm": 0.4023662325711982,
+      "maxVelocityKmS": 0.00034409762195387726
+    },
+    "triton": {
+      "count": 48,
+      "maxPositionKm": 0.9317791139919592,
+      "maxVelocityKmS": 0.0001992639147590689
+    },
+    "proteus": {
+      "count": 48,
+      "maxPositionKm": 0.9098197984340943,
+      "maxVelocityKmS": 0.0007781500446512438
+    },
+    "nereid": {
+      "count": 48,
+      "maxPositionKm": 0.02718925398586033,
+      "maxVelocityKmS": 0.00000425356516675093
+    }
+  }
+}
