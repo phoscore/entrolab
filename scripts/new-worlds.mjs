@@ -14,7 +14,7 @@ const output = join(root, 'dist/explorer/data', RELEASE);
 const endpoint = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const chunk = 10000;
 const samplesPerCheck = 32;
-const systems = Object.keys(SYSTEMS);
+const systems = ['earth','jupiter','pluto'];
 const series = systems.flatMap(system => seriesFor(system).map(s => ({...s, system})));
 const anchors = [{id: 'earth', target: 3, centre: 10, hours: 6}, {id: 'jupiter', target: 5, centre: 10, hours: 12}];
 const pairs = [

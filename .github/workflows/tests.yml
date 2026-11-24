@@ -57,3 +57,37 @@ jobs:
           path: browser-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  capture-outer-moons:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v0.9.5-moon-systems-expansion'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Capture and verify JPL source vectors
+        run: |
+          node scripts/outer-moons.mjs --capture
+          node scripts/outer-moons.mjs --build
+          node scripts/outer-moons.mjs --check
+      - name: Commit validated data to the feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cosmic-explorer/data/raw/v0.9.5-horizons-outer-2026-2027.1 dist/explorer/data/v0.9.5-horizons-outer-2026-2027.1 dist/explorer/outer-moons-pin.mjs
+          git commit -m '[CF-Pages-Skip] Archive validated outer moon Horizons ephemerides'
+          git push origin HEAD:refs/heads/feature/v0.9.5-moon-systems-expansion
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: outer-moon-capture
+          path: |
+            cosmic-explorer/data/raw/v0.9.5-horizons-outer-2026-2027.1
+            dist/explorer/data/v0.9.5-horizons-outer-2026-2027.1
+            dist/explorer/outer-moons-pin.mjs

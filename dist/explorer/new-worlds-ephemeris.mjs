@@ -1,23 +1,29 @@
 import {checkedBytes} from './catalog.mjs';
-import {END, EPHEMERIS_PACKAGES, RELEASE, SECONDS_PER_DAY, START, SYSTEMS, seriesFor} from './new-worlds-spec.mjs';
+import {SECONDS_PER_DAY, SYSTEMS, seriesFor, ephemerisSpec} from './new-worlds-spec.mjs';
 
 const VALUES = 6;
 const BYTES_PER_STATE = VALUES * Float64Array.BYTES_PER_ELEMENT;
 const PACKAGE_MAGIC = 0x45504d31; // EPM1
 
-export const supportsEpoch = day => Number.isFinite(day) && day >= START && day <= END;
-export const sampleCount = hours => (END - START) * 24 / hours + 1;
+export function supportsEpoch(day,system) {
+  const {start,end}=ephemerisSpec(system);
+  return Number.isFinite(day) && day >= start && day <= end;
+}
+export function sampleCount(hours,system) {
+  const {start,end}=ephemerisSpec(system);
+  return (end-start)*24/hours+1;
+}
 
 export function encodeSystem(system, samples) {
   const series = seriesFor(system);
-  const bytes = new ArrayBuffer(8 + series.reduce((total, s) => total + sampleCount(s.hours) * BYTES_PER_STATE, 0));
+  const bytes = new ArrayBuffer(8 + series.reduce((total, s) => total + sampleCount(s.hours,system) * BYTES_PER_STATE, 0));
   const output = new DataView(bytes);
   output.setUint32(0, PACKAGE_MAGIC);
   output.setUint32(4, SYSTEMS[system].centre);
   let cursor = 8;
   for (const s of series) {
     const values = samples.get(s.id);
-    if (values?.length !== sampleCount(s.hours) * VALUES) throw new Error(`Invalid length: ${s.id}`);
+    if (values?.length !== sampleCount(s.hours,system) * VALUES) throw new Error(`Invalid length: ${s.id}`);
     for (const v of values) {
       if (!Number.isFinite(v)) throw new Error(`Invalid coordinate: ${s.id}`);
       output.setFloat64(cursor, v, true);
@@ -30,7 +36,7 @@ export function encodeSystem(system, samples) {
 export function decodeSystem(system, bytes) {
   const series = seriesFor(system);
   const data = new DataView(bytes);
-  const length = 8 + series.reduce((total, s) => total + sampleCount(s.hours) * BYTES_PER_STATE, 0);
+  const length = 8 + series.reduce((total, s) => total + sampleCount(s.hours,system) * BYTES_PER_STATE, 0);
   if (bytes.byteLength !== length || data.getUint32(0) !== PACKAGE_MAGIC || data.getUint32(4) !== SYSTEMS[system].centre) {
     throw new Error(`Invalid ${system} ephemeris package`);
   }
@@ -40,14 +46,17 @@ export function decodeSystem(system, bytes) {
   let offset = 8;
   const sources = new Map(series.map(s => {
     const start = offset;
-    const count = sampleCount(s.hours);
+    const count = sampleCount(s.hours,system);
     offset += count * BYTES_PER_STATE;
     return [s.id, {start, count, hours: s.hours}];
   }));
+  const {start: epochStart,planetCentred}=ephemerisSpec(system);
   return {sample(id, day) {
+    if (!supportsEpoch(day,system)) return null;
+    if (planetCentred && id===system) return {position:[0,0,0],velocity:[0,0,0]};
     const source = sources.get(id);
-    if (!source || !supportsEpoch(day)) return null;
-    const units = (day - START) * (24 / source.hours);
+    if (!source) return null;
+    const units = (day - epochStart) * (24 / source.hours);
     const index = Math.min(Math.floor(units), source.count - 2);
     const row = source.start + index * BYTES_PER_STATE;
     const next = row + BYTES_PER_STATE;
@@ -68,10 +77,11 @@ export function decodeSystem(system, bytes) {
 }
 
 export function loadEphemeris(system, signal) {
-  if (!Object.hasOwn(EPHEMERIS_PACKAGES, system)) throw new RangeError('Unknown lunar system');
-  const url = new URL(`./data/${RELEASE}/${system}.bin`, import.meta.url);
+  const {release,pack}=ephemerisSpec(system);
+  if (!pack) throw new RangeError('Unknown lunar system');
+  const url = new URL(`./data/${release}/${system}.bin`, import.meta.url);
   // The view caches verified systems. A retry must bypass cached HTTP errors or unverified bytes.
-  return checkedBytes(url, EPHEMERIS_PACKAGES[system], signal ?? new AbortController().signal,
+  return checkedBytes(url, pack, signal ?? new AbortController().signal,
     (url, options) => fetch(url, {...options, cache: 'no-store'}))
     .then(bytes => decodeSystem(system, bytes.buffer));
 }
