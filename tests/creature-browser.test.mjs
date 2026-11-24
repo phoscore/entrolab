@@ -47,8 +47,13 @@ async function controlled(p,roll=.85,durationRoll=.5){
     fn();
    },
    pending:()=>timers.size,
+   roll(...values){rolls=values},
+   deadline:()=>timers.values().next().value?.at??null,
+   now:()=>now,
+
   };
   window.nullAudit.mount();
+  window.nullAudit.original=document.querySelector('#creature');
  },{roll,durationRoll});
  try{await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});}
  catch(error){
@@ -317,6 +322,145 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
   assert.deepEqual(await physical(p),before);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
+});
+
+test('Null 3.5: one figure visits seven real laboratory headings in safe space',async()=>{
+ const {p,context}=await h.lab({viewport:{width:1440,height:950},reducedMotion:'no-preference'});
+ try{
+  await controlled(p);
+  for(const area of ['blackhole','extreme','temperature','entropy','explorer','science','gravity']){
+   await tab(p,area==='temperature'?'extreme':area);
+   const heading=p.locator('[data-null-anchor='+area+']');
+   await heading.scrollIntoViewIfNeeded();
+   await p.waitForFunction(area=>window.entrolabCreature.inspect().place===area&&window.nullAudit.pending()===1,area);
+   const before=await physical(p);
+   const visual=await p.evaluate(()=>{
+    const blackhole=Array.from(document.querySelectorAll('#blackhole input,#blackhole output,#bhTemp')).map(e=>e.value??e.textContent);
+    const ex=window.entrolabExplorer?.inspect();
+    return {blackhole,explorer:ex&&{camera:ex.camera,selected:ex.selected,mode:ex.mode}};
+   });
+   const initialFocus=await p.evaluate(()=>document.activeElement?.outerHTML);
+   await advance(p);
+   const placement=await heading.evaluate(el=>{
+    const slot=el.querySelector('.null-slot');
+    const bounds=slot.getBoundingClientRect(),band=el.getBoundingClientRect();
+    const intersects=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+    const range=document.createRange();
+    const content=[...el.children].filter(child=>child!==slot).flatMap(child=>{
+     if(!child.matches('div'))return [child.getBoundingClientRect()];
+     range.selectNodeContents(child);
+     return [...range.getClientRects()];
+    });
+    return {
+     same:slot.querySelector('#creature')===window.nullAudit.original,
+     visible:!slot.querySelector('#creature').hidden,
+     intersects:content.some(box=>box.width&&box.height&&intersects(box,bounds)),
+     inside:bounds.left>=band.left&&bounds.right<=band.right+.02&&bounds.top>=band.top&&bounds.bottom<=band.bottom+.02,
+     pointer:!!document.elementFromPoint(bounds.left+bounds.width/2,bounds.top+bounds.height/2)?.closest('.null-slot'),
+     count:document.querySelectorAll('.null-slot').length,
+    };
+   });
+   assert.deepEqual(placement,{same:true,visible:true,intersects:false,inside:true,pointer:false,count:1},area);
+   assert.deepEqual(await p.evaluate(()=>document.activeElement?.outerHTML),initialFocus);
+   if(['blackhole','entropy','explorer','temperature'].includes(area)){
+    await seekPose(p,2800);
+    await heading.screenshot({path:join(h.output,'null35-'+area+'-1440.png')});
+   }
+   await advance(p);
+   assert.deepEqual(await physical(p),before);
+   assert.deepEqual(await p.evaluate(()=>{
+    const blackhole=Array.from(document.querySelectorAll('#blackhole input,#blackhole output,#bhTemp')).map(e=>e.value??e.textContent);
+    const ex=window.entrolabExplorer?.inspect();
+    return {blackhole,explorer:ex&&{camera:ex.camera,selected:ex.selected,mode:ex.mode}};
+   }),visual);
+  }
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
+
+test('Null 3.5: a recent context wins within one timer and cooldown survives navigation',async()=>{
+ const {p,context}=await h.lab({viewport:{width:1440,height:950},reducedMotion:'no-preference'});
+ try{
+  await controlled(p);
+  for(const id of ['blackhole','entropy','extreme']){
+   await p.locator('[data-tab='+id+']').evaluate(e=>e.click());
+  }
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().context==='extreme'&&window.nullAudit.pending()===1);
+  await p.evaluate(()=>window.nullAudit.roll(.05,.5,.60,.5));
+  await p.locator('#extremeObject').selectOption('sun');
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().queued==='extreme');
+  assert.equal((await inspect(p)).timers,1);
+  await advance(p);
+  assert.equal((await inspect(p)).sequence,'curiosity');
+  assert.equal((await inspect(p)).place,'extreme');
+  const began=await p.evaluate(()=>window.nullAudit.now());
+  await p.evaluate(()=>window.nullAudit.roll(.5,.05,.5));
+  await tab(p,'entropy');
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().context==='entropy:particles'&&!window.entrolabCreature.inspect().moving);
+  assert.equal((await inspect(p)).timers,1);
+  const deadline=await p.evaluate(()=>window.nullAudit.deadline());
+  assert(deadline>=began+6400+8000);
+  await tab(p,'science');
+  assert.equal((await inspect(p)).visible,false);
+  assert.equal(await p.locator('svg .null-mass').count(),1);
+ }finally{await context.close()}
+});
+
+test('Null 3.5: gamma is labelled fiction and stays inside the hero stage through its entrance and retreat',async()=>{
+ const {p,context}=await h.lab({viewport:{width:1440,height:950},reducedMotion:'no-preference'});
+ try{
+  await controlled(p,.997);
+  await tab(p,'science');
+  const heading=p.locator('[data-null-anchor=science]');
+  await heading.scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().place==='science'&&window.entrolabCreature.inspect().pose==='hero');
+  await advance(p);
+  assert.equal((await inspect(p)).sequence,'gamma');
+  assert.equal(await art(p).locator('.null-effect small').textContent(),'Null · Fiktion');
+  await p.locator('[data-language=en]').evaluate(e=>e.click());
+  await p.waitForFunction(()=>document.querySelector('.null-effect small').textContent==='Null · Fiction');
+  const proof=[];
+  for(const elapsed of [120,1300,2365,3550,4200]){
+   await seekPose(p,elapsed);
+   const opacity=await art(p).evaluate(el=>{
+    const stage=el.getBoundingClientRect(),effect=el.querySelector('.null-effect');
+    const rect=effect.getBoundingClientRect();
+    if(rect.left<stage.left||rect.right>stage.right||rect.bottom>stage.bottom||rect.top<stage.top)throw Error('Fiction effect escaped its stage');
+    return {beam:+getComputedStyle(effect).opacity,body:+getComputedStyle(el.querySelector('.null-mass')).opacity};
+   });
+   proof.push({elapsed,...opacity});
+   await heading.screenshot({path:join(h.output,'null35-gamma-'+elapsed+'ms.png')});
+  }
+  assert(proof[0].beam===0&&proof[0].body<proof[1].body);
+  assert(proof[2].beam>.5&&proof[3].beam===0&&proof[4].body<proof[3].body);
+  console.log('Null 3.5 temporal proof '+JSON.stringify(proof));
+  await advance(p);
+  assert.equal((await frames(p)).length,0);
+ }finally{await context.close()}
+});
+
+test('Null 3.5: 320 and 390 px use only clear peeks, with no effect in Reduced Motion',async()=>{
+ for(const width of [320,390]){
+  const {p,context}=await h.lab({viewport:{width,height:850},deviceScaleFactor:2,reducedMotion:'no-preference'});
+  try{
+   await controlled(p,.997);
+   await tab(p,'entropy');
+   const heading=p.locator('[data-null-anchor=entropy]');
+   await heading.scrollIntoViewIfNeeded();
+   await p.waitForFunction(()=>window.entrolabCreature.inspect().pose==='peek');
+   await advance(p);
+   assert.equal((await inspect(p)).sequence,'peek');
+   assert.equal(await art(p).locator('.null-effect').isVisible(),false);
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+   await seekPose(p,1250);
+   await heading.screenshot({path:join(h.output,'null35-peek-'+width+'.png')});
+   await p.emulateMedia({reducedMotion:'reduce'});
+   await p.waitForFunction(()=>window.entrolabCreature.inspect().sequence==='still');
+   assert.equal((await inspect(p)).timers,0);
+   assert.deepEqual(await frames(p),[]);
+   await heading.screenshot({path:join(h.output,'null35-reduced-'+width+'.png')});
+  }finally{await context.close()}
+ }
 });
 
 test('Null: both favicon eyes remain distinct in real Chromium at 16 and 32 pixels',async()=>{
