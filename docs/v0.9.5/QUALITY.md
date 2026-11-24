@@ -38,3 +38,7 @@ Bei 1 Mio. Punkten belegen synthetische Tiles plus Suchseiten bereits rund 14,49
 ## Reproduktion und Übergabe
 
 Die [Reproduktionsbefehle](README.md#offline-wiederholen) laufen ohne wissenschaftliche Netzverbindungen. Die [Quellenmatrix](SOURCES.md) beschreibt die Unterschiede zwischen öffentlichem Zugriff, Forschungsnutzung und Weiterverteilung pro Produkt. Phase 2 beginnt mit einer repräsentativeren, gezielt geschichteten Stichprobe, separaten Footprints, einer unabhängig geprüften HEALPix-Implementierung oder einem dokumentierten Alternativindex sowie einer Offline-Probe für JPL-Ephemeriden. Danach folgen Referenzprüfungen der Kosmologie, echte Geräte- und Netzwerkbudgets und Renderer-Vergleiche. Die Phase-1-Probe begründet noch keine Releaseentscheidung.
+
+## Heliosphere
+
+The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercises deterministic nested geometry, physical units and ephemeris coverage, and adds Chromium evidence for region selection, camera and epoch restoration, both Voyager trajectories, event navigation and 320/390 px layouts. It uses the existing source integrity and historical regression suites.

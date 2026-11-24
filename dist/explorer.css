@@ -292,3 +292,40 @@
 .ex-voyager-events li {margin-block:.4rem}
 .ex-voyager-events button {text-align:start;max-width:100%;white-space:normal}
 #voyStatus span {font-size:.9rem}
+
+.ex-heliosphere label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .35rem .55rem;
+  max-width: 100%;
+}
+.ex-heliosphere select { max-width: 100%; }
+.ex-helio-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem .9rem;
+  margin: .35rem 0 .55rem;
+  padding: 0;
+  list-style: none;
+  font-size: .75rem;
+  color: #c5d5df;
+}
+.ex-helio-legend li::before {
+  display: inline-block;
+  width: .65em;
+  height: .65em;
+  margin-inline-end: .38em;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  content: "";
+}
+.ex-helio-legend li:first-child::before { background: #ffd09e; border-color: #ffd09e; }
+.ex-helio-legend li:nth-child(2)::before { background: #8ed5f4; border-color: #8ed5f4; }
+#helioEventList li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .2rem .6rem;
+}
+#helioEventList button { max-width: 100%; white-space: normal; text-align: start; }
