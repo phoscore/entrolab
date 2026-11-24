@@ -311,7 +311,8 @@ export function mountSolar(root) {
   const relevantSystem = () => system ?? (selected === 'pluto' || reference === 'pluto' ? 'pluto' : null);
   const localSpec = () => ephemerisSpec(system);
   const outerLocal = () => system && localSpec().planetCentred;
-  const distance = () => voyager ? voyager.distance : system ? 3.1 * SYSTEMS[system].scaleKm / AU_KM : galactic?.distance ?? 85;
+  const distance = () => voyager ? voyager.distance : system ?
+    (outerLocal()?Math.max(2.28,2.2*height/width):3.1)*SYSTEMS[system].scaleKm/AU_KM : galactic?.distance??85;
   const minDay = () => voyager ? VOY_START : galactic ? GALACTIC_MIN_DAY : outerLocal() ? localSpec().start : MIN_DAY;
   const maxDay = () => voyager ? VOY_END : galactic ? GALACTIC_MAX_DAY : outerLocal() ? localSpec().end : MAX_DAY;
   const clampDay = value => Math.max(minDay(),Math.min(maxDay(),value));
@@ -903,7 +904,7 @@ export function mountSolar(root) {
         }
         vectors = cached.vectors;
       }
-      if (vectors) strokePath(vectors,body.color+(selected===body.id?'77':'35'),selected===body.id?1.5:1);
+      if (vectors) strokePath(vectors,body.color+(selected===body.id?(outerLocal()?'88':'77'):body.id==='nereid'?'63':'35'),selected===body.id?1.5:1);
     }
     if(trails)for(const {body,orbit} of entries){
       if(!orbit&&!body.period)continue;
@@ -933,8 +934,9 @@ export function mountSolar(root) {
     markers=entries.map(({body,vector})=>{
       const p=screen(displayedVector(vector));if(!p)return null;
       const planet=contextPlanet(body.id);
-      const radius=planet?Math.min(4,.9+p.pixelsPerAU*.5):voyager?body.size:enlarged?Math.min(galactic?body.size:system?28:52,Math.max(2,body.size*baseDistance/p.depth)):
-        radiusAU(body)*p.pixelsPerAU;
+      const maxSymbol=outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
+      const radius=planet?Math.min(4,.9+p.pixelsPerAU*.5):voyager?body.size:
+        enlarged?Math.min(maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):radiusAU(body)*p.pixelsPerAU;
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
         reference:reference===body.id&&reference!==selected,
@@ -1089,7 +1091,11 @@ export function mountSolar(root) {
       galactic.distance = fitted.distance;
       space = {...space,focus:fitted.focus,zoom:0};
       invalidate();
-    } else if(view==='3d'){space=spaceCamera();markPose('angle');invalidate();}
+    } else if(view==='3d'){
+      space=spaceCamera();
+      if(system)space={...space,...SYSTEMS[system].angle};
+      markPose('angle');invalidate();
+    }
     else setCamera(fit());
   };
 
@@ -1265,12 +1271,15 @@ export function mountSolar(root) {
   listen($('solOpenSelectedSystem'),'click',()=>{
     if(system||voyager||!Object.hasOwn(SYSTEMS,selected))return;
     enterSystem(selected);
-    $('solGlobal').focus({preventScroll:true});
+    $('solGlobal').focus();
   });
   listen($('solFirstWorldDay'),'click',()=>{changeDay(ephemerisSpec(relevantSystem()).start);$('solDate').focus({preventScroll:true});});
   listen($('solWorldRetry'),'click',()=>{const id=relevantSystem();if(id)loadSystem(id,true);updateInspector();});
   for(const [id,pose] of [['solTop','top'],['solAngle','angle'],['solSide','side']])
-    listen($(id),'click',()=>{setSpace({...space,...ORBIT_POSES[pose]});markPose(pose);invalidate();});
+    listen($(id),'click',()=>{
+      const orientation=(pose==='angle'&&system&&SYSTEMS[system].angle)||ORBIT_POSES[pose];
+      setSpace({...space,...orientation});markPose(pose);invalidate();
+    });
   listen($('solTrails'),'click',()=>{
     trails=!trails;$('solTrails').setAttribute('aria-pressed',String(trails));
     $('solTrails').textContent=t(trails?'trailsOn':'trailsOff');invalidate();

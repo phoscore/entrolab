@@ -81,6 +81,10 @@ test('outer system navigation, real positions and mobile rendering',async()=>{
       const start=await solar(p);
       assert.equal(requests.length,0);
       await click(p,'#solOpenSelectedSystem');
+      assert(await p.locator('#solGlobal').evaluate(el=>{
+        const rect=el.getBoundingClientRect();
+        return el===document.activeElement&&rect.top>=0&&rect.bottom<=innerHeight;
+      }));
       await loaded(p,'saturn',8);
       assert.equal((await solar(p)).view,'3d');
       assert((await solar(p)).day>=OUTER_START&&(await solar(p)).day<=OUTER_END);
