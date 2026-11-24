@@ -18,25 +18,28 @@ test('creature: eligibility gates all work and preserves static reduced/legacy s
  for(const value of ['subtle','still','off'])assert(validMode(value));
 });
 
-test('creature: seeded visits reproduce, select four sequences and skip opportunities',()=>{
- assert.equal(planAppearance(fixed(.10)),null);
+test('creature: seeded visits reproduce, select eight poses and gate the fictional effect',()=>{
+ assert.equal(planAppearance(fixed(.08)),null);
  for(const [roll,sequence] of [[.19,'mischief'],[.31,'glitch'],[.48,'curiosity'],[.85,'observer']]){
   assert.deepEqual(planAppearance(fixed(roll,.5)),{sequence,duration:6400});
  }
- assert.equal(planAppearance(fixed(.64,.5),true).sequence,'curiosity');
- assert.equal(planAppearance(fixed(.64,.5),false).sequence,'observer');
+ assert.equal(planAppearance(fixed(.64,.5),{reason:'extreme'}).sequence,'curiosity');
+ assert.equal(planAppearance(fixed(.64,.5)).sequence,'satisfied');
+ assert.equal(planAppearance(fixed(.60,.5),{reason:'scale'}).sequence,'disturbed');
+ assert.equal(planAppearance(fixed(.997,.5)).sequence,'peek');
+ assert.deepEqual(planAppearance(fixed(.997,.5),{room:true}),{sequence:'gamma',duration:4300});
  const one=creatureRandom(75),two=creatureRandom(75),seen=new Set();
  for(let i=0;i<1200;i++){
   const a=planAppearance(one),b=planAppearance(two);
   assert.deepEqual(a,b);
   seen.add(a?.sequence);
-  if(a)assert(a.duration>=4900&&a.duration<=7900);
+  if(a)assert(a.duration>=2300&&a.duration<=7900);
  }
- assert.equal(seen.size,5);
+ assert.equal(seen.size,9);
 });
 
 test('creature: a skipped opportunity consumes only the choice roll',()=>{
- const values=[.1,.77,.25];
+ const values=[.08,.85,.25];
  const random=()=>values.shift();
  assert.equal(planAppearance(random),null);
  assert.deepEqual(planAppearance(random),{sequence:'observer',duration:5650});
@@ -46,13 +49,15 @@ test('creature: a skipped opportunity consumes only the choice roll',()=>{
 test('creature: bounded first and later waits',()=>{
  assert.equal(restDelay(fixed(0),true),6000);
  assert.equal(restDelay(fixed(.99999),true),12000);
- assert.equal(restDelay(fixed(0)),22000);
- assert.equal(restDelay(fixed(.99999)),58000);
+ assert.equal(restDelay(fixed(0)),13000);
+ assert.equal(restDelay(fixed(.99999)),32000);
 });
 
 test('creature: general preference has a DE and EN label',()=>{
  assert.equal(de['v0925.decorativeMotion'],'Dekorative Bewegung');
  assert.equal(en['v0925.decorativeMotion'],'Decorative motion');
+ assert.equal(de['v0925.nullFiction'],'Null · Fiktion');
+ assert.equal(en['v0925.nullFiction'],'Null · Fiction');
 });
 
 test('creature: rendering and scheduling never depend on laboratory code or Math.random',()=>{
