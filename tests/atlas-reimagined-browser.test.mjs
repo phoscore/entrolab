@@ -60,7 +60,11 @@ async function capture(which,site,width){
     assert.ok(alpha[0]>alpha[2]&&alpha[2]>0,'only the occupied side of an empty boundary fades');
   }
   await page.locator('#exDesiEnabled').check();
-  await page.locator('#exCanvas').scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>window.entrolabExplorer?.inspect().desi.status==='overview');
+  // The full-height screenshot can move the canvas outside the historical
+  // renderer's intersection gate before the DESI response arrives.
+  await page.locator('#exCanvas').evaluate(canvas=>canvas.scrollIntoView({block:'center',behavior:'instant'}));
+  await page.locator('#exHome').evaluate(button=>button.click());
   try {await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.desi.status==='overview'&&s.desi.counts?.selected===32392;},null,{timeout:12000});}
   catch(error) {console.error('Atlas DESI state',which,width,JSON.stringify(await page.evaluate(()=>window.entrolabExplorer?.inspect())),errors);throw error;}
   await image('combined');

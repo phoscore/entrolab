@@ -53,7 +53,6 @@ async function controlled(p,roll=.85,durationRoll=.5){
 
   };
   window.nullAudit.mount();
-  window.nullAudit.original=document.querySelector('#creature');
  },{roll,durationRoll});
  try{await p.waitForFunction(()=>window.nullAudit.pending()===1,null,{timeout:3500});}
  catch(error){
@@ -292,6 +291,16 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
   await cd.send('HeapProfiler.collectGarbage');
   const counters=await cd.send('Memory.getDOMCounters');
   for(let i=0;i<3;i++)for(const id of ['blackhole','extreme','entropy','matter','science','gravity'])await tab(p,id);
+  await p.evaluate(async()=>{
+   const tabs=Array.from(document.querySelectorAll('[data-tab]')).filter(button=>button.dataset.tab!=='explorer');
+   for(let i=0;i<100;i++){
+    tabs[i%tabs.length].click();
+    await Promise.resolve();
+    const state=window.entrolabCreature.inspect();
+    if(state.timers>1||state.figures!==1)throw Error('Null leaked an owner during navigation');
+   }
+   document.querySelector('[data-tab=gravity]').click();
+  });
   await reset(p);
   await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1);
   const stats=await p.evaluate(async()=>{
@@ -312,11 +321,13 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
   });
   assert.equal(stats.visits,250);
   assert.deepEqual({...stats,visits:0},{visits:0,maxTimers:1,maxFigures:1,slots:1,pending:1});
+  await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await cd.send('HeapProfiler.collectGarbage');
   const after=await cd.send('Memory.getDOMCounters');
   assert.equal(after.documents,counters.documents);
   assert(after.jsEventListeners<=counters.jsEventListeners+5,JSON.stringify({counters,after}));
   assert(after.nodes<=counters.nodes+35,JSON.stringify({counters,after}));
+  console.log('Null 3.5 resource proof '+JSON.stringify({counters,after,...stats}));
   const nextId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('sentinel','planet',1e-6,0,0,0,0,'#fff').id});
   assert.equal(nextId,firstId+1);
   assert.deepEqual(await physical(p),before);
@@ -328,6 +339,7 @@ test('Null 3.5: one figure visits seven real laboratory headings in safe space',
  const {p,context}=await h.lab({viewport:{width:1440,height:950},reducedMotion:'no-preference'});
  try{
   await controlled(p);
+  await p.evaluate(()=>{window.nullAudit.original=document.querySelector('#creature')});
   for(const area of ['blackhole','extreme','temperature','entropy','explorer','science','gravity']){
    await tab(p,area==='temperature'?'extreme':area);
    const heading=p.locator('[data-null-anchor='+area+']');
@@ -461,6 +473,37 @@ test('Null 3.5: 320 and 390 px use only clear peeks, with no effect in Reduced M
    await heading.screenshot({path:join(h.output,'null35-reduced-'+width+'.png')});
   }finally{await context.close()}
  }
+});
+
+test('Null 3.5: a small scroll clips no active visit and multi-touch stays quiet until the last contact',async()=>{
+ const {p,context}=await h.lab({viewport:{width:1440,height:950},reducedMotion:'no-preference'});
+ try{
+  await controlled(p);
+  await tab(p,'extreme');
+  await p.locator('[data-null-anchor=extreme]').evaluate(el=>el.scrollIntoView({block:'start',behavior:'instant'}));
+  await p.waitForFunction(()=>window.entrolabCreature.inspect().place==='extreme'&&window.nullAudit.pending()===1);
+  await advance(p);
+  assert.equal((await inspect(p)).visible,true);
+  const delta=await p.locator('.null-slot').evaluate(el=>Math.floor(el.getBoundingClientRect().top)+1);
+  assert(delta>0&&delta<=5,delta);
+  await p.evaluate(delta=>scrollBy({top:delta,behavior:'instant'}),delta);
+  await p.waitForFunction(()=>!window.entrolabCreature.inspect().visible);
+  await tab(p,'gravity');
+  await reset(p);
+  await p.waitForFunction(()=>window.nullAudit.pending()===1);
+  await p.evaluate(()=>{
+   const canvas=document.querySelector('#universe');
+   // Exercise Null’s capture-phase guard without supplying synthetic pointers
+   // to Gravity’s separately tested native pointer capture.
+   canvas.addEventListener('pointerdown',event=>event.stopImmediatePropagation(),{capture:true});
+   for(const pointerId of [1,2])canvas.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId,pointerType:'touch'}));
+   window.dispatchEvent(new PointerEvent('pointerup',{pointerId:2,pointerType:'touch'}));
+  });
+  assert.equal((await inspect(p)).timers,0);
+  assert.equal((await inspect(p)).visible,false);
+  await p.evaluate(()=>window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:1,pointerType:'touch'})));
+  assert.equal((await inspect(p)).timers,1);
+ }finally{await context.close()}
 });
 
 test('Null: both favicon eyes remain distinct in real Chromium at 16 and 32 pixels',async()=>{

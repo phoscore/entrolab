@@ -27,7 +27,8 @@ export function initCreature(doc=globalThis.document,options={}){
  let storage=options.storage,mode='subtle',globalOff=false,disposed=false;
  let pending=null,visit=null,first=true,visits=0,nextAllowed=0;
  let stage=null,context=null,preferLab=false,generation=0,reason=null;
- let pointer=null,committedSelect=null;
+ const pointers=new Set();
+ let committedSelect=null;
  try{
   if(storage===undefined)storage=win.localStorage;
   const preference=storage?.getItem(preferenceKey);
@@ -36,7 +37,7 @@ export function initCreature(doc=globalThis.document,options={}){
    globalOff=preference==='off';
    mode=globalOff?'off':'subtle';
   }
-  else if(validMode(legacy))mode=legacy;
+  else if(validMode(legacy)){mode=legacy;globalOff=legacy==='off';}
  }catch{}
 
  const slot=doc.createElement('span'),figure=doc.createElement('span');
@@ -113,7 +114,7 @@ export function initCreature(doc=globalThis.document,options={}){
  }
  const policyFor=seen=>creaturePolicy({
   mode,reduced:motion.matches,hidden:doc.hidden,seen,
-  editing:pointer!==null||doc.activeElement!==committedSelect&&!!doc.activeElement?.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"])'),
+  editing:pointers.size>0||doc.activeElement!==committedSelect&&!!doc.activeElement?.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"])'),
   focus:doc.body.classList.contains('has-focus'),guide:guide.open,
  });
  function clear(){
@@ -215,7 +216,7 @@ export function initCreature(doc=globalThis.document,options={}){
   updatePreference();
  });
  listen(doc,'visibilitychange',()=>{
-  pointer=null;
+  pointers.clear();
   committedSelect=null;
   reconcile();
  });
@@ -224,17 +225,15 @@ export function initCreature(doc=globalThis.document,options={}){
  listen(doc,'pointerdown',event=>{
   if(!event.target.closest?.('.view.active :is(canvas,input,select,textarea,[contenteditable])'))return;
   committedSelect=null;
-  pointer=event.pointerId;
+  pointers.add(event.pointerId);
   reconcile();
  },true);
  function finishPointer(event){
-  if(pointer!==event.pointerId)return;
-  pointer=null;
-  reconcile();
+  if(pointers.delete(event.pointerId)&&!pointers.size)reconcile();
  }
  listen(win,'pointerup',finishPointer,true);
  listen(win,'pointercancel',finishPointer,true);
- listen(win,'blur',()=>{pointer=null;committedSelect=null;reconcile();});
+ listen(win,'blur',()=>{pointers.clear();committedSelect=null;reconcile();});
  listen(doc,'keydown',event=>{
   if(event.target!==committedSelect||event.key==='Tab')return;
   committedSelect=null;
@@ -292,7 +291,14 @@ export function initCreature(doc=globalThis.document,options={}){
  if(explorer)stateObserver.observe(explorer,{childList:true,attributes:true,attributeFilter:['class']});
  watchHeading(anchor);
  for(const element of heading.values())watchHeading(element);
- if(!observer)listen(win,'scroll',()=>reconcile(),{passive:true});
+ listen(win,'scroll',()=>{
+  if(figure.hidden&&observer)return;
+  const box=slot.getBoundingClientRect(),bounds=viewport();
+  if(box.top<bounds.top||box.bottom>bounds.bottom||box.left<bounds.left||box.right>bounds.right){
+   stop();
+   reconcile();
+  }else if(!observer)reconcile();
+ },{passive:true,capture:true});
  const controller={
   inspect:()=>disposed?inactive:{
    mounted:true,visible:!figure.hidden,moving:!!visit,sequence:figure.dataset.sequence??null,
