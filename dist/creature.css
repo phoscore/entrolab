@@ -100,13 +100,6 @@
 @keyframes null-gaze {0%,17%,86%,100%{transform:translate(0)}27%,46%{transform:translate(-5px,1px)}60%,77%{transform:translate(4px,-1px)}}
 @keyframes null-assemble {0%{transform:translate(var(--shard-x),var(--shard-y));opacity:0}25%{opacity:.86}72%{transform:translate(0);opacity:.38}100%{transform:translate(0);opacity:0}}
 
-#decorativeMotion {
- appearance:none;border:0;border-radius:4px;padding:6px 8px;margin:0 0 12px;
- background:transparent;color:#bdafcc;font:inherit;font-size:.85rem;text-decoration:underline;
- text-underline-offset:3px;cursor:pointer;
-}
-#decorativeMotion[aria-pressed="false"] {color:#aa9bb9}
-body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-state:paused}
 @media(max-width:600px) {
  .null-slot {top:0;width:54px;height:55px}
  #creature[data-sequence="mischief"] .null-pose {transform:translate(4px,8px) scale(.88)}

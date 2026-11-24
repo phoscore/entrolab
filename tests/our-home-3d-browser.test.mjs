@@ -58,7 +58,7 @@ test('W-01 rejects the shifted Earth Y values without exposing geometry and retr
     });
 
     await page.locator('[data-system=pluto]').click();
-    await page.locator('#solFirstWorldDay').click();
+    await page.locator('#solDate').fill('2025-01-01');
     await page.locator('#solCanvas').scrollIntoViewIfNeeded();
     await page.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.length===2);
     const validPluto=await state(page);
@@ -125,14 +125,14 @@ test('the three Horizons system views load on demand and remain usable at 1440, 
     requests.length=0;
     page.on('request',request=>{if(/horizons-2025-2030.*\.bin$/.test(request.url()))requests.push(request.url().split('/').at(-1));});
     try{
-      await page.locator('[data-system=earth]').click();
-      assert.match(await page.locator('#solWorldMessage').innerText(),/01\.01\.2025/);
-      assert.equal((await state(page)).pair,null);
+      const original=await state(page);
+      assert.equal(original.day,2451545);
       assert.deepEqual(requests,[]);
       const earthStarted=Date.now();
-      await page.locator('#solFirstWorldDay').click();
-      await page.locator('#solDate').fill('2026-11-17');
+      await page.locator('[data-system=earth]').click();
+      assert.match(await page.locator('#solTimestamp').textContent(),/00:00 TDB$/);
       const time=(await state(page)).day;
+      assert.ok(time>=2460676.5&&time<=2462502.5);
       for(const [system,selected,count] of cases){
         const started=system==='earth'?earthStarted:Date.now();
         const trigger=page.locator(`[data-system=${system}]`);
@@ -188,6 +188,7 @@ test('the three Horizons system views load on demand and remain usable at 1440, 
       assert.equal((await state(page)).pair,null);
       assert.match(await page.locator('#solWorldMessage').innerText(),/through 1 Jan 2030/);
       await page.locator('#solDate').fill('2026-11-17');
+      const chosenDay=(await state(page)).day;
       await page.locator('#solGlobal').click();
       assert.equal((await state(page)).view,'2d');
       await page.locator('#solCanvas').scrollIntoViewIfNeeded();
@@ -206,7 +207,7 @@ test('the three Horizons system views load on demand and remain usable at 1440, 
         await page.waitForTimeout(180);
         assert.equal((await state(page)).draws,idle);
         assert.deepEqual(requests,['earth.bin','jupiter.bin','pluto.bin']);
-        assert.equal((await state(page)).day,time);
+        assert.equal((await state(page)).day,chosenDay);
       }
       assert.deepEqual(errors,[]);
     }finally{await context.close();}
@@ -214,6 +215,84 @@ test('the three Horizons system views load on demand and remain usable at 1440, 
   console.log('NEW_WORLDS_MEASUREMENTS '+JSON.stringify(measurements));
   await writeFile(join(output,'new-worlds-measurements.json'),JSON.stringify({browser:browser.version(),measurements,cycles:100},null,2)+'\n');
 });
+test('moon-system fallback is temporary and restores 2D and 3D cameras',async()=>{
+  const {page,context,errors}=await open(1440);
+  const canvas=page.locator('#solCanvas');
+  const date=page.locator('#solDate');
+  async function openSystem(id,count){
+    await page.locator(`[data-system=${id}]`).click();
+    await canvas.scrollIntoViewIfNeeded();
+    await page.waitForFunction(n=>window.entrolabExplorer.inspect().solar.markers.length===n,count);
+    const lunar=await state(page);
+    assert.equal(lunar.system,id);
+    assert.equal(lunar.pose,'angle');
+    assert.equal(lunar.space.zoom,0);
+    assert.ok(lunar.pair);
+    return lunar;
+  }
+  try{
+    await page.clock.setFixedTime(new Date('2026-11-24T22:00:00Z'));
+    await canvas.press('+');
+    const original=await state(page);
+    const earth=await openSystem('earth',2);
+    assert.equal(await date.inputValue(),'2026-11-24');
+    await page.locator('[data-system=earth]').click();
+    assert.deepEqual((await state(page)).space,earth.space);
+    await page.locator('#sol2d').click();
+    const overview=await state(page);
+    assert.equal(overview.day,original.day);
+    assert.deepEqual(overview.camera,original.camera);
+    assert.equal(overview.view,'2d');
+
+    await page.locator('#sol3d').click();
+    await canvas.press('ArrowLeft');
+    await canvas.press('+');
+    await date.fill('2040-03-01');
+    const three=await state(page);
+    await page.clock.setFixedTime(new Date('2035-09-15T12:00:00Z'));
+    await openSystem('jupiter',5);
+    assert.equal(await date.inputValue(),'2025-01-01');
+    await page.locator('#solGlobal').click();
+    const restored=await state(page);
+    assert.equal(restored.view,'3d');
+    assert.equal(restored.day,three.day);
+    assert.equal(restored.pose,three.pose);
+    assert.deepEqual(restored.space,three.space);
+
+    await openSystem('pluto',2);
+    await date.fill('2028-02-29');
+    const chosen=await state(page);
+    await page.locator('#solGlobal').click();
+    assert.equal((await state(page)).day,chosen.day);
+    await openSystem('earth',2);
+    assert.equal((await state(page)).day,chosen.day);
+    await date.fill('2024-12-31');
+    assert.equal((await state(page)).pair,null);
+    await page.locator('#solFirstWorldDay').click();
+    assert.equal(await date.inputValue(),'2025-01-01');
+    assert.ok((await state(page)).pair);
+    await page.locator('#solGlobal').click();
+    await date.fill('2010-04-10');
+    await page.locator('#solGalactic').click();
+    await canvas.press('ArrowRight');
+    const flight=await state(page);
+    await openSystem('jupiter',5);
+    assert.equal(await date.inputValue(),'2025-01-01');
+    await page.locator('#solGlobal').click();
+    const resumed=await state(page);
+    assert.ok(resumed.galactic);
+    assert.equal(resumed.day,flight.day);
+    assert.deepEqual(resumed.space,flight.space);
+    await openSystem('earth',2);
+    await date.fill('2040-03-01');
+    await page.locator('#solGlobal').click();
+    assert.equal(await date.inputValue(),'2040-03-01');
+    assert.equal((await state(page)).galactic,null);
+    assert.equal((await state(page)).view,'3d');
+    assert.deepEqual(errors,[]);
+  }finally{await context.close();}
+});
+
 test('local 3D uses the same TDB epoch, selection and 3D comparison at 1440/390/320',async()=>{
   const measurements=[];
   for(const width of [1440,390,320]){
@@ -585,6 +664,8 @@ test('Galactic time, follow, boundaries, Moon return, 100 switches and idle stay
     assert.equal(local.galactic,null);
     await page.locator('#solGlobal').click();
     assert.equal((await getFlight(page)).view,'3d');
+    assert.ok((await getFlight(page)).galactic);
+    await page.locator('#solHelio').click();
     await page.locator('#solCanvas').scrollIntoViewIfNeeded();
     await flightFrameSettled(page);
     const cdp=await context.newCDPSession(page);

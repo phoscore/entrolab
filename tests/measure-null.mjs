@@ -35,7 +35,7 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
    initCreature().dispose();
    let next=null;
    let rolls=[];
-   initCreature(document,{storage:null,random:()=>rolls.shift()??.5,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
+   initCreature(document,{random:()=>rolls.shift()??.5,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
    window.startNullBenchmark=roll=>{rolls=[roll,.5];window.advanceNullBenchmark()};
    window.advanceNullBenchmark=()=>{const callback=next;next=null;callback()};
   });

@@ -1,46 +1,31 @@
-import {CREATURE_COOLDOWN,creaturePolicy,creatureRandom,planAppearance,restDelay,validMode} from './creature-policy.mjs';
+import {CREATURE_COOLDOWN,creaturePolicy,creatureRandom,planAppearance,restDelay} from './creature-policy.mjs';
 import {creatureArt} from './creature-art.mjs';
 import {headingSpace} from './creature-places.mjs';
 import {t} from './i18n.mjs';
 
 const instances=new WeakMap();
-const preferenceKey='entrolab-decorative-motion';
-const oldPreferenceKey='entrolab-creature-mode';
 const inactive=Object.freeze({mounted:false,subscriptions:0,observers:0,timers:0,figures:0});
 
 export function initCreature(doc=globalThis.document,options={}){
  if(instances.has(doc))return instances.get(doc);
  const win=doc.defaultView,guide=doc.getElementById('physicsGuide');
  const anchor=guide?.querySelector(':scope > summary');
- const control=doc.getElementById('decorativeMotion');
  const label=anchor?.querySelector(':scope > span');
  const views=[...doc.querySelectorAll('.view')];
  const explorer=doc.getElementById('explorer');
  const heading=new Map([...doc.querySelectorAll('[data-null-anchor]')].map(el=>[el.dataset.nullAnchor,el]));
- if(!anchor||!control)return null;
+ if(!anchor)return null;
 
  const {clock=()=>win.performance.now(),schedule=(fn,ms)=>win.setTimeout(fn,ms),
   cancel=id=>win.clearTimeout(id)}=options;
  const random=options.random??creatureRandom(win.crypto?.getRandomValues(new Uint32Array(1))[0]);
  const motion=win.matchMedia('(prefers-reduced-motion: reduce)');
  const cleanup=[];
- let storage=options.storage,mode='subtle',globalOff=false,disposed=false;
+ let disposed=false;
  let pending=null,visit=null,first=true,visits=0,nextAllowed=0;
  let stage=null,context=null,preferLab=false,generation=0,reason=null;
  const pointers=new Set();
  let committedSelect=null;
- try{
-  if(storage===undefined)storage=win.localStorage;
-  const preference=storage?.getItem(preferenceKey);
-  const legacy=storage?.getItem(oldPreferenceKey);
-  if(preference==='on'||preference==='off'){
-   globalOff=preference==='off';
-   mode=globalOff?'off':'subtle';
-  }
-  // The old preference governed only Null. The shared switch governs the sky as well.
-  else if(validMode(legacy))mode=legacy;
- }catch{}
-
  const slot=doc.createElement('span'),figure=doc.createElement('span');
  slot.className='null-slot';
  slot.setAttribute('aria-hidden','true');
@@ -114,7 +99,7 @@ export function initCreature(doc=globalThis.document,options={}){
   }
  }
  const policyFor=seen=>creaturePolicy({
-  mode,reduced:motion.matches,hidden:doc.hidden,seen,
+  reduced:motion.matches,hidden:doc.hidden,seen,
   editing:pointers.size>0||doc.activeElement!==committedSelect&&!!doc.activeElement?.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"])'),
   focus:doc.body.classList.contains('has-focus'),guide:guide.open,
  });
@@ -204,18 +189,6 @@ export function initCreature(doc=globalThis.document,options={}){
   if(progress>.80)return 'retreating';
   return ['observer','peek'].includes(visit.sequence)?'observing':'reacting';
  }
- function updatePreference(){
-  control.setAttribute('aria-pressed',String(!globalOff));
-  if(globalOff)doc.body.dataset.decorativeMotion='off';
-  else delete doc.body.dataset.decorativeMotion;
-  reconcile();
- }
- listen(control,'click',()=>{
-  globalOff=!globalOff;
-  mode=globalOff?'off':'subtle';
-  try{storage?.setItem(preferenceKey,mode==='off'?'off':'on')}catch{}
-  updatePreference();
- });
  listen(doc,'visibilitychange',()=>{
   pointers.clear();
   committedSelect=null;
@@ -303,7 +276,7 @@ export function initCreature(doc=globalThis.document,options={}){
  const controller={
   inspect:()=>disposed?inactive:{
    mounted:true,visible:!figure.hidden,moving:!!visit,sequence:figure.dataset.sequence??null,
-   mode,visits,place:stage?.id??null,pose:stage?.pose??null,phase:phase(),queued:reason,context,subscriptions:cleanup.length,
+   visits,place:stage?.id??null,pose:stage?.pose??null,phase:phase(),queued:reason,context,subscriptions:cleanup.length,
    observers:1+Number(!!observer)+Number(!!resize),
    timers:Number(pending!==null),figures:1,
   },
@@ -316,12 +289,11 @@ export function initCreature(doc=globalThis.document,options={}){
    stateObserver.disconnect();
    for(const remove of cleanup)remove();
    slot.remove();
-   delete doc.body.dataset.decorativeMotion;
    instances.delete(doc);
   },
  };
  instances.set(doc,controller);
- updatePreference();
+ reconcile();
  return controller;
 }
 

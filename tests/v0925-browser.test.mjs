@@ -30,7 +30,7 @@ test('v0.9.25: all eight object descriptions update in both languages, including
    de:[/bolometrischen Leuchtkraft ab.*0,9 Jupiterradien/,/separat 1 Jupiterradius.*illustrative Leuchtkraft/],
    en:[/bolometric luminosity.*0\.9 Jupiter radii/,/separately adopts 1 Jupiter radius.*illustrative luminosity/],
   };
-  for(const lang of ['de','en','de']){
+  for(const [pass,lang] of ['de','en','de'].entries()){
    await p.locator(`[data-language=${lang}]`).click();
    for(const [index,kind] of extremeKinds.entries()){
     await choose(p,kind);
@@ -43,6 +43,15 @@ test('v0.9.25: all eight object descriptions update in both languages, including
     assert.equal(await p.locator('#objectFacts').isVisible(),index>=3);
     assert.equal(await p.locator('#objectSources a').count()>0,index>=3);
     assert.equal(await p.locator('#extremeToBlackHole').isVisible(),kind==='blackhole');
+    if(kind==='white'||kind==='neutron'){
+     const names={de:{white:'Weißer Zwerg',neutron:'Neutronenstern'},en:{white:'White dwarf',neutron:'Neutron star'}};
+     const label=names[lang][kind];
+     assert.equal(await p.locator('#extremeObject option:checked').textContent(),label);
+     assert.equal(await p.locator(`#objectComparison [data-kind=${kind}] h3`).textContent(),label);
+     assert.match(await p.locator('#objectAssumption').textContent(),lang==='de'?/^Illustratives Beispiel:/:/^Illustrative example:/);
+     assert.equal(await p.locator('#extremeStatus').textContent(),lang==='de'?'Künstlerische Darstellung':'Artist’s impression');
+     if(pass<2)await p.locator('.extreme-controls').screenshot({path:join(h.output,`qol-extreme-${kind}-${lang}.png`)});
+    }
     if(kind==='sun'){
      assert.match(await p.locator('#objectFacts').innerText(),lang==='de'?/5\.772 K.*Fluchtgeschwindigkeit/s:/5,772 K.*Surface escape speed/s);
      assert.match(await p.locator('#extremeRadius').innerText(),lang==='de'?/695\.700 km/:/695,700 km/);
