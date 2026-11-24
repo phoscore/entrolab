@@ -61,9 +61,22 @@ test('native Chromium renders a schematic heliosphere and real crossings at 1440
         await settle(p);
         assert.notEqual((await solar(p)).space.yaw,state.space.yaw);
         await screenshot(p,'alternate');
+        const pickRegion=async region=>{
+          await p.locator('#helioRegion').selectOption(region);
+          await settle(p);
+          return canvas(p).evaluate(el=>el.toDataURL());
+        };
+        assert.notEqual(await pickRegion('wind'),await pickRegion('shock'));
+        assert.notEqual(await pickRegion('interstellar'),await pickRegion('heliopause'));
+        assert.match(await canvas(p).getAttribute('aria-label'),/Heliosphäre/);
         await p.locator('#helioRegion').selectOption('sheath');
+        await settle(p);
         assert.match(await p.locator('#helioDescription').textContent(),/Stoßfront und Heliopause/);
         await screenshot(p,'region');
+        await click(p,'#solList [data-body=neptune]');
+        assert.equal((await solar(p)).selected,'neptune');
+        assert.match(await p.locator('#solDistance').textContent(),/AU/);
+        assert(await p.locator('#solPlanetInspector').isVisible());
         await click(p,'#helioV2');
         assert.equal((await solar(p)).selected,'v2');
         assert((await p.locator('#voyPanel dd').allTextContents()).every(value=>value.startsWith('≈')));
@@ -116,6 +129,7 @@ test('Voyager and moon state restore across heliosphere mode, which redraws only
     await click(p,'#sol3d');
     await click(p,'#solGalactic');
     assert(await p.locator('#solHeliosphere').isHidden());
+    assert(await p.locator('#solHeliocentricHint').isVisible());
     await click(p,'#solHelio');
     const normal=await solar(p);
     await p.evaluate(()=>{

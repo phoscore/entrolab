@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {AU_KM,parseModelDate} from '../dist/explorer/solar-model.mjs';
-import {boundaries,nose,shellGeometry,crossings,crossingPosition,observedRegion} from '../dist/explorer/heliosphere-model.mjs';
+import {boundaries,nose,shellGeometry,crossings,crossingPosition,observedRegion,regionPoint} from '../dist/explorer/heliosphere-model.mjs';
 import {decodeVoyager,END,RELEASE,V2_GAP} from '../dist/explorer/voyager-data.mjs';
 import {resolveCrossings,heliosphereText} from '../dist/explorer/heliosphere-view.mjs';
 
@@ -23,6 +23,9 @@ test('shells are finite, asymmetric, nested and expressed in heliocentric eclipt
       assert(shock>70&&heliopause-shock>25);
     }
   }
+  const east=[-Math.sin(256*Math.PI/180),Math.cos(256*Math.PI/180),0];
+  const radii=['wind','shock','sheath','heliopause','interstellar'].map(id=>Math.hypot(...regionPoint(id,east)));
+  assert(radii.every((radius,index)=>!index||radius>radii[index-1]));
   assert(boundaries(-1,0).heliopause>2*boundaries(1,0).heliopause);
   assert.notEqual(boundaries(0,Math.PI/2).heliopause,boundaries(0,-Math.PI/2).heliopause);
 });

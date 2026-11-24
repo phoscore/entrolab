@@ -329,3 +329,5 @@
   gap: .2rem .6rem;
 }
 #helioEventList button { max-width: 100%; white-space: normal; text-align: start; }
+
+#helioMarkerEpoch { margin: 0 0 .55rem; }

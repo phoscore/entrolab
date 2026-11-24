@@ -64,3 +64,13 @@ export function observedRegion(probe,day) {
   if (day>=shock.day) return day<shock.lastDay+1?'shockCrossing':'sheath';
   return 'wind';
 }
+
+export function regionPoint(region,direction) {
+  const dot = axis => axis.reduce((value,v,i)=>value+v*direction[i],0);
+  const {shock,heliopause}=boundaries(dot(nose),Math.atan2(dot(north),dot(east)));
+  const radii={
+    wind:shock*.55, shock, sheath:(shock+heliopause)/2,
+    heliopause, interstellar:heliopause*1.23, tail:heliopause*.82,
+  };
+  return direction.map(v=>v*radii[region]);
+}

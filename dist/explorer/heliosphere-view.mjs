@@ -1,4 +1,4 @@
-import {crossingPosition,crossings,observedRegion} from './heliosphere-model.mjs';
+import {crossingPosition,crossings,observedRegion,nose,regionPoint} from './heliosphere-model.mjs';
 
 export const heliosphereText = {
   helioOpen:['Heliosphäre · 3D','Heliosphere · 3D'],
@@ -6,7 +6,10 @@ export const heliosphereText = {
   helioCaption:['Wissenschaftlich orientiertes, schematisches 3D-Modell','Science-informed schematic 3D model'],
   helioLegendShock:['Termination Shock','Termination shock'],
   helioLegendPause:['Heliopause','Heliopause'],
-  helioLegendCross:['Historische Messpunkte','Historical crossings'],
+  helioLegendCross:['Historische Überquerungen','Historical crossings'],
+  helioMarkerEpoch:['Markierungen · Horizons um 00:00 TDB am jeweiligen Kalendertag','Markers · Horizons at 00:00 TDB on each calendar date'],
+  helioBodies:['Sonden und Planeten','Probes and planets'],
+  helioData:['Voyager: Horizons · Planeten: JPL-Näherung','Voyager: Horizons · Planets: JPL approximation'],
   helioFit:['Heliosphäre einpassen','Fit heliosphere'],
   helioMode:['Heliosphäre im lokalen, sonnenzentrierten Bezug.','Heliosphere in the local, Sun-centred frame.'],
   helioScience:['Warum diese Form?','Why this shape?'],
@@ -122,8 +125,8 @@ export function paintHeliosphere(ctx,screen,shells,region) {
   ctx.save();
   for(const {id,rings} of shells){
     const outer=id==='heliopause';
-    const selected=region===id||region==='sheath'||(outer&&(region==='tail'||region==='interstellar'))||
-      (!outer&&region==='wind');
+    const selected=region===id||(outer&&region==='tail');
+    const volume=outer?region==='sheath':region==='wind';
     const area=new Path2D(), grid=new Path2D(), tailGrid=new Path2D();
     for(let j=0;j<rings.length;j++){
       const ring=rings[j], next=rings[j+1];
@@ -135,7 +138,8 @@ export function paintHeliosphere(ctx,screen,shells,region) {
         if(next&&i%5===0)addLine(gridPath,screen,ring[i],next[i]);
       }
     }
-    ctx.fillStyle=outer?(selected?'#68bdfa23':'#68bdfa12'):(selected?'#ffb87b28':'#ffb87b14');
+    ctx.fillStyle=outer?(volume?'#68bdfa43':selected?'#68bdfa23':'#68bdfa12'):
+      (volume?'#f9c98742':selected?'#ffb87b28':'#ffb87b14');
     ctx.fill(area);
     ctx.strokeStyle=outer?(selected?'#8ed5f44e':'#8ed5f425'):(selected?'#ffd09e65':'#ffd09e45');
     ctx.lineWidth=.85;ctx.stroke(grid);
@@ -174,3 +178,23 @@ export const resolveCrossings = data => crossings.flatMap(event=>{
   const vector=crossingPosition(event,data);
   return vector?[{event,vector}]:[];
 });
+
+export function paintRegionAnchor(ctx,screen,basis,region,lang,width,height) {
+  const [right,up]=basis;
+  const reverse=vector=>vector.map(value=>-value);
+  const directions=region==='tail'?[reverse(nose)]:[right,reverse(right),up,reverse(up)];
+  for(const direction of directions){
+    const point=screen(regionPoint(region,direction));
+    if(!point||point.x<12||point.x>width-12||point.y<12||point.y>height-59)continue;
+    const {x,y}=point;
+    ctx.save();
+    ctx.strokeStyle='#dbeaf7';ctx.lineWidth=1.25;
+    ctx.beginPath();
+    ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);
+    ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);
+    ctx.stroke();
+    ctx.restore();
+    return {x,y,radius:4,priority:19,label:descriptions[region][0][lang]};
+  }
+  return null;
+}
