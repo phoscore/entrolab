@@ -24,6 +24,7 @@ const examples = Object.freeze({
   sources:Object.freeze([
    ['Bedin et al. (2024)', 'https://arxiv.org/abs/2403.08865'],
    ['Faherty et al. (2014)', 'https://doi.org/10.1088/0004-637X/790/2/90'],
+   ['Crossfield et al. (2014)', 'https://doi.org/10.1038/nature12955'],
    ['Spiegel et al. (2011)', 'https://doi.org/10.1088/0004-637X/727/1/57'],
   ].map(Object.freeze)),
  }),
@@ -33,6 +34,7 @@ const examples = Object.freeze({
   sources:Object.freeze([
    ['Joyce et al. (2020)', 'https://arxiv.org/abs/2006.09837'],
    ['Levesque & Massey (2020)', 'https://arxiv.org/abs/2002.10463'],
+   ['ALMA · Betelgeuse', 'https://www.almaobservatory.org/en/audiences/alma-reveals-long-lived-hotspots-on-betelgeuses-bubbling-surface/'],
   ].map(Object.freeze)),
  }),
  magnetar: sphereExample({
@@ -48,6 +50,16 @@ const examples = Object.freeze({
   temperature:140000, luminosity:10**5.45, massLoss:10**-5.14, density:null,
   color:'#99c9e4', assumption:'v0925.wolf.model',
   sources:Object.freeze([Object.freeze(['Gräfener & Hamann (2005), Table 2', 'https://arxiv.org/abs/astro-ph/0410697'])]),
+ }),
+ sun: sphereExample({
+  name:'v0925.sun', reference:'G2 V', mass:C.sun, radius:solarRadius,
+  temperature:solarTemperature, escapeVelocity:617.6, color:'#f4c477', assumption:'v0925.sun.model',
+  sources:Object.freeze([
+   ['NASA NSSDCA · Sun Fact Sheet', 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html'],
+   ['IAU 2015 Resolution B3', 'https://arxiv.org/abs/1510.07674'],
+   ['National Solar Observatory · DKIST', 'https://nso.edu/telescopes/dkist/first-light-full-image/'],
+   ['NASA Marshall · Photosphere', 'https://solarscience.msfc.nasa.gov/surface.shtml'],
+  ].map(Object.freeze)),
  }),
 });
 

@@ -1,7 +1,7 @@
 import {routeLegacyTour} from './legacy-tour-fixture.mjs';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
-import {resolve,extname} from 'node:path';
+import {resolve,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
 export async function browserHarness(){
@@ -12,7 +12,7 @@ export async function browserHarness(){
   const u=new URL(req.url,'http://localhost');
   if(u.pathname==='/__fractional'){res.writeHead(200,{'Content-Type':'text/html'}).end('<style>body{margin:0}iframe{border:0;width:320.5px;height:900px}</style><iframe src="/"></iframe>');return}
   const path=resolve(root,'.'+(u.pathname==='/'?'/index.html':decodeURIComponent(u.pathname)));
-  if(!path.startsWith(resolve(root)+'/')){res.writeHead(403).end();return}
+  if(!path.startsWith(resolve(root)+sep)){res.writeHead(403).end();return}
   res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.jpg':'image/jpeg'})[extname(path)]??'application/octet-stream','Cache-Control':'no-store'}).end(await readFile(path));
  }catch{res.writeHead(404).end()}});
  await new Promise(done=>server.listen(0,'127.0.0.1',done));const url='http://127.0.0.1:'+server.address().port;

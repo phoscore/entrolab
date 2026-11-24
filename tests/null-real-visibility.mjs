@@ -15,7 +15,9 @@ async function stop(child){
 }
 
 async function devToolsEndpoint(profile){
- for(let i=0;i<80;i++){
+ // Starting a second, headed browser can take longer on the shared CI runner.
+ const deadline=performance.now()+20000;
+ while(performance.now()<deadline){
   try{
    const [port,path]=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).trim().split('\n');
    if(port&&path)return 'ws://127.0.0.1:'+port+path;
@@ -86,6 +88,7 @@ export async function checkRealVisibility(h,t){
   await browser?.close();
   await stop(chrome);
   await stop(xvfb);
-  await rm(profile,{recursive:true,force:true});
+  // Chrome subprocesses may still be flushing the profile after the parent exits.
+  await rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
  }
 }

@@ -3,10 +3,11 @@ import { fitCanvas } from './extreme-render.mjs';
 
 const circle = (x,cx,cy,r) => { x.beginPath(); x.arc(cx,cy,r,0,2*Math.PI); };
 const disks = {
- brown: {size:.29,core:['#df9e81','#9f544c','#401e2a','#180f1d'],halo:'#9b463233'},
- supergiant: {size:.38,core:['#fff1b2','#fbc374','#c95c3c','#642132'],halo:'#c3563038'},
- magnetar: {size:.115,core:['#f8fcff','#acd6f8','#4666aa','#151d48'],halo:'#4467ba44'},
- wolf: {size:.17,core:['#ffffff','#e5faff','#8cc5ee','#355f94'],halo:'#71bafa66'},
+ brown: {size:.32,halo:'#7736362c'},
+ supergiant: {size:.40,halo:'#a82e1b42'},
+ magnetar: {size:.125,core:['#edf4ff','#9aabc8','#415674','#111824'],halo:'#3f577123'},
+ wolf: {size:.15,core:['#ffffff','#f3f7ff','#bbcbe1','#60758d'],halo:'#8da9cc46'},
+ sun: {size:.36,halo:'#ae63242e'},
 };
 const plates=new WeakMap();
 const TAU=2*Math.PI;
@@ -22,14 +23,20 @@ function drawPlate(x,w,h,cx,cy,r,kind) {
  const glow=x.createRadialGradient(cx,cy,r*.55,cx,cy,r*(kind==='magnetar'?5.2:2.15));
  glow.addColorStop(0,disks[kind].halo);
  glow.addColorStop(1,'#080a1500');
- x.fillStyle='#070914';x.fillRect(0,0,w,h);
+ x.fillStyle='#070910';x.fillRect(0,0,w,h);
  x.fillStyle=glow;x.fillRect(0,0,w,h);
  for(let i=0;i<82;i++){
-  x.fillStyle=i%13===0?'#b6c3e093':'#8f9bbb3f';
-  const size=i%13===0?1.4:.85;
+  x.fillStyle=i%13===0?'#b6c3e060':'#8f9bbb30';
+  const size=i%13===0?1.2:.7;
   x.fillRect(fraction(i*.618033+.11)*w,fraction(i*.414213+.29)*h,size,size);
  }
- if(kind!=='magnetar')sphere(x,cx,cy,r,kind);
+ if(kind==='wolf'){
+  const haze=x.createRadialGradient(cx,cy,r*.8,cx,cy,r*3.8);
+  haze.addColorStop(0,'#dfebff70');haze.addColorStop(.14,'#afc5e33b');
+  haze.addColorStop(.43,'#819ec31a');haze.addColorStop(1,'#819ec300');
+  x.fillStyle=haze;circle(x,cx,cy,r*3.8);x.fill();
+  windFilaments(x,cx,cy,r,0,42,40,.65);
+ }
 }
 
 function background(canvas,x,w,h,cx,cy,r,kind) {
@@ -47,46 +54,136 @@ function background(canvas,x,w,h,cx,cy,r,kind) {
  x.drawImage(entry.layer,0,0,w,h);
 }
 
-function brownClouds(x,cx,cy,r,time) {
- x.save();circle(x,cx,cy,r);x.clip();
- for(let band=0;band<8;band++){
-  const y=cy+r*(band-3.5)*.255, bend=Math.sin(time*.30+band*1.83);
-  x.beginPath();x.moveTo(cx-r,y-r*.06);
-  x.bezierCurveTo(cx-r*.3,y+r*(.18+.11*bend),cx+r*.46,y-r*.23,cx+r,y+r*bend*.12);
-  x.strokeStyle=band%3===0?'#f6bd9354':'#29182966';
-  x.lineWidth=r*(band%3===0?.067:.095);x.stroke();
- }
- for(let i=0;i<12;i++){
-  const y=cy+r*(fraction(i*.618)-.5)*1.6, px=cx+r*(fraction(i*.382+time*.014)*2-1);
-  x.fillStyle=i%2?'#e6a88749':'#34192b80';
-  x.beginPath();x.ellipse(px,y,r*(.13+i%4*.041),r*.039,-.12,0,TAU);x.fill();
- }
- x.restore();
+// Periodic texture lookup in longitude, orthographic projection onto the disk.
+// The texture and its display cadence illustrate structure, with no physical time scale.
+const mapWidth=512,mapHeight=256;
+const surfaces=new Map();
+const projected=new WeakMap();
+const clamp01=value=>Math.max(0,Math.min(value,1));
+const mix=(a,b,f)=>a+(b-a)*f;
+const smooth=f=>f*f*(3-2*f);
+function hash(x,y,seed) {
+ let n=Math.imul(x,0x1f1f1f1f)^Math.imul(y,0x5f356495)^Math.imul(seed,0x2c1b3c6d);
+ n=Math.imul(n^(n>>>16),0x85ebca6b);
+ n=Math.imul(n^(n>>>13),0xc2b2ae35);
+ return ((n^(n>>>16))>>>0)/4294967296;
 }
 
-function convection(x,cx,cy,r,time,quality) {
- x.save();circle(x,cx,cy,r);x.clip();
- const count=quality==='high'?26:16;
- for(let i=0;i<count;i++){
-  const a=i*2.399963, d=Math.sqrt((i+.4)/count)*r;
-  const px=cx+Math.cos(a)*d,py=cy+Math.sin(a)*d;
-  const size=r*(.17+fraction(i*.414)*.18)*(1+.12*Math.sin(time*.29+i));
-  const glow=x.createRadialGradient(px,py,0,px,py,size);
-  glow.addColorStop(0,i%4===0?'#792537b0':'#ffefb8ac');
-  glow.addColorStop(.45,i%4===0?'#9c354050':'#ff9d5166');
-  glow.addColorStop(1,'#a4443300');x.fillStyle=glow;
-  x.fillRect(px-size,py-size,2*size,2*size);
+function noise(u,v,columns,rows,seed) {
+ const x=u*columns,y=v*rows,i=Math.floor(x),j=Math.floor(y);
+ const a=(i%columns+columns)%columns,b=(a+1)%columns;
+ const f=smooth(x-i),g=smooth(y-j);
+ return mix(mix(hash(a,j,seed),hash(b,j,seed),f),mix(hash(a,j+1,seed),hash(b,j+1,seed),f),g);
+}
+
+function cells(u,v,columns,rows,seed) {
+ const x=u*columns,y=v*rows,i=Math.floor(x),j=Math.floor(y);
+ let first=Infinity,second=Infinity,tone=0;
+ for(let row=j-1;row<=j+1;row++)for(let col=i-1;col<=i+1;col++){
+  const c=(col%columns+columns)%columns;
+  const dx=x-col-.15-.7*hash(c,row,seed),dy=y-row-.15-.7*hash(c,row,seed+1);
+  const d=dx*dx+dy*dy;
+  if(d<first){second=first;first=d;tone=hash(c,row,seed+2);}
+  else if(d<second)second=d;
  }
- x.restore();
+ return smooth(clamp01((second-first)*2.7))*(.55+.45*tone);
+}
+
+// An illustrative activity group. Dark umbrae sit inside lighter penumbrae.
+const spots=[[.566,.59,.008,.013],[.585,.598,.006,.010],[.597,.583,.003,.005],[.337,.39,.004,.006]];
+const surfaceStyles={
+ sun: {dark:[120,60,24],light:[255,235,183],rotation:1.0,limb:.49,
+  brightness(u,v,grain){
+   const warp=noise(u,v,67,35,2)-.5;
+   const granules=cells(u+warp*.004,v+(grain-.5)*.004,137,71,19);
+   let intensity=.62+granules*.36+grain*.046;
+   for(const [x,y,w,h] of spots){
+    const d=Math.hypot((u-x)/w,(v-y)/h)+(grain-.5)*.39;
+    intensity-=.31*clamp01((1.1-d)*5)+.30*clamp01((.56-d)*8);
+   }
+   return intensity;
+  }},
+ brown: {dark:[22,15,25],light:[198,126,93],rotation:3.4,limb:.32,
+  brightness(u,v,grain){
+   const warp=noise(u,v,8,5,4)-.5;
+   const broad=noise(u+warp*.065,v,9,22,5);
+   const filaments=noise(u+warp*.06,v+warp*.024,21,78,6);
+   const bands=Math.sin(TAU*(v*8.5+.31*warp+.10*Math.sin(TAU*u*3)));
+   return .11+.34*broad+.28*filaments+.07*bands+.07*grain;
+  }},
+ supergiant: {dark:[79,13,18],light:[255,189,109],rotation:.65,limb:.39,
+  brightness(u,v,grain){
+   const x=u+(noise(u,v,18,11,7)-.5)*.09;
+   const y=v+(noise(u,v,21,12,11)-.5)*.09;
+   const hot=noise(x,y,12,7,8);
+   const texture=noise(x,y,41,23,10);
+   const giant=cells(x,y,15,8,13);
+   return clamp01(.05+.78*hot+.24*texture+.09*giant+.07*grain);
+  }},
+};
+
+function surfaceMap(kind,style) {
+ if(surfaces.has(kind))return surfaces.get(kind);
+ const map=new Float32Array(mapWidth*mapHeight);
+ for(let y=0;y<mapHeight;y++)for(let x=0;x<mapWidth;x++){
+  const u=x/mapWidth,v=y/mapHeight;
+  map[y*mapWidth+x]=style.brightness(u,v,noise(u,v,211,105,36));
+ }
+ surfaces.set(kind,map);
+ return map;
+}
+
+function projectDisk(canvas,size) {
+ let disk=projected.get(canvas);
+ if(disk?.size===size)return disk;
+ const layer=canvas.ownerDocument.createElement('canvas');
+ layer.width=layer.height=size;
+ const context=layer.getContext('2d'),pixels=context.createImageData(size,size);
+ const samples=[];
+ for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+  const nx=(2*x+1)/size-1,ny=(2*y+1)/size-1,distance=Math.hypot(nx,ny);
+  if(distance>=1)continue;
+  const depth=Math.sqrt(1-distance*distance);
+  const latitude=Math.acos(-ny)/Math.PI*mapHeight;
+  const row=Math.min(mapHeight-2,Math.floor(latitude));
+  const lon=(.5+Math.atan2(nx,depth)/TAU)*mapWidth;
+  const index=4*(y*size+x);
+  pixels.data[index+3]=255*clamp01((1-distance)*size/2+.25);
+  samples.push(index,depth,row*mapWidth,latitude-row,lon);
+ }
+ disk={size,layer,context,pixels,samples:new Float32Array(samples)};
+ projected.set(canvas,disk);
+ return disk;
+}
+
+function drawSurface(canvas,x,cx,cy,r,kind,time,quality) {
+ const style=surfaceStyles[kind],map=surfaceMap(kind,style);
+ const {layer,context,pixels,samples}=projectDisk(canvas,quality==='high'?256:176);
+ const offset=(time*style.rotation)%mapWidth;
+ const {data}=pixels,{dark,light,limb}=style;
+ const red=light[0]-dark[0],green=light[1]-dark[1],blue=light[2]-dark[2];
+ const evolution=Math.sin(time*(kind==='supergiant'?.37:.20));
+ for(let i=0;i<samples.length;i+=5){
+  const index=samples[i],row=samples[i+2],v=samples[i+3],u=samples[i+4]+offset;
+  const col=Math.floor(u)&(mapWidth-1),next=(col+1)&(mapWidth-1),f=u-Math.floor(u);
+  const b=mix(mix(map[row+col],map[row+next],f),mix(map[row+col+mapWidth],map[row+next+mapWidth],f),v);
+  const brightness=b+evolution*(b-.55)*.08;
+  const shade=1-limb*(1-samples[i+1]);
+  data[index]=(dark[0]+red*brightness)*shade;
+  data[index+1]=(dark[1]+green*brightness)*shade;
+  data[index+2]=(dark[2]+blue*brightness)*shade;
+ }
+ context.putImageData(pixels,0,0);
+ x.drawImage(layer,cx-r,cy-r,2*r,2*r);
 }
 
 function magnetar(x,cx,cy,r,time,quality) {
  const phase=time*.7+.75, tilt=.55, sine=Math.sin(tilt), cosine=Math.cos(tilt);
  // Rotation axis is vertical in the projection. The dipole tilts and co-rotates.
  const mx=sine*Math.cos(phase),my=-cosine;
- const loops=quality==='high'?14:9;
+ const loops=quality==='high'?18:12;
  for(let i=0;i<loops;i++){
-  const phi=phase+TAU*(i%7)/7, shell=r*(2.35+.19*i);
+  const phi=TAU*(i%6)/6, shell=r*(2.05+Math.floor(i/6)*.8);
   const ux=cosine*Math.cos(phase)*Math.cos(phi)-Math.sin(phase)*Math.sin(phi);
   const uy=sine*Math.cos(phi);
   const foot=Math.asin(Math.sqrt(r/shell));
@@ -97,29 +194,37 @@ function magnetar(x,cx,cy,r,time,quality) {
    const py=cy+distance*(my*Math.cos(angle)+uy*Math.sin(angle));
    if(j===0)x.moveTo(px,py);else x.lineTo(px,py);
   }
-  x.strokeStyle=i%3===0?'#9cccf387':'#7388c44f';x.lineWidth=i%3===0?1.2:.8;x.stroke();
+  x.strokeStyle=i<6?'#c1d3ed98':'#94aec366';x.lineWidth=i<6?1.15:.8;x.stroke();
  }
  sphere(x,cx,cy,r,'magnetar');
  // A surface patch follows the near-side projection of the rotating magnetic pole.
  const near=Math.sin(phase);
- x.fillStyle='#f2f8ffbc';
- circle(x,cx+r*mx*Math.sign(near),cy+r*my*Math.sign(near),r*(.08+.045*Math.abs(near)));
+ x.fillStyle=`rgba(242,248,255,${.75*Math.abs(near)})`;
+ circle(x,cx+r*mx*Math.sign(near)*.91,cy+r*my*Math.sign(near)*.91,r*(.057+.055*Math.abs(near)));
  x.fill();
- x.setLineDash([4,5]);x.strokeStyle='#adb5cda8';x.lineWidth=1;
+ x.setLineDash([4,5]);x.strokeStyle='#adb5cd8f';x.lineWidth=1;
  x.beginPath();x.moveTo(cx,cy-r*3.8);x.lineTo(cx,cy+r*3.8);x.stroke();
- x.setLineDash([]);x.strokeStyle='#acd8fa';x.lineWidth=1.25;
+ x.setLineDash([]);x.strokeStyle='#d3e4f5d8';x.lineWidth=1;
  x.beginPath();x.moveTo(cx-mx*r*3.1,cy-my*r*3.1);x.lineTo(cx+mx*r*3.1,cy+my*r*3.1);x.stroke();
 }
 
-function wind(x,cx,cy,r,time,quality) {
- const count=quality==='high'?65:37;
+function windFilaments(x,cx,cy,r,time,count,seed,contrast) {
  for(let i=0;i<count;i++){
-  const angle=i*2.399963, p=fraction(i*.618033+time*(.15+(i%4)*.027));
-  const start=r*(1+p*3.2), end=start+r*(.18+p*.34);
+  const angle=i*TAU/count+(hash(i,0,seed)-.5)*.085;
+  const knot=hash(i,0,seed+1),p=fraction(knot+time*(.095+knot*.033));
+  const start=r*(.76+1.85*p*p),end=start+r*(.59+1.27*p);
   const dx=Math.cos(angle),dy=Math.sin(angle);
-  x.strokeStyle=`rgba(159,210,250,${.08+.42*Math.sin(Math.PI*p)})`;
-  x.lineWidth=i%6===0?1.55:.8;
-  x.beginPath();x.moveTo(cx+start*dx,cy+start*dy);x.lineTo(cx+end*dx,cy+end*dy);x.stroke();
+  const ax=cx+start*dx,ay=cy+start*dy,bx=cx+end*dx,by=cy+end*dy;
+  const opacity=contrast*(.07+knot*.20)*Math.sin(Math.PI*p)**1.5*(1-p*.71);
+  const width=r*(.016+.046*knot)*(1+p);
+  const colour=x.createLinearGradient(ax,ay,bx,by);
+  colour.addColorStop(0,'#afc5e300');
+  colour.addColorStop(.34,`rgba(182,206,236,${opacity})`);
+  colour.addColorStop(1,'#afc5e300');
+  x.fillStyle=colour;x.beginPath();x.moveTo(ax,ay);
+  x.quadraticCurveTo(mix(ax,bx,.48)-dy*width,mix(ay,by,.48)+dx*width,bx,by);
+  x.quadraticCurveTo(mix(ax,bx,.48)+dy*width*.55,mix(ay,by,.48)-dx*width*.55,ax,ay);
+  x.fill();
  }
 }
 
@@ -130,8 +235,10 @@ export function drawStellarExample(canvas,state,time) {
  const cx=w/2,cy=h*.49,r=Math.min(h*disks[kind].size,w*(kind==='magnetar'?.14:.36))*state.zoom;
  x.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
  background(canvas,x,w,h,cx,cy,r,kind);
- if(kind==='brown')brownClouds(x,cx,cy,r,time);
- if(kind==='supergiant')convection(x,cx,cy,r,time,quality);
  if(kind==='magnetar')magnetar(x,cx,cy,r,time,quality);
- if(kind==='wolf')wind(x,cx,cy,r,time,quality);
+ else if(kind==='wolf'){
+  windFilaments(x,cx,cy,r,time,quality==='high'?28:20,52,1);
+  sphere(x,cx,cy,r,'wolf');
+ }
+ else drawSurface(canvas,x,cx,cy,r,kind,time,quality);
 }

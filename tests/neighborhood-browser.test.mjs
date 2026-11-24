@@ -166,8 +166,9 @@ test('Stellar Neighborhood is usable at 320 and 390 px under Reduced Motion, wit
       assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
       assert.ok(await p.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches));
       await p.locator('[data-language=en]').click();
-      assert.match(await p.locator('#snAxes').innerText(),/Camera pivot · Sun.*Looking toward/);
       await p.locator('#snCanvas').scrollIntoViewIfNeeded();
+      // The camera caption is translated during the next visible canvas redraw.
+      await p.waitForFunction(()=>/Camera pivot · Sun.*Looking toward/.test(document.getElementById('snAxes').innerText),null,{timeout:5000});
       const times=[];
       for(let i=0;i<20;i++) {
         const prior=(await state(p)).neighborhood.draws;
