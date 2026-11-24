@@ -1,5 +1,6 @@
 import {creaturePolicy,creatureRandom,planAppearance,restDelay,validMode} from './creature-policy.mjs';
 import {creatureArt} from './creature-art.mjs';
+import {headingSpace} from './creature-places.mjs';
 
 const instances=new WeakMap();
 const preferenceKey='entrolab-decorative-motion';
@@ -12,6 +13,9 @@ export function initCreature(doc=globalThis.document,options={}){
  const anchor=guide?.querySelector(':scope > summary');
  const control=doc.getElementById('decorativeMotion');
  const label=anchor?.querySelector(':scope > span');
+ const views=[...doc.querySelectorAll('.view')];
+ const explorer=doc.getElementById('explorer');
+ const heading=new Map([...doc.querySelectorAll('[data-null-anchor]')].map(el=>[el.dataset.nullAnchor,el]));
  if(!anchor||!control)return null;
 
  const {clock=()=>win.performance.now(),schedule=(fn,ms)=>win.setTimeout(fn,ms),
@@ -19,8 +23,9 @@ export function initCreature(doc=globalThis.document,options={}){
  const random=options.random??creatureRandom(win.crypto?.getRandomValues(new Uint32Array(1))[0]);
  const motion=win.matchMedia('(prefers-reduced-motion: reduce)');
  const cleanup=[];
- let storage=options.storage,mode='subtle',globalOff=false,seen=false,disposed=false;
+ let storage=options.storage,mode='subtle',globalOff=false,disposed=false;
  let pending=null,visit=null,first=true,visits=0,lastContextChange=-Infinity;
+ let stage=null,context=null,preferLab=false,generation=0;
  try{
   if(storage===undefined)storage=win.localStorage;
   const preference=storage?.getItem(preferenceKey);
@@ -45,21 +50,64 @@ export function initCreature(doc=globalThis.document,options={}){
   target.addEventListener(type,fn,settings);
   cleanup.push(()=>target.removeEventListener(type,fn,settings));
  };
- const measure=()=>{
-  const r=slot.getBoundingClientRect();
+ const viewport=()=>({left:0,top:0,right:doc.documentElement.clientWidth,bottom:win.innerHeight});
+ function guideSpace(){
+  const bounds=viewport();
+  const rect=(slot.parentNode===anchor?slot:anchor).getBoundingClientRect();
+  const box=slot.parentNode===anchor?rect:{
+   left:rect.right-(bounds.right<=600?54:84),right:rect.right,
+   top:rect.top-(bounds.right<=600?0:4),bottom:rect.top+(bounds.right<=600?55:72),
+  };
+  if(!rect.width||!rect.height||box.top<0||box.bottom>bounds.bottom||box.left<0||box.right>bounds.right)return null;
   if(label){
-   const textRange=doc.createRange();
-   textRange.selectNodeContents(label);
-   if(textRange.getBoundingClientRect().right>=r.left)return false;
+   const range=doc.createRange();
+   range.selectNodeContents(label);
+   if(range.getBoundingClientRect().right>=box.left)return null;
   }
-  return r.width>0&&r.height>0&&r.top>=0&&r.bottom<=win.innerHeight&&r.left>=0&&r.right<=win.innerWidth;
- };
- const eligible=()=>creaturePolicy({
-  mode,reduced:motion.matches,hidden:doc.hidden,seen:seen&&measure(),
+  return {id:'guide',host:anchor,pose:'guide'};
+ }
+ function currentContext(){
+  const view=views.find(element=>element.classList.contains('active'))?.id;
+  if(view==='entropy')return view+':'+(doc.querySelector('[data-entropy-view][aria-pressed="true"]')?.dataset.entropyView??'particles');
+  if(view==='explorer')return view+':'+(explorer.querySelector('.ex-mode-bar [aria-pressed="true"]')?.id??'exSkyMode');
+  return view??'';
+ }
+ function chooseStage(){
+  const area=context.split(':')[0],bounds=viewport();
+  if(!preferLab&&area==='gravity'){
+   const welcome=guideSpace();
+   if(welcome)return welcome;
+  }
+  for(const id of area==='extreme'?['temperature',area]:[area]){
+   const host=heading.get(id);
+   const space=host&&headingSpace(doc,host,bounds,bounds.right<=600);
+   if(space)return {id,host,...space};
+  }
+  return guideSpace();
+ }
+ function place(next){
+  stage=next;
+  if(next.host!==slot.parentNode)next.host.append(slot);
+  if(next.id==='guide'){
+   delete slot.dataset.place;
+   delete slot.dataset.pose;
+   slot.removeAttribute('style');
+  }else{
+   slot.dataset.place=next.id;
+   slot.dataset.pose=next.pose;
+   slot.style.left=next.x+'px';
+   slot.style.top=next.y+'px';
+   slot.style.width=next.width+'px';
+   slot.style.height=next.height+'px';
+  }
+ }
+ const policyFor=seen=>creaturePolicy({
+  mode,reduced:motion.matches,hidden:doc.hidden,seen,
   editing:!!doc.activeElement?.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"])'),
   focus:doc.body.classList.contains('has-focus'),guide:guide.open,
  });
  function clear(){
+  generation++;
   if(pending!==null)cancel(pending);
   pending=null;
  }
@@ -68,14 +116,23 @@ export function initCreature(doc=globalThis.document,options={}){
   if(sequence)figure.dataset.sequence=sequence;
   else figure.removeAttribute('data-sequence');
  }
+ function stop(){
+  clear();
+  visit=null;
+  display(null);
+ }
  function wait(fn,ms){
+  const token=++generation;
   pending=schedule(()=>{
+   if(disposed||token!==generation)return;
    pending=null;
-   if(!disposed)fn();
+   fn();
   },ms);
  }
  function next(){
-  if(!eligible().moving){reconcile();return;}
+  const candidate=policyFor(true).moving&&chooseStage();
+  if(!candidate){reconcile();return;}
+  place(candidate);
   first=false;
   visit=planAppearance(random,clock()-lastContextChange<70000);
   if(!visit){reconcile();return;}
@@ -90,11 +147,23 @@ export function initCreature(doc=globalThis.document,options={}){
  }
  function reconcile(){
   if(disposed)return;
-  const policy=eligible();
-  if(!policy.moving){
-   clear();
-   visit=null;
-   display(policy.still?'still':null);
+  const current=currentContext();
+  if(context!==null&&current!==context){
+   stop();
+   preferLab=true;
+   lastContextChange=clock();
+  }
+  context=current;
+  const available=policyFor(true);
+  const candidate=(available.moving||available.still)&&chooseStage();
+  if(!candidate){stop();stage=null;return;}
+  if(stage?.host!==candidate.host||stage.pose!==candidate.pose){
+   stop();
+  }
+  place(candidate);
+  if(available.still){
+   stop();
+   display('still');
   }else if(!visit&&pending===null){
    display(null);
    wait(next,restDelay(random,first));
@@ -116,27 +185,46 @@ export function initCreature(doc=globalThis.document,options={}){
  listen(doc,'focusin',reconcile);
  listen(doc,'focusout',()=>win.queueMicrotask(reconcile));
  listen(doc,'click',event=>{
-  if(event.target.closest?.('[data-tab],[data-entropy-view],[data-explain]'))lastContextChange=clock();
+  if(event.target.closest?.('[data-tab],[data-entropy-view],[data-explain],.ex-mode-bar button')){
+   win.queueMicrotask(reconcile);
+  }
  });
  listen(motion,'change',reconcile);
- listen(win,'resize',()=>{seen=measure();reconcile();});
+ listen(win,'resize',reconcile);
+ const observer=typeof win.IntersectionObserver==='function'?new win.IntersectionObserver(reconcile,
+  {threshold:[0,.25,.5,.75,1]}):null;
+ const resize=typeof win.ResizeObserver==='function'?new win.ResizeObserver(reconcile):null;
+ function watchHeading(element){
+  observer?.observe(element);
+  resize?.observe(element);
+  for(const child of element.children)if(child!==slot)resize?.observe(child);
+ }
  const stateObserver=new win.MutationObserver(()=>{
-  seen=measure();
+  if(explorer){
+   const mounted=explorer.querySelector('[data-null-anchor="explorer"]');
+   if(mounted&&heading.get('explorer')!==mounted){
+    heading.set('explorer',mounted);
+    watchHeading(mounted);
+    for(const button of explorer.querySelectorAll('.ex-mode-bar button')){
+     stateObserver.observe(button,{attributes:true,attributeFilter:['aria-pressed']});
+    }
+   }
+  }
   reconcile();
  });
- stateObserver.observe(doc.body,{attributes:true,attributeFilter:['class']});
+ for(const element of [doc.body,...views])stateObserver.observe(element,{attributes:true,attributeFilter:['class']});
+ for(const button of doc.querySelectorAll('[data-entropy-view]'))stateObserver.observe(button,{attributes:true,attributeFilter:['aria-pressed']});
  stateObserver.observe(guide,{attributes:true,attributeFilter:['open']});
- const observer=typeof win.IntersectionObserver==='function'?new win.IntersectionObserver(entries=>{
-  seen=entries.at(-1)?.isIntersecting??false;
-  reconcile();
- },{threshold:[0,.98,1]}):null;
- if(observer)observer.observe(slot);
- else listen(win,'scroll',()=>{seen=measure();reconcile();},{passive:true});
- seen=measure();
+ stateObserver.observe(doc.documentElement,{attributes:true,attributeFilter:['lang']});
+ if(explorer)stateObserver.observe(explorer,{childList:true,attributes:true,attributeFilter:['class']});
+ watchHeading(anchor);
+ for(const element of heading.values())watchHeading(element);
+ if(!observer)listen(win,'scroll',reconcile,{passive:true});
  const controller={
   inspect:()=>disposed?inactive:{
    mounted:true,visible:!figure.hidden,moving:!!visit,sequence:figure.dataset.sequence??null,
-   mode,visits,subscriptions:cleanup.length,observers:1+Number(!!observer),
+   mode,visits,place:stage?.id??null,pose:stage?.pose??null,subscriptions:cleanup.length,
+   observers:1+Number(!!observer)+Number(!!resize),
    timers:Number(pending!==null),figures:1,
   },
   dispose(){
@@ -144,6 +232,7 @@ export function initCreature(doc=globalThis.document,options={}){
    disposed=true;
    clear();
    observer?.disconnect();
+   resize?.disconnect();
    stateObserver.disconnect();
    for(const remove of cleanup)remove();
    slot.remove();

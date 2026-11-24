@@ -19,7 +19,7 @@ export function mountExplorer(root) {
     return el;
   };
   root.innerHTML = `
-    <div class="ex-heading"><div><p class="ex-kicker" data-ex="subtitle"></p><h1>Cosmic Explorer</h1><p data-ex="intro"></p></div></div>
+    <div class="ex-heading" data-null-anchor="explorer"><div><p class="ex-kicker" data-ex="subtitle"></p><h1>Cosmic Explorer</h1><p data-ex="intro"></p></div></div>
     <div class="ex-mode-bar" role="group" aria-label="Cosmic Explorer">
       <button type="button" id="exSkyMode" data-ex="skyMode" aria-pressed="true" aria-controls="exSkyPanel"></button>
       <button type="button" id="exSolarMode" data-ex="solarMode" aria-pressed="false" aria-controls="exSolarPanel"></button>

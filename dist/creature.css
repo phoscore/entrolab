@@ -114,3 +114,10 @@ body[data-decorative-motion="off"] #cosmicBackground::before {animation-play-sta
 @media(prefers-reduced-motion:reduce) {
  #creature[data-sequence] * {animation:none!important}
 }
+
+/* Existing heading bands contain the entire decorative visit. */
+[data-null-anchor] {position:relative}
+.null-slot[data-place] {inset:auto}
+.null-slot[data-pose="peek"] #creature svg {
+ position:absolute;width:100%;height:205%;top:-7%;left:0;
+}

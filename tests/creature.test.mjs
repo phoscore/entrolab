@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {creaturePolicy,creatureRandom,planAppearance,restDelay,validMode} from '../dist/creature-policy.mjs';
+import {freeCreatureSpace} from '../dist/creature-places.mjs';
 import {de,en} from '../dist/i18n.mjs';
 
 const fixed=(...values)=>()=>values.shift();
@@ -59,4 +60,17 @@ test('creature: rendering and scheduling never depend on laboratory code or Math
   const code=readFileSync(new URL('../dist/'+file,import.meta.url),'utf8');
   assert.doesNotMatch(code,/Math\.random\s*\(|entrolab(?:Entropy|Gas|Thermal)|requestAnimationFrame|setInterval|\.webp/);
  }
+});
+
+test('creature: uses only free, on-screen heading space and narrows to a peek on mobile',()=>{
+ const rect=(left,top,right,bottom)=>({left,top,right,bottom});
+ const viewport=rect(0,0,1440,900),band=rect(48,180,1392,274);
+ const title=rect(48,180,651,244),badge=rect(1130,212,1392,238);
+ const spot=freeCreatureSpace(band,[title,badge],viewport);
+ assert.equal(spot.pose,'hero');
+ assert(spot.x+48>title.right&&spot.x+48+spot.width<badge.left);
+ const compact=rect(12,80,308,202),mobile=rect(0,0,320,800);
+ assert.equal(freeCreatureSpace(compact,[rect(12,80,235,200)],mobile,true).pose,'peek');
+ assert.equal(freeCreatureSpace(compact,[rect(12,80,275,200)],mobile,true),null);
+ assert.equal(freeCreatureSpace(rect(48,-94,1392,1),[],viewport),null);
 });
