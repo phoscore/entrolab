@@ -65,5 +65,4 @@ export const reimagined = {
  'v09.qcd.fields': ['Dynamische Felder','Dynamical fields'],
  'v09.qcd.valenceNote': ['uud zählt den Nettoüberschuss an u- und d-Quarks. Ein zusätzliches Quark-Antiquark-Paar derselben Sorte ändert diese Nettozählung nicht.','uud counts the net excess of up and down quarks. An additional quark–antiquark pair of the same flavour leaves this net count unchanged.'],
  'v09.qcd.fieldsNote': ['Die starke Wechselwirkung bindet Quark- und Gluonenfelder. Das Feldschema zeigt weder Teilchenbahnen noch Massenanteile. Der Higgs-Mechanismus erklärt elementare Quarkmassen, und die QCD-Dynamik prägt die Ruheenergie des Protons.','The strong interaction binds quark and gluon fields. The field diagram shows neither particle trajectories nor mass fractions. The Higgs mechanism accounts for elementary quark masses, and QCD dynamics shapes the proton’s rest energy.'],
- 'v0925.decorativeMotion': ['Dekorative Bewegung','Decorative motion'],
 };

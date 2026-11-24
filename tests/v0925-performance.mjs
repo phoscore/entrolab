@@ -22,9 +22,9 @@ async function profile(h,baselineDir,{width,height,cpu},version,scenes){
    await route.fulfill({path:file,contentType:types[extname(file)]});
   });
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
-  await context.addInitScript(()=>localStorage.setItem('entrolab-creature-mode','off'));
   const p=await context.newPage();p.on('pageerror',error=>errors.push(error.message));
   await p.goto(h.url);await h.ready(p);
+  if(version!=='v0.9')await p.evaluate(async()=>{(await import('/creature-ui.mjs')).initCreature().dispose()});
   await p.waitForFunction(()=>document.getElementById('checkRunStatus').getAttribute('aria-busy')==='false');
   if(!await p.evaluate(()=>window.entrolab.inspect().paused))await p.locator('#play').click();
   const session=await context.newCDPSession(p);

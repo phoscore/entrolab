@@ -1,9 +1,6 @@
-export const CREATURE_MODES=Object.freeze(['subtle','still','off']);
-export const validMode=value=>CREATURE_MODES.includes(value);
-
-export function creaturePolicy({mode='subtle',reduced=false,hidden=false,seen=true,editing=false,focus=false,guide=false}={}){
- const available=mode!=='off'&&!hidden&&seen&&!editing&&!focus&&!guide;
- const moving=available&&mode==='subtle'&&!reduced;
+export function creaturePolicy({reduced=false,hidden=false,seen=true,editing=false,focus=false,guide=false}={}){
+ const available=!hidden&&seen&&!editing&&!focus&&!guide;
+ const moving=available&&!reduced;
  return {moving,still:available&&!moving};
 }
 

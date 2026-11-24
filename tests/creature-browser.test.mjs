@@ -36,7 +36,7 @@ async function controlled(p,roll=.85,durationRoll=.5){
   let now=0,serial=0,rolls=[.5,roll,durationRoll];
   window.nullAudit={
    mount(){return initCreature(document,{
-    clock:()=>now,random:()=>rolls.shift()??roll,storage:null,
+    clock:()=>now,random:()=>rolls.shift()??roll,
     schedule(fn,ms){timers.set(++serial,{fn,at:now+ms});return serial},
     cancel(id){timers.delete(id)},
    })},
@@ -205,50 +205,36 @@ test('Null: hidden page, offscreen, editors, guide and focus cancel animation an
  }finally{await context.close()}
 });
 
-test('Null: a legacy still preference and blocked local storage remain safe',async()=>{
- const {p,context}=await h.lab({reducedMotion:'no-preference'});
+test('Null: fresh and restarted profiles run decorative motion without a switch, ignoring stored off values',async()=>{
+ const options={reducedMotion:'no-preference'};
+ const {p,context}=await h.lab(options);
+ let storageState;
  try{
   await reset(p);
-  await p.evaluate(async()=>{
-   const {initCreature}=await import('/creature-ui.mjs');
-   initCreature().dispose();
-   initCreature(document,{storage:{getItem:key=>key==='entrolab-creature-mode'?'still':null,setItem(){throw Error('blocked')}}});
-  });
-  await p.waitForFunction(()=>window.entrolabCreature.inspect().sequence==='still');
-  assert.deepEqual(await frames(p),[]);
-  assert.equal(await sky(p),'running');
-  await p.locator('#physicsGuide > summary').click();
-  await p.locator('#decorativeMotion').click();
-  assert.equal((await inspect(p)).mode,'off');
-  assert.equal(await sky(p),'paused');
- }finally{await context.close()}
-});
-
-test('Null: quiet general preference persists and pauses the sky in DE and EN',async()=>{
- const {p,context}=await h.lab({reducedMotion:'no-preference'});
- try{
-  await p.locator('#physicsGuide > summary').click();
-  const toggle=p.locator('#decorativeMotion');
-  assert.equal(await toggle.textContent(),'Dekorative Bewegung');
-  await toggle.click();
-  assert.equal(await toggle.getAttribute('aria-pressed'),'false');
-  assert.equal((await inspect(p)).mode,'off');
-  assert.equal((await inspect(p)).timers,0);
-  assert.equal(await sky(p),'paused');
-  await p.locator('[data-language=en]').click();
-  assert.equal(await toggle.textContent(),'Decorative motion');
-  await p.reload();await h.ready(p);
-  assert.equal(await toggle.getAttribute('aria-pressed'),'false');
-  assert.equal((await inspect(p)).mode,'off');
-  await p.locator('#physicsGuide > summary').click();
-  await toggle.click();
-  assert.equal(await sky(p),'running');
-  await p.locator('#physicsGuide > summary').click();
   await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1);
-  assert.equal(await p.locator('.header-tools #decorativeMotion').count(),0);
-  assert.equal(await p.locator('footer').textContent(),'No plot armor. Just physics?');
-  assert.deepEqual(h.errors,[]);
+  assert.equal(await sky(p),'running');
+  assert.equal(await p.locator('#decorativeMotion').count(),0);
+  await p.evaluate(()=>{
+   localStorage.setItem('entrolab-decorative-motion','off');
+   localStorage.setItem('entrolab-creature-mode','off');
+  });
+  storageState=await context.storageState();
  }finally{await context.close()}
+ const restarted=await h.lab({...options,storageState});
+ try{
+  await reset(restarted.p);
+  await restarted.p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1);
+  assert.equal(await sky(restarted.p),'running');
+  assert.equal(await art(restarted.p).count(),1);
+  await restarted.p.locator('[data-language=en]').click();
+  assert.equal(await restarted.p.locator('#decorativeMotion').count(),0);
+  await restarted.p.emulateMedia({reducedMotion:'reduce'});
+  await restarted.p.waitForFunction(()=>window.entrolabCreature.inspect().sequence==='still');
+  assert.deepEqual(await frames(restarted.p),[]);
+  assert.equal((await inspect(restarted.p)).timers,0);
+  assert.equal(await restarted.p.locator('#cosmicBackground').evaluate(el=>getComputedStyle(el,'::before').animationName),'none');
+  assert.deepEqual(h.errors,[]);
+ }finally{await restarted.context.close()}
 });
 
 test('Null: mobile and desktop art neither shifts the lab nor intersects guide text or input hints',async()=>{

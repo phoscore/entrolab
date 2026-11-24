@@ -119,6 +119,7 @@ const copy = {
   systems:['Mondsysteme','Moon systems'],
   overview:['Zur Sonnensystemübersicht','Back to Solar System overview'],
   localFit:['System einpassen','Fit system'],
+  localEpoch:['Ephemeridenbeginn','Ephemeris start'],
   baryFrame:['Koordinatenursprung: gemeinsamer Schwerpunkt · J2000-Ekliptik','Origin: system barycentre · J2000 ecliptic'],
   localScene:['JPL Horizons · feine Linien zeigen ein Bahnfenster, leuchtende Spuren den zurückgelegten Abschnitt.','JPL Horizons · faint lines show an orbital window and bright trails show past motion.'],
   localLimit:['Die Achsen schneiden sich im Systemschwerpunkt. Der Linienabschnitt im Bild ist eine Projektion.','The axes meet at the system barycentre. The line drawn on screen is a projection.'],
@@ -359,23 +360,33 @@ export function mountSolar(root) {
   function enterSystem(id) {
     if (system === id) return;
     if (galactic) changeFrame(false);
-    if (!system) overview = {selected,reference,follow,space,pose,view};
+    suspend();
+    if (!system) overview = {selected,reference,follow,camera,space,pose,view,returnDay:null};
+    if (!supportsEpoch(day)) {
+      overview.returnDay ??= day;
+      const today = parseModelDate(new Date().toISOString().slice(0,10));
+      day = supportsEpoch(today) ? today : START;
+    }
     system = id;
+    follow = false;
     const [parent, moon] = systemBodies(id);
     selected = moon.id; reference = parent.id;
     markers = [];
     stateDay = null;
     trailCache.clear();
     rebuildBodies();
-    fitView();
     switchView('3d');
+    fitView();
     loadVisibleData();
     localize();
+    updateClock(true);
   }
 
   function exitSystem(next = overview?.view) {
     if (!system) return;
-    ({selected,reference,follow,space,pose} = overview);
+    suspend();
+    ({selected,reference,follow,camera,space,pose} = overview);
+    day = overview.returnDay ?? day;
     system = null;
     overview = null;
     markers = [];
@@ -387,6 +398,7 @@ export function mountSolar(root) {
     switchView(next);
     loadVisibleData();
     localize();
+    updateClock(true);
   }
 
   function current() {
@@ -565,7 +577,7 @@ export function mountSolar(root) {
     $('voyPanel').hidden=!voyager;
     if(voyager)updateVoyagerTimeline(root,selected,lang());
     else $('voyStatus').hidden=true;
-    $('solEpoch').textContent=voyager?t(latestEpoch()===VOY_END?'voyagerLast':'voyagerCurrent'):'J2000.0';
+    $('solEpoch').textContent=voyager?t(latestEpoch()===VOY_END?'voyagerLast':'voyagerCurrent'):system?t('localEpoch'):'J2000.0';
     $('solGlobal').hidden = !system;
     $('solInner').hidden = Boolean(system||voyager);
     $('solFrames').hidden = view!=='3d'||Boolean(system||voyager);
@@ -857,8 +869,9 @@ export function mountSolar(root) {
     if (raf !== null) cancelAnimationFrame(raf);
     raf = null; clock = null; gestures.cancel(); updateClock();
   }
-  function changeDay(value, reframe = false) {
+  function changeDay(value, reframe = false, explicit = true) {
     const next = clampDay(value);
+    if (system && explicit) overview.returnDay = null;
     if (galactic && reframe) {
       const before = sunDisplacement(day), after = sunDisplacement(next);
       space = {...space,focus:space.focus.map((v,i)=>v+(after[i]-before[i]))};
@@ -1100,11 +1113,11 @@ export function mountSolar(root) {
   listen($('solSymbols'),'change',()=>{
     enlarged=$('solSymbols').checked;updateSymbolNote();invalidate();
   });
-  listen($('solPlay'),'click',()=>{if (clock) changeDay(day);else beginClock();});
+  listen($('solPlay'),'click',()=>{if (clock) changeDay(day,false,false);else beginClock();});
   listen($('solRate'),'change',()=>{if (clock) beginClock();});
   listen($('solPrev'),'click',()=>changeDay(advanceModelDay(day,1,-1)));
   listen($('solNext'),'click',()=>changeDay(advanceModelDay(day,1,1)));
-  listen($('solEpoch'),'click',()=>changeDay(voyager?latestEpoch():J2000,true));
+  listen($('solEpoch'),'click',()=>changeDay(voyager?latestEpoch():system?START:J2000,true));
   listen($('solDate'),'change',()=>{
     const field=$('solDate'), next=parseModelDate(field.value);
     if (next !== null && next>=minDay() && next<=maxDay()) changeDay(next,true);else updateClock(true);

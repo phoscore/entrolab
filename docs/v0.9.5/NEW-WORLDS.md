@@ -68,6 +68,12 @@ node --test tests/new-worlds.test.mjs
 
 Use `--capture` only when acquiring a new source snapshot. It queries the official service serially, caches validated responses and records their SHA-256 hashes. A recapture can differ because the upstream source updates its ephemerides and includes generation timestamps. The archived bodies and manifest define the exact input for this release.
 
+### Opening a local system
+
+On the Voyager release tree, the Chromium regression opened Earth–Moon in fresh profiles at 1440, 390 and 320 CSS pixels. The main view started at J2000.0. The local view showed the coverage notice and no comparison or binary request until the test used the manual jump. [Baseline Chromium run](https://github.com/phoscore/entrolab/actions/runs/45384007590)
+
+Local entry now keeps any covered epoch and otherwise opens at 00:00 TDB on the current UTC calendar date. If that date is outside the archive, it opens at the first covered epoch, 2025-01-01 00:00 TDB. The model clock displays the selected TDB epoch. The local camera starts at the barycentre with the angled system fit. Leaving the local view restores the overview camera and any date replaced automatically. A manual date selection or step takes precedence over that saved date. Dates explicitly entered outside the archive still show the unavailable state and a jump to the first covered epoch.
+
 ### Browser integrity contract
 
 `dist/explorer/new-worlds-spec.mjs` pins the asset release, the exact byte length, and the SHA-256 digest of each system package in application code. A release update must change the pins together with the versioned assets. The offline manifest documents provenance and reproduction. The browser uses its application pins directly.

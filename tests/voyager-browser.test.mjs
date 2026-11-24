@@ -130,6 +130,7 @@ test('Voyager hides lunar status and legacy comparison values, then restores the
   try{
     await enter(p);
     await press(p,'#solSystems [data-system=earth]');
+    await p.locator('#solDate').fill('2024-12-31');
     assert.equal(await p.locator('#solWorldState').isVisible(),true);
     await press(p,'#solVoyager');
     await ready(p);

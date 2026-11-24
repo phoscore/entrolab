@@ -1,21 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {creaturePolicy,creatureRandom,planAppearance,restDelay,validMode} from '../dist/creature-policy.mjs';
+import {creaturePolicy,creatureRandom,planAppearance,restDelay} from '../dist/creature-policy.mjs';
 import {freeCreatureSpace} from '../dist/creature-places.mjs';
 import {de,en} from '../dist/i18n.mjs';
 
 const fixed=(...values)=>()=>values.shift();
 
-test('creature: eligibility gates all work and preserves static reduced/legacy still modes',()=>{
+test('creature: eligibility gates all work and preserves a static Reduced Motion mode',()=>{
  assert.deepEqual(creaturePolicy(),{moving:true,still:false});
- for(const input of [{reduced:true},{mode:'still'}])assert.deepEqual(creaturePolicy(input),{moving:false,still:true});
- for(const input of [{mode:'off'},{hidden:true},{seen:false},{editing:true},{focus:true},{guide:true}]){
+ assert.deepEqual(creaturePolicy({reduced:true}),{moving:false,still:true});
+ for(const input of [{hidden:true},{seen:false},{editing:true},{focus:true},{guide:true}]){
   assert.deepEqual(creaturePolicy(input),{moving:false,still:false});
   assert.deepEqual(creaturePolicy({...input,reduced:true}),{moving:false,still:false});
  }
- assert.equal(validMode('bad'),false);
- for(const value of ['subtle','still','off'])assert(validMode(value));
 });
 
 test('creature: seeded visits reproduce, select eight poses and gate the fictional effect',()=>{
@@ -53,9 +51,7 @@ test('creature: bounded first and later waits',()=>{
  assert.equal(restDelay(fixed(.99999)),32000);
 });
 
-test('creature: general preference has a DE and EN label',()=>{
- assert.equal(de['v0925.decorativeMotion'],'Dekorative Bewegung');
- assert.equal(en['v0925.decorativeMotion'],'Decorative motion');
+test('creature: fictional effect has a DE and EN label',()=>{
  assert.equal(de['v0925.nullFiction'],'Null · Fiktion');
  assert.equal(en['v0925.nullFiction'],'Null · Fiction');
 });

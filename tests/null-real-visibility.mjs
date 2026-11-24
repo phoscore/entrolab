@@ -64,7 +64,7 @@ export async function checkRealVisibility(h,t){
    const {initCreature}=await import('/creature-ui.mjs');
    initCreature().dispose();
    let next;
-   initCreature(document,{storage:null,random:()=>.85,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
+   initCreature(document,{random:()=>.85,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
    window.startNull=()=>{const fn=next;next=null;fn()};
    window.visibilityAudit=[];
    document.addEventListener('visibilitychange',event=>{
