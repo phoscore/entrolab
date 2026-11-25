@@ -91,7 +91,7 @@ async function database(entry){
   const body=JSON.parse(await archive('sbdb-'+entry.id+'.json.gz','https://ssd-api.jpl.nasa.gov/sbdb.api?'+args));
   const o=body.object,orbit=body.orbit;
   assert(o?.des===entry.designation&&/^\d+$/.test(o.spkid)&&orbit?.epoch&&orbit?.elements,entry.id+': SBDB identity mismatch');
-  assert(o.fullname?.toLowerCase().replace(/[^a-z]/g,'').includes(entry.name.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'')),entry.id+': SBDB name mismatch '+o.fullname);
+  assert(o.fullname?.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'').includes(entry.name.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'')),entry.id+': SBDB name mismatch '+o.fullname);
   const values=Object.fromEntries(orbit.elements.map(e=>[e.name,Number(e.value)]));
   const diameter=body.phys_par?.find(p=>p.name==='diameter');
   const positive=value=>Number.isFinite(Number(value))&&Number(value)>0?Number(value):null;
@@ -102,6 +102,7 @@ async function database(entry){
 }
 
 function gridsFor(entry){
+  assert(Number.isFinite(entry.start)&&Number.isFinite(entry.end)&&entry.end>entry.start,entry.id+': invalid capture interval');
   const n=Math.floor((entry.end-entry.start)/entry.step);
   const days=Array.from({length:n+1},(_,i)=>entry.start+entry.step*i), result=[];
   for(let i=0;i<days.length;i+=2300)result.push({days:days.slice(i,i+2300),grid:true});

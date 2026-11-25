@@ -1,4 +1,10 @@
-import {parseModelDate} from './solar-model.mjs';
+const JD_UNIX=2440587.5, MS_PER_DAY=86400000;
+export function parseSmallDate(value){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;
+  const ms=Date.parse(value+'T00:00:00Z');
+  return Number.isFinite(ms)&&new Date(ms).toISOString().slice(0,10)===value?JD_UNIX+ms/MS_PER_DAY:null;
+}
+export const formatSmallDate=day=>new Date(Math.round((day-JD_UNIX)*MS_PER_DAY)).toISOString().slice(0,16);
 
 export const RELEASE='v0.9.5-horizons-small-bodies.1';
 export const FRAME='ICRF / Ecliptic of J2000.0 / Sun centre (10) / TDB / KM-S / geometric';
@@ -145,5 +151,5 @@ export const catalog=Object.entries(GROUPS).flatMap(([group,objects])=>objects.m
   id,group,designation,name,
   command:group==='comet'?`DES=${designation};NOFRAG;CAP`:`${designation};`,
   step:cadence??(group==='tno'?4:2),
-  start:parseModelDate(first??'2025-01-01'),end:parseModelDate(last??'2029-01-01'),
+  start:parseSmallDate(first??'2025-01-01'),end:parseSmallDate(last??'2029-01-01'),
 })));
