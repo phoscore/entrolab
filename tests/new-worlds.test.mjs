@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import {decodeSystem,encodeSystem,loadEphemeris,sampleCount,supportsEpoch} from '../dist/explorer/new-worlds-ephemeris.mjs';
-import {END,RELEASE,SECONDS_PER_DAY,START,SYSTEMS,seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
+import {END,RELEASE,SECONDS_PER_DAY,START,SYSTEMS,LEGACY_SYSTEMS,seriesFor} from '../dist/explorer/new-worlds-spec.mjs';
 import {localOrbitPath,worldComparison,worldTrail,worldVector} from '../dist/explorer/new-worlds.mjs';
 import {AU_KM,solarState} from '../dist/explorer/solar-model.mjs';
 import {LIGHT_KM_S} from '../dist/explorer/solar-motion.mjs';
@@ -40,7 +40,7 @@ test('cubic Hermite interpolation keeps position and velocity in matching units'
 });
 
 test('the runtime loader accepts only the pinned original release bytes', async t => {
-  const originals = new Map(await Promise.all(Object.keys(SYSTEMS).map(async id=>[id,await readPackageBytes(id)])));
+  const originals = new Map(await Promise.all(Object.keys(LEGACY_SYSTEMS).map(async id=>[id,await readPackageBytes(id)])));
   let payload;
   const request = t.mock.method(globalThis,'fetch',async (url, options)=>{
     assert.equal(url.pathname.split('/').at(-2),RELEASE);
@@ -110,7 +110,7 @@ test('the decoder rejects non-finite position and velocity values throughout a p
 });
 
 test('versioned Horizons packages preserve barycentric geometry at both endpoints', async () => {
-  for (const id of Object.keys(SYSTEMS)) {
+  for (const id of Object.keys(LEGACY_SYSTEMS)) {
     const data = await readPackage(id);
     const [parent,satellite] = SYSTEMS[id].bodies;
     for (const day of [START,START+.75,END]) {

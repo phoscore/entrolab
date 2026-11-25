@@ -331,3 +331,5 @@
 #helioEventList button { max-width: 100%; white-space: normal; text-align: start; }
 
 #helioMarkerEpoch { margin: 0 0 .55rem; }
+
+#explorer #solOpenSelectedSystem { margin-top: .55rem; min-height: 42px; }

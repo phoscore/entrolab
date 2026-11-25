@@ -1,0 +1,17 @@
+export const outerMoonNotes = {
+  titan: [["Titan hat eine dichte Stickstoffatmosphäre. Methan bildet Wolken, Regen und Seen.","Titan has a dense nitrogen atmosphere. Methane forms clouds, rain and lakes."], 'https://science.nasa.gov/saturn/moons/titan/'],
+  enceladus: [["Eis- und Wasserdampffontänen am Südpol geben Material aus einem Ozean unter der Eiskruste frei.","South-polar jets of ice and water vapour release material from an ocean beneath the icy crust."], 'https://science.nasa.gov/saturn/moons/enceladus/'],
+  rhea: [["Rheas eisige Oberfläche trägt viele Einschlagkrater und helle, von Brüchen geprägte Gebiete.","Rhea’s icy surface has many impact craters and bright areas shaped by fractures."], 'https://science.nasa.gov/saturn/moons/rhea/'],
+  dione: [["Helle Streifen auf Dione sind steile Eiswände entlang tektonischer Brüche.","Dione’s bright streaks are steep icy cliffs along tectonic fractures."], 'https://science.nasa.gov/saturn/moons/dione/'],
+  tethys: [["Der Krater Odysseus und der lange Graben Ithaca Chasma prägen Tethys.","The Odysseus crater and the long Ithaca Chasma trough shape Tethys."], 'https://science.nasa.gov/saturn/moons/tethys/'],
+  iapetus: [["Iapetus hat helle und dunkle Regionen sowie einen auffälligen Gebirgsrücken am Äquator.","Iapetus has bright and dark regions and a striking equatorial ridge."], 'https://science.nasa.gov/saturn/moons/iapetus/'],
+  mimas: [["Der Krater Herschel ist etwa ein Drittel so breit wie Mimas selbst.","The Herschel crater is about a third as wide as Mimas itself."], 'https://science.nasa.gov/saturn/moons/mimas/'],
+  titania: [["Uranus’ größter Mond hat lange Gräben und zahlreiche Einschlagkrater.","Uranus’s largest moon has long canyons and numerous impact craters."], 'https://science.nasa.gov/uranus/moons/titania/'],
+  oberon: [["Der äußerste der fünf hier gezeigten großen Uranusmonde besitzt eine stark verkraterte Oberfläche.","The outermost of the five major Uranian moons shown here has a heavily cratered surface."], 'https://science.nasa.gov/uranus/moons/oberon/'],
+  umbriel: [["Umbriels dunkle, verkraterte Oberfläche trägt einen auffallend hellen Ring im Krater Wunda.","Umbriel’s dark, cratered surface has a conspicuous bright ring in Wunda crater."], 'https://science.nasa.gov/uranus/moons/umbriel/'],
+  ariel: [["Tiefe Täler durchziehen Ariels eisige Oberfläche. Manche Gebiete sind weniger dicht verkratert als andere.","Deep valleys cross Ariel’s icy surface. Some areas have fewer craters than others."], 'https://science.nasa.gov/uranus/moons/ariel/'],
+  miranda: [["Mirandas Oberfläche vereint tiefe Abbrüche und große, ovale Regionen mit Rillen und Rücken.","Miranda’s surface combines deep scarps with large oval regions of grooves and ridges."], 'https://science.nasa.gov/uranus/moons/miranda/'],
+  triton: [["Triton läuft entgegen der Rotation Neptuns um ihn. Voyager 2 beobachtete aktive Fontänen.","Triton orbits opposite to Neptune’s rotation. Voyager 2 observed active plumes."], 'https://science.nasa.gov/neptune/moons/triton/'],
+  proteus: [["Proteus ist ein dunkler, unregelmäßig geformter innerer Mond mit großen Kratern.","Proteus is a dark, irregular inner moon with large craters."], 'https://science.nasa.gov/neptune/moons/proteus/'],
+  nereid: [["Nereids stark exzentrische Bahn führt den Mond abwechselnd nah an Neptun heran und weit hinaus.","Nereid’s highly eccentric orbit takes it close to Neptune and then far away."], 'https://science.nasa.gov/neptune/moons/nereid/'],
+};

@@ -42,3 +42,7 @@ Die [Reproduktionsbefehle](README.md#offline-wiederholen) laufen ohne wissenscha
 ## Heliosphere
 
 The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercises deterministic nested geometry, physical units and ephemeris coverage, and adds Chromium evidence for region selection, camera and epoch restoration, both Voyager trajectories, event navigation and 320/390 px layouts. It uses the existing source integrity and historical regression suites.
+
+## Outer planet moons
+
+[Moon Systems](MOON-SYSTEMS.md#checks-and-limits) adds byte-for-byte offline replay, local geometry checks and native Chromium evidence for the Saturn, Uranus and Neptune modes.

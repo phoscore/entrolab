@@ -1,4 +1,6 @@
 import {parseModelDate} from './solar-model.mjs';
+import {OUTER_SYSTEMS,OUTER_START,OUTER_END,OUTER_RELEASE} from './outer-moons-spec.mjs';
+import {OUTER_PACKAGES} from './outer-moons-pin.mjs';
 
 export const RELEASE = 'v0.9.5-horizons-2025-2030.1';
 // Update these pins together with RELEASE when publishing new package bytes.
@@ -11,7 +13,7 @@ export const START = parseModelDate('2025-01-01');
 export const END = parseModelDate('2030-01-01');
 export const SECONDS_PER_DAY = 86400;
 export const FRAME = 'ICRF / Ecliptic of J2000.0 / TDB / KM-S / geometric';
-export const SYSTEMS = {
+export const LEGACY_SYSTEMS = {
   earth: {anchor: 'earth', centre: 3, scaleKm: 480000, names: ['Erde–Mond', 'Earth–Moon'], bodies: [
     {id: 'earth', target: 399, hours: 6},
     {id: 'moon', target: 301, hours: 6, period: 27.32, names: ['Mond', 'Moon'], radiusKm: 1737.4, color: '#c3cad8', size: 6},
@@ -28,10 +30,18 @@ export const SYSTEMS = {
     {id: 'charon', target: 901, hours: 12, period: 6.39, names: ['Charon', 'Charon'], radiusKm: 606, color: '#b0b8c5', size: 5},
   ]},
 };
+export const SYSTEMS = {...LEGACY_SYSTEMS,...OUTER_SYSTEMS};
 export const PLUTO_ANCHOR = {id: 'pluto-anchor', target: 9, centre: 10, hours: 24};
 
 export function seriesFor(system) {
   const {bodies, centre} = SYSTEMS[system];
   const relative = bodies.map(body => ({...body, centre}));
+  if (Object.hasOwn(OUTER_SYSTEMS,system)) return relative.slice(1);
   return system === 'pluto' ? [...relative, PLUTO_ANCHOR] : relative;
+}
+
+export function ephemerisSpec(system) {
+  return Object.hasOwn(OUTER_SYSTEMS,system)
+    ? {start:OUTER_START,end:OUTER_END,release:OUTER_RELEASE,pack:OUTER_PACKAGES[system],planetCentred:true}
+    : {start:START,end:END,release:RELEASE,pack:EPHEMERIS_PACKAGES[system],planetCentred:false};
 }
