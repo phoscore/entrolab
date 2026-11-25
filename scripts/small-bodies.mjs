@@ -71,7 +71,7 @@ async function vectors(entry,file,epochs,grid=false){
   const target=header.match(/Target body name:\s*([^\n{]+?)\s*\{source:\s*([^}]+)\}/i);
   const centre=header.match(/Center body name:\s*Sun\s*\(10\)\s*\{source:\s*([^}]+)\}/i);
   const label=target?.[1].trim();
-  assert(label&&(label.startsWith(entry.designation+' ')||label.startsWith(entry.designation+'/')),file+': wrong target: '+label);
+  assert(label&&(label.startsWith(entry.designation+' ')||label.startsWith(entry.designation+'/')||label.endsWith('('+entry.designation+')')),file+': wrong target: '+label);
   assert(centre&&/Output units\s*:\s*KM-S/i.test(header)&&/GEOMETRIC/i.test(header)&&/Ecliptic of J2000\.0/i.test(header)&&/JDTDB/i.test(header),file+': wrong frame');
   const source={label,target:target[2].trim(),centre:centre[1].trim()};
   const rows=text.slice(start+5,finish).trim().split(/\r?\n/);

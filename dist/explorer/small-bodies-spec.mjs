@@ -109,7 +109,7 @@ export const GROUPS=Object.freeze({
       "halley",
       "1P",
       "Halley",
-      2,
+      1,
       "1985-01-01",
       "2064-01-01"
     ],
