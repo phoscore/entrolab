@@ -57,3 +57,29 @@ jobs:
           path: browser-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  capture-small-bodies:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v0.9.5-beyond-the-planets'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Snapshot, build and verify JPL release
+        run: |
+          node scripts/small-bodies.mjs --capture
+          node scripts/small-bodies.mjs --build
+          node scripts/small-bodies.mjs --check
+      - name: Commit reviewed-format data to the feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add cosmic-explorer/data/raw/v0.9.5-horizons-small-bodies.1 dist/explorer/data/v0.9.5-horizons-small-bodies.1 dist/explorer/small-bodies-release.mjs
+          git commit -m '[CF-Pages-Skip] Archive validated small-body Horizons and SBDB data'
+          git push origin HEAD:refs/heads/feature/v0.9.5-beyond-the-planets
