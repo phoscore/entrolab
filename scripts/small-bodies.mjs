@@ -90,7 +90,9 @@ async function database(entry){
   const args=new URLSearchParams({sstr:entry.designation,'phys-par':'true'});
   const body=JSON.parse(await archive('sbdb-'+entry.id+'.json.gz','https://ssd-api.jpl.nasa.gov/sbdb.api?'+args));
   const o=body.object,orbit=body.orbit;
-  assert(o?.des===entry.designation&&/^\d+$/.test(o.spkid)&&orbit?.epoch&&orbit?.elements,entry.id+': SBDB identity mismatch');
+  const normalizeDesignation=value=>String(value).trim().replace(/^C\//,'');
+  assert(normalizeDesignation(o?.des)===normalizeDesignation(entry.designation)&&/^\d+$/.test(o?.spkid)&&orbit?.epoch&&orbit?.elements,
+    entry.id+': SBDB identity mismatch '+JSON.stringify({designation:o?.des,spkid:o?.spkid,epoch:orbit?.epoch}));
   assert(o.fullname?.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'').includes(entry.name.toLowerCase().normalize('NFD').replace(/[^a-z]/g,'')),entry.id+': SBDB name mismatch '+o.fullname);
   const values=Object.fromEntries(orbit.elements.map(e=>[e.name,Number(e.value)]));
   const diameter=body.phys_par?.find(p=>p.name==='diameter');
