@@ -225,8 +225,22 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     assert.match(await p.locator('#voyForecastStatus').textContent(),/prognose/i);
     await click(p,'#solVoyager');
     await click(p,'#solBeyond');
+    const deferred=Promise.withResolvers();
+    await context.route('**/v0.9.5-horizons-small-bodies.1/asteroid.bin',async route=>{
+      await deferred.promise;
+      await route.continue();
+    });
     await p.locator('[data-beyond-group=asteroid]').check();
-    await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.beyond.loaded.includes('asteroid'));
+    try{
+      await click(p,'#solFree');
+      await move(p,'w');
+      const beforeLoad=(await get(p)).free.position;
+      deferred.resolve();
+      await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.beyond.loaded.includes('asteroid'));
+      await settle(p);
+      assert.deepEqual((await get(p)).free.position,beforeLoad);
+    }finally{deferred.resolve();}
+    await click(p,'#solFree');
     await p.locator('#smallTarget').selectOption('apophis');
     await click(p,'#apophisJump');
     await p.waitForFunction(day=>window.entrolabExplorer.inspect().solar.day===day,ENCOUNTER.event.day);
@@ -237,7 +251,8 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     assert.match(await p.locator('#apophisHeight').textContent(),/31.*km/);
     await shot(p,'apophis');
     await shot(p,'encounter','#apophisPanel');
-    await p.locator('#solTarget').selectOption('earth');
+    const earth=(await get(p)).markers.find(m=>m.id==='earth');
+    await canvas(p).click({position:{x:earth.x,y:earth.y}});
     assert.equal((await get(p)).selected,'earth');
     assert.match(await p.locator('#solEarth').textContent(),/Horizons-Position des Erdmittelpunkts/);
     const date=p.locator('#solDate');
