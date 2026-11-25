@@ -110,6 +110,9 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         await click(p,'#smallBeltFit');await settle(p);
         assert((await solar(p)).markers.some(m=>m.id==='vesta'));
         await shot(p,'main-belt');
+        await select(p,'pluto');
+        assert.equal((await solar(p)).selected,'pluto');
+        assert(await p.locator('#solOpenSelectedSystem').isHidden());
         await select(p,'ceres');
         assert.match(await p.locator('#smallClass').textContent(),/Zwergplanet/);
         assert.match(await p.locator('#smallDistance').textContent(),/AU/);
@@ -122,6 +125,8 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         assert.equal((await solar(p)).day,parseSmallDate('2061-07-28'));
         assert(await p.locator('#smallPlanetWindow').isVisible());
         assert.match(await p.locator('#smallDistance').textContent(),/AU/);
+        await click(p,'#solNext');
+        assert.equal((await solar(p)).day,parseSmallDate('2061-07-29'));
         await select(p,'ceres');
         assert.equal(await p.locator('#smallDistance').textContent(),'—');
         assert(await p.locator('#smallFirst').isVisible());
@@ -171,6 +176,9 @@ test('small-body integrity retry and repeated view lifecycle',async()=>{
     await click(p,'#solHeliosphere');
     await click(p,'[data-system=earth]');
     assert(await p.locator('#solBeyond').isHidden());
+    await click(p,'#solGlobal');
+    await click(p,'[data-system=pluto]');
+    assert.equal((await solar(p)).system,'pluto');
     await click(p,'#solGlobal');
     await click(p,'#solBeyond');await settle(p);
     await p.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.scheduled);

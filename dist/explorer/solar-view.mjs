@@ -543,7 +543,7 @@ export function mountSolar(root) {
   }
 
   function enterSystem(id) {
-    if (system === id) return;
+    if (beyond || system === id) return;
     suspend();
     if (!system) overview = {selected,reference,follow,camera,space,pose,view,galactic,epoch:day,returnDay:null};
     galactic = null;
@@ -712,7 +712,7 @@ export function mountSolar(root) {
       return;
     }
     $('solPlanetInspector').hidden=Boolean(voyager&&!usePlanetPanel());
-    $('solOpenSelectedSystem').hidden=Boolean(system||voyager||!Object.hasOwn(SYSTEMS,selected));
+    $('solOpenSelectedSystem').hidden=Boolean(beyond||system||voyager||!Object.hasOwn(SYSTEMS,selected));
     if(heliosphere)updateHeliospherePanel(root,{
       region:heliosphere.region,event:heliosphere.event,probe:selected,day,data:voyData,lang:lang(),
     });
@@ -1465,7 +1465,7 @@ export function mountSolar(root) {
   });
   listen($('solGlobal'),'click',()=>{const previous=system;exitSystem();systemButtons.find(item=>item.id===previous)?.button.focus();});
   listen($('solOpenSelectedSystem'),'click',()=>{
-    if(system||voyager||!Object.hasOwn(SYSTEMS,selected))return;
+    if(beyond||system||voyager||!Object.hasOwn(SYSTEMS,selected))return;
     enterSystem(selected);
     $('solGlobal').focus();
   });
