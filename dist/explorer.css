@@ -384,6 +384,8 @@
 #explorer .ex-apophis button { min-height: 42px; }
 @media(max-width:760px){
   #explorer .ex-free { padding-inline: .55rem; }
+  #explorer .ex-free-speed { grid-template-columns: minmax(0, 1fr) auto; row-gap: .2rem; }
+  #explorer .ex-free-speed input { grid-column: 1 / -1; grid-row: 2; }
   #explorer .ex-free-axis { grid-template-columns: repeat(3,minmax(0,1fr)); }
   #explorer .ex-free-axis button { min-height: 42px; }
 }

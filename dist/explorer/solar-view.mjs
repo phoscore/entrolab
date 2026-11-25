@@ -39,8 +39,9 @@ const copy = {
   apophisEvent:['Vorbeiflug · 13. April 2029','Earth flyby · 13 April 2029'],
   apophisCentre:['Abstand zum Erdmittelpunkt','Distance from Earth centre'],
   apophisHeight:['Höhe über einer Kugel mit 6.371 km Radius','Altitude above a sphere of radius 6,371 km'],
-  apophisModel:['JPL-Prognose · 13. April 2029 gegen 21:46 UTC. Im Begegnungsfenster stammt der Erdmittelpunkt aus Horizons.','JPL forecast · 13 April 2029 at about 21:46 UTC. During the encounter window Earth’s centre comes from Horizons.'],
+  apophisModel:['JPL-Prognose · 13. April 2029 gegen 21:46 TDB. Im Begegnungsfenster stammt der Erdmittelpunkt aus Horizons.','JPL forecast · 13 April 2029 at about 21:46 TDB. During the encounter window Earth’s centre comes from Horizons.'],
   apophisSource:['NASA zum Vorbeiflug','NASA flyby information'],
+  apophisEarth:['Horizons-Position des Erdmittelpunkts im Begegnungsfenster.','Horizons position of Earth’s centre during the encounter window.'],
   ...smallBodyCopy,
   ...heliosphereText,
   title:['Unser Sonnensystem','Our Solar System'],
@@ -388,7 +389,7 @@ export function mountSolar(root) {
   let heliosphere=null,beyond=null,free=null;
   let freeLevel=0;
   let forecastPending=false,forecastFailed=false,forecastReady=false;
-  let encounterData=null,encounterPending=false,encounterFailed=false,encounterJump=false;
+  let encounterData=null,encounterPending=false,encounterFailed=false,encounterJump=null;
   const smallData=new Map(),smallPending=new Set(),smallFailures=new Set();
   const planetEpoch=()=>day>=MIN_DAY&&day<=MAX_DAY;
   const formatEpoch=()=>beyond?formatSmallDate(day):formatModelDay(day);
@@ -565,15 +566,15 @@ export function mountSolar(root) {
       return;
     }
     if(encounterFailed&&!jump)return;
-    encounterJump ||= jump;
+    if(jump)encounterJump=beyond;
     if(encounterPending)return;
     encounterPending=true;encounterFailed=false;updateInspector();
     loadEncounter(abort.signal).then(data=>{
       encounterData=data;stateDay=null;
       if(beyond)beyond.arc=null;
-      if(encounterJump&&beyond&&selected==='apophis')jumpToEncounter();
+      if(encounterJump===beyond&&beyond&&selected==='apophis')jumpToEncounter();
     }).catch(error=>{if(error.name!=='AbortError')encounterFailed=true;}).finally(()=>{
-      encounterJump=false;encounterPending=false;
+      encounterJump=null;encounterPending=false;
       if(beyond&&!abort.signal.aborted){updateInspector();invalidate();}
     });
   }
@@ -772,6 +773,8 @@ export function mountSolar(root) {
         if(earth){
           earth.vector=absolute.slice(0,3).map((km,i)=>(km-relative[i])/AU_KM);
           earth.distanceAU=Math.hypot(...earth.vector);
+          earth.orbit=null;
+          earth.horizonsCentre=true;
         }
       }
       stateDay = day;
@@ -802,7 +805,7 @@ export function mountSolar(root) {
     const w = Math.round(width*dpr), h = Math.round(height*dpr);
     if (canvas.width !== w || canvas.height !== h) {canvas.width=w;canvas.height=h;}
     ctx?.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);
-    if((voyager?.fitted||beyond?.fitted)&&(width!==previousWidth||height!==previousHeight))fitView();
+    if(!free&&(voyager?.fitted||beyond?.fitted)&&(width!==previousWidth||height!==previousHeight))fitView();
     invalidate();
   }
   function displayedVector(vector) {
@@ -920,6 +923,7 @@ export function mountSolar(root) {
     $('solAxisLabel').textContent = t(body.meanOrbitKm?'meanAxis':'axis');
     $('solAxis').textContent = body.meanOrbitKm ? n(body.meanOrbitKm)+' km' : orbit ? n(orbit.a)+' AU' : '';
     $('solEarth').hidden = body.id !== 'earth' || Boolean(system||heliosphere);
+    $('solEarth').textContent=t(entry?.horizonsCentre?'apophisEarth':'earth');
     $('solWorldNote').hidden = $('solWorldSource').hidden = !notes;
     if (notes) {
       $('solWorldNote').textContent = notes[0][lang()];
@@ -1534,7 +1538,10 @@ export function mountSolar(root) {
     const dx=mid[0]-spaceGesture.point[0],dy=mid[1]-spaceGesture.point[1];
     if(Math.hypot(dx,dy)>4)spaceMoved=true;
     if(points.length===1&&Math.hypot(dx,dy)>4)markPose(null);
-    if(free){free=aimFree(spaceGesture.camera,dx,-dy);invalidate();return;}
+    if(free){
+      const {yaw,pitch}=aimFree(spaceGesture.camera,dx,-dy);
+      free={...free,yaw,pitch};invalidate();return;
+    }
     setSpace(points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
       rotateSpace(spaceGesture.camera,dx,-dy));
     invalidate();
@@ -1589,12 +1596,12 @@ export function mountSolar(root) {
       if(!beyond)return;
       const group=input.dataset.beyondGroup;
       const key=group??input.dataset.beyondBelt;
-      const active=group?beyond.groups:beyond.belts;
+      const enabledLayers=group?beyond.groups:beyond.belts;
       if(input.checked){
-        active.add(key);
+        enabledLayers.add(key);
         if(group)loadSmallGroup(group);
       }else{
-        active.delete(key);
+        enabledLayers.delete(key);
         if(group&&(smallBodyById.get(selected)?.group===group||selected==='pluto'&&group==='dwarf'))selected='sun';
       }
       stateDay=null;

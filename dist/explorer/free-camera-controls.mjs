@@ -8,14 +8,12 @@ export const freeCopy={
   freeUp:['Aufwärts','Up'],freeDown:['Abwärts','Down'],
   freeForward:['Vorwärts','Forward'],freeBack:['Rückwärts','Back'],
   freeHelp:['Karte ziehen oder Pfeiltasten zum Umsehen. Bei Kartenfokus bewegen WASD und Q/E die Kamera. Bewegungstasten gedrückt halten.','Drag the map or use arrow keys to look. With the map focused, move with WASD and Q/E. Hold a direction to move.'],
-  freeSpeedUnit:['pro Echtzeitsekunde','per real second'],
   freeControls:['Freie Kamerasteuerung','Free camera controls'],
 };
 
 export function bindFreeControls({canvas,controls,listen,enabled,look,move,wake}){
   const keys=new Set(), pointers=new Map();
   let last=null;
-  let moved=false;
   const release=()=>{
     keys.clear();
     const captured=[...pointers];
@@ -63,15 +61,13 @@ export function bindFreeControls({canvas,controls,listen,enabled,look,move,wake}
   }
   const moving=()=>keys.size>0||pointers.size>0;
   return {release,onMapKey,moving,tick(time){
-    moved=false;
-    if(!enabled()||!moving()){last=null;return moved;}
+    if(!enabled()||!moving()){last=null;return;}
     const seconds=last===null?0:Math.min(.08,Math.max(0,time-last)/1000);
     last=time;
     const combined=[0,0,0];
     const add=axis=>axis.forEach((value,i)=>{combined[i]+=value;});
     for(const key of keys)add(motionKeys[key]);
     for(const {axis} of pointers.values())add(axis);
-    if(seconds&&combined.some(Boolean)){move(combined,seconds);moved=true;}
-    return moved;
+    if(seconds&&combined.some(Boolean))move(combined,seconds);
   }};
 }

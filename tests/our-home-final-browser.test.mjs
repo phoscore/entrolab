@@ -86,7 +86,7 @@ test('native Chromium free translation and look, focus release, restored scenes 
     const orbit=await get(p);
     await click(p,'#solFree');
     assert(await p.locator('#solPlay').isDisabled());
-    await p.locator('#solFreeSpeed').fill('2');
+    await p.locator('#solFreeSpeed').fill('1');
     assert.match(await p.locator('#solFreeSpeedText').textContent(),/AU\/s/);
     await move(p,'w');await move(p,'d');await move(p,'e');
     const moved=await get(p);
@@ -101,6 +101,17 @@ test('native Chromium free translation and look, focus release, restored scenes 
     assert.deepEqual(looked.free.position,moved.free.position);
     assert.notEqual(looked.free.yaw,moved.free.yaw);
     await shot(p,'look');
+    await p.mouse.move(point.x,point.y);await p.mouse.down();
+    await p.keyboard.down('w');
+    try{
+      await p.waitForFunction(start=>window.entrolabExplorer.inspect().solar.free.position.some((x,i)=>x!==start[i]),looked.free.position);
+      await p.keyboard.up('w');
+      await settle(p);
+      const duringDrag=(await get(p)).free.position;
+      await p.mouse.move(point.x+35,point.y-22);
+      assert.deepEqual((await get(p)).free.position,duringDrag);
+    }finally{await p.keyboard.up('w');await p.mouse.up();}
+    const afterCombined=await get(p);
     await p.keyboard.down('w');
     await p.locator('#solFreeSpeed').focus();
     await p.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.free.moving);
@@ -108,7 +119,7 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await click(p,'#solFree');
     await settle(p);
     assert.equal((await get(p)).free,null);
-    assert.equal((await get(p)).space.yaw,looked.free.yaw);
+    assert.equal((await get(p)).space.yaw,afterCombined.free.yaw);
     await shot(p,'return');
     await click(p,'#solFree');
     const saved=(await get(p)).free;
@@ -117,6 +128,7 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.loadedWorlds.includes('earth'));
     assert.equal((await get(p)).free,null);
     await click(p,'#solFree');
+    await p.locator('#solFreeSpeed').fill('0');
     assert.match(await p.locator('#solFreeSpeedText').textContent(),/km\/s/);
     await move(p,'a');await shot(p,'moon');
     await click(p,'#solGlobal');
@@ -126,7 +138,13 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.heliosphere?.crossings===4);
     await click(p,'#solFree');
     await p.locator('#solFreeSpeed').fill('-1');
+    await click(p,'#solFit');
     await move(p,'w');await shot(p,'helio');
+    const beforeResize=(await get(p)).free;
+    await p.setViewportSize({width:1280,height:1050});
+    await settle(p);
+    assert.deepEqual((await get(p)).free.position,beforeResize.position);
+    await p.setViewportSize({width:1440,height:1050});
     await click(p,'#solHeliosphere');
     const recovered=(await get(p)).free;
     assert.deepEqual(recovered.position,saved.position);
@@ -136,6 +154,9 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await move(p,'q');
     await click(p,'#solFree');
     await click(p,'#solHelio');
+    const session=await context.newCDPSession(p);
+    await session.send('HeapProfiler.collectGarbage');
+    const heapBefore=(await session.send('Runtime.getHeapUsage')).usedSize;
     await p.evaluate(()=>{
       const mode=document.querySelector('#solFree');
       for(let i=0;i<100;i++){mode.click();mode.click();}
@@ -146,6 +167,10 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await p.waitForTimeout(220);
     assert.equal((await get(p)).draws,idle);
     assert.equal((await get(p)).free,null);
+    await session.send('HeapProfiler.collectGarbage');
+    const heapAfter=(await session.send('Runtime.getHeapUsage')).usedSize;
+    assert(heapAfter-heapBefore<3*1024*1024);
+    console.log(`Free-camera 100-switch heap delta: ${heapAfter-heapBefore} bytes`);
     assert.deepEqual(h.errors,[]);
   }finally{await context.close();}
 });
@@ -197,7 +222,7 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     await click(p,'#voyForecast');
     await p.waitForFunction(()=>document.querySelector('#solDate').max==='2027-11-26');
     assert((await get(p)).day>FORECAST.start&&(await get(p)).day<=FORECAST.end);
-    assert.match(await p.locator('#voyForecastStatus').textContent(),/Prognose/);
+    assert.match(await p.locator('#voyForecastStatus').textContent(),/prognose/i);
     await click(p,'#solVoyager');
     await click(p,'#solBeyond');
     await p.locator('[data-beyond-group=asteroid]').check();
@@ -212,6 +237,12 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     assert.match(await p.locator('#apophisHeight').textContent(),/31.*km/);
     await shot(p,'apophis');
     await shot(p,'encounter','#apophisPanel');
+    await p.locator('#solTarget').selectOption('earth');
+    assert.equal((await get(p)).selected,'earth');
+    assert.match(await p.locator('#solEarth').textContent(),/Horizons-Position des Erdmittelpunkts/);
+    const date=p.locator('#solDate');
+    await date.fill('2029-04-16');await date.dispatchEvent('change');
+    assert.doesNotMatch(await p.locator('#solEarth').textContent(),/Horizons-Position/);
     await contactSheet(p);
     assert.deepEqual(h.errors,[]);
   }finally{await context.close();}
