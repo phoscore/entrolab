@@ -1,6 +1,6 @@
 # Our Home · Free camera
 
-Open any local 3D scene and choose **Free camera** beside the view presets. **Orbit** switches back. The starting camera is Orbit. In free mode drag the map or press the arrow keys to look. With the map focused, hold W/S to move along the view, A/D to strafe and Q/E to move down/up along the camera basis. The six on-screen direction buttons accept continuous mouse or touch holds. Focus one and press Enter or Space for a short step. Tab or Escape leaves map input. No pointer lock is acquired. The speed slider uses 17 settings, each a factor of approximately 3.16 from its neighbour. Values are relative to real time and describe movement of the observer, independent of the simulation clock.
+Open any local 3D scene and choose **Free camera** beside the view presets. **Orbit** switches back. The starting camera is Orbit. In free mode drag the map or press the arrow keys to look. With the map focused, hold W/S to move along the view, A/D to strafe and Q/E to move down/up along the camera basis. The six on-screen direction buttons accept continuous mouse or touch holds. Focus one and press Enter or Space for a short step. Tab or Escape leaves map input. No pointer lock is acquired. The speed slider uses 17 settings, each a factor of approximately 3.16 from its neighbour. The selected speed setting carries between scenes and each scene interprets it at its own spatial scale. Values are relative to real time and describe movement of the observer, independent of the simulation clock.
 
 ## Camera state and projection
 

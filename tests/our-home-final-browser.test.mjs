@@ -132,7 +132,7 @@ test('native Chromium free translation and look, focus release, restored scenes 
     assert.match(await p.locator('#solFreeSpeedText').textContent(),/km\/s/);
     await move(p,'a');await shot(p,'moon');
     await click(p,'#solGlobal');
-    assert.deepEqual((await get(p)).free,saved);
+    assert.deepEqual((await get(p)).free,{...saved,level:0});
     await click(p,'#solHeliosphere');
     await settle(p);
     await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.heliosphere?.crossings===4);
@@ -233,6 +233,7 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     await p.locator('[data-beyond-group=asteroid]').check();
     try{
       await click(p,'#solFree');
+      await click(p,'#solFit');
       await move(p,'w');
       const beforeLoad=(await get(p)).free.position;
       deferred.resolve();
@@ -260,5 +261,22 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     assert.doesNotMatch(await p.locator('#solEarth').textContent(),/Horizons-Position/);
     await contactSheet(p);
     assert.deepEqual(h.errors,[]);
+  }finally{await context.close();}
+});
+
+test('switching camera modes preserves active simulation playback',async()=>{
+  const {p,context}=await h.lab({viewport:{width:1440,height:1050},reducedMotion:'no-preference'});
+  try{
+    await open(p);
+    await p.locator('#solTarget').selectOption('saturn');
+    await click(p,'#solPlay');
+    assert.equal((await get(p)).playing,true);
+    await click(p,'#solFree');
+    assert.equal((await get(p)).playing,true);
+    assert.equal((await get(p)).selected,'saturn');
+    await click(p,'#solFree');
+    assert.equal((await get(p)).playing,true);
+    await click(p,'#solPlay');
+    assert.equal((await get(p)).playing,false);
   }finally{await context.close();}
 });
