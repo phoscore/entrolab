@@ -83,6 +83,8 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await click(p,'#solJump');
     await settle(p);
     await shot(p,'orbit');
+    await p.locator('#solZoom').fill('0.75');
+    await settle(p);
     const orbit=await get(p);
     await click(p,'#solFree');
     assert(await p.locator('#solPlay').isDisabled());
@@ -90,6 +92,7 @@ test('native Chromium free translation and look, focus release, restored scenes 
     assert.match(await p.locator('#solFreeSpeedText').textContent(),/AU\/s/);
     await move(p,'w');await move(p,'d');await move(p,'e');
     const moved=await get(p);
+    assert(Math.hypot(...moved.free.position)>5&&Math.hypot(...moved.free.position)<30);
     pose(orbit,moved);
     await shot(p,'free');
     const rect=await canvas(p).boundingBox();
@@ -248,7 +251,7 @@ test('trajectory forecast and Apophis event are inspected and bounded independen
     await settle(p);
     assert((await get(p)).markers.some(m=>m.id==='earth'));
     assert((await get(p)).markers.some(m=>m.id==='apophis'));
-    assert.match(await p.locator('#apophisCentre').textContent(),/38.*km/);
+    assert.equal(await p.locator('#apophisCentre').textContent(),'38.011 km');
     assert.match(await p.locator('#apophisHeight').textContent(),/31.*km/);
     await shot(p,'apophis');
     await shot(p,'encounter','#apophisPanel');

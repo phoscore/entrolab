@@ -40,6 +40,7 @@ const copy = {
   apophisCentre:['Abstand zum Erdmittelpunkt','Distance from Earth centre'],
   apophisHeight:['Höhe über einer Kugel mit 6.371 km Radius','Altitude above a sphere of radius 6,371 km'],
   apophisModel:['JPL-Prognose · 13. April 2029 gegen 21:46 TDB. Im Begegnungsfenster stammt der Erdmittelpunkt aus Horizons.','JPL forecast · 13 April 2029 at about 21:46 TDB. During the encounter window Earth’s centre comes from Horizons.'],
+  apophisTrack:['Die Nahansicht zeigt den heliozentrischen Bahnabschnitt vom 12. bis 15. April.','The close view shows the heliocentric trajectory from 12 to 15 April.'],
   apophisSource:['NASA zum Vorbeiflug','NASA flyby information'],
   apophisEarth:['Horizons-Position des Erdmittelpunkts im Begegnungsfenster.','Horizons position of Earth’s centre during the encounter window.'],
   ...smallBodyCopy,
@@ -186,6 +187,7 @@ export function mountSolar(root) {
   const comparisonName=body=>body.id==='earth'&&!system?t('earthBary'):name(body);
   const format = [new Intl.NumberFormat('de-DE',{maximumSignificantDigits:4}),new Intl.NumberFormat('en-GB',{maximumSignificantDigits:4})];
   const n = value => format[lang()].format(value);
+  const whole = [new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}),new Intl.NumberFormat('en-GB',{maximumFractionDigits:0})];
   const coarse = [new Intl.NumberFormat('de-DE',{maximumSignificantDigits:3}),new Intl.NumberFormat('en-GB',{maximumSignificantDigits:3})];
   const rough = value => coarse[lang()].format(value);
   root.innerHTML = `
@@ -350,6 +352,7 @@ export function mountSolar(root) {
               <dt data-solar="apophisCentre"></dt><dd id="apophisCentre"></dd>
               <dt data-solar="apophisHeight"></dt><dd id="apophisHeight"></dd>
             </dl>
+            <p class="ex-small" data-solar="apophisTrack"></p>
             <a href="https://science.nasa.gov/solar-system/asteroids/apophis/" data-solar="apophisSource"></a>
           </section>
         </div>
@@ -545,7 +548,10 @@ export function mountSolar(root) {
       const points=orbitalArc(series,body);
       if(body.id==='apophis'&&encounterData)for(let i=4;i<encounterData.sun.length;i+=4)
         points.push(encounterData.sun[i].slice(1,4).map(km=>km/AU_KM));
-      beyond.arc={body,points};
+      const encounter=body.id==='apophis'&&encounterData?encounterData.sun
+        .filter(([epoch])=>epoch>=encounterData.relative[0][0]&&epoch<=encounterData.relative.at(-1)[0])
+        .map(row=>row.slice(1,4).map(km=>km/AU_KM)):null;
+      beyond.arc={body,points,encounter};
     }
     return beyond.arc.points;
   }
@@ -860,8 +866,8 @@ export function mountSolar(root) {
       $('apophisStatus').textContent=encounterPending?t('loading'):encounterFailed?t('loadError'):'';
       if(relative){
         const km=Math.hypot(...relative.slice(0,3));
-        $('apophisCentre').textContent=n(km)+' km';
-        $('apophisHeight').textContent=n(km-6371)+' km';
+        $('apophisCentre').textContent=whole[lang()].format(km)+' km';
+        $('apophisHeight').textContent=whole[lang()].format(km-6371)+' km';
       }
     }
     forecastStatus();
@@ -1261,8 +1267,13 @@ export function mountSolar(root) {
     if(heliosphere)paintHeliosphere(ctx,screen,heliosphere.shells,heliosphere.region);
     if(voyager){if(trails)paintVoyager(ctx,screen,tracksVoyager());}
     else if (!galactic && (!outerLocal() || entries.length)) paintSolarOrbits(screen,entries);
-    if(beyond&&trails)paintSmallArc(ctx,screen,selectedSmallArc(),smallBodyById.get(selected)?.color??'#a5cdd1');
-    markers=entries.map(({body,vector})=>{
+    if(beyond&&trails){
+      const arc=selectedSmallArc();
+      const depth=free?.depth??baseDistance/10**space.zoom;
+      const nearEncounter=depth<.1&&entries.some(entry=>entry.horizonsCentre);
+      paintSmallArc(ctx,screen,(nearEncounter?beyond.arc?.encounter:null)??arc,smallBodyById.get(selected)?.color??'#a5cdd1');
+    }
+    markers=entries.map(({body,vector,horizonsCentre})=>{
       const p=screen(displayedVector(vector));if(!p)return null;
       const planet=contextPlanet(body.id);
       const maxSymbol=beyond?(body.id==='sun'?11:7):outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
@@ -1273,7 +1284,7 @@ export function mountSolar(root) {
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
         reference:reference===body.id&&reference!==selected,
         priority:chosen?20:body.id===reference?15:body.id==='sun'?10:body.small?5:1,
-        label:!chosen&&(planet||beyond&&!body.small&&body.id!=='sun'&&body.id!=='pluto')?'':name(body)};
+        label:!chosen&&!horizonsCentre&&(planet||beyond&&!body.small&&body.id!=='sun'&&body.id!=='pluto')?'':name(body)};
     }).filter(m=>m&&m.x+m.radius>=0&&m.x-m.radius<=width&&m.y+m.radius>=0&&m.y-m.radius<=height);
     if(!beyond&&!voyager&&selected!==reference){
       const a=markers.find(m=>m.body.id===selected),b=markers.find(m=>m.body.id===reference);
