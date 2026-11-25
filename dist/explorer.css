@@ -333,3 +333,36 @@
 #helioMarkerEpoch { margin: 0 0 .55rem; }
 
 #explorer #solOpenSelectedSystem { margin-top: .55rem; min-height: 42px; }
+
+#explorer .ex-beyond { padding: .6rem 1rem; display: grid; gap: .5rem; }
+#explorer .ex-beyond fieldset {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .9rem;
+  min-width: 0; margin: 0; padding: .15rem .55rem .35rem;
+  border: 1px solid #36515e; border-radius: 7px;
+}
+#explorer .ex-beyond legend { padding-inline: .3rem; color: #b9d4dc; font-size: .79rem; }
+#explorer .ex-beyond fieldset label {
+  display: inline-flex; align-items: center; gap: .3rem; min-height: 32px; min-width: 0;
+  margin: 0; padding: 0; font-size: .84rem; line-height: 1.25; letter-spacing: normal;
+}
+#explorer .ex-beyond fieldset input { flex: none; margin: 0; }
+#explorer .ex-beyond input { accent-color: #91cfc6; }
+#explorer .ex-beyond-target { display: flex; flex-wrap: wrap; gap: .4rem .65rem; align-items: center; }
+#explorer #smallTarget { max-width: 100%; min-width: 0; min-height: 36px; }
+#explorer .ex-beyond-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+#explorer .ex-beyond p { margin: 0; }
+#explorer #smallInspector h3 { margin: .9rem 0 .4rem; font-size: .9rem; }
+#explorer #smallInspector p { overflow-wrap: anywhere; }
+#explorer .ex-beyond label:has(input[data-beyond-group]) span::after {
+  display: inline-block; margin-inline-start: .35em; opacity: .9;
+}
+#explorer [data-beyond-group-label="dwarf"]::after { content: '●'; color: #ffc58c; }
+#explorer [data-beyond-group-label="asteroid"]::after { content: '■'; color: #f3b27f; }
+#explorer [data-beyond-group-label="tno"]::after { content: '◆'; color: #8bdde6; }
+#explorer [data-beyond-group-label="comet"]::after { content: '▲'; color: #c8afff; }
+@media(max-width:760px){
+  #explorer .ex-beyond { padding-inline: .65rem; }
+  #explorer .ex-beyond fieldset { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .15rem .45rem; }
+  #explorer .ex-beyond fieldset button { grid-column: 1 / -1; justify-self: start; }
+  #explorer .ex-beyond button,#explorer #smallTarget,#explorer .ex-beyond fieldset label { min-height: 42px; }
+}

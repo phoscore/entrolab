@@ -46,3 +46,7 @@ The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercis
 ## Outer planet moons
 
 [Moon Systems](MOON-SYSTEMS.md#checks-and-limits) adds byte-for-byte offline replay, local geometry checks and native Chromium evidence for the Saturn, Uranus and Neptune modes.
+
+## Beyond the Planets
+
+[Verification for the new small-body release](BEYOND-THE-PLANETS.md#verification) describes the offline replay, orbital checks and native Chromium review. The existing physical and visual regressions remain in the normal CI checks.

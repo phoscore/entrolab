@@ -22,3 +22,7 @@ Die begrenzten Datenabfragen sind Offline-Vorbereitung. Produktion, Browser und 
 ## Outer planet moons
 
 [Moon Systems](MOON-SYSTEMS.md) archives the source contract for 15 moons, three planet-centred Horizons packages and independently queried off-grid states.
+
+## Beyond the Planets
+
+[Small-body sources, releases and model limits](BEYOND-THE-PLANETS.md) specifies the original Horizons vector responses, independently queried epochs and object-specific JPL SBDB snapshots. Belt dimensions are schematic guides based on publicly documented ranges and carry no fake catalogue entries.
