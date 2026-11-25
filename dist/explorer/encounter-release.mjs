@@ -23,3 +23,35 @@ export const ENCOUNTER={
   "bytes": 248968,
   "sha256": "38c37908249c06a5090dad7ecf4c2a2ace38cfa653cdb47808baa25ffb91cd5a"
 };
+export const FORECAST={
+  "start": 2461370.5,
+  "end": 2461735.5,
+  "checks": {
+    "v1": {
+      "count": 32,
+      "km": 0.000011483759478370947,
+      "kms": 2.1651878246206146e-10,
+      "seamKm": 0,
+      "seamKmS": 0,
+      "source": "Voyager_1_ST+refit2022_m"
+    },
+    "v2": {
+      "count": 32,
+      "km": 0.000011121658124628639,
+      "kms": 2.1138118164084376e-10,
+      "seamKm": 0,
+      "seamKmS": 0,
+      "source": "Voyager_2_ST+refit2022_m"
+    },
+    "earth": {
+      "count": 32,
+      "km": 0.08710018666117027,
+      "kms": 0.000003024252990881611,
+      "seamKm": 0,
+      "seamKmS": 0,
+      "source": "DE441"
+    }
+  },
+  "bytes": 201141,
+  "sha256": "b4d7e00e0d5a9eee19038dfc3827de4db0dbc85d413efa703231aff31b2a1851"
+};
