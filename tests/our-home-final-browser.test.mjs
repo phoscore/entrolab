@@ -74,6 +74,12 @@ async function move(p,key){
 function pose(before,after){
   for(const key of ['day','selected','playing','trails'])assert.deepEqual(after[key],before[key],key);
 }
+function markerContinuity(before,after,id){
+  const a=before.markers.find(marker=>marker.id===id);
+  const b=after.markers.find(marker=>marker.id===id);
+  assert(a&&b);
+  for(const key of ['x','y','radius'])assert(Math.abs(a[key]-b[key])<1e-7,`${id} ${key}`);
+}
 
 test('native Chromium free translation and look, focus release, restored scenes and evidence',async()=>{
   const {p,context}=await h.lab({viewport:{width:1440,height:1050}});
@@ -87,6 +93,8 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await settle(p);
     const orbit=await get(p);
     await click(p,'#solFree');
+    await settle(p);
+    markerContinuity(orbit,await get(p),'jupiter');
     assert(await p.locator('#solPlay').isDisabled());
     await p.locator('#solFreeSpeed').fill('1');
     assert.match(await p.locator('#solFreeSpeedText').textContent(),/AU\/s/);
@@ -121,8 +129,10 @@ test('native Chromium free translation and look, focus release, restored scenes 
     await p.keyboard.up('w');
     await click(p,'#solFree');
     await settle(p);
-    assert.equal((await get(p)).free,null);
-    assert.equal((await get(p)).space.yaw,afterCombined.free.yaw);
+    const returned=await get(p);
+    assert.equal(returned.free,null);
+    assert.equal(returned.space.yaw,afterCombined.free.yaw);
+    markerContinuity(afterCombined,returned,'jupiter');
     await shot(p,'return');
     await click(p,'#solFree');
     const saved=(await get(p)).free;

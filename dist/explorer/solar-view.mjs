@@ -1278,7 +1278,7 @@ export function mountSolar(root) {
       const planet=contextPlanet(body.id);
       const maxSymbol=beyond?(body.id==='sun'?11:7):outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
       const radius=body.small?body.size:planet?Math.min(4,.9+p.pixelsPerAU*.5):voyager?body.size:
-        enlarged?Math.min(free?Math.min(22,maxSymbol):maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):
+        enlarged?Math.min(maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):
           Math.min(free?Math.max(width,height)*2:Infinity,radiusAU(body)*p.pixelsPerAU);
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
