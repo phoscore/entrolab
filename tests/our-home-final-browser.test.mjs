@@ -122,17 +122,18 @@ test('native Chromium free translation and look, focus release, restored scenes 
       await p.mouse.move(point.x+35,point.y-22);
       assert.deepEqual((await get(p)).free.position,duringDrag);
     }finally{await p.keyboard.up('w');await p.mouse.up();}
-    const afterCombined=await get(p);
     await p.keyboard.down('w');
     await p.locator('#solFreeSpeed').focus();
     await p.waitForFunction(()=>!window.entrolabExplorer.inspect().solar.free.moving);
     await p.keyboard.up('w');
+    await settle(p);
+    const beforeReturn=await get(p);
     await click(p,'#solFree');
     await settle(p);
     const returned=await get(p);
     assert.equal(returned.free,null);
-    assert.equal(returned.space.yaw,afterCombined.free.yaw);
-    markerContinuity(afterCombined,returned,'jupiter');
+    assert.equal(returned.space.yaw,beforeReturn.free.yaw);
+    markerContinuity(beforeReturn,returned,'jupiter');
     await shot(p,'return');
     await click(p,'#solFree');
     const saved=(await get(p)).free;
