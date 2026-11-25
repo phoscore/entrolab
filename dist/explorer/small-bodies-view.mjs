@@ -64,7 +64,7 @@ const notes={
   hygiea:bilingual('Hygiea ist ein großer Hauptgürtelasteroid mit annähernd runder Gestalt.','Hygiea is a large, nearly round main-belt asteroid.'),
   bennu:bilingual('OSIRIS-REx brachte Material von Bennu zur Erde.','OSIRIS-REx returned material from Bennu to Earth.'),
   ryugu:bilingual('Hayabusa2 brachte Proben von Ryugu zur Erde.','Hayabusa2 returned samples from Ryugu to Earth.'),
-  apophis:bilingual('Die starke Annäherung an die Erde 2029 liegt außerhalb dieses Datenfensters.','The close Earth encounter in 2029 falls outside this data window.'),
+  apophis:bilingual('Am 13. April 2029 passiert Apophis die Erde in geringer Entfernung.','Apophis makes a close Earth flyby on 13 April 2029.'),
   eros:bilingual('NEAR Shoemaker umkreiste Eros und setzte auf seiner Oberfläche auf.','NEAR Shoemaker orbited Eros and touched down on its surface.'),
   sedna:bilingual('Sedna bleibt selbst am sonnennächsten Punkt weit jenseits von Neptun.','Sedna stays far beyond Neptune even at its closest approach to the Sun.'),
   quaoar:bilingual('Sternbedeckungen lieferten Hinweise auf Ringe um Quaoar.','Stellar occultations revealed rings around Quaoar.'),
@@ -97,7 +97,7 @@ export function rebuildSmallTargets(select,active,lang,selected){
   select.value=(smallBodyById.has(selected)||selected==='pluto')?selected:'sun';
 }
 
-export function updateSmallPanel(get,body,entry,day,lang,n){
+export function updateSmallPanel(get,body,entry,day,lang,n,end=body.end){
   const meta=METADATA[body.id];
   get('smallName').textContent=`${body.name} · ${body.designation}`;
   const kind={dwarf:bilingual('Zwergplanet','Dwarf planet'), asteroid:bilingual('Asteroid','Asteroid'),
@@ -109,7 +109,7 @@ export function updateSmallPanel(get,body,entry,day,lang,n){
   get('smallNote').textContent=body.notes[lang];
   get('smallSource').href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='+encodeURIComponent(body.designation);
   const date=value=>formatSmallDate(value).slice(0,10);
-  get('smallCoverage').textContent=date(body.start)+' – '+date(body.end);
+  get('smallCoverage').textContent=date(body.start)+' – '+date(end);
   get('smallEpoch').textContent=formatSmallDate(day).replace('T',' ')+' TDB';
   get('smallOrbitEpoch').textContent=meta?.orbitEpoch?'JD '+String(meta.orbitEpoch)+' TDB':'—';
   get('smallDistance').textContent=entry?n(Math.hypot(...entry.vector))+' AU':'—';

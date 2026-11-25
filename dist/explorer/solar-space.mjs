@@ -22,11 +22,13 @@ export function spaceBasis({yaw,pitch}){
   return [[-s,c,0],[-v*c,-v*s,u],[u*c,u*s,v]];
 }
 export function spaceProjector(camera,width,height,baseDistance=85){
-  const {focus,zoom}=camera;
+  const {focus,zoom,position,nearPlane}=camera;
   const [right,up,toward]=spaceBasis(camera);
-  const distance=baseDistance/10**zoom,focal=height*.9,near=distance*.025;
+  const distance=position?0:baseDistance/10**zoom, focal=height*.9;
+  const near=position?nearPlane:distance*.025;
+  const origin=position??focus;
   function offset(vector){
-    return [vector[0]-focus[0],vector[1]-focus[1],vector[2]-focus[2]];
+    return [vector[0]-origin[0],vector[1]-origin[1],vector[2]-origin[2]];
   }
   const depthAt=([dx,dy,dz])=>distance-(dx*toward[0]+dy*toward[1]+dz*toward[2]);
   function project([dx,dy,dz],depth){

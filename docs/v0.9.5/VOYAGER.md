@@ -36,3 +36,7 @@ The raw manifest records the exact request URL, returned identifiers and source 
 The `VOY1` format stores target ID, record count, and increasing epoch + six state components as little-endian Float64 payload. The two trails each have at most 1,100 points, drawn from model-time samples with three-hour spacing near flybys. Camera rotation and zoom use the existing perspective projection and do not affect measurement. The dormant tab, paused view and Reduced Motion reuse the existing rendering lifecycle.
 
 Sources: [Horizons API specification](https://ssd-api.jpl.nasa.gov/doc/horizons.html), [Horizons manual](https://ssd.jpl.nasa.gov/horizons/manual.html), [JPL SSD data and attribution terms](https://ssd.jpl.nasa.gov/faq.html), [NASA Voyager fast facts](https://science.nasa.gov/mission/voyager/fast-facts/). JPL raw exports are archived as supplied. The compact binary and sampled trails are derived products. NASA/JPL endorsement is not implied.
+
+## Optional forecast release
+
+The [finalization add-on](OUR-HOME-FINALIZATION.md#voyager-trajectory-forecast) adds checked predicted positions through 26 November 2027. The table above describes the original archive, which continues to supply its historical data verbatim.

@@ -50,3 +50,7 @@ The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercis
 ## Beyond the Planets
 
 [Verification for the new small-body release](BEYOND-THE-PLANETS.md#verification) describes the offline replay, orbital checks and native Chromium review. The existing physical and visual regressions remain in the normal CI checks.
+
+## Our Home Finalization
+
+[Free camera and interaction checks](FREE-CAMERA.md) and [ephemeris verification](OUR-HOME-FINALIZATION.md#offline-verification) cover the new rendering and data paths.

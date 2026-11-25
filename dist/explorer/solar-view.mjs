@@ -23,10 +23,24 @@ import {loadSmallBodies} from './small-bodies-data.mjs';
 import {smallBodyCopy,groupNames,beltNames,smallBodies,smallBodyById,SMALL_MIN,SMALL_MAX,currentSmallDay,
   rebuildSmallTargets,updateSmallPanel,beltFitPoints,paintBelts,orbitalArc,paintSmallArc,paintSmallMarker} from './small-bodies-view.mjs';
 
+import {orbitToFree,freeToOrbit,aimFree,moveFree,freeNear,freeSpeed} from './free-camera.mjs';
+import {bindFreeControls,freeCopy} from './free-camera-controls.mjs';
+
+import {sampleVector} from './encounter-model.mjs';
+import {loadEncounter,loadForecast,extendVoyager,ENCOUNTER,FORECAST} from './our-home-data.mjs';
+
 export const SOLAR_FRAME = [-32, -32, 32, 32];
 const fit = () => ({x:0, y:0, zoom:0});
 const copy = {
   ...voyagerText,
+  ...freeCopy,
+  voyForecast:['JPL-Prognose öffnen','Open JPL forecast'],
+  voyForecastNote:['JPL-Trajektorienprognose · bis 26.11.2027, 00:00 TDB','JPL trajectory forecast · through 26 Nov 2027, 00:00 TDB'],
+  apophisEvent:['Vorbeiflug · 13. April 2029','Earth flyby · 13 April 2029'],
+  apophisCentre:['Abstand zum Erdmittelpunkt','Distance from Earth centre'],
+  apophisHeight:['Höhe über einer Kugel mit 6.371 km Radius','Altitude above a sphere of radius 6,371 km'],
+  apophisModel:['JPL-Prognose · 13. April 2029 gegen 21:46 UTC. Im Begegnungsfenster stammt der Erdmittelpunkt aus Horizons.','JPL forecast · 13 April 2029 at about 21:46 UTC. During the encounter window Earth’s centre comes from Horizons.'],
+  apophisSource:['NASA zum Vorbeiflug','NASA flyby information'],
   ...smallBodyCopy,
   ...heliosphereText,
   title:['Unser Sonnensystem','Our Solar System'],
@@ -184,7 +198,7 @@ export function mountSolar(root) {
             <button type="button" id="solCenter" data-solar="center"></button>
           </div>
         </div>
-        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><button type="button" id="solVoyager" data-solar="voyager" aria-pressed="false"></button><button type="button" id="solHeliosphere" data-solar="helioOpen" aria-pressed="false"></button><button type="button" id="solBeyond" data-solar="beyondOpen" aria-pressed="false" aria-controls="beyondControls"></button><span id="sol3dControls" hidden><span class="ex-solar-pose-buttons" id="solOrbitPoses"><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button></span><button type="button" id="solTrails" aria-pressed="true"></button></span>
+        <div class="ex-solar-viewbar" role="group" aria-label="" id="solViewBar"><button type="button" id="sol2d" data-solar="view2d" aria-pressed="true"></button><button type="button" id="sol3d" data-solar="view3d" aria-pressed="false"></button><button type="button" id="solSun" data-solar="sunHome"></button><button type="button" id="solVoyager" data-solar="voyager" aria-pressed="false"></button><button type="button" id="solHeliosphere" data-solar="helioOpen" aria-pressed="false"></button><button type="button" id="solBeyond" data-solar="beyondOpen" aria-pressed="false" aria-controls="beyondControls"></button><span id="sol3dControls" hidden><button type="button" id="solFree" aria-pressed="false" aria-controls="solFreeControls" data-solar="freeMode"></button><span class="ex-solar-pose-buttons" id="solOrbitPoses"><button type="button" id="solTop" data-solar="topView" aria-pressed="false"></button><button type="button" id="solAngle" data-solar="angleView" aria-pressed="true"></button><button type="button" id="solSide" data-solar="sideView" aria-pressed="false"></button></span><button type="button" id="solTrails" aria-pressed="true"></button></span>
         <span class="ex-flight-frames" role="group" id="solFrames" hidden>
           <button type="button" id="solHelio" data-solar="heliocentric" aria-pressed="true"></button>
           <button type="button" id="solGalactic" data-solar="galactic" aria-pressed="false"></button>
@@ -197,6 +211,10 @@ export function mountSolar(root) {
         <div class="ex-solar-caption" id="solWorldState" hidden><span id="solWorldMessage" role="status"></span> <button type="button" id="solFirstWorldDay" data-solar="startRange" hidden></button> <button type="button" id="solWorldRetry" data-solar="retry" hidden></button></div>
         <div id="voyStatus" class="ex-solar-viewbar" hidden>
           <span id="voyMessage" role="status"></span><button type="button" id="voyRetry" data-solar="retry" hidden></button>
+        </div>
+        <div class="ex-solar-viewbar" id="voyForecastRow" hidden>
+          <button type="button" id="voyForecast" data-solar="voyForecast"></button>
+          <span id="voyForecastStatus" class="ex-small" role="status"></span>
         </div>
         <div class="ex-solar-quick" id="solQuick">
           <label><span data-solar="target"></span><select id="solTarget"></select></label>
@@ -234,6 +252,17 @@ export function mountSolar(root) {
           <p class="ex-small" id="helioMarkerEpoch" data-solar="helioMarkerEpoch"></p>
         </div>
         <div class="ex-map ex-solar-map"><canvas id="solCanvas" tabindex="0" aria-describedby="solHelp solLimit"></canvas></div>
+        <section class="ex-free" id="solFreeControls" hidden>
+          <div class="ex-free-speed">
+            <label for="solFreeSpeed" data-solar="freeSpeed"></label>
+            <input id="solFreeSpeed" type="range" min="-8" max="8" step="1" value="0">
+            <output id="solFreeSpeedText" for="solFreeSpeed"></output>
+          </div>
+          <div class="ex-free-axis">
+            ${[['KeyA','freeLeft'],['KeyD','freeRight'],['KeyQ','freeDown'],['KeyE','freeUp'],['KeyW','freeForward'],['KeyS','freeBack']].map(([code,key])=>
+              `<button type="button" data-free-direction="${code}" data-solar="${key}"></button>`).join('')}
+          </div>
+        </section>
         <div class="ex-map-foot"><span data-solar="model"></span><span id="solScaleNote"></span><strong id="solPairSummary" hidden></strong></div>
         <div class="ex-zoom"><label for="solZoom" data-solar="zoom"></label><input id="solZoom" type="range" min="0" max="${MAX_ZOOM}" step="0.01" value="0"><output id="solZoomValue"></output></div>
         <div class="ex-solar-viewbar ex-flight-controls" role="group" id="solFlightControls" hidden>
@@ -312,6 +341,16 @@ export function mountSolar(root) {
             <dt data-solar="beyondInc"></dt><dd id="smallInc"></dd>
           </dl>
           <a id="smallSource" data-solar="beyondSBDB"></a>
+          <section class="ex-apophis" id="apophisPanel" hidden>
+            <button type="button" id="apophisJump" data-solar="apophisEvent"></button>
+            <p id="apophisStatus" role="status" class="ex-small" hidden></p>
+            <p data-solar="apophisModel"></p>
+            <dl id="apophisMetrics" hidden>
+              <dt data-solar="apophisCentre"></dt><dd id="apophisCentre"></dd>
+              <dt data-solar="apophisHeight"></dt><dd id="apophisHeight"></dd>
+            </dl>
+            <a href="https://science.nasa.gov/solar-system/asteroids/apophis/" data-solar="apophisSource"></a>
+          </section>
         </div>
         <div class="ex-inspector" id="solPlanetInspector"><h2 data-solar="selected"></h2><p id="solName" class="ex-selected" aria-live="polite"></p><p id="solKind" class="ex-small"></p>
           <dl><dt id="solDistanceLabel" data-solar="distance"></dt><dd id="solDistance"></dd>
@@ -346,7 +385,10 @@ export function mountSolar(root) {
   let day = J2000, camera = fit(), space=spaceCamera(), view='2d', trails=true, pose='angle', selected = 'sun', reference = 'sun', follow = false, enlarged = true;
   let system = null, overview = null, galactic = null, buttons = [];
   let voyager=null,voyData=null,voyPending=false,voyError=false,voyTracks=null;
-  let heliosphere=null,beyond=null;
+  let heliosphere=null,beyond=null,free=null;
+  let freeLevel=0;
+  let forecastPending=false,forecastFailed=false,forecastReady=false;
+  let encounterData=null,encounterPending=false,encounterFailed=false,encounterJump=false;
   const smallData=new Map(),smallPending=new Set(),smallFailures=new Set();
   const planetEpoch=()=>day>=MIN_DAY&&day<=MAX_DAY;
   const formatEpoch=()=>beyond?formatSmallDate(day):formatModelDay(day);
@@ -367,7 +409,7 @@ export function mountSolar(root) {
   const distance = () => beyond ? beyond.distance : voyager ? voyager.distance : system ?
     (outerLocal()?Math.max(2.28,2.2*height/width):3.1)*SYSTEMS[system].scaleKm/AU_KM : galactic?.distance??85;
   const minDay = () => beyond ? SMALL_MIN : voyager ? VOY_START : galactic ? GALACTIC_MIN_DAY : outerLocal() ? localSpec().start : MIN_DAY;
-  const maxDay = () => beyond ? SMALL_MAX : voyager ? VOY_END : galactic ? GALACTIC_MAX_DAY : outerLocal() ? localSpec().end : MAX_DAY;
+  const maxDay = () => beyond ? SMALL_MAX : voyager ? (forecastReady?FORECAST.end:VOY_END) : galactic ? GALACTIC_MAX_DAY : outerLocal() ? localSpec().end : MAX_DAY;
   const clampDay = value => Math.max(minDay(),Math.min(maxDay(),value));
   const trailCache=new Map(),pathCache=new Map(),spacePointers=new Map();
   let spaceGesture=null,spaceMoved=false;
@@ -416,6 +458,7 @@ export function mountSolar(root) {
   function loadVisibleData() {
     if (active && voyager) loadProbes();
     else if (active && !galactic) loadSystem(system ?? 'pluto');
+    if(active&&beyond?.groups.has('asteroid')&&day>ENCOUNTER.first&&day<=ENCOUNTER.last)requestEncounter();
   }
 
   function loadSmallGroup(group,retry=false){
@@ -430,12 +473,47 @@ export function mountSolar(root) {
     }).finally(()=>{
       smallPending.delete(group);
       if(beyond&&!abort.signal.aborted){
-        if(beyond.fitted&&beyond.groups.has(group))fitView();
+        if(!free&&beyond.fitted&&beyond.groups.has(group))fitView();
         updateInspector();
         invalidate();
       }
     });
     updateInspector();
+  }
+
+  function updateFreeSpeed(){
+    if(!free)return;
+    const speed=freeSpeed(free,freeLevel), unit=speed<.01?'km/s':'AU/s';
+    const value=n(speed*(speed<.01?AU_KM:1))+' '+unit;
+    $('solFreeSpeedText').textContent=value;
+    $('solFreeSpeed').setAttribute('aria-valuetext',value);
+  }
+
+  const freeInput=bindFreeControls({canvas,controls:$('solFreeControls'),listen,
+    enabled:()=>Boolean(free&&view==='3d'&&active&&visible&&!document.hidden),
+    look:(dx,dy)=>{free=aimFree(free,dx,dy);invalidate();},
+    move:(axis,seconds)=>{free=moveFree(free,axis,freeSpeed(free,freeLevel),seconds);},
+    wake:invalidate,
+  });
+
+  function toggleFree(){
+    if(view!=='3d')return;
+    cancelSpace();
+    if(free){
+      space=freeToOrbit(free,distance());free=null;markPose(null);
+    }else{
+      free=orbitToFree(space,distance());
+      follow=false;$('solFollow').setAttribute('aria-pressed','false');
+      if(galactic)setSunFollow(false);
+      if(voyager)voyager.fitted=false;
+      if(beyond)beyond.fitted=false;
+    }
+    localize();
+    canvas.focus();
+  }
+  function resetFreeToOrbitPose(){
+    if(free)free=orbitToFree(space,distance());
+    updateFreeSpeed();
   }
 
   function toggleBeyond(){
@@ -444,26 +522,86 @@ export function mountSolar(root) {
     if(beyond){
       const previous=beyond.original;
       beyond=null;stateDay=null;markers=[];
-      ({day,camera,space,pose,selected,reference,follow,trails}=previous);
+      ({day,camera,space,pose,selected,reference,follow,trails,free}=previous);
       switchView(previous.view);markPose(previous.pose);
       $('solFollow').setAttribute('aria-pressed',String(follow));
       loadVisibleData();localize();updateClock(true);
       return;
     }
-    beyond={original:{day,camera,view,space,pose,selected,reference,follow,trails},
+    beyond={original:{day,camera,view,space,pose,selected,reference,follow,trails,free},
       groups:new Set(['dwarf']),belts:new Set(),distance:120,fitted:true,arc:null};
     // J2000 and epochs with no dwarf-planet coverage open on today's TDB date label.
     const sample=smallBodyById.get('ceres');
     if(day<sample.start||day>sample.end)day=Math.max(sample.start,Math.min(sample.end,currentSmallDay()));
-    stateDay=null;markers=[];selected=reference='sun';follow=false;
+    stateDay=null;markers=[];selected=reference='sun';follow=false;free=null;
     switchView('3d');fitView();loadSmallGroup('dwarf');loadVisibleData();localize();updateClock(true);
   }
 
   function selectedSmallArc(){
     const body=smallBodyById.get(selected), series=body&&smallSeries(body);
     if(!series)return [];
-    if(beyond.arc?.body!==body)beyond.arc={body,points:orbitalArc(series,body)};
+    if(beyond.arc?.body!==body){
+      const points=orbitalArc(series,body);
+      if(body.id==='apophis'&&encounterData)for(let i=4;i<encounterData.sun.length;i+=4)
+        points.push(encounterData.sun[i].slice(1,4).map(km=>km/AU_KM));
+      beyond.arc={body,points};
+    }
     return beyond.arc.points;
+  }
+
+  function jumpToEncounter(){
+    changeDay(ENCOUNTER.event.day);
+    if(free)space=freeToOrbit(free,distance());
+    const focus=selectedBody()?.vector;
+    if(!focus)return;
+    const zoom=Math.min(MAX_ZOOM,Math.max(0,Math.log10(distance()/.0015)));
+    setSpace({...space,focus,zoom});
+    canvas.focus();invalidate();
+  }
+
+  function requestEncounter(jump=false){
+    if(encounterData){
+      if(jump)jumpToEncounter();
+      return;
+    }
+    if(encounterFailed&&!jump)return;
+    encounterJump ||= jump;
+    if(encounterPending)return;
+    encounterPending=true;encounterFailed=false;updateInspector();
+    loadEncounter(abort.signal).then(data=>{
+      encounterData=data;stateDay=null;
+      if(beyond)beyond.arc=null;
+      if(encounterJump&&beyond&&selected==='apophis')jumpToEncounter();
+    }).catch(error=>{if(error.name!=='AbortError')encounterFailed=true;}).finally(()=>{
+      encounterJump=false;encounterPending=false;
+      if(beyond&&!abort.signal.aborted){updateInspector();invalidate();}
+    });
+  }
+
+  function forecastStatus(){
+    $('voyForecastRow').hidden=!voyager;
+    $('voyForecast').disabled=!voyData||forecastPending;
+    $('voyForecastStatus').textContent=forecastPending?t('loading'):forecastFailed?t('loadError'):
+      day>VOY_END&&forecastReady?t('voyForecastNote'):'';
+  }
+
+  function requestForecast(){
+    const setForecastDate=()=>{
+      const today=parseModelDate(new Date().toISOString().slice(0,10));
+      changeDay(Math.max(FORECAST.start+1,Math.min(FORECAST.end,today??FORECAST.end)));
+    };
+    if(!voyager||!voyData||forecastPending)return;
+    if(forecastReady){setForecastDate();return;}
+    const origin=voyager;
+    forecastPending=true;forecastFailed=false;forecastStatus();
+    loadForecast(abort.signal).then(data=>{
+      voyData=extendVoyager(voyData,data);
+      forecastReady=true;stateDay=null;voyTracks=null;
+      if(voyager===origin)setForecastDate();
+    }).catch(error=>{if(error.name!=='AbortError')forecastFailed=true;}).finally(()=>{
+      forecastPending=false;
+      if(voyager&&!abort.signal.aborted){localize();invalidate();}
+    });
   }
 
   function loadProbes(retry=false){
@@ -474,7 +612,7 @@ export function mountSolar(root) {
       if(voyager){
         stateDay=null;voyTracks=null;
         if(heliosphere)heliosphere.positions=resolveCrossings(voyData);
-        if(!heliosphere||voyager.fitted)fitView();
+        if(!free&&(!heliosphere||voyager.fitted))fitView();
       }
     }).catch(error=>{if(error.name!=='AbortError')voyError=true;}).finally(()=>{
       voyPending=false;
@@ -485,7 +623,8 @@ export function mountSolar(root) {
   function enterVoyager(openHeliosphere=false){
     if(voyager)return;
     suspend();
-    const original={day,camera,view,space,pose,selected,reference,follow,system,overview,galactic,trails};
+    const original={day,camera,view,space,pose,selected,reference,follow,system,overview,galactic,trails,free};
+    free=null;
     // Keep the entire prior view, including lunar and galactic state, intact.
     voyager={original,distance:220};
     if(openHeliosphere)heliosphere=createHeliosphere();
@@ -500,7 +639,7 @@ export function mountSolar(root) {
     suspend();
     const previous=voyager.original;
     voyager=null;heliosphere=null;voyTracks=null;stateDay=null;markers=[];
-    ({day,camera,space,pose,selected,reference,follow,system,overview,galactic,trails}=previous);
+    ({day,camera,space,pose,selected,reference,follow,system,overview,galactic,trails,free}=previous);
     rebuildBodies();switchView(previous.view);markPose(previous.pose);
     $('solFollow').setAttribute('aria-pressed',String(follow));
     loadVisibleData();localize();updateClock(true);
@@ -516,14 +655,15 @@ export function mountSolar(root) {
       if(!previous){exitVoyager();return;}
       suspend();
       heliosphere=null;
-      ({day,space,selected,trails}=previous);
+      ({day,space,selected,trails,free}=previous);
       ({distance:voyager.distance,fitted:voyager.fitted}=previous);
       markPose(previous.pose);
       stateDay=null;rebuildBodies();localize();updateClock(true);
       return;
     }
     suspend();
-    heliosphere=createHeliosphere({day,space,selected,trails,pose,distance:voyager.distance,fitted:voyager.fitted});
+    heliosphere=createHeliosphere({day,space,selected,trails,pose,free,distance:voyager.distance,fitted:voyager.fitted});
+    free=null;
     trails=true;stateDay=null;rebuildBodies();fitView();localize();
   }
 
@@ -534,7 +674,7 @@ export function mountSolar(root) {
     heliosphere.event=event;
     changeDay(event.day);
     select(event.probe,false);
-    setSpace({...space,focus:position.vector,zoom:.4});
+    setSpace({...((free&&freeToOrbit(free,distance()))||space),focus:position.vector,zoom:.4});
   }
 
   function tracksVoyager(){
@@ -545,7 +685,8 @@ export function mountSolar(root) {
   function enterSystem(id) {
     if (beyond || system === id) return;
     suspend();
-    if (!system) overview = {selected,reference,follow,camera,space,pose,view,galactic,epoch:day,returnDay:null};
+    if (!system) overview = {selected,reference,follow,camera,space,pose,view,galactic,free,epoch:day,returnDay:null};
+    free=null;
     galactic = null;
     if (!supportsEpoch(day,id)) {
       overview.returnDay ??= day;
@@ -570,7 +711,7 @@ export function mountSolar(root) {
   function exitSystem(next = overview?.view) {
     if (!system) return;
     suspend();
-    ({selected,reference,follow,camera,space,pose} = overview);
+    ({selected,reference,follow,camera,space,pose,free} = overview);
     day = overview.returnDay ?? day;
     if (overview.galactic) {
       if (next==='3d' && supportsGalacticDay(day)) {
@@ -578,10 +719,11 @@ export function mountSolar(root) {
         if (day!==overview.epoch) {
           const before = sunDisplacement(overview.epoch), after = sunDisplacement(day);
           space = {...space,focus:space.focus.map((value,i)=>value+(after[i]-before[i]))};
+          if(free)free={...free,position:free.position.map((value,i)=>value+(after[i]-before[i]))};
         }
       } else {
         const {previous} = overview.galactic;
-        ({space,pose,follow} = previous);
+        ({space,pose,follow,free} = previous);
         if (previous.selected==='pluto' && selected==='sun') selected='pluto';
         if (previous.reference==='pluto' && reference==='sun') reference='pluto';
       }
@@ -619,8 +761,18 @@ export function mountSolar(root) {
       }
       if(beyond)for(const body of smallBodies){
         if(!beyond.groups.has(body.group))continue;
-        const own=smallSeries(body)?.sample(day);
+        const addition=body.id==='apophis'&&day>ENCOUNTER.first?sampleVector(encounterData?.sun,day):null;
+        const own=addition?{position:addition.slice(0,3),velocity:addition.slice(3)}:smallSeries(body)?.sample(day);
         if(own)state.push({body,vector:own.position.map(km=>km/AU_KM),velocity:own.velocity});
+      }
+      if(beyond?.groups.has('asteroid')){
+        const relative=sampleVector(encounterData?.relative,day);
+        const absolute=relative&&sampleVector(encounterData.sun,day);
+        const earth=absolute&&state.find(({body})=>body.id==='earth');
+        if(earth){
+          earth.vector=absolute.slice(0,3).map((km,i)=>(km-relative[i])/AU_KM);
+          earth.distanceAU=Math.hypot(...earth.vector);
+        }
       }
       stateDay = day;
     }
@@ -666,9 +818,11 @@ export function mountSolar(root) {
     if(voyager)voyager.fitted=false;
     if(beyond)beyond.fitted=false;
     if(view==='3d'){
+      if(free)space=freeToOrbit(free,distance());
       const zoom=heliosphere&&selected!=='v1'&&selected!=='v2'
         ? Math.max(0,Math.min(2.5,Math.log10(distance()/Math.max(6,2*Math.hypot(...vector))))) : .55;
       space={...space,focus:[...displayedVector(vector)],...(voyager?{zoom}:{})};
+      resetFreeToOrbitPose();
     }
     else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
     invalidate();
@@ -679,6 +833,7 @@ export function mountSolar(root) {
       $('smallTarget').value=smallBodyById.has(id)||id==='pluto'?id:'sun';
       beyond.arc=null;
     }
+    if(beyond&&id==='apophis')requestEncounter();
     if(heliosphere?.event&&heliosphere.event.probe!==id)heliosphere.event=null;
     $('solTarget').value=id;
     if(voyager)updateVoyagerTimeline(root,selected,lang());
@@ -692,10 +847,25 @@ export function mountSolar(root) {
     const entry = selectedBody();
     const small=beyond&&smallBodyById.get(selected);
     $('smallInspector').hidden=!small;
+    const apophis=small?.id==='apophis';
+    $('apophisPanel').hidden=!apophis;
+    if(apophis){
+      const relative=sampleVector(encounterData?.relative,day);
+      $('apophisMetrics').hidden=!relative;
+      $('apophisJump').disabled=encounterPending;
+      $('apophisStatus').hidden=!encounterPending&&!encounterFailed;
+      $('apophisStatus').textContent=encounterPending?t('loading'):encounterFailed?t('loadError'):'';
+      if(relative){
+        const km=Math.hypot(...relative.slice(0,3));
+        $('apophisCentre').textContent=n(km)+' km';
+        $('apophisHeight').textContent=n(km-6371)+' km';
+      }
+    }
+    forecastStatus();
     if(beyond){
       const groupError=[...beyond.groups].some(group=>smallFailures.has(group));
       const loading=[...beyond.groups].some(group=>smallPending.has(group));
-      const missing=small&&(day<small.start||day>small.end);
+      const missing=small&&(day<small.start||day>(apophis?ENCOUNTER.last:small.end));
       const status=groupError?'loadError':loading?'beyondLoading':small&&!entry?'beyondUnavailable':null;
       $('smallStatus').hidden=!status;
       $('smallStatus').textContent=status?t(status):'';
@@ -708,7 +878,7 @@ export function mountSolar(root) {
     if(small){
       $('solPlanetInspector').hidden=$('solWorldState').hidden=$('solPairSummary').hidden=true;
       $('solCenter').disabled=!entry;
-      updateSmallPanel($,small,entry,day,lang(),n);
+      updateSmallPanel($,small,entry,day,lang(),n,apophis?ENCOUNTER.last:small.end);
       return;
     }
     $('solPlanetInspector').hidden=Boolean(voyager&&!usePlanetPanel());
@@ -853,7 +1023,15 @@ export function mountSolar(root) {
     $('solInner').hidden = Boolean(beyond||voyager||system&&!SYSTEMS[system].innerKm);
     $('solInner').textContent=t(system?'moonInner':'inner');
     $('solFrames').hidden = view!=='3d'||Boolean(system||voyager||beyond);
-    $('solOrbitPoses').hidden = Boolean(galactic);
+    $('solOrbitPoses').hidden = Boolean(galactic||free);
+    $('solFree').textContent=t(free?'freeOrbit':'freeMode');
+    $('solFree').setAttribute('aria-pressed',String(Boolean(free)));
+    $('solFreeControls').hidden=!free;
+    $('solFreeControls').setAttribute('aria-label',t('freeControls'));
+    $('solZoom').parentElement.hidden=Boolean(free);
+    for(const id of ['solIn','solOut','solFollow','solFollowSun','solFlightAngle','solAcross','solAlong'])$(id).hidden=Boolean(free);
+    if(free)$('solInner').hidden=true;
+    updateFreeSpeed();
     $('solHelio').setAttribute('aria-pressed',String(!galactic));
     $('solGalactic').setAttribute('aria-pressed',String(Boolean(galactic)));
     $('solHeliocentricHint').hidden=!galactic;
@@ -866,7 +1044,7 @@ export function mountSolar(root) {
     $('solFlightScale').setAttribute('aria-label',t('flightScaleLabel'));
     for (const option of $('solFlightWindow').options) option.textContent = option.value+' '+t('flightDay');
     $('solDate').min = beyond ? formatSmallDate(SMALL_MIN).slice(0,10) : outerLocal() ? formatModelDay(localSpec().start).slice(0,10) : voyager ? '1977-08-21' : galactic ? GALACTIC_MIN_DATE : '1800-01-01';
-    $('solDate').max = beyond ? formatSmallDate(SMALL_MAX).slice(0,10) : outerLocal() ? formatModelDay(localSpec().end).slice(0,10) : voyager ? '2026-11-26' : galactic ? GALACTIC_MAX_DATE : '2050-01-01';
+    $('solDate').max = beyond ? formatSmallDate(SMALL_MAX).slice(0,10) : outerLocal() ? formatModelDay(localSpec().end).slice(0,10) : voyager ? (forecastReady?'2027-11-26':'2026-11-26') : galactic ? GALACTIC_MAX_DATE : '2050-01-01';
     $('solFit').textContent=t(heliosphere?'helioFit':voyager?'voyagerFit':system?'localFit':galactic?'flightFit':'fit');
     $('solBodiesTitle').textContent=t(heliosphere?'helioBodies':voyager?'voyagerBodies':system?'localBodies':'overviewBodies');
     root.querySelector('[data-solar="title"]').textContent=beyond?t('beyondOpen'):heliosphere?t('helioOpen'):voyager?t('voyager'):system?name(SYSTEMS[system]):t('title');
@@ -875,7 +1053,7 @@ export function mountSolar(root) {
     $('solScene3d').textContent=t(beyond?'beyondScene':heliosphere?'helioCaption':voyager?'voyagerScene':
       system?(outerLocal()?'outerScene':'localScene'):galactic?'galacticScene':'scene3d');
     if(outerLocal()&&overview.returnDay!==null)$('solScene3d').textContent+=' '+t('outerFallback');
-    $('solHelp').textContent=t(voyager?'voyagerNav':view==='3d'?'help3d':'help');
+    $('solHelp').textContent=t(free?'freeHelp':voyager?'voyagerNav':view==='3d'?'help3d':'help');
     $('solLimit').textContent=t(beyond?'beyondLimit':voyager?'voyagerLimit':system?(outerLocal()?'outerLimit':'localLimit'):galactic?'galacticLimit':view==='3d'?'limit3d':'limit');
     for(const key of ['scienceNote','earth'])for(const el of root.querySelectorAll('[data-solar="'+key+'"]'))el.hidden=Boolean(voyager);
     $('voyBounds').hidden=!voyager;
@@ -898,7 +1076,8 @@ export function mountSolar(root) {
     }
     loadVisibleData();
     const vector = follow ? selectedBody()?.vector : null;
-    if(galactic?.followSun) space={...space,focus:sunDisplacement(day)};
+    if(free)freeInput.tick(time);
+    if(!free&&galactic?.followSun) space={...space,focus:sunDisplacement(day)};
     else if(vector) {
       if(view==='3d')space={...space,focus:[...displayedVector(vector)]};
       else {const [x,y]=eclipticToMap(vector);camera={...camera,x,y};}
@@ -910,7 +1089,7 @@ export function mountSolar(root) {
     }
     draws++;
     drawMs = performance.now()-started;
-    if (clock) invalidate();
+    if (clock||free&&freeInput.moving()) invalidate();
   }
 
   function render() {
@@ -1072,7 +1251,7 @@ export function mountSolar(root) {
   function renderSpace() {
     ctx.clearRect(0,0,width,height);
     const baseDistance=distance();
-    const screen=spaceProjector(space,width,height,baseDistance);
+    const screen=spaceProjector(free?{...free,nearPlane:freeNear(free)}:space,width,height,baseDistance);
     const entries=current();
     if(beyond)paintBelts(ctx,screen,beyond.belts);
     if(heliosphere)paintHeliosphere(ctx,screen,heliosphere.shells,heliosphere.region);
@@ -1084,7 +1263,8 @@ export function mountSolar(root) {
       const planet=contextPlanet(body.id);
       const maxSymbol=beyond?(body.id==='sun'?11:7):outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
       const radius=body.small?body.size:planet?Math.min(4,.9+p.pixelsPerAU*.5):voyager?body.size:
-        enlarged?Math.min(maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):radiusAU(body)*p.pixelsPerAU;
+        enlarged?Math.min(free?Math.min(22,maxSymbol):maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):
+          Math.min(free?Math.max(width,height)*2:Infinity,radiusAU(body)*p.pixelsPerAU);
       const chosen=selected===body.id;
       return {body,x:p.x,y:p.y,depth:p.depth,radius,selected:chosen,
         reference:reference===body.id&&reference!==selected,
@@ -1105,11 +1285,12 @@ export function mountSolar(root) {
     let regionAnchor;
     if(heliosphere){
       paintCrossings(ctx,screen,heliosphere.positions,heliosphere.event);
-      regionAnchor=paintRegionAnchor(ctx,screen,spaceBasis(space),heliosphere.region,lang(),width,height);
+      regionAnchor=paintRegionAnchor(ctx,screen,spaceBasis(free??space),heliosphere.region,lang(),width,height);
     }
     ctx.font='12px "DM Sans", sans-serif';
     drawLabels(ctx,placeLabels(regionAnchor?[...markers,regionAnchor]:markers,
       label=>ctx.measureText(label).width,width,height,{bottom:height-52}));
+    if(free)return;
     const pixelsAtFocus=height*.9/(baseDistance/10**space.zoom);
     const bar=niceStep(46/pixelsAtFocus);
     ctx.strokeStyle=ctx.fillStyle='#cde4e5';ctx.lineWidth=1.5;
@@ -1165,13 +1346,13 @@ export function mountSolar(root) {
       overview.returnDay=null;
       if(outerLocal())$('solScene3d').textContent=t('outerScene');
     }
-    if (galactic && reframe) {
+    if (galactic && reframe && !free) {
       const before = sunDisplacement(day), after = sunDisplacement(next);
       space = {...space,focus:space.focus.map((v,i)=>v+(after[i]-before[i]))};
     }
     if(heliosphere?.event&&next!==heliosphere.event.day)heliosphere.event=null;
     clock = null;day = next;lastReadout = null;
-    if((voyager||beyond?.fitted)&&reframe)fitView();
+    if(!free&&(voyager||beyond?.fitted)&&reframe)fitView();
     loadVisibleData();updateClock(true);updateInspector();invalidate();
   }
   function beginClock() {
@@ -1199,8 +1380,9 @@ export function mountSolar(root) {
     if(voyager) voyager.fitted=false;
     if(beyond)beyond.fitted=false;
     space=next;
+    resetFreeToOrbitPose();
   }
-  const zoomBy=delta=>{if(view==='3d'){setSpace(zoomSpace(space,delta));invalidate();}
+  const zoomBy=delta=>{if(free)return;if(view==='3d'){setSpace(zoomSpace(space,delta));invalidate();}
     else gestures.zoomBy(delta);};
   function setSunFollow(value) {
     galactic.followSun = value;
@@ -1219,7 +1401,7 @@ export function mountSolar(root) {
     beyond.distance=Math.max(8,fit.distance);
     space.focus=fit.focus;
     beyond.fitted=fitted;
-    markPose('angle');invalidate();
+    markPose('angle');resetFreeToOrbitPose();invalidate();
   }
 
   const fitView=()=>{
@@ -1259,6 +1441,7 @@ export function mountSolar(root) {
       markPose('angle');invalidate();
     }
     else setCamera(fit());
+    resetFreeToOrbitPose();
   };
 
   function changeFrame(next) {
@@ -1269,13 +1452,14 @@ export function mountSolar(root) {
     markers = [];
     if (next) {
       galactic = {
-        previous:{space,pose,follow,selected,reference},
+        previous:{space,pose,follow,selected,reference,free},
         restoredDate:supportsGalacticDay(day)?null:day,
         duration:Number($('solFlightWindow').value),
         schematic:$('solFlightScale').value==='schematic',
         followSun:false,
         distance:85,
       };
+      free=null;
       if (galactic.restoredDate !== null) day = J2000;
       if (selected==='pluto') selected='sun';
       if (reference==='pluto') reference='sun';
@@ -1286,7 +1470,7 @@ export function mountSolar(root) {
       const {previous,restoredDate} = galactic;
       galactic = null;
       if (restoredDate !== null && day===J2000) day=restoredDate;
-      ({space,pose,follow} = previous);
+      ({space,pose,follow,free} = previous);
       if (previous.selected==='pluto'&&selected==='sun') selected='pluto';
       if (previous.reference==='pluto'&&reference==='sun') reference='pluto';
       markPose(pose);
@@ -1303,6 +1487,8 @@ export function mountSolar(root) {
     else gestures.zoomTo(value);
   });
   listen($('solFit'),'click',fitView);
+  listen($('solFree'),'click',toggleFree);
+  listen($('solFreeSpeed'),'input',()=>{freeLevel=Number($('solFreeSpeed').value);updateFreeSpeed();});
   listen($('solInner'),'click',()=>{
     if(outerLocal()&&SYSTEMS[system].innerKm){
       const zoom=Math.log10(SYSTEMS[system].scaleKm/SYSTEMS[system].innerKm);
@@ -1320,6 +1506,7 @@ export function mountSolar(root) {
   });
   listen($('solCenter'),'click',center);
   function cancelSpace(){
+    freeInput.release();
     for(const id of spacePointers.keys())if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
     spacePointers.clear();spaceGesture=null;canvas.dataset.interacting='false';
   }
@@ -1330,7 +1517,7 @@ export function mountSolar(root) {
   function resetSpaceGesture(){
     const points=[...spacePointers.values()];
     const mid=points.length===2?[(points[0][0]+points[1][0])/2,(points[0][1]+points[1][1])/2]:points[0];
-    spaceGesture=mid?{point:mid,span:points.length===2?Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]):0,camera:space}:null;
+    spaceGesture=mid?{point:mid,span:points.length===2?Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]):0,camera:free??space}:null;
   }
   listen(canvas,'pointerdown',event=>{
     if(view!=='3d'||event.button!==0||spacePointers.size>=2)return;
@@ -1347,6 +1534,7 @@ export function mountSolar(root) {
     const dx=mid[0]-spaceGesture.point[0],dy=mid[1]-spaceGesture.point[1];
     if(Math.hypot(dx,dy)>4)spaceMoved=true;
     if(points.length===1&&Math.hypot(dx,dy)>4)markPose(null);
+    if(free){free=aimFree(spaceGesture.camera,dx,-dy);invalidate();return;}
     setSpace(points.length===2?zoomSpace(spaceGesture.camera,Math.log10(Math.max(1,Math.hypot(points[0][0]-points[1][0],points[0][1]-points[1][1]))/Math.max(1,spaceGesture.span))):
       rotateSpace(spaceGesture.camera,dx,-dy));
     invalidate();
@@ -1363,12 +1551,14 @@ export function mountSolar(root) {
   });
   listen(canvas,'wheel',event=>{
     if(view!=='3d'||document.activeElement!==canvas)return;
+    if(free)return;
     event.preventDefault();
     setSpace(zoomSpace(space,-Math.max(-.4,Math.min(.4,event.deltaY*.001))));
     invalidate();
   },{passive:false});
   listen(canvas,'keydown',event=>{
     if(view!=='3d')return;
+    if(freeInput.onMapKey(event))return;
     const arrows={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,25],ArrowDown:[0,-25]};
     if(Object.hasOwn(arrows,event.key)){event.preventDefault();setSpace(rotateSpace(space,...arrows[event.key]));markPose(null);invalidate();}
     else if(['+','=','-','Home','Escape'].includes(event.key)){
@@ -1381,7 +1571,7 @@ export function mountSolar(root) {
   function switchView(next){
     if(view===next)return;
     if (galactic && next==='2d') changeFrame(false);
-    if(next==='3d')gestures.cancel();else cancelSpace();
+    if(next==='3d')gestures.cancel();else {cancelSpace();free=null;}
     view=next;
     $('sol2d').setAttribute('aria-pressed',String(view==='2d'));
     $('sol3d').setAttribute('aria-pressed',String(view==='3d'));
@@ -1408,7 +1598,8 @@ export function mountSolar(root) {
         if(group&&(smallBodyById.get(selected)?.group===group||selected==='pluto'&&group==='dwarf'))selected='sun';
       }
       stateDay=null;
-      fitView();localize();
+      if(!free)fitView();
+      localize();
     });
   }
   listen($('smallTarget'),'change',()=>{if(beyond)select($('smallTarget').value,true);});
@@ -1440,6 +1631,8 @@ export function mountSolar(root) {
     if(crossing&&heliosphere)navigateCrossing(crossing);
   });
   listen($('voyRetry'),'click',()=>loadProbes(true));
+  listen($('voyForecast'),'click',requestForecast);
+  listen($('apophisJump'),'click',()=>{if(beyond&&selected==='apophis')requestEncounter(true);});
   listen($('voyEvents'),'click',event=>{
     const button=event.target.closest('button[data-voy-date]');
     if(button)changeDay(parseModelDate(button.dataset.voyDate),true);
@@ -1517,6 +1710,7 @@ export function mountSolar(root) {
       if (active) {loadVisibleData();resize();} else suspend();
     },
     inspect:()=>({active,day,camera:{...camera},view,space:{...space,focus:[...space.focus]},pose,trails,system,
+      free:free?{...free,position:[...free.position],level:freeLevel,moving:freeInput.moving()}:null,
       beyond:beyond?{groups:[...beyond.groups],belts:[...beyond.belts],loaded:[...smallData.keys()],distance:beyond.distance}:null,
       heliosphere:heliosphere?{region:heliosphere.region,event:heliosphere.event?.id??null,crossings:heliosphere.positions.length}:null,
       voyager:voyager?{loaded:!!voyData,error:voyError,tracks:trails?tracksVoyager().map(track=>track.points.length):[]}:null,

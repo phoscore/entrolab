@@ -26,3 +26,7 @@ Die begrenzten Datenabfragen sind Offline-Vorbereitung. Produktion, Browser und 
 ## Beyond the Planets
 
 [Small-body sources, releases and model limits](BEYOND-THE-PLANETS.md) specifies the original Horizons vector responses, independently queried epochs and object-specific JPL SBDB snapshots. Belt dimensions are schematic guides based on publicly documented ranges and carry no fake catalogue entries.
+
+## Our Home Finalization
+
+[Voyager forecasts and the Apophis encounter](OUR-HOME-FINALIZATION.md) documents the additional Horizons captures, model context and checks.

@@ -366,3 +366,24 @@
   #explorer .ex-beyond fieldset button { grid-column: 1 / -1; justify-self: start; }
   #explorer .ex-beyond button,#explorer #smallTarget,#explorer .ex-beyond fieldset label { min-height: 42px; }
 }
+
+#explorer .ex-free { padding: .6rem .9rem; background: #10212d; border-top: 1px solid #36515e; }
+#explorer .ex-free-speed {
+  display: grid; grid-template-columns: auto minmax(55px, 1fr) auto;
+  align-items: center; column-gap: .65rem; font-size: .8rem;
+}
+#explorer .ex-free-speed input { width: 100%; accent-color: #94d5cd; }
+#explorer .ex-free-speed output { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#explorer .ex-free-axis {
+  display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: .3rem; margin-top: .45rem;
+}
+#explorer .ex-free-axis button {
+  min-width: 0; min-height: 36px; padding: .3rem; font-size: .76rem; touch-action: none;
+}
+#explorer .ex-apophis { margin-top: 1rem; padding-top: .7rem; border-top: 1px solid #36515e; }
+#explorer .ex-apophis button { min-height: 42px; }
+@media(max-width:760px){
+  #explorer .ex-free { padding-inline: .55rem; }
+  #explorer .ex-free-axis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  #explorer .ex-free-axis button { min-height: 42px; }
+}

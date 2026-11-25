@@ -35,7 +35,7 @@ export const voyagerText={
   voyagerData:['Berechnete Horizons-Ephemeride · keine Live-Telemetrie','Computed Horizons ephemeris · no live telemetry'],
   voyagerCurrent:['Heute · 00:00 TDB','Today · 00:00 TDB'],
   voyagerLast:['Letzte Ephemeridenposition','Last ephemeris position'],
-  voyagerBounds:['Die früheste verfügbare Sondenposition liegt nach dem Start. Die Abdeckung endet am 26.11.2026, 00:00 TDB. Bei Voyager 2 bleibt am 29.08.1989 zwischen 08:00 und 08:05 TDB eine kurze Datenlücke.','First probe states are after launch. Coverage ends on 26 Nov 2026, 00:00 TDB. Voyager 2 has a short gap on 29 Aug 1989 between 08:00 and 08:05 TDB.'],
+  voyagerBounds:['Die früheste verfügbare Sondenposition liegt nach dem Start. Das Missionsarchiv endet am 26.11.2026, 00:00 TDB. Die separat abrufbare JPL-Prognose reicht bis 26.11.2027, 00:00 TDB. Bei Voyager 2 bleibt am 29.08.1989 zwischen 08:00 und 08:05 TDB eine kurze Datenlücke.','First probe states are after launch. The mission archive ends on 26 Nov 2026, 00:00 TDB. The separately available JPL forecast runs through 26 Nov 2027, 00:00 TDB. Voyager 2 has a short gap on 29 Aug 1989 between 08:00 and 08:05 TDB.'],
   voyagerSun:['Entfernung zur Sonne','Distance from the Sun'],
   voyagerEarth:['Entfernung zum Erdmittelpunkt','Distance from Earth’s centre'],
   voyagerSpeed:['Geschwindigkeit relativ zur Sonne','Speed relative to the Sun'],
