@@ -1082,7 +1082,7 @@ export function mountSolar(root) {
     markers=entries.map(({body,vector})=>{
       const p=screen(displayedVector(vector));if(!p)return null;
       const planet=contextPlanet(body.id);
-      const maxSymbol=outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
+      const maxSymbol=beyond?(body.id==='sun'?11:7):outerLocal()?(body.id===system?16:7):galactic?body.size:system?28:52;
       const radius=body.small?body.size:planet?Math.min(4,.9+p.pixelsPerAU*.5):voyager?body.size:
         enlarged?Math.min(maxSymbol,Math.max(2,body.size*baseDistance/p.depth)):radiusAU(body)*p.pixelsPerAU;
       const chosen=selected===body.id;

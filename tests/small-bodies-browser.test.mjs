@@ -14,7 +14,7 @@ const canvas=p=>p.locator('#solCanvas');
 const shot=(p,id,selector='.ex-solar-map')=>p.locator(selector).screenshot({path:join(h.output,'beyond-the-planets-'+id+'.png')});
 const reviewImages=[
   ['overview','Overview · four groups'],['main-belt','Asteroid belt'],['kuiper','Kuiper Belt and TNOs'],
-  ['dwarf','Ceres'],['halley','Halley · archived orbital arc'],['return','Return to planets'],
+  ['dwarf','Ceres selected'],['dwarf-info','Ceres · inspector'],['halley','Halley · archived orbital arc'],['return','Return to planets'],
   ['390','390 CSS px'],['320','320 CSS px'],['controls-320','320 px controls'],['inspector-320','320 px inspector'],
 ];
 async function contactSheet(page){
@@ -93,6 +93,7 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         await shot(p,String(width));
         if(width===320){
           await select(p,'ceres');
+          assert((await p.locator('#beyondControls').boundingBox()).height<390);
           await shot(p,'controls-320','#beyondControls');
           await shot(p,'inspector-320','#smallInspector');
         }
@@ -106,7 +107,18 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         await click(p,'#solFit');await settle(p);
         assert((await solar(p)).markers.some(m=>m.id==='sedna'));
         await shot(p,'overview');
+        await p.locator('[data-beyond-group=comet]').uncheck();
+        await p.locator('[data-beyond-group=asteroid]').uncheck();
+        await p.locator('[data-beyond-belt=asteroid]').uncheck();
+        await select(p,'arrokoth');
+        await click(p,'#solFit');
+        await click(p,'#solTop');
+        await settle(p);
         await shot(p,'kuiper');
+        await p.locator('[data-beyond-group=asteroid]').check();
+        await p.locator('[data-beyond-belt=asteroid]').check();
+        await p.locator('[data-beyond-group=tno]').uncheck();
+        await p.locator('[data-beyond-belt=tno]').uncheck();
         await click(p,'#smallBeltFit');await settle(p);
         assert((await solar(p)).markers.some(m=>m.id==='vesta'));
         await shot(p,'main-belt');
@@ -116,7 +128,9 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         await select(p,'ceres');
         assert.match(await p.locator('#smallClass').textContent(),/Zwergplanet/);
         assert.match(await p.locator('#smallDistance').textContent(),/AU/);
-        await shot(p,'dwarf','#smallInspector');
+        await shot(p,'dwarf');
+        await shot(p,'dwarf-info','#smallInspector');
+        await p.locator('[data-beyond-group=comet]').check();
         await select(p,'halley');
         await click(p,'#smallArcFit');await settle(p);await shot(p,'halley');
         await click(p,'[data-language=en]');
@@ -133,7 +147,6 @@ test('small-body mode, guide layers, orbital arcs, native screenshots and mobile
         assert(!(await solar(p)).markers.some(m=>m.id==='ceres'));
         await click(p,'#smallFirst');await settle(p);
         assert.match(await p.locator('#smallDistance').textContent(),/AU/);
-        await p.locator('[data-beyond-group=tno]').uncheck();
         assert.equal(await p.locator('#smallTarget option[value=sedna]').count(),0);
       }
       await click(p,'#solBeyond');await settle(p);
