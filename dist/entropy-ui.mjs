@@ -10,7 +10,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  const active=()=>root.classList.contains('active')&&!$('particleExperiment').hidden&&!doc.hidden&&seen;
  const inspect=()=>({state:[...state],steps,playing,n:state.length,k:macrostate(state),scheduled:timer!==null});
  function schedule(){if(timer===null&&playing&&active())timer=setTimer(()=>{timer=null;if(playing&&active()){state=randomStep(state,rng);steps++;render()}schedule();flags()},500);flags()}
- function flags(){root.dataset.playing=String(playing);root.dataset.scheduled=String(timer!==null);root.dataset.step=String(steps);root.dataset.n=String(state.length);root.dataset.k=String(macrostate(state))}
+ function flags(){root.dataset.playing=String(playing);root.dataset.scheduled=String(timer!==null);root.dataset.step=String(steps);if(root.dataset.n!==String(state.length))root.dataset.n=String(state.length);root.dataset.k=String(macrostate(state))}
  function sync(){if(timer!==null){clearTimer(timer);timer=null}schedule();renderStatus()}
  function renderStatus(){const key=playing?(active()?'Mischt · Schritt {step}':'Ausgeblendet · Schritt {step}'):'Pausiert · Schritt {step}';$('entropyStatus').textContent=t(key,{step:format(steps,0)});$('entropyPlay').textContent=t(playing?'Mischen pausieren':'Automatisch mischen');$('entropyPlay').setAttribute('aria-pressed',String(playing));flags()}
  function svg(tag,attributes={},text){const node=doc.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attributes))node.setAttribute(k,String(v));if(text!==undefined)node.textContent=text;return node}
@@ -24,8 +24,12 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   ]){const element=$(id);element.dataset.i18n=dense?large:small;element.textContent=t(element.dataset.i18n)}
   markers=dense?[]:state.map((_,i)=>{const marker=doc.createElement('span');marker.className='entropy-marker';marker.textContent=i+1;return marker});$('entropyMarkers').replaceChildren(...markers);
   const peak=Math.max(...rows.map(r=>r.probability));
-  const bars=dense?[svg('path',{d:rows.map(r=>[32+(r.k+.5)*600/(n+1),180-145*r.probability/peak].join(' ')).map((p,i)=>(i?'L':'M')+p).join(' '),fill:'none',stroke:'#cbb2ff','stroke-width':2})]:rows.map(r=>svg('rect',{x:32+r.k*600/(n+1),y:180-145*r.probability/peak,width:Math.max(2,600/(n+1)-4),height:145*r.probability/peak,class:'entropy-bar','data-k':r.k}));
-  $('entropyChart').replaceChildren(...bars,svg('path',{'data-current-marker':'',fill:'#fff','aria-hidden':'true'}),svg('path',{d:'M30 25V182H635',fill:'none',stroke:'#73617e'}),svg('text',{x:5,y:19},percent(peak)),...[...new Set([0,Math.floor(n/2),n])].map(k=>svg('text',{x:32+(k+.5)*600/(n+1),y:212,'text-anchor':'middle'},format(k,0))));
+  const point=r=>[32+(r.k+.5)*600/(n+1),180-145*r.probability/peak];
+  const comparisonPoints=dense?[rows[Math.floor(n/2)],rows[n]].map(r=>{
+   const [cx,cy]=point(r);return svg('circle',{cx,cy,r:4,fill:'#ffbd79',stroke:'#171322',visibility:'hidden','data-comparison-k':r.k,'aria-hidden':'true'});
+  }):[];
+  const bars=dense?[svg('path',{d:rows.map(r=>point(r).join(' ')).map((p,i)=>(i?'L':'M')+p).join(' '),fill:'none',stroke:'#cbb2ff','stroke-width':2})]:rows.map(r=>svg('rect',{x:32+r.k*600/(n+1),y:180-145*r.probability/peak,width:Math.max(2,600/(n+1)-4),height:145*r.probability/peak,class:'entropy-bar','data-k':r.k}));
+  $('entropyChart').replaceChildren(...bars,...comparisonPoints,svg('path',{'data-current-marker':'',fill:'#fff','aria-hidden':'true'}),svg('path',{d:'M30 25V182H635',fill:'none',stroke:'#73617e'}),svg('text',{x:5,y:19},percent(peak)),...[...new Set([0,Math.floor(n/2),n])].map(k=>svg('text',{x:32+(k+.5)*600/(n+1),y:212,'text-anchor':'middle'},format(k,0))));
   if(dense){$('entropyTable').replaceChildren();return;}
   $('entropyTable').replaceChildren(...rows.map(r=>{const tr=doc.createElement('tr');tr.dataset.k=r.k;for(const value of [r.k,format(r.omega,0),percent(r.probability)]){const td=doc.createElement('td');td.textContent=value;tr.append(td)}return tr}));
  }
@@ -59,7 +63,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  $('entropyPlay').onclick=()=>{playing=!playing;sync()};
  $('entropyStep').onclick=()=>{pause();state=randomStep(state,rng);steps++;render()};
  $('entropyReset').onclick=()=>{pause();state=arrangement(state.length);steps=0;invalid=false;$('entropyN').value=state.length;render()};
- $('entropyN').oninput=()=>{const text=$('entropyN').value.trim(),n=Number(text);invalid=text===''||!Number.isInteger(n)||n<1||n>MAX_MARKERS;if(invalid){render();return}pause();state=arrangement(n);steps=0;build();render()};
+ $('entropyN').oninput=()=>{const text=$('entropyN').value.trim(),n=Number(text);invalid=text===''||!Number.isInteger(n)||n<1||n>MAX_MARKERS;if(invalid){render();return}pause();state=arrangement(n);steps=0;if(rows.length!==n+1)build();render()};
  for(const button of doc.querySelectorAll('[data-marker-count]'))button.onclick=()=>{
   $('entropyN').value=button.dataset.markerCount;
   $('entropyN').oninput();

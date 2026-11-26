@@ -66,8 +66,9 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await shot(gas,'gas');
   assert.equal(await p.evaluate(()=>entrolabGas.inspect().scheduled),false);
   await p.emulateMedia({reducedMotion:'no-preference'});
+  const timeBefore=await p.evaluate(()=>entrolabGas.inspect().time);
   await p.locator('#gasPause').click();
-  await p.waitForFunction(()=>entrolabGas.inspect().frames>2);
+  await p.waitForFunction(time=>entrolabGas.inspect().time>time+.02,timeBefore);
   await chooseLab(p,'gravity');
   await p.waitForFunction(()=>!entrolabGas.inspect().scheduled);
   await p.locator('[data-language=en]').click();
@@ -117,6 +118,14 @@ test('512 markers: native layouts, measured render work, motion and lifecycle',{
    assert.match(extreme,/153|152/);
    await p.locator('.entropy-micro summary').press('Enter');
    assert.equal((await p.locator('#entropyMicrostate').textContent()).trim().split(/\s+/).length,512);
+   const comparison=p.locator('#macrostateComparison');
+   await comparison.locator(':scope > summary').press('Enter');
+   const balanced=p.locator('#entropyChart [data-comparison-k="256"]');
+   await p.waitForFunction(()=>document.querySelector('#entropyChart [data-comparison-k="256"]')?.getAttribute('visibility')==='visible');
+   assert.equal(await balanced.getAttribute('visibility'),'visible');
+   if(!narrow)await shot(p.locator('.entropy-results'),'comparison-512');
+   assert.equal(await p.evaluate(()=>entrolabEntropy.inspect().k),512);
+   await comparison.locator(':scope > summary').press('Enter');
    for(let i=0;i<6;i++){
     await size(p,32);
     await size(p,512);
@@ -135,6 +144,13 @@ test('512 markers: native layouts, measured render work, motion and lifecycle',{
    const final=await counters();
    assert(final.nodes<initial.nodes+850,JSON.stringify({initial,final}));
    reports.push({width,cpuThrottle:narrow?4:1,initial,final,runs});
+   if(narrow){
+    await chooseLab(p,'matter','tap');
+    const field=p.locator('details.polish-b-panel').filter({has:p.locator('#fieldCharge')});
+    await field.locator('summary').tap();
+    assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await shot(field,'field-'+width);
+   }
   }finally{await context.close()}
  }
  await writeFile(join(h.output,'polish-b-performance.json'),JSON.stringify(reports,null,2));

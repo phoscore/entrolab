@@ -17,6 +17,10 @@ export const polishB={
   "The model uses 1–512 distinguishable, non-interacting markers in two equally sized chambers. The microstate lists their chamber assignments. The macrostate k counts the markers on the left."
  ],
  "polishB.denseChart": ["Die Kurve verbindet die Wahrscheinlichkeiten der einzelnen k-Werte. Das Dreieck zeigt deinen aktuellen Makrozustand.", "The line connects the probabilities of the individual k values. The triangle marks your current macrostate."],
+ "polishB.denseComparison": [
+  "Der orange Punkt zeigt den ausgewählten Vergleich in der Kurve. Weißes Dreieck und Tabelle zeigen das aktuelle k. Der Vergleich bewegt keine Marker.",
+  "The orange dot shows the selected comparison on the curve. The white triangle and the table show the current k. The comparison leaves the markers in place."
+ ],
  "polishB.denseTable": ["Aktuellen Makrozustand als Tabelle ansehen","View the current macrostate in a table"],
  "polishB.markerHint": [
   "Eine neue Markerzahl setzt alle Marker nach links. Der k-Regler setzt die ersten k nach links und pausiert. Ab 33 Markern zeigen Balken die Anteile pro Kammer.",
