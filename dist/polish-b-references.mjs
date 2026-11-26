@@ -4,8 +4,8 @@ export const references=new Map([
   [
    "Gaia BH1",
    [
-    "≈480 pc ab Sonnensystem. Astrometrie und Radialgeschwindigkeit ergeben 9,62 ± 0,18 Sonnenmassen für den dunklen Begleiter.",
-    "≈480 pc from the Solar System. Astrometry and radial velocity give 9.62 ± 0.18 solar masses for the dark companion."
+    "Rund 480 pc ab Sonne (Gaia-Parallaxe 2,09 ± 0,02 mas). Astrometrie und Radialgeschwindigkeit ergeben 9,62 ± 0,18 Sonnenmassen für den dunklen Begleiter.",
+    "About 480 pc from the Sun (Gaia parallax 2.09 ± 0.02 mas). Astrometry and radial velocity give 9.62 ± 0.18 solar masses for the dark companion."
    ],
    "https://arxiv.org/abs/2209.06833"
   ]
@@ -37,8 +37,8 @@ export const references=new Map([
   [
    "Luhman 16B",
    [
-    "Brauner Zwerg vom frühen T-Typ, Teil eines Doppelobjekts knapp 2 pc vom Sonnensystem entfernt. Infrarotbeobachtungen zeigen eine ungleichmäßige Wolkendecke.",
-    "Early T-type brown dwarf in a binary just under 2 pc from the Solar System. Infrared observations reveal patchy clouds."
+    "Brauner Zwerg vom frühen T-Typ, Teil eines Doppelobjekts, dessen Schwerpunkt bei 1,9960 pc ab Sonne liegt (Unsicherheit 50 AU). Infrarotbeobachtungen zeigen eine ungleichmäßige Wolkendecke.",
+    "Early T-type brown dwarf in a binary whose barycentre lies 1.9960 pc from the Sun (uncertainty 50 AU). Infrared observations reveal patchy clouds."
    ],
    "https://arxiv.org/abs/2403.08865",
    "https://doi.org/10.1038/nature12955"
@@ -71,8 +71,8 @@ export const references=new Map([
   [
    "WR 111",
    [
-    "Kohlenstoffreicher Wolf-Rayet-Stern (WC4–5). Eine publizierte Distanzlösung liegt bei rund 1,3 kpc (+0,1/−0,2) ab Sonne; die Analyse verwendet rund 2.200 km/s als Endgeschwindigkeit des Sternwinds.",
-    "Carbon-rich Wolf–Rayet star (WC4–5). A published distance solution is about 1.3 kpc (+0.1/−0.2) from the Sun; the analysis adopts a terminal wind speed of about 2,200 km/s."
+    "Kohlenstoffreicher Wolf-Rayet-Stern (WC4–5). Die publizierte Distanzlösung liegt bei 1,3 kpc (+0,1/−0,0, gerundet) ab Sonne. Die Halbwertsbreite des C-IV-Dubletts bei 5801/5812 Å beträgt rund 2.200 km/s.",
+    "Carbon-rich Wolf–Rayet star (WC4–5). The published distance solution is 1.3 kpc (+0.1/−0.0, rounded) from the Sun. The C IV doublet at 5801/5812 Å has a full width at half maximum of about 2,200 km/s."
    ],
    "https://doi.org/10.1093/mnras/stad418"
   ]
@@ -80,7 +80,7 @@ export const references=new Map([
  [
   "sun",
   [
-   "Sol",
+   "polishB.sun",
    [
     "Unsere Sonne ist ein Hauptreihenstern. Ihr Abstand zur Erde variiert von rund 147 bis 152 Millionen km; die effektive Temperatur liegt bei rund 5.772 K.",
     "The Sun is a main-sequence star. Its distance from Earth varies from about 147 to 152 million km; its effective temperature is about 5,772 K."

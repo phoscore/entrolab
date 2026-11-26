@@ -11,9 +11,16 @@ export const polishB={
   "Schnellwahl Markerzahl",
   "Marker-count presets"
  ],
+ "polishB.markerCount": ["MARKERZAHL N · 1–512", "MARKER COUNT N · 1–512"],
+ "polishB.markerAssumptions": [
+  "Das Modell verwendet 1–512 unterscheidbare Marker ohne Wechselwirkung in zwei gleich großen Kammern. Der Mikrozustand ist ihre Links/Rechts-Zuordnung. Der Makrozustand k zählt die Marker links.",
+  "The model uses 1–512 distinguishable, non-interacting markers in two equally sized chambers. The microstate lists their chamber assignments. The macrostate k counts the markers on the left."
+ ],
+ "polishB.denseChart": ["Die Kurve verbindet die Wahrscheinlichkeiten der einzelnen k-Werte. Das Dreieck zeigt deinen aktuellen Makrozustand.", "The line connects the probabilities of the individual k values. The triangle marks your current macrostate."],
+ "polishB.denseTable": ["Aktuellen Makrozustand als Tabelle ansehen","View the current macrostate in a table"],
  "polishB.markerHint": [
-  "Ab 33 Markern zeigen die Balken die Anteile pro Kammer.",
-  "From 33 markers, the bars show the fraction in each chamber."
+  "Eine neue Markerzahl setzt alle Marker nach links. Der k-Regler setzt die ersten k nach links und pausiert. Ab 33 Markern zeigen Balken die Anteile pro Kammer.",
+  "A new count puts all markers on the left. The k slider pauses and places the first k markers on the left. From 33 markers, the bars show each chamber’s share."
  ],
  "polishB.microstate": [
   "Vollständige Markerfolge",
@@ -219,6 +226,10 @@ export const polishB={
   "In der Allgemeinen Relativitätstheorie ist eine Raumzeit singulär, wenn bestimmte frei fallende Bahnen oder Lichtwege nach endlicher Eigenzeit beziehungsweise endlichem Bahnparameter enden, ohne sich in der Raumzeit fortsetzen zu lassen. Der Ereignishorizont dagegen ist eine Grenze dafür, welche Signale ferne Beobachter erreichen können. Das ideale Schwarzschild-Loch hat im Inneren eine Krümmungssingularität. Die exakte rotierende Kerr-Lösung besitzt eine kompliziertere innere Struktur mit einer Ringsingularität. Keine davon ist als Objekt unendlicher Dichte experimentell bestätigt. Bei extremen Krümmungen könnte Quantengravitation die klassische Beschreibung ändern. Wie genau, ist offen.",
   "A spacetime is singular in general relativity if some free-fall or light paths end after a finite proper time or affine parameter and cannot be continued within that spacetime. An event horizon, by contrast, marks which signals can reach distant observers. The ideal Schwarzschild hole has an interior curvature singularity. The exact rotating Kerr solution has a more complicated interior containing a ring singularity. Neither has been experimentally confirmed as an object of infinite density. A theory of quantum gravity could change the classical description at extreme curvature. How it would do so remains open."
  ],
+ "polishB.gasEnergy": [
+  "Mittlere translatorische Energie je Teilchen in Kammer A: {a} J, in Kammer B: {b} J.",
+  "Mean translational energy per particle in chamber A: {a} J, in chamber B: {b} J."
+ ],
  "polishB.gas": [
   "Beide Kammern verwenden gleich schwere Argon-Modellteilchen und dieselbe Darstellungsskala. Die Punkte zeigen nur zwei Komponenten einer dreidimensionalen Bewegung. Das Diagramm zeigt den Betrag der Geschwindigkeit. Seine Verteilungen überlappen: Einzelne Teilchen im kälteren Gas können schneller sein. Im klassischen einatomigen Gas ist die mittlere translatorische Energie proportional zur absoluten Temperatur. Ein einzelner Punkt hat eine Geschwindigkeit und Energie, aber keine Gastemperatur.",
   "Both chambers use equal-mass argon model particles and the same visual scale. The dots show only two components of three-dimensional motion. The chart shows speed magnitude. The distributions overlap: some particles in the colder gas can be faster. In a classical monatomic gas, mean translational energy is proportional to absolute temperature. A single dot has a velocity and energy, but no gas temperature."
@@ -230,6 +241,11 @@ export const polishB={
  "polishB.temp": [
   "Temperatur bestimmt mit, in welche Richtung Wärme zwischen Systemen im Gleichgewicht mit sich selbst fließt. Im klassischen idealen Gas hängt sie mit der mittleren translatorischen Energie zusammen. Bei quantenmechanisch dominierten Systemen können diskrete Energieniveaus entscheidend sein, und für relativistische Teilchen gelten andere Energie-Impuls-Beziehungen. Das klassische Gasbild gilt deshalb nur innerhalb seiner Modellgrenzen.",
   "Temperature helps determine which way heat flows between systems that are each internally in equilibrium. In a classical ideal gas it is tied to mean translational energy. Discrete energy levels can dominate in quantum systems, and relativistic particles obey different energy–momentum relations. The classical gas picture therefore applies within its model limits."
+ ],
+ "polishB.sun": ["Sonne", "Sun"],
+ "polishB.fieldResult": [
+  "Feldstärke: {strength} N/C (x: {x} N/C, y: {y} N/C).",
+  "Field strength: {strength} N/C (x: {x} N/C, y: {y} N/C)."
  ],
  "polishB.reference": [
   "Beobachtetes Referenzobjekt",

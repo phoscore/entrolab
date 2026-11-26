@@ -6,7 +6,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  let rows=distribution(12),markers=[];
  const format=(v,digits=4)=>new Intl.NumberFormat(locale(),{maximumFractionDigits:digits}).format(v);
  const percent=p=>p<.0001?new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:4}).format(100*p)+' %':new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:5}).format(p);
- const formatInteger=(value,n)=>n<=32?format(value,0):new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:5}).format(Number(value));
+ const formatInteger=(value,n)=>n<=32||value<10000n?format(value,0):'≈ '+new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:5}).format(Number(value));
  const active=()=>root.classList.contains('active')&&!$('particleExperiment').hidden&&!doc.hidden&&seen;
  const inspect=()=>({state:[...state],steps,playing,n:state.length,k:macrostate(state),scheduled:timer!==null});
  function schedule(){if(timer===null&&playing&&active())timer=setTimer(()=>{timer=null;if(playing&&active()){state=randomStep(state,rng);steps++;render()}schedule();flags()},500);flags()}
@@ -18,6 +18,10 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   rows=distribution(state.length);
   const n=state.length,dense=n>32;
   $('entropyChambers').dataset.dense=String(dense);
+  for(const [id,small,large] of [
+   ['entropyChartCopy','Balkenhöhe: Wahrscheinlichkeit für k Marker links. Heller Balken und Dreieck: dein aktueller Makrozustand.','polishB.denseChart'],
+   ['entropyTableCopy','Alle Wahrscheinlichkeiten als Tabelle','polishB.denseTable']
+  ]){const element=$(id);element.dataset.i18n=dense?large:small;element.textContent=t(element.dataset.i18n)}
   markers=dense?[]:state.map((_,i)=>{const marker=doc.createElement('span');marker.className='entropy-marker';marker.textContent=i+1;return marker});$('entropyMarkers').replaceChildren(...markers);
   const peak=Math.max(...rows.map(r=>r.probability));
   const bars=dense?[svg('path',{d:rows.map(r=>[32+(r.k+.5)*600/(n+1),180-145*r.probability/peak].join(' ')).map((p,i)=>(i?'L':'M')+p).join(' '),fill:'none',stroke:'#cbb2ff','stroke-width':2})]:rows.map(r=>svg('rect',{x:32+r.k*600/(n+1),y:180-145*r.probability/peak,width:Math.max(2,600/(n+1)-4),height:145*r.probability/peak,class:'entropy-bar','data-k':r.k}));
@@ -31,7 +35,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   $('entropyLeft').textContent=format(k,0);$('entropyRight').textContent=format(n-k,0);$('entropyChambers').setAttribute('aria-label',t('Links {left}, rechts {right}; {n} unterscheidbare Marker.',{left:k,right:n-k,n}));
   if(n>32){
    for(const [id,count] of [['entropyDenseLeft',k],['entropyDenseRight',n-k]]){
-    $(id).style.setProperty('--filled',Math.round(count/n*100)+'%');
+    $(id).style.setProperty('--filled',(count/n*100)+'%');
    }
    const tr=doc.createElement('tr');tr.dataset.k=k;
    for(const value of [k,row.omega.toString(),percent(row.probability)]){

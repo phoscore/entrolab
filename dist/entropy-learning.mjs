@@ -13,7 +13,8 @@ export function initEntropyLearning(doc=globalThis.document){
  const detail=(key,id)=>{const e=node('details',null,'learning-panel');if(id)e.id=id;e.append(node('summary',key));return e};
  const listen=(e,type,fn)=>{e.addEventListener(type,fn);cleanup.push(()=>e.removeEventListener(type,fn))};
  const number=v=>new Intl.NumberFormat(locale(),typeof v==='bigint'?{maximumFractionDigits:0}:{maximumSignificantDigits:6}).format(v);
- const percent=v=>new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:6}).format(v);
+ const compactOmega=(v,n)=>n<=32||v<10000n?number(v):'≈ '+new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:6}).format(Number(v));
+ const percent=v=>v<.0001?new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:6}).format(v*100)+' %':new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:6}).format(v);
  const link=(model,label='k.ui.model')=>{const a=node('a',label,'knowledge-model-link');a.href='#'+modelById[model].target;a.dataset.modelLink=modelById[model].target;return a};
 
  // Independent four-marker example. It never reads or writes the live markers.
@@ -46,7 +47,7 @@ export function initEntropyLearning(doc=globalThis.document){
  compare.append(actions,comparisonText,node('p','k.learning.compare.note'),node('p','k.learning.compare.units'),node('p','k.learning.compare.next'),link('markers'));demo.after(compare);owned.push(compare);
  function renderComparison(){
   const r=liveComparison(Number(root.dataset.n)||12,choice);
-  comparisonText.replaceChildren(...[['labelBalanced',r.balanced],['labelEdge',r.edge]].map(([label,row])=>{const p=node('p');p.textContent=t('k.learning.compare.row',{label:t('k.learning.compare.'+label),k:row.k,omega:number(row.omega),probability:percent(row.probability),entropy:number(row.entropy)});return p}));
+  comparisonText.replaceChildren(...[['labelBalanced',r.balanced],['labelEdge',r.edge]].map(([label,row])=>{const p=node('p');p.textContent=t('k.learning.compare.row',{label:t('k.learning.compare.'+label),k:row.k,omega:compactOmega(row.omega,r.n),probability:percent(row.probability),entropy:number(row.entropy)});return p}));
   for(const [id,b]of Object.entries(comparisonButtons))b.setAttribute('aria-pressed',String(choice===id));
   for(const e of doc.querySelectorAll('#entropyChart [data-k], #entropyTable [data-k]')){if(compare.open&&Number(e.dataset.k)===r.selected.k)e.dataset.comparison='true';else delete e.dataset.comparison}
   compare.dataset.selectedK=r.selected.k;compare.dataset.n=r.n;

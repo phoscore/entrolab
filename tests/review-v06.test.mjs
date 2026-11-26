@@ -27,7 +27,7 @@ test('review P3: invalid state is rejected before RNG consumption and without fi
   const before=Object.getOwnPropertyDescriptors(state);let calls=0;
   assert.throws(()=>randomStep(state,()=>{calls++;return .5}),TypeError);assert.equal(calls,0);assert.deepEqual(Object.getOwnPropertyDescriptors(state),before);
  }
- for(const state of [[],Array(33).fill(true)])for(const consume of consumers)assert.throws(()=>consume(state),RangeError);
+ for(const state of [[],Array(MAX_MARKERS+1).fill(true)])for(const consume of consumers)assert.throws(()=>consume(state),RangeError);
 });
 test('review P3: all supported dense states and generated/sampled/stepped states remain valid, without input mutation',()=>{
  const rng=seededRandom(6);

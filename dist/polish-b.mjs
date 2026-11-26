@@ -42,7 +42,7 @@ for(const [i,row] of questions.entries()){
 
 section('blackhole','polishB.singTitle','polishB.sing').append(link('Einstein Online · Black holes','https://www.einstein-online.info/en/spotlight/black-holes/'));
 const matter=section('matter','polishB.matterTitle','polishB.matter');
-matter.append(link('CERN · The Standard Model','https://home.cern/science/physics/standard-model'));
+matter.append(link('Yang et al. (2018) · Proton mass','https://doi.org/10.1103/PhysRevLett.121.212001'),document.createTextNode(' · '),link('CERN · The Standard Model','https://home.cern/science/physics/standard-model'));
 const field=section('matter','polishB.field','polishB.fieldNote');
 const controls=node('div');controls.className='field-inputs';
 for(const [id,key,min,max,value] of [['fieldCharge','charge',-5,5,2],['fieldX','probeX',-2,2,1],['fieldY','probeY',-2,2,.5]]){
@@ -75,7 +75,8 @@ function paintField(){
   const u=a+25*dx,v=b+25*dy;
   arrow.setAttribute('d',`M${a} ${b}L${u} ${v}m${-7*dx+4*dy} ${-7*dy-4*dx}L${u} ${v}l${-7*dx-4*dy} ${-7*dy+4*dx}`);
  }
- value.textContent=e?new Intl.NumberFormat(locale(),{maximumSignificantDigits:4}).format(e.magnitude)+' N/C':t('polishB.fieldNear');
+ const format=new Intl.NumberFormat(locale(),{maximumSignificantDigits:4});
+ value.textContent=e?t('polishB.fieldResult',{strength:format.format(e.magnitude),x:format.format(e.x||0),y:format.format(e.y||0)}):t('polishB.fieldNear');
 }
 labels.push(paintField);
 
@@ -86,7 +87,7 @@ function updateReference(){
  const entry=references.get($('extremeObject').value);
  if(!entry)return;
  const [title,copy,...links]=entry;
- name.textContent=title;description.textContent=copy[language()==='de'?0:1];
+ name.textContent=t(title);description.textContent=copy[language()==='de'?0:1];
  sources.replaceChildren(...links.map((url,i)=>link((language()==='de'?'Quelle ':'Source ')+(i+1),url)));
 }
 $('extremeObject').addEventListener('change',updateReference);

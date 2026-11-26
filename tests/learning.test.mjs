@@ -19,7 +19,7 @@ test('v0.8 learning: N=1,12,32 comparison retains exact counts and honest small 
  const one=liveComparison(1);assert.equal(one.balanced.omega,1n);assert.equal(one.edge.probability,.5);
  const twelve=liveComparison(12);assert.equal(twelve.balanced.omega,924n);assert.equal(twelve.balanced.probability,924/4096);assert(twelve.balanced.probability<.5);assert.equal(twelve.edge.omega,1n);
  const max=liveComparison(32,'edge');assert.equal(max.balanced.omega,601080390n);assert.equal(max.selected.k,32);assert.equal(max.selected.probability,2**-32);
- for(const n of [0,33,2.2,NaN,'12'])assert.throws(()=>liveComparison(n));assert.throws(()=>liveComparison(12,'other'));
+ for(const n of [0,513,2.2,NaN,'12'])assert.throws(()=>liveComparison(n));assert.throws(()=>liveComparison(12,'other'));
 });
 test('v0.8 learning: thermal teaching projection preserves independent 350/290 K reference and signed units',()=>{
  const p={...THERMAL_DEFAULT},time=10,exactQ=30000*(1-Math.exp(-.02*time));
