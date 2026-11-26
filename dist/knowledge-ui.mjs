@@ -11,6 +11,7 @@ export function initKnowledge(doc=globalThis.document){
  const guide=initGuide(doc);
  const node=(tag,key,cls)=>{const e=doc.createElement(tag);if(cls)e.className=cls;if(key){e.dataset.i18n=key;e.textContent=t(key)}return e};
  const detail=(key,cls='knowledge-advanced')=>{const e=node('details',null,cls);e.append(node('summary',key));return e};
+ function simple(type,id){const e=detail('polishB.simple','knowledge-simple');e.append(node('p','polishB.'+type+'.'+id));return e}
  function sourceList(ids){
   const list=node('ul',null,'knowledge-sources');
   for(const id of ids){const source=sources[id],li=node('li'),a=node('a');a.href=source.url;a.textContent=source.publisher+' · '+source.title;a.target='_blank';a.rel='noopener';a.dataset.source=id;li.append(a);
@@ -25,7 +26,7 @@ export function initKnowledge(doc=globalThis.document){
   const legacy={microstate:'Advanced · Fluktuationen',stars:'Advanced · Sternbeispiele & Pulsar',universe:'Gravitation im Lab',schwarzschild:'Advanced',hawking:'Advanced'};
   const advanced=detail(legacy[term.id]??'k.ui.advanced');advanced.append(node('p',term.long));
   if(term.equation){const formula=node('p',null,'knowledge-formula');formula.textContent=term.equation;advanced.append(formula)}
-  advanced.append(node('h4','k.ui.sources'),sourceList(term.sources),modelLink(term.model));body.append(advanced);return body;
+  advanced.append(node('h4','k.ui.sources'),sourceList(term.sources),modelLink(term.model));body.append(simple('term',term.id),advanced);return body;
  }
  function help(id){
   const term=termById[id],e=node('details',null,'knowledge-help'),summary=node('summary');
@@ -58,8 +59,9 @@ export function initKnowledge(doc=globalThis.document){
  for(const model of models){
   const article=node('article',null,'panel knowledge-model');article.id=model.target;article.tabIndex=-1;
   article.append(node('h2',model.title),node('p',model.overview));
-  const limits=node('p',model.limits,'knowledge-limit');article.append(limits);
+  const limits=node('p',model.limits,'knowledge-limit');article.append(limits,simple('model',model.id));
   const advanced=detail('k.ui.advanced');
+  if(model.id==='temperature')advanced.append(node('p','polishB.temp'));
   for(const [heading,key]of [['method',model.method],['units',model.units],['illustration',model.illustration],['misconception',model.misconception]])advanced.append(node('h3','k.ui.'+heading),node('p',key));
   advanced.append(node('h3','k.ui.formulas'));
   for(const formula of model.equations){const e=node('p',null,'knowledge-formula');e.textContent=formula;advanced.append(e)}

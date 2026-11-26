@@ -433,8 +433,8 @@ const messages={
     "Not every neutron star is an observed pulsar. The animation calculates neither light paths nor nuclear matter."
   ],
   "k.model.temperature.title": [
-    "Temperaturskala und sichere Brücke",
-    "Temperature scale and safe transfer"
+    "Was Temperatur misst",
+    "What temperature measures"
   ],
   "k.model.temperature.overview": [
     "Temperaturgrößenordnungen verstehen, ohne Temperatur mit Gesamtenergie zu verwechseln.",

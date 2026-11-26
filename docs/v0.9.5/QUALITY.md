@@ -54,3 +54,5 @@ The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercis
 ## Our Home Finalization
 
 [Free camera and interaction checks](FREE-CAMERA.md) and [ephemeris verification](OUR-HOME-FINALIZATION.md#offline-verification) cover the new rendering and data paths.
+
+See [Final Polish B – Physics for Everyone](FINAL-POLISH-B.md) for learning content, physical model assumptions, observed reference sources and validation.

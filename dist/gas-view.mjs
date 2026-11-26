@@ -30,7 +30,7 @@ export function initGasView(doc = globalThis.document) {
   <p id="gasError" class="error" role="status"></p><p id="gasTransfer" class="hint"></p>
   <p id="gasMetrics" class="experiment-values" role="status"></p><p id="gasSampleMetrics" class="hint"></p>
   <figure class="experiment-figure gas-chart"><h4 data-i18n="v09.gas.chart"></h4><svg id="gasChart" viewBox="0 0 520 176" aria-hidden="true"></svg>
-   <figcaption><span data-i18n="v09.gas.axes"></span><br><span data-i18n="v09.gas.legend"></span></figcaption>
+   <figcaption><span data-i18n="v09.gas.axes"></span><br><span data-i18n="v09.gas.legend"></span></figcaption><p class="hint" data-i18n="polishB.gas"></p>
   </figure>
   <details><summary data-i18n="v09.modelDetails"></summary><p data-i18n="v09.gas.formula"></p><p data-i18n="v09.gas.limits"></p>
    <a href="https://openstax.org/books/university-physics-volume-2/pages/2-4-distribution-of-molecular-speeds" target="_blank" rel="noopener">OpenStax · Distribution of Molecular Speeds</a>

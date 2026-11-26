@@ -1,10 +1,21 @@
 // Finite, distinguishable two-state markers. No positions, energies or SI time.
-export const MAX_MARKERS=32;
+export const MAX_MARKERS=512;
 export const SWITCH_PROBABILITY=.25;
-export function validateN(n){if(!Number.isInteger(n)||n<1||n>MAX_MARKERS)throw new RangeError('N must be an integer in [1,32]');return n}
+export function validateN(n){if(!Number.isInteger(n)||n<1||n>MAX_MARKERS)throw new RangeError(`N must be an integer in [1,${MAX_MARKERS}]`);return n}
 function validateK(n,k){validateN(n);if(!Number.isInteger(k)||k<0||k>n)throw new RangeError('k must be an integer in [0,N]')}
 export function multiplicity(n,k){validateK(n,k);let result=1n;for(let i=1;i<=Math.min(k,n-k);i++)result=result*BigInt(n-i+1)/BigInt(i);return result}
-export function distribution(n){validateN(n);const total=2n**BigInt(n);return Array.from({length:n+1},(_,k)=>{const omega=multiplicity(n,k);return {k,omega,total,probability:Number(omega)/Number(total),entropy:Math.log(Number(omega))}})}
+export function distribution(n){
+ validateN(n);
+ // At N <= 512 even the smallest probability, 2^-512, is a normal
+ // binary64 value. Conversion only affects rounded display quantities.
+ const total=1n<<BigInt(n), denominator=2**n;
+ let omega=1n;
+ return Array.from({length:n+1},(_,k)=>{
+  const mass=Number(omega), row={k,omega,total,probability:mass/denominator,entropy:Math.log(mass)};
+  omega=omega*BigInt(n-k)/BigInt(k+1);
+  return row;
+ });
+}
 export function arrangement(n,k=n){validateK(n,k);return Array.from({length:n},(_,i)=>i<k)}
 export function validateState(state){
  if(!Array.isArray(state))throw new TypeError('State must be an array of Boolean markers');
