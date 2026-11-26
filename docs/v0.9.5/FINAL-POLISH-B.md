@@ -24,14 +24,14 @@ Extemp-lab labels the existing two-chamber classical argon demonstration with a 
 
 The standard Node suite adds checks for all marker counts, exact tails, electrostatics, explanation coverage and reference identities. The Chromium suite takes snapshots of the desktop learning and experiment panels and both mobile widths. It checks actual gas and marker playback, sign reversal and the excluded field region. Its performance report samples seven marker counts at 1440, 390 and 320 CSS px, at 4× CPU slowdown on the mobile viewports. The report records the 90th percentile calculation, synchronous update including forced layout, and two-animation-frame interval. DOM node and listener counts after forced collection are proxies for retained resources. Mobile results use Chromium touch emulation.
 
-The [Chromium measurement run](https://github.com/phoscore/entrolab/actions/runs/45883942275) produced these p90 observations at N=512. The final run regenerates the same measurements. Two animation frames include the browser’s normal refresh interval and are not CPU time.
+The [Chromium measurement run](https://github.com/phoscore/entrolab/actions/runs/45884773523) produced these p90 observations at N=512. The final run regenerates the same measurements. Two animation frames include the browser’s normal refresh interval and are not CPU time.
 
 | Viewport | CPU factor | Distribution | Update + layout | Two animation frames |
 | --- | ---: | ---: | ---: | ---: |
-| 1440 px | 1× | 0.3 ms | 2.1 ms | 34.7 ms |
-| 390 px | 4× slowdown | 2.1 ms | 11.4 ms | 53.6 ms |
-| 320 px | 4× slowdown | 1.8 ms | 25.2 ms | 34.7 ms |
+| 1440 px | 1× | 0.8 ms | 3.9 ms | 35.0 ms |
+| 390 px | 4× slowdown | 2.0 ms | 20.1 ms | 36.1 ms |
+| 320 px | 4× slowdown | 1.9 ms | 7.3 ms | 33.7 ms |
 
-This sample retained 367 JavaScript event listeners per context before and after repeated population changes and a lab switch, with about 93–95 fewer DOM nodes after collection. It exercises actual marker playback and verifies that hidden and paused views stop scheduling steps. The run shares a CI host with other suites. Timing varies with runner load and should be interpreted alongside the full seven-size JSON report. The same run passed the Phase B browser tests. Its existing local 3D preset test timed out waiting for a redraw. The fresh run on the final head provides the acceptance status for both CI checks.
+This sample retained 367 JavaScript event listeners per context before and after repeated population changes and a lab switch, with 88–90 fewer DOM nodes after collection. It exercises actual marker playback and verifies that hidden and paused views stop scheduling steps. The run shares a CI host with other suites. Timing varies with runner load and should be interpreted alongside the full seven-size JSON report. The gas movement check requires both advancing model time and newly painted frames while the canvas intersects the viewport. The visible simulation deliberately runs much slower than real time. The final GitHub checks and screenshot archive provide the acceptance result.
 
 Explorer rendering, release/version work, and further Null changes belong to Phase C.

@@ -8,7 +8,7 @@ import {chooseLab} from './browser-lab-navigation.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
 after(async()=>{await h?.close()});
-const shot=(locator,id)=>locator.screenshot({path:join(h.output,'polish-b-'+id+'.png')});
+const shot=(locator,id,options)=>locator.screenshot({path:join(h.output,'polish-b-'+id+'.png'),...options});
 const size=(p,n)=>p.locator('#entropyN').fill(String(n));
 const questions=(p,id)=>p.locator('#'+id+' details.polish-b-panel').filter({has:p.locator('fieldset')});
 const screenshots=['gravity','blackhole','extreme','temperature','entropy','matter','explorer','science'];
@@ -63,12 +63,17 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await chooseLab(p,'temperature');
   const gas=p.locator('#gasExperiment');
   await gas.scrollIntoViewIfNeeded();
-  await shot(gas,'gas');
+  // Oversized element captures can include off-viewport fixed elements.
+  await shot(gas,'gas',{style:'.skip-link:not(:focus){clip-path:inset(50%)}'});
   assert.equal(await p.evaluate(()=>entrolabGas.inspect().scheduled),false);
   await p.emulateMedia({reducedMotion:'no-preference'});
-  const timeBefore=await p.evaluate(()=>entrolabGas.inspect().time);
+  const beforeGas=await p.evaluate(()=>entrolabGas.inspect());
   await p.locator('#gasPause').click();
-  await p.waitForFunction(time=>entrolabGas.inspect().time>time+.02,timeBefore);
+  await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
+  await p.waitForFunction(({time,frames})=>{
+   const gas=entrolabGas.inspect();
+   return gas.time>time&&gas.frames>frames;
+  },beforeGas);
   await chooseLab(p,'gravity');
   await p.waitForFunction(()=>!entrolabGas.inspect().scheduled);
   await p.locator('[data-language=en]').click();
