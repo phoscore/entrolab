@@ -102,14 +102,16 @@ function refresh(keepMass=false){
  $('hawkingReadout').textContent=state.kind==='blackhole'?
   tx`Hawking-Temperatur: ${scientific(b.hawking,'K')} – theoretische Strahlungstemperatur für entfernte Beobachter, keine gewöhnliche Materialtemperatur und nicht die Temperatur der illustrierten Scheibe.`:
   b.kind==='wolf'?t('v0925.wolf.density'):t('Dichte ist M/(4πR³/3): sphärische Volumennäherung, keine lokale Dichte oder Zustandsgleichung. Leuchten ist illustrativ.');
- const button=$('extremePlay');
- button.dataset.paused=String(state.paused);
- button.setAttribute('aria-label',t(state.paused?'Animation starten':'Animation pausieren'));
+ const button=$('extremePlay'),moving=canAnimate();
+ button.disabled=!moving;
+ button.dataset.paused=String(state.paused||!moving);
+ button.setAttribute('aria-label',t(!moving?'identity.staticIllustration':state.paused?'Animation starten':'Animation pausieren'));
  $('extremeStatus').textContent=state.geometry&&state.kind==='blackhole'?t('SCHEMATISCHE SCHWARZSCHILD-GEOMETRIE'):t('v0925.illustration');
  describeObject(b);comparison();paint();sync();
 }
 function paint(){const paintStart=performance.now();if(!root.classList.contains('active')||document.hidden||!objectSeen)return;(hasStellarExample(state.kind)?drawStellarExample:drawObject)($('extremeCanvas'),state,time);rendered++;root.dataset.rendered=String(rendered);root.dataset.paintMs=(performance.now()-paintStart).toFixed(3)}
-function active(){return root.classList.contains('active')&&!document.hidden&&objectSeen&&(state.kind!=='blackhole'||state.disk&&!state.geometry)&&!state.paused}
+function canAnimate(){return state.kind!=='blackhole'||state.disk&&!state.geometry}
+function active(){return root.classList.contains('active')&&!document.hidden&&objectSeen&&canAnimate()&&!state.paused}
 function sync(){if(raf!==null){cancelAnimationFrame(raf);raf=null}previous=null;nextDraw=null;if(active())raf=requestAnimationFrame(tick);root.dataset.animating=String(active())}
 function tick(now){
  raf=null;

@@ -4,6 +4,7 @@ import {upgradeDE,upgradeEN} from './upgrade-text.mjs';
 import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  "identity.staticIllustration": "Statische Illustration",
   "identity.gravity": "Gravity Sandbox",
   "identity.gravity.line": "Deine Regeln? Eher nicht.",
   "identity.blackhole": "Singularities",
@@ -566,6 +567,7 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  "identity.staticIllustration": "Static illustration",
   "identity.gravity": "Gravity Sandbox",
   "identity.gravity.line": "Your rules? Probably not.",
   "identity.blackhole": "Singularities",

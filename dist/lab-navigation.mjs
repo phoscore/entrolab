@@ -5,6 +5,7 @@ const toggle=document.getElementById('labMenu');
 const label=document.getElementById('labMenuName');
 const tabs=[...nav.querySelectorAll('[data-tab]')];
 const compact=matchMedia('(max-width:760px)');
+let wasCompact=compact.matches,lastNavigationFocus=null;
 const active=()=>tabs.find(tab=>tab.classList.contains('active'))??tabs[0];
 const expanded=()=>toggle.getAttribute('aria-expanded')==='true';
 
@@ -44,21 +45,30 @@ nav.addEventListener('keydown',event=>{
   tabs[(next+tabs.length)%tabs.length].focus();
  }
 });
+document.addEventListener('focusin',event=>{
+ lastNavigationFocus=nav.contains(event.target)?event.target:null;
+});
 nav.addEventListener('focusout',event=>{
- if(!nav.contains(event.relatedTarget))close();
+ if(nav.contains(event.relatedTarget))return;
+ if(compact.matches===wasCompact)lastNavigationFocus=null;
+ close();
 });
 document.addEventListener('pointerdown',event=>{
- if(expanded()&&!nav.contains(event.target)){
-  close(nav.contains(document.activeElement)&&!event.target.closest('a,button,input,select,textarea,[tabindex]'));
- }
+ if(nav.contains(event.target))return;
+ lastNavigationFocus=null;
+ if(expanded())close(nav.contains(document.activeElement)&&!event.target.closest('a,button,input,select,textarea,[tabindex]'));
 });
 for(const tab of tabs)tab.addEventListener('click',()=>{
  nameCurrent();
  if(compact.matches)close(expanded());
 });
 compact.addEventListener('change',()=>{
- if(compact.matches&&tabs.includes(document.activeElement))toggle.focus();
- else if(!compact.matches&&document.activeElement===toggle)active().focus();
+ // CSS can hide the old control and release its focus before this event.
+ const focused=document.activeElement;
+ const previous=focused===document.body?lastNavigationFocus:focused;
+ wasCompact=compact.matches;
+ if(wasCompact&&tabs.includes(previous))toggle.focus();
+ else if(!wasCompact&&previous===toggle)active().focus();
  close();
 });
 onLanguageChange(nameCurrent);

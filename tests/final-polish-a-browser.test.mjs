@@ -46,6 +46,11 @@ test('polish A: eight persistent lab views and their identity fit desktop and bo
     await p.locator('[data-language=en]').tap();
     assert.equal(await menu.getAttribute('aria-expanded'),'false');
     await p.locator('[data-language=de]').tap();
+    await menu.focus();
+    await p.setViewportSize({width:1440,height:920});
+    await p.waitForFunction(()=>document.activeElement.dataset.tab==='gravity');
+    await p.setViewportSize({width,height:920});
+    await p.waitForFunction(()=>document.activeElement.id==='labMenu');
    }
    const snapshot=await physical(p),colours=new Set();
    for(const [i,id] of labs.entries()){
@@ -84,6 +89,10 @@ test('polish A: cold #temperature, title translations, Back/Forward and cross-la
   assert.equal(await active(p),'temperature');
   assert.equal(await p.locator('#extreme #kelvinInput').count(),0);
   await p.locator('#kelvinInput').fill('425');
+  await p.setViewportSize({width:1440,height:900});
+  assert.equal(await p.evaluate(()=>document.activeElement.id),'kelvinInput');
+  await p.setViewportSize({width:390,height:900});
+  assert.equal(await p.evaluate(()=>document.activeElement.id),'kelvinInput');
   await p.locator('#temperatureCompare > summary').click();
   await p.locator('#comparisonKelvinB').fill('365');
   await chooseLab(p,'blackhole','Enter');
@@ -142,6 +151,28 @@ test('polish A: illustration controls expose a compact glyph inside a 44px keybo
    await canvas.scrollIntoViewIfNeeded();
    await shot(p,'animation-'+id,390, id==='blackhole'?'.bh-image-frame':'.object-image-frame');
    await p.locator('[data-language=de]').click();
+   if(id==='blackhole'){
+    await p.locator('#bhView').selectOption('light');
+    assert(await toggle.isDisabled());
+    assert.equal(await toggle.getAttribute('aria-label'),'Statische Illustration');
+    await p.locator('#bhView').selectOption('environment');
+    assert(await toggle.isEnabled());
+    assert.equal(await toggle.getAttribute('data-paused'),'true');
+   }
+   if(id==='extreme'){
+    await toggle.press('Space');
+    assert.equal(await toggle.getAttribute('data-paused'),'false');
+    await p.locator('#geometryOn').check();
+    assert(await toggle.isDisabled());
+    assert.equal(await toggle.getAttribute('aria-label'),'Statische Illustration');
+    assert.equal(await p.locator('#extreme').getAttribute('data-animating'),'false');
+    await p.locator('[data-language=en]').click();
+    assert.equal(await toggle.getAttribute('aria-label'),'Static illustration');
+    await p.locator('#geometryOn').uncheck();
+    assert(await toggle.isEnabled());
+    assert.equal(await toggle.getAttribute('data-paused'),'false');
+    assert.match(await toggle.getAttribute('aria-label'),/pause/i);
+   }
   }
   await chooseLab(p,'blackhole');
   await p.emulateMedia({reducedMotion:'reduce'});
