@@ -12,7 +12,7 @@ const fits=(box,bounds)=>box.left>=bounds.left&&box.right<=bounds.right&&
 const overlaps=(a,b)=>a.left<b.right+inset&&a.right>b.left-inset&&
  a.top<b.bottom+inset&&a.bottom>b.top-inset;
 
-export function freeCreatureSpace(bounds,blockers,viewport,compact=false){
+export function freeCreatureSpace(bounds,blockers,viewport,compact=false,accept=()=>true){
  const frame={
   left:Math.max(bounds.left,viewport.left),right:Math.min(bounds.right,viewport.right),
   top:Math.max(bounds.top,viewport.top),bottom:Math.min(bounds.bottom,viewport.bottom),
@@ -20,19 +20,20 @@ export function freeCreatureSpace(bounds,blockers,viewport,compact=false){
  for(const [pose,width,height] of sizes){
   if(compact&&pose!=='peek')continue;
   if(frame.right-frame.left<width||frame.bottom-frame.top<height)continue;
-  const xs=[frame.right-width,frame.left,...blockers.flatMap(rect=>[rect.left-width-inset,rect.right+inset])];
+  const xs=[frame.right-width,frame.left,(frame.right+frame.left-width)/2,...blockers.flatMap(rect=>[rect.left-width-inset,rect.right+inset])];
   const ys=[frame.top,frame.bottom-height,...blockers.flatMap(rect=>[rect.bottom+inset,rect.top-height-inset])];
   for(const left of xs)for(const top of ys){
    const box={left,right:left+width,top,bottom:top+height};
    if(fits(box,frame)&&!blockers.some(rect=>overlaps(box,rect))){
-    return {x:left-bounds.left,y:top-bounds.top,width,height,pose};
+    const space={x:left-bounds.left,y:top-bounds.top,width,height,pose};
+    if(accept(space))return space;
    }
   }
  }
  return null;
 }
 
-export function headingSpace(doc,element,viewport,compact){
+export function headingSpace(doc,element,viewport,compact,accept){
  const bounds=element.getBoundingClientRect();
  if(!bounds.width||!bounds.height)return null;
  const blockers=[];
@@ -53,5 +54,5 @@ export function headingSpace(doc,element,viewport,compact){
    if(rect.width&&rect.height)blockers.push(rect);
   }
  }
- return freeCreatureSpace(bounds,blockers,viewport,compact);
+ return freeCreatureSpace(bounds,blockers,viewport,compact,accept);
 }

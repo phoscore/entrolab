@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -31,7 +32,7 @@ async function page(options={}){
   return {p,context,errors};
 }
 async function open(p){
-  await p.locator('[data-tab=explorer]').click();
+  await chooseLab(p,'explorer');
   await p.waitForFunction(()=>window.entrolabExplorer?.inspect().objectCount===22&&!window.entrolabExplorer.inspect().failed);
   await p.locator('#exCanvas').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>window.entrolabExplorer.inspect().groups.length>0);
@@ -97,8 +98,8 @@ test('Explorer browser: pointer anchor, keyboard, resize, idle and tab lifecycle
     assert.ok(Math.hypot(anchor[0][0]-anchor[1][0],anchor[0][1]-anchor[1][1])<1e-5);
     await canvas.press('ArrowRight');await canvas.press('Home');assert.equal((await inspect(p)).camera.zoom,0);
     await p.waitForTimeout(150);const draws=(await inspect(p)).draws;await p.waitForTimeout(180);assert.equal((await inspect(p)).draws,draws);
-    for(let i=0;i<10;i++){await p.locator('[data-tab=gravity]').click();await p.locator('[data-tab=explorer]').click();}
-    await p.locator('[data-tab=gravity]').click();await p.waitForTimeout(100);
+    for(let i=0;i<10;i++){await chooseLab(p,'gravity');await chooseLab(p,'explorer');}
+    await chooseLab(p,'gravity');await p.waitForTimeout(100);
     const closed=await inspect(p);assert.equal(closed.scheduled,false);assert.equal(closed.queued,0);assert.equal(closed.requests,0);
     await open(p);
     const spot=(await inspect(p)).groups.find(group=>group.ids.length===1);
@@ -132,7 +133,7 @@ test('Explorer browser: mobile pinch works on first contact, with no horizontal 
 test('Explorer browser: failed data is distinct from an empty search and retry recovers',async()=>{
   const {p,context}=await page();try{
     await p.route('**/explorer/data/**/manifest.json',route=>route.fulfill({status:503,body:'Unavailable'}));
-    await p.locator('[data-tab=explorer]').click();await p.waitForFunction(()=>window.entrolabExplorer?.inspect().failed);
+    await chooseLab(p,'explorer');await p.waitForFunction(()=>window.entrolabExplorer?.inspect().failed);
     assert.equal(await p.locator('#exError').isVisible(),true);
     await p.unroute('**/explorer/data/**/manifest.json');await p.locator('#exRetry').click();await p.waitForFunction(()=>window.entrolabExplorer.inspect().objectCount===22&&!window.entrolabExplorer.inspect().failed);
     await p.locator('#exSearch').fill('nonexistent-source');await p.waitForFunction(()=>document.querySelector('#exList').textContent.includes('Kein Treffer'));
@@ -242,7 +243,7 @@ test('Home & Systems: shared camera, model date, scaled radii, playback and sepa
     for(let i=0;i<3;i++){await p.locator('#exSolarMode').press('Enter');await p.locator('#exSkyMode').press('Enter');}
     assert.equal((await inspect(p)).solar.day,stopped.day);
     await openSolar(p);
-    await p.locator('[data-tab=gravity]').click();
+    await chooseLab(p,'gravity');
     assert.equal((await inspect(p)).solar.scheduled,false);
     assert.deepEqual(await physical(),before);
     assert.deepEqual(errors,[]);

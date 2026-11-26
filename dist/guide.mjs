@@ -8,6 +8,9 @@ export function initGuide(doc=globalThis.document){
  if(!glossary||!back)return null;
  const originalParent=back.parentNode,originalNext=back.nextSibling,win=doc.defaultView;
  const bound=new WeakSet(),cleanup=[];
+ const tabs=[...doc.querySelectorAll('[data-tab]')];
+ const tabFor=id=>tabs.find(tab=>tab.dataset.tab===id);
+ const activeTab=()=>doc.querySelector?.('[data-tab].active');
  const modelDestination=target=>doc.getElementById('matter')?.contains(target)?'matter':doc.getElementById('science')?.contains(target)?'science':null;
  const modelSlot=destination=>doc.getElementById(destination==='matter'?'matterReturnSlot':'knowledgeReturnSlot');
  let origin=null,kind='term',sourceTab=null,previousHash='',routing=false,disposed=false,coldTerm=false,suspendedTerm=null;
@@ -16,6 +19,9 @@ export function initGuide(doc=globalThis.document){
   if(!target?.isConnected||target.disabled||!target.getClientRects().length)return false;
   target.focus();if(doc.activeElement!==target)return false;
   target.scrollIntoView?.({block:'center'});return true;
+ }
+ function focusTab(tab){
+  return focusVisible(tab)||focusVisible(doc.getElementById('labMenu'));
  }
  function putBack(){if(originalParent&&back.parentNode!==originalParent){if(originalNext?.parentNode===originalParent)originalParent.insertBefore(back,originalNext);else originalParent.append(back)}}
  function label(){const key=origin&&(kind==='model'||sourceTab?.dataset.tab==='science')?'k.ui.return':'Zurück zum Labor';back.textContent=t(key)}
@@ -39,7 +45,7 @@ export function initGuide(doc=globalThis.document){
    if(resume){({origin,kind,sourceTab,previousHash,coldTerm}=resume);back.hidden=false}
   }
   label();
-  if(restore&&!focusVisible(previous)&&!focusVisible(doc.querySelector?.('[data-tab].active')))focusVisible(doc.getElementById('mainContent'));
+  if(restore&&!focusVisible(previous)&&!focusTab(activeTab()))focusVisible(doc.getElementById('mainContent'));
  }
  function open(link,mode='term'){
   const id=mode==='model'?link.dataset.modelLink:link.dataset.explain,target=doc.getElementById(id);
@@ -68,9 +74,11 @@ export function initGuide(doc=globalThis.document){
   if(!link||bound.has(link))return;
   if(open(link,link.dataset.modelLink?'model':'term'))e.preventDefault();
  });
- for(const tab of doc.querySelectorAll('[data-tab]'))listen(tab,'click',()=>{
+ for(const tab of tabs)listen(tab,'click',()=>{
   close(false);
-  if(!routing&&win?.location.hash&&/^(#model-|#guide-|#(?:gravity|blackhole|extreme|entropy|matter|science|temperature)$)/.test(win.location.hash))changeHash('#'+tab.dataset.tab,true);
+  if(!routing&&win?.location&&(!tab.classList.contains('active')||win.location.hash&&win.location.hash!=='#'+tab.dataset.tab)){
+   changeHash('#'+tab.dataset.tab);
+  }
  },true);
  listen(glossary,'toggle',()=>{if(kind==='term'&&!glossary.open)close(false)});
  listen(back,'click',()=>close());
@@ -82,13 +90,15 @@ export function initGuide(doc=globalThis.document){
   if(!win)return false;
   if(origin&&kind==='model'&&win.location.hash===previousHash){close();return true}
   let id;try{id=decodeURIComponent(win.location.hash.slice(1))}catch{return false}
-  if(!id||!/^[a-z][a-z0-9-]*$/.test(id))return false;
-  const tabs=['gravity','blackhole','extreme','entropy','matter','science'];
-  const target=doc.getElementById(id);
-  if(tabs.includes(id)){
-   close(false);activate(doc.querySelector('[data-tab="'+id+'"]'));focusVisible(doc.querySelector('[data-tab="'+id+'"]'));return true;
+  if(id&&!/^[a-z][a-z0-9-]*$/.test(id))return false;
+  const tab=tabFor(id||'gravity');
+  const target=id?doc.getElementById(id):null;
+  if(tab){
+   if(!id&&tab.classList.contains('active'))return true;
+   close(false);activate(tab);
+   if(id==='temperature'&&focusVisible(target))return true;
+   focusTab(tab);return true;
   }
-  if(id==='temperature'&&target){close(false);activate(doc.querySelector('[data-tab="extreme"]'));return focusVisible(target)}
   if(id.startsWith('guide-')&&target&&glossary.contains(target)){
    close(false);sourceTab=doc.querySelector?.('[data-tab].active');origin=sourceTab??glossary.querySelector?.(':scope > summary');kind='term';coldTerm=true;previousHash=sourceTab?'#'+sourceTab.dataset.tab:'';glossary.open=true;back.hidden=!origin;label();focusVisible(target);return true;
   }

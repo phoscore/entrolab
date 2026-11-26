@@ -1,5 +1,5 @@
 // Presentation-only route definitions; existing controls are observed, never applied.
-const config={gravity:['gravity','#scenario','change'],blackhole:['blackhole','#bhMass','change'],objects:['extreme','#comparisonMode','change'],temperature:['extreme','#kelvinInput','input'],markers:['entropy','#entropyStep','click'],science:['science','#model-gravity summary','click']};
+const config={gravity:['gravity','#scenario','change'],blackhole:['blackhole','#bhMass','change'],objects:['extreme','#comparisonMode','change'],temperature:['temperature','#kelvinInput','input'],markers:['entropy','#entropyStep','click'],science:['science','#model-gravity summary','click']};
 export const scienceActions=Object.freeze({
  chapter:'#science .knowledge-model > .knowledge-advanced > summary',
  term:'#science .knowledge-term-links [data-explain]'

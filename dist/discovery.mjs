@@ -1,3 +1,4 @@
+import {openLabChoices} from './lab-navigation.mjs';
 import {t,onLanguageChange} from './i18n.mjs';
 import {pathIds,pathSteps,scienceActions} from './discovery-paths.mjs';
 const $=id=>document.getElementById(id),box=$('quickStart');
@@ -20,7 +21,7 @@ function steps(){return route?pathSteps(route,quick):[]}
 function current(){return steps()[step]}
 function navigationTarget(s){const nav=document.querySelector('[data-tab="'+s.navigation+'"]');if(!nav?.classList.contains('active'))return nav;if(s.view&&$('thermalExperiment').hidden!==(s.view!=='thermal'))return document.querySelector('[data-entropy-view="'+s.view+'"]');return s.view?document.querySelector('[data-entropy-view="'+s.view+'"]'):nav}
 function target(){const s=current();if(!s)return null;
- const nav=route==='objects'||route==='temperature'?'extreme':route==='markers'||route==='thermal'?'entropy':route;
+ const nav=route==='objects'?'extreme':route==='markers'||route==='thermal'?'entropy':route;
  if(!$(nav)?.classList.contains('active'))return document.querySelector('[data-tab="'+nav+'"]');
  if((route==='markers'||route==='thermal')&&$('thermalExperiment').hidden!==(route!=='thermal'))return document.querySelector('[data-entropy-view="'+(route==='thermal'?'thermal':'particles')+'"]');
  return s.navigation?navigationTarget(s):document.querySelector(s.target);
@@ -38,7 +39,7 @@ function render(){
  put('discoveryLocate',t('v85.tour.locate'));highlight=target();if(visible(highlight))highlight.classList.add('discovery-highlight');box.dataset.step=String(step);box.dataset.done=String(done);box.dataset.route=route;
 }
 function move(delta){if(delta>0&&step===steps().length-1){$('helpClose').click();return}step=Math.max(0,Math.min(steps().length-1,step+delta));done=false;edited=false;render();$('discoveryLocate').focus()}
-$('discoveryLocate').onclick=()=>{const el=target();if(!el)return;for(let p=el.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS'&&!(el.tagName==='SUMMARY'&&p===el.parentElement))p.open=true;if(visible(el)){el.focus();el.scrollIntoView({block:'center',behavior:'auto'})}};
+$('discoveryLocate').onclick=()=>{const el=target();if(!el)return;const menu=$('labMenu');if(el.matches('[data-tab]')&&!visible(el)&&visible(menu))openLabChoices();for(let p=el.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS'&&!(el.tagName==='SUMMARY'&&p===el.parentElement))p.open=true;if(visible(el)){el.focus();el.scrollIntoView({block:'center',behavior:'auto'})}};
 $('discoveryNext').onclick=()=>{if(done)move(1)};
 $('discoveryRestart').onclick=()=>{if(route)begin(route,quick)};
 for(const id of ['helpToggle','helpClose'])$(id).addEventListener('click',()=>{if(id==='helpToggle'&&route)menu=false;render()});

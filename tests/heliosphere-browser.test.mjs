@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
@@ -50,7 +51,7 @@ async function contactSheet(page){
 }
 const restoredKeys=['view','day','space','camera','system','selected','reference','trails','galactic'];
 async function enter(p){
-  await click(p,'[data-tab=explorer]');
+  await chooseLab(p,'explorer');
   await click(p,'#exSolarMode');
   await canvas(p).scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>window.entrolabExplorer.inspect().solar.markers.length>=9);

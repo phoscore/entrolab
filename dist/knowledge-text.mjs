@@ -165,8 +165,8 @@ const messages={
     "Temperature describes a thermal state, not a system’s total energy on its own."
   ],
   "k.term.temperature.long": [
-    "Menge, Stoff und Zustand sind zusätzlich wichtig. Das Extreme Temperature Lab vergleicht Skalen; es löst weder Materialphasen noch Plasma- oder Gasdynamik.",
-    "Amount, material and state also matter. Extreme Temperature Lab compares scales; it solves neither material phases nor plasma or gas dynamics."
+    "Menge, Stoff und Zustand sind zusätzlich wichtig. Das Extemp-lab vergleicht Skalen; es löst weder Materialphasen noch Plasma- oder Gasdynamik.",
+    "Amount, material and state also matter. Extemp-lab compares scales; it solves neither material phases nor plasma or gas dynamics."
   ],
   "k.term.heat.label": [
     "Wärme",

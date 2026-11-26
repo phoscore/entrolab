@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 // Real Chromium regression suite. Dev dependency only; the application stays buildless.
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
@@ -60,7 +61,7 @@ test('browser P2: fresh EN placement labels, instrument sentence and custom vali
   assert.equal(await page.locator('#add').textContent(),'＋ Place a body');await page.locator('.adding-options > summary').click();await page.locator('#add').click();assert.equal(await page.locator('#add').textContent(),'✕ Cancel placement');
   await page.locator('[data-language=de]').click();assert.equal(await page.locator('#add').textContent(),'✕ Platzieren abbrechen');await page.keyboard.press('Escape');await page.locator('[data-language=en]').click();assert.equal(await page.locator('#add').textContent(),'＋ Place a body');
   await page.locator('.instruments > summary').click();assert.equal(await page.locator('#selectedDistance').textContent(),'1 AU from Sun');
-  await page.locator('[data-tab=blackhole]').click();await page.locator('#bhMass').fill('1e42');await page.locator('#bhSlider').focus();
+  await chooseLab(page,'blackhole');await page.locator('#bhMass').fill('1e42');await page.locator('#bhSlider').focus();
   for(const lang of ['de','en','de']){await page.locator('[data-language='+lang+']').click();assert.equal(await page.locator('#bhMass').evaluate(el=>el.validationMessage),await page.locator('#bhMassError').textContent());assert.equal(await page.locator('#bhMass').inputValue(),'1e42')}
  }finally{await context.close()}
 });
@@ -81,13 +82,13 @@ test('browser P3: confirming the active language persists and overrides a later 
 
 test('browser: schematic pulsar notice stays visible in focus and translates without model changes',async()=>{
  const {page,context}=await lab({locale:'en-GB',viewport:{width:390,height:844}});try{
-  await page.locator('[data-tab=extreme]').click();await page.locator('#extremeObject').selectOption('neutron');await page.locator('#pulsarOn').check();const radius=await page.locator('#extremeRadius').textContent();await page.locator('#extremeFocus').click();
+  await chooseLab(page,'extreme');await page.locator('#extremeObject').selectOption('neutron');await page.locator('#pulsarOn').check();const radius=await page.locator('#extremeRadius').textContent();await page.locator('#extremeFocus').click();
   assert.equal(await page.locator('#pulsarVisualNote').isVisible(),true);const noticeBox=await page.locator('#pulsarVisualNote').boundingBox(),canvasBox=await page.locator('#extremeCanvas').boundingBox();assert(noticeBox.y>=canvasBox.y&&noticeBox.y+noticeBox.height<=canvasBox.y+canvasBox.height,'notice is directly inside the animation area');assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematic/);assert.equal(await page.locator('#pulsarNote').isVisible(),false);await page.locator('[data-language=de]').click();assert.match(await page.locator('#pulsarVisualNote').textContent(),/schematisch/);assert.equal(await page.locator('#extremeRadius').textContent(),radius);await page.keyboard.press('Escape');await page.locator('#extremeObject').selectOption('white');assert.equal(await page.locator('#pulsarVisualNote').isVisible(),false);
  }finally{await context.close()}
 });
 
 test('browser: real media-query emulation and application scripts produce no page errors',async()=>{
- const {page,context}=await lab();try{assert.equal(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches),true);assert.equal((await state(page)).paused,true);await page.locator('[data-tab=extreme]').click();assert.equal(await page.locator('#extreme').getAttribute('data-animating'),'false');assert.deepEqual(errors,[])}finally{await context.close()}
+ const {page,context}=await lab();try{assert.equal(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches),true);assert.equal((await state(page)).paused,true);await chooseLab(page,'extreme');assert.equal(await page.locator('#extreme').getAttribute('data-animating'),'false');assert.deepEqual(errors,[])}finally{await context.close()}
 });
 
 test('Gravity trail integrity at identical frame times, with real before and after Canvas screenshots',async()=>{

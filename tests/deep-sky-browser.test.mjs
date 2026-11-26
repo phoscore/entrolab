@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
@@ -21,7 +22,7 @@ const network=p=>p.evaluate(path=>performance.getEntriesByType('resource').filte
   path:new URL(e.name).pathname.split(path)[1], decoded:e.decodedBodySize,
 })), '/'+DESI_RELEASE+'/');
 async function open(p) {
-  await p.locator('[data-tab=explorer]').click();
+  await chooseLab(p,'explorer');
   await p.locator('#exCanvas').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>window.entrolabExplorer?.inspect().atlas.total===50635);
 }

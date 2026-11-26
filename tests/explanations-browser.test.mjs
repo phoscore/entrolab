@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
@@ -7,7 +8,7 @@ import {browserHarness,physical} from './v08-browser-harness.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
 after(async()=>{if(h){await writeFile(resolve(h.output,'v08-questions-measurements.json'),JSON.stringify({measurements:h.measurements,errors:h.errors},null,2));await h.close()}});
-async function select(p,id){await p.locator('[data-tab="'+({objects:'extreme',temperature:'extreme',markers:'entropy',thermal:'entropy'}[id]??id)+'"]').click();if(['markers','thermal'].includes(id))await p.locator('[data-entropy-view="'+(id==='markers'?'particles':'thermal')+'"]').click()}
+async function select(p,id){await chooseLab(p,({objects:'extreme',markers:'entropy',thermal:'entropy'}[id]??id));if(['markers','thermal'].includes(id))await p.locator('[data-entropy-view="'+(id==='markers'?'particles':'thermal')+'"]').click()}
 test('v0.8 browser: all six questions and predictions are voluntary; check, reveal, Escape and locate preserve models/drafts',async()=>{
  const {p,context}=await h.lab();try{
   await p.waitForFunction(()=>window.entrolabExplanations);

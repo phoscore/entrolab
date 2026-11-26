@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
@@ -26,7 +27,7 @@ const traffic=p=>p.evaluate(root=>performance.getEntriesByType('resource').filte
   path:new URL(e.name).pathname.split(root)[1], bytes:e.decodedBodySize,
 })),rootPath);
 async function explorer(p) {
-  await p.locator('[data-tab=explorer]').click();
+  await chooseLab(p,'explorer');
   await p.waitForFunction(()=>window.entrolabExplorer?.inspect().atlas.total===50635);
 }
 async function enter(p) {

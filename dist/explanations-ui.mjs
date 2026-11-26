@@ -5,7 +5,7 @@ import {t,onLanguageChange} from './i18n.mjs';
 const instances=new WeakMap();
 export function initExplanations(doc=globalThis.document){
  if(instances.has(doc))return instances.get(doc);
- const anchors={gravity:'#gravity .page-heading h1',blackhole:'#blackhole .page-heading h1',objects:'#extreme .page-heading h1',temperature:'.thermal-lab .extreme-section-heading h2'};
+ const anchors={gravity:'#gravity .page-heading h1',blackhole:'#blackhole .page-heading h1',objects:'#extreme .page-heading h1',temperature:'#temperature .page-heading h1'};
  const cleanup=[],owned=[],views=[];let disposed=false;
  const node=(tag,key,cls)=>{const e=doc.createElement(tag);if(cls)e.className=cls;if(key){e.dataset.i18n=key;e.textContent=t(key)}return e};
  const listen=(e,type,fn)=>{e.addEventListener(type,fn);cleanup.push(()=>e.removeEventListener(type,fn))};
@@ -31,7 +31,7 @@ export function initExplanations(doc=globalThis.document){
   const locate=node('button','k.question.ui.locate','secondary');locate.type='button';locate.dataset.locateContext=q.id;
   const link=node('a','k.ui.model','knowledge-model-link');link.id='question-model-'+q.id;link.href='#'+modelById[q.model].target;link.dataset.modelLink=modelById[q.model].target;
   const locateStatus=node('p');locateStatus.setAttribute('role','status');
-  content.append(locate,link,locateStatus);details.append(content);anchor.after(details);owned.push(details);
+  content.append(locate,link,locateStatus);details.append(content);if(['gravity','blackhole','objects','temperature'].includes(q.id))anchor=anchor.parentElement.querySelector('.lab-tagline')??anchor;anchor.after(details);owned.push(details);
   const state={feedback:null,unavailable:false};
   function render(){status.textContent=state.feedback?t('k.question.ui.'+state.feedback):'';locateStatus.textContent=state.unavailable?t('k.question.ui.unavailable'):''}
   listen(check,'click',()=>{const selected=radios.find(x=>x.checked);state.feedback=!selected?'choose':selected.value===q.correct?'correct':'incorrect';answer.hidden=!selected;render()});

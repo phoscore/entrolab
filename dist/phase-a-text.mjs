@@ -19,7 +19,7 @@ export const phaseA = {
  'v0925.escape': ['Fluchtgeschwindigkeit an der Oberfläche','Surface escape speed'],
  'v0925.illustration': ['Künstlerische Darstellung','Artist’s impression'],
  'v0925.displayLimits': ['Maßstab und Bildgrenzen','Scale and image limitations'],
- 'v0925.bhLab': ['Horizont und Gezeiten im Black Hole Lab untersuchen','Explore the horizon and tides in the Black Hole Lab'],
+ 'v0925.bhLab': ['Horizont und Gezeiten in Singularities untersuchen','Explore the horizon and tides in Singularities'],
  'v0925.logRadius': ['Logarithmische Skala. Gleiche Abstände stehen für gleiche Radiusverhältnisse. Jeder Balken verwendet denselben kleinsten und größten Radius als Endpunkte.','Logarithmic scale. Equal distances represent equal radius ratios. Each bar uses the same minimum and maximum radii as its endpoints.'],
  'v0925.wolf.density': ['Keine mittlere Dichte aus R★ abgeleitet. Die gewählte optische Tiefe definiert eine Modellgrenze im Wind.','No mean density derived from R★. The chosen optical depth defines a model boundary in the wind.'],
  'v0925.temp': ['Effektive Temperatur','Effective temperature'],

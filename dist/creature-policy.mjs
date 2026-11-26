@@ -15,7 +15,14 @@ export function creatureRandom(seed){
  };
 }
 
-export const CREATURE_COOLDOWN=8000;
+export const CREATURE_COOLDOWN=24000;
+export const CREATURE_PLACE_REST=56000;
+
+export function repeatsPlace(candidate,previous){
+ if(candidate.id!==previous.id)return false;
+ if(candidate.id==='guide')return true;
+ return Math.hypot(candidate.x-previous.x,candidate.y-previous.y)<72;
+}
 
 export function restDelay(random,first=false){
  return Math.round(first?6000+random()*6000:13000+random()*19000);
@@ -38,8 +45,8 @@ export function planAppearance(random,{reason,room=false}={}){
    roll<.79?'disturbed':roll<.91?'observer':'peek';
  }
  const length=random();
- const duration=sequence==='gamma'?4300:sequence==='peek'?Math.round(2300+length*1100):
-  ['suspicious','satisfied','disturbed'].includes(sequence)?Math.round(3250+length*1100):
+ const duration=sequence==='gamma'?4300:sequence==='peek'?Math.round(3800+length*1100):
+  ['suspicious','satisfied','disturbed'].includes(sequence)?Math.round(4400+length*1100):
    Math.min(7900,Math.round(4900+length*3000));
  return {sequence,duration};
 }
