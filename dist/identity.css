@@ -1,0 +1,121 @@
+/* Lab identity decorates the shell. Model colours remain in their own styles. */
+:is(#gravity,[data-tab=gravity],[data-current=gravity]) { --lab-accent:#cbb2ff; --lab-hue:0deg }
+:is(#blackhole,[data-tab=blackhole],[data-current=blackhole]) { --lab-accent:#eba7ae; --lab-hue:98deg }
+:is(#extreme,[data-tab=extreme],[data-current=extreme]) { --lab-accent:#e7c380; --lab-hue:162deg }
+:is(#temperature,[data-tab=temperature],[data-current=temperature]) { --lab-accent:#efb391; --lab-hue:135deg }
+:is(#entropy,[data-tab=entropy],[data-current=entropy]) { --lab-accent:#b9b5ff; --lab-hue:-21deg }
+:is(#matter,[data-tab=matter],[data-current=matter]) { --lab-accent:#96d9d0; --lab-hue:-97deg }
+:is(#explorer,[data-tab=explorer],[data-current=explorer]) { --lab-accent:#a0c7fc; --lab-hue:-51deg }
+:is(#science,[data-tab=science],[data-current=science]) { --lab-accent:#c4d1e1; --lab-hue:-48deg; --lab-saturation:.42 }
+.site-header {
+ display:grid; grid-template-columns:minmax(0,1fr) auto;
+ grid-template-areas:"brand languages" "navigation navigation";
+ gap:.45rem 1rem; min-height:0; padding:.65rem clamp(.8rem,3vw,2.65rem); align-items:center;
+}
+.site-header .brand {
+ grid-area:brand; display:flex; align-items:center; justify-self:start; gap:.5rem;
+ font-size:clamp(.93rem,1.5vw,1.23rem); line-height:1.17;
+}
+.site-header .logo {
+ box-sizing:border-box; display:grid; place-items:center; flex:none; width:1.02em; height:1.02em;
+ margin:0; font-size:1em; color:var(--accent); border:1px solid currentColor; border-radius:50%;
+}
+.site-header .logo::after { content:""; width:64%; aspect-ratio:1; border-radius:50%; background:currentColor }
+.site-header .brand small { margin:0; padding:.14rem .24rem; font-size:.63rem; line-height:1.1 }
+.site-header .header-tools { grid-area:languages; margin:0; width:auto; justify-self:end }
+.site-header .language-switch {
+ overflow:visible; border-color:transparent; gap:.1rem;
+}
+.site-header .language-switch button {
+ display:grid; place-items:center; padding:0; background:transparent;
+ color:#bfb6d0; font-size:.72rem; min-height:44px; min-width:44px;
+ border:1px solid transparent; border-radius:.38rem;
+}
+.site-header .language-switch button[aria-pressed=true] {
+ border-color:#4b3e60; background:#201a2a; color:#f1e8ff;
+}
+.site-header #labNavigation {
+ grid-area:navigation; display:block; width:auto; min-width:0;
+}
+.lab-menu { display:none }
+.lab-choices { display:flex; align-items:stretch; justify-content:center; gap:.18rem }
+.site-header #labChoices .tab {
+ flex:1; display:block; align-content:center; margin:0; padding:.4rem .45rem;
+ border:1px solid transparent; border-radius:.45rem; background:#12121d;
+ color:#c7c4d2; line-height:1.25; min-width:0; min-height:44px; font-size:.79rem;
+}
+.site-header #labChoices .tab:not(.active):hover { background:#201c2d; color:#f4effc }
+.site-header #labChoices .tab.active,.site-header .lab-menu {
+ border-color:color-mix(in srgb,var(--lab-accent) 43%,#1e2230);
+ background:color-mix(in srgb,var(--lab-accent) 10%,#11121e); color:var(--lab-accent);
+}
+.site-header button:focus-visible,.motion-toggle:focus-visible {
+ outline:2px solid var(--lab-accent,#d5c5f1); outline-offset:2px;
+}
+.page-heading:has(.lab-title) {
+ margin:0 0 1.15rem; padding:.34rem .75rem .64rem;
+ box-shadow:inset 2px 0 color-mix(in srgb,var(--lab-accent) 52%,#191c29);
+ gap:.35rem 1rem; align-items:start;
+}
+.page-heading .lab-title {
+ color:#f6f2fb; font-size:clamp(1.65rem,4vw,2.9rem);
+ line-height:1.1; margin:0 0 .38rem; overflow-wrap:anywhere;
+}
+.page-heading .lab-tagline {
+ color:var(--lab-accent); font:500 clamp(.9rem,1.4vw,1.06rem)/1.45 "Space Grotesk",system-ui,sans-serif;
+ margin:0 0 .32rem;
+}
+.lab-tagline-copy { display:inline }
+.lab-tagline-copy .lab-symbol {
+ display:inline-block; width:1.22em; height:1.22em; margin-inline-start:.22em;
+ vertical-align:-.23em; filter:hue-rotate(var(--lab-hue,0deg)) saturate(var(--lab-saturation,1));
+}
+.page-heading:has(.lab-title) p:not(.lab-tagline) { font-size:.86rem; line-height:1.5; max-width:63ch }
+.page-heading:has(.lab-title) .badge { border-color:color-mix(in srgb,var(--lab-accent) 38%,#1e2230) }
+#temperature.thermal-lab { margin-top:0; border-top:0 }
+#temperature .thermal-layout { margin-bottom:1.2rem }
+.object-image-frame,.bh-image-frame { position:relative }
+.object-stage .stage-caption { z-index:2 }
+.motion-toggle {
+ position:absolute; z-index:1; inset:auto .5rem .5rem auto;
+ display:grid; place-items:center; inline-size:44px; block-size:44px; padding:0; margin:0;
+ background:transparent; border:0; border-radius:.38rem; color:#f4ebfb;
+}
+.motion-toggle::before {
+ content:""; grid-area:1/1; width:29px; height:29px; border-radius:.42rem;
+ background:#10111de8; border:1px solid color-mix(in srgb,var(--lab-accent) 44%,#292535);
+}
+.motion-toggle::after { content:""; grid-area:1/1; z-index:1; width:12px; height:13px; background:currentColor }
+.motion-toggle[data-paused=true]::after { clip-path:polygon(15% 0,100% 50%,15% 100%) }
+.motion-toggle[data-paused=false]::after { clip-path:polygon(0 0,34% 0,34% 100%,0 100%,0 0,66% 0,100% 0,100% 100%,66% 100%) }
+.motion-toggle:disabled { opacity:.65 }
+.motion-toggle:hover:not(:disabled)::before { background:#262239 }
+@media (min-width:1240px) {
+ .site-header { grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"brand navigation languages" }
+}
+@media (max-width:760px) {
+ .site-header { padding:.38rem .8rem .55rem; column-gap:.35rem }
+ .site-header .brand { gap:.35rem; font-size:clamp(.82rem,3.55vw,1.04rem) }
+ .site-header .brand small { font-size:.56rem; padding:.12rem; align-self:center }
+ .site-header .language-switch { gap:0 }
+ .site-header .language-switch button { min-width:44px; font-size:.68rem }
+ .site-header .lab-menu {
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; min-height:44px; margin:0; padding:.4rem .68rem;
+  border-width:1px; border-style:solid; border-radius:.48rem; font-size:.92rem; font-weight:650;
+  text-align:left; line-height:1.2;
+ }
+ .lab-menu-icon { width:.52em; height:.52em; border:solid currentColor; border-width:0 2px 2px 0; transform:rotate(45deg); margin:.1rem .16rem .3rem .55rem }
+ .lab-menu[aria-expanded=true] .lab-menu-icon { transform:rotate(225deg); margin-block:.3rem .1rem }
+ .lab-choices { display:none }
+ .lab-menu[aria-expanded=true]+.lab-choices {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.2rem;
+  margin-top:.3rem; padding:.27rem; background:#100e1a; border:1px solid #332d45; border-radius:.45rem;
+ }
+ .site-header #labChoices .tab { text-align:left; font-size:.8rem; padding-inline:.5rem }
+}
+@media (max-width:370px) {
+ .site-header .brand { display:grid; grid-template-columns:auto minmax(0,1fr); gap:.1rem .34rem }
+ .site-header .logo { grid-row:1; }
+ .site-header .brand small { grid-column:2; justify-self:start }
+}

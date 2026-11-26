@@ -12,7 +12,7 @@ export function initGasView(doc = globalThis.document) {
  if (instances.has(doc)) return instances.get(doc);
  const root = doc.getElementById('gasExperiment');
  if (!root) return null;
- const win = doc.defaultView, view = doc.getElementById('extreme');
+ const win = doc.defaultView, view = doc.getElementById('temperature');
  const motion = win.matchMedia('(prefers-reduced-motion: reduce)');
  const cleanup = [];
  root.innerHTML = `<section class="panel gas-lab" aria-labelledby="gasTitle">

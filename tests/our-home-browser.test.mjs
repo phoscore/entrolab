@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -39,7 +40,7 @@ async function open(site,width,reduced=true){
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));await page.goto(site.url);
-  await page.locator('[data-tab=explorer]').click();
+  await chooseLab(page,'explorer');
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>window.entrolabExplorer?.inspect().atlas?.status==='density');
   return {page,context,errors};

@@ -1,4 +1,4 @@
-import {language, onLanguageChange} from '../i18n.mjs';
+import {language, localizeTree, onLanguageChange} from '../i18n.mjs';
 import {translate, number, measurement, objectName} from './text.mjs';
 import {loadCatalog, makeLoader, loadSky, findObjects, DATA_URL} from './catalog.mjs';
 import {homeCamera, cameraScale, screenPoint, worldPoint, project, unproject, centerObject, visibleGroups, hitGroup, skyViewport, niceStep, MAX_ZOOM} from './camera.mjs';
@@ -19,7 +19,7 @@ export function mountExplorer(root) {
     return el;
   };
   root.innerHTML = `
-    <div class="ex-heading" data-null-anchor="explorer"><div><p class="ex-kicker" data-ex="subtitle"></p><h1>Cosmic Explorer</h1><p data-ex="intro"></p></div></div>
+    <div class="page-heading" data-null-anchor="explorer"><div><h1 id="heading-explorer" class="lab-title" tabindex="-1"><span data-i18n="identity.explorer">Cosmic Explorer</span></h1><p class="lab-tagline"><span class="lab-tagline-copy"><span data-i18n="identity.explorer.line">Ziemlich viel Nichts da draußen.</span> <img class="lab-symbol" src="rules-null.svg" width="24" height="24" alt="" aria-hidden="true"></span></p><p data-ex="intro"></p></div></div>
     <div class="ex-mode-bar" role="group" aria-label="Cosmic Explorer">
       <button type="button" id="exSkyMode" data-ex="skyMode" aria-pressed="true" aria-controls="exSkyPanel"></button>
       <button type="button" id="exSolarMode" data-ex="solarMode" aria-pressed="false" aria-controls="exSolarPanel"></button>
@@ -81,6 +81,7 @@ export function mountExplorer(root) {
   const desi = mountDesi(root,{listen,t,n,invalidate,project,onInspector:showInspector,onSelect:selectDesi,onCenter:centerCatalogue});
 
   function localize() {
+    localizeTree(root.querySelector('[data-null-anchor="explorer"]'));
     for (const el of root.querySelectorAll('[data-ex]')) el.textContent = t(el.dataset.ex);
     canvas.setAttribute('aria-label', `${t('map')}. ${t('help')}`);
     $('exControls').setAttribute('aria-label', t('camera'));

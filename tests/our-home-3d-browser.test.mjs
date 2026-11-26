@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -30,7 +31,7 @@ async function open(width,reduced=true){
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
   const page=await context.newPage(),errors=[];
   page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(url);await page.locator('[data-tab=explorer]').click();
+  await page.goto(url);await chooseLab(page,'explorer');
   await page.locator('#exSolarMode').click();
   await page.locator('#solCanvas').scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>window.entrolabExplorer?.inspect().solar?.markers.length===9);

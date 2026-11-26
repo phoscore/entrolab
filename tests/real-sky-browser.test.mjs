@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -44,7 +45,7 @@ const snapshot=page=>page.evaluate(()=>window.entrolabExplorer.inspect());
 const atlas=async page=>(await snapshot(page)).atlas;
 const calm=page=>page.waitForFunction(()=>{const s=window.entrolabExplorer.inspect();return !s.scheduled&&s.atlas.requests===0&&s.atlas.status!=='loading';});
 async function open(page) {
-  await page.locator('[data-tab=explorer]').click();
+  await chooseLab(page,'explorer');
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.atlas.status==='density'&&s.atlas.visible===50635&&s.objectCount===22&&s.groups.length>0;});
 }
@@ -128,7 +129,7 @@ test('Real Sky integrity failures, delayed tile requests and mode abort keep the
   const hold=new Promise(resolve=>{release=resolve;});
   try {
     await page.route(densityPattern,route=>route.fulfill({status:200,body:Buffer.alloc(196620)}));
-    await page.locator('[data-tab=explorer]').click();
+    await chooseLab(page,'explorer');
     await page.locator('#exCanvas').scrollIntoViewIfNeeded();
     await page.waitForFunction(()=>window.entrolabExplorer?.inspect().atlas.status==='error'&&window.entrolabExplorer.inspect().objectCount===22);
     assert.match(await page.locator('#exAtlasStatus').innerText(),/nicht geladen oder verifiziert/);
@@ -233,11 +234,11 @@ test('Real Sky desktop and 390/320 px Canvas evidence with at least 100 camera/l
       }
       let lifecycle=0;
       for (let i=0;i<6;i++) {
-        await page.locator('[data-tab=gravity]').click();lifecycle++;
+        await chooseLab(page,'gravity');lifecycle++;
         const gone=await snapshot(page);
         assert.equal(gone.scheduled,false);
         assert.equal(gone.atlas.cacheBytes,0);assert.equal(gone.atlas.queued,0);
-        await page.locator('[data-tab=explorer]').click();lifecycle++;
+        await chooseLab(page,'explorer');lifecycle++;
       }
       await page.locator('#exHome').press('Enter');await page.locator('#exCanvas').scrollIntoViewIfNeeded();await calm(page);
       // Let the final visibility/resize notifications and their one-shot frames settle.

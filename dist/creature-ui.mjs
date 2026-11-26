@@ -1,4 +1,4 @@
-import {CREATURE_COOLDOWN,creaturePolicy,creatureRandom,planAppearance,restDelay} from './creature-policy.mjs';
+import {CREATURE_COOLDOWN,CREATURE_PLACE_REST,repeatsPlace,creaturePolicy,creatureRandom,planAppearance,restDelay} from './creature-policy.mjs';
 import {creatureArt} from './creature-art.mjs';
 import {headingSpace} from './creature-places.mjs';
 import {t} from './i18n.mjs';
@@ -19,12 +19,13 @@ export function initCreature(doc=globalThis.document,options={}){
  const {clock=()=>win.performance.now(),schedule=(fn,ms)=>win.setTimeout(fn,ms),
   cancel=id=>win.clearTimeout(id)}=options;
  const random=options.random??creatureRandom(win.crypto?.getRandomValues(new Uint32Array(1))[0]);
+ const labMenu=doc.getElementById('labMenu');
  const motion=win.matchMedia('(prefers-reduced-motion: reduce)');
  const cleanup=[];
  let disposed=false;
  let pending=null,visit=null,first=true,visits=0,nextAllowed=0;
  let stage=null,context=null,preferLab=false,generation=0,reason=null;
- const pointers=new Set();
+ const pointers=new Set(),recent=[];
  let committedSelect=null;
  const slot=doc.createElement('span'),figure=doc.createElement('span');
  slot.className='null-slot';
@@ -69,18 +70,20 @@ export function initCreature(doc=globalThis.document,options={}){
   }
   return view??'';
  }
- function chooseStage(local=false){
+ function chooseStage(local=false,accept=()=>true){
   const area=context.split(':')[0],bounds=viewport();
+  const guideCandidate=()=>{
+   const spot=guideSpace();
+   return spot&&accept(spot)?spot:null;
+  };
   if(!local&&!preferLab&&area==='gravity'){
-   const welcome=guideSpace();
+   const welcome=guideCandidate();
    if(welcome)return welcome;
   }
-  for(const id of area==='extreme'?['temperature',area]:[area]){
-   const host=heading.get(id);
-   const space=host&&headingSpace(doc,host,bounds,bounds.right<=600);
-   if(space)return {id,host,...space};
-  }
-  return local?null:guideSpace();
+  const host=heading.get(area);
+  const space=host&&headingSpace(doc,host,bounds,bounds.right<=600,spot=>accept({id:area,...spot}));
+  if(space)return {id:area,host,...space};
+  return local?null:guideCandidate();
  }
  function place(next){
   stage=next;
@@ -101,7 +104,7 @@ export function initCreature(doc=globalThis.document,options={}){
  const policyFor=seen=>creaturePolicy({
   reduced:motion.matches,hidden:doc.hidden,seen,
   editing:pointers.size>0||doc.activeElement!==committedSelect&&!!doc.activeElement?.closest?.('input,select,textarea,[contenteditable]:not([contenteditable="false"])'),
-  focus:doc.body.classList.contains('has-focus'),guide:guide.open,
+  focus:doc.body.classList.contains('has-focus')||labMenu?.getAttribute('aria-expanded')==='true',guide:guide.open,
  });
  function clear(){
   generation++;
@@ -112,6 +115,7 @@ export function initCreature(doc=globalThis.document,options={}){
   figure.hidden=!sequence;
   if(sequence)figure.dataset.sequence=sequence;
   else figure.removeAttribute('data-sequence');
+  slot.toggleAttribute('data-edge',Boolean(visit&&sequence!=='gamma'&&figure.dataset.route==='edge'&&stage?.id!=='guide'&&stage.x+stage.width>=stage.host.clientWidth-12));
  }
  function stop(){
   clear();
@@ -130,19 +134,29 @@ export function initCreature(doc=globalThis.document,options={}){
  function next(){
   const plannedReason=reason;
   reason=null;
-  const candidate=policyFor(true).moving&&(chooseStage(!!plannedReason)||chooseStage());
-  if(!candidate){reconcile();return;}
+  if(!policyFor(true).moving){reconcile();return;}
+  const now=clock();
+  while(recent.length&&now-recent[0].started>=CREATURE_PLACE_REST)recent.shift();
+  const unused=spot=>!recent.some(last=>repeatsPlace(spot,last));
+  const candidate=plannedReason&&chooseStage(true,unused)||chooseStage(false,unused);
+  if(!candidate){
+   const earliest=recent[0]?.started+CREATURE_PLACE_REST;
+   if(chooseStage()&&earliest>now)wait(next,Math.max(1000,earliest-now));
+   else reconcile();
+   return;
+  }
   const welcome=first&&!preferLab&&context==='gravity';
   first=false;
-  const home=welcome&&candidate.id==='guide'?chooseStage(true):null;
+  const home=welcome&&candidate.id==='guide'?chooseStage(true,unused):null;
   const plan=planAppearance(random,{reason:plannedReason,room:candidate.pose==='hero'||home?.pose==='hero'});
   if(!plan){reconcile();return;}
   const destination=home?.pose==='hero'&&['gamma','glitch'].includes(plan.sequence)?home:candidate;
   place(destination);
-  const now=clock();
+  recent.push({id:destination.id,x:destination.x,y:destination.y,started:now});
   visit={...plan,started:now};
   nextAllowed=now+plan.duration+CREATURE_COOLDOWN;
   visits++;
+  figure.dataset.route=['edge','dip','rise'][(visits+Math.floor(plan.duration/137))%3];
   if(plan.sequence==='gamma')effectLabel.textContent=t('v0925.nullFiction');
   figure.style.setProperty('--null-visit',plan.duration+'ms');
   display(plan.sequence);
@@ -163,8 +177,13 @@ export function initCreature(doc=globalThis.document,options={}){
   const available=policyFor(true);
   const stateMayShow=available.moving||available.still;
   // Keep a visit at its chosen place until that place is no longer safe.
+  const currentPlace=spot=>spot.id===stage?.id&&spot.pose===stage.pose&&
+   (spot.id==='guide'||Math.abs(spot.x-stage.x)<.5&&Math.abs(spot.y-stage.y)<.5);
+  const retained=available.moving&&visit&&(chooseStage(true,currentPlace)||chooseStage(false,currentPlace));
+  if(retained)return;
+  if(visit)stop();
   const local=stateMayShow&&chooseStage(true);
-  const candidate=local&&(signal||reason||visit&&stage?.id===local.id)?local:stateMayShow&&chooseStage();
+  const candidate=local&&(signal||reason)?local:stateMayShow&&chooseStage();
   if(!candidate){stop();stage=null;return;}
   if(stage?.host!==candidate.host||stage.pose!==candidate.pose)stop();
   place(candidate);
@@ -218,7 +237,7 @@ export function initCreature(doc=globalThis.document,options={}){
   const control=event.target.closest?.('button,[data-explain]');
   if(!control)return;
   let signal;
-  if(control.matches('[data-tab]'))signal=control.dataset.tab;
+  if(control.matches('[data-tab].active'))signal=control.dataset.tab;
   else if(control.matches('[data-entropy-view],#entropyPlay,#entropyReset,#thermalPlay,#thermalReset'))signal='entropy';
   else if(control.matches('.ex-mode-bar button,#snOut,#snCenter,#solViewBar button,#solSystems button')){
    signal=control.matches('#exNeighborhoodMode,#solGalactic')?'scale':'explorer';
@@ -261,6 +280,7 @@ export function initCreature(doc=globalThis.document,options={}){
  for(const element of [doc.body,...views])stateObserver.observe(element,{attributes:true,attributeFilter:['class']});
  for(const button of doc.querySelectorAll('[data-entropy-view]'))stateObserver.observe(button,{attributes:true,attributeFilter:['aria-pressed']});
  stateObserver.observe(guide,{attributes:true,attributeFilter:['open']});
+ if(labMenu)stateObserver.observe(labMenu,{attributes:true,attributeFilter:['aria-expanded']});
  stateObserver.observe(doc.documentElement,{attributes:true,attributeFilter:['lang']});
  if(explorer)stateObserver.observe(explorer,{childList:true,attributes:true,attributeFilter:['class']});
  watchHeading(anchor);
@@ -276,7 +296,8 @@ export function initCreature(doc=globalThis.document,options={}){
  const controller={
   inspect:()=>disposed?inactive:{
    mounted:true,visible:!figure.hidden,moving:!!visit,sequence:figure.dataset.sequence??null,
-   visits,place:stage?.id??null,pose:stage?.pose??null,phase:phase(),queued:reason,context,subscriptions:cleanup.length,
+   visits,place:stage?.id??null,pose:stage?.pose??null,route:visit?figure.dataset.route:null,
+   coordinates:stage&&stage.id!=='guide'?[stage.x,stage.y]:null,phase:phase(),queued:reason,context,subscriptions:cleanup.length,
    observers:1+Number(!!observer)+Number(!!resize),
    timers:Number(pending!==null),figures:1,
   },

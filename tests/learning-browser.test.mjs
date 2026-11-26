@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
@@ -6,8 +7,8 @@ import {browserHarness,physical} from './v08-browser-harness.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
 after(async()=>{if(h){await writeFile(resolve(h.output,'v08-learning-measurements.json'),JSON.stringify({measurements:h.measurements,errors:h.errors},null,2));await h.close()}});
-async function particles(p){await p.locator('[data-tab=entropy]').click();await p.locator('[data-entropy-view=particles]').click();await p.waitForFunction(()=>window.entrolabLearning)}
-async function heat(p){await p.locator('[data-tab=entropy]').click();await p.locator('[data-entropy-view=thermal]').click()}
+async function particles(p){await chooseLab(p,'entropy');await p.locator('[data-entropy-view=particles]').click();await p.waitForFunction(()=>window.entrolabLearning)}
+async function heat(p){await chooseLab(p,'entropy');await p.locator('[data-entropy-view=thermal]').click()}
 test('v0.8 browser: independent N=4 example updates exact patterns without RNG/model mutations and retains keyboard focus',async()=>{
  const {p,context}=await h.lab();try{
   await particles(p);const before=await physical(p);assert.equal(await p.locator('#microstateDemo').getAttribute('open'),null);

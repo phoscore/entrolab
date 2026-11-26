@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
@@ -12,7 +13,7 @@ const solar=page=>page.evaluate(()=>window.entrolabExplorer.inspect().solar);
 const press=(page,selector)=>page.locator(selector).click();
 const canvas=page=>page.locator('#solCanvas');
 async function enter(page){
-  await press(page,'[data-tab=explorer]');
+  await chooseLab(page,'explorer','Enter');
   await press(page,'#exSolarMode');
   await canvas(page).scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>window.entrolabExplorer?.inspect().solar?.markers.length>=9);

@@ -4,15 +4,14 @@ import {length,scientific,number} from './display.mjs';
 import {compactObject,kelvinToCelsius,celsiusToKelvin,logTemperature,temperatureAt,comparisonPosition} from './extreme-data.mjs';
 import {extremeKinds,extremeExample,extremeExplanation,hasStellarExample} from './stellar-examples.mjs';
 import {drawStellarExample} from './stellar-art.mjs';
-import {drawObject,drawThermal} from './extreme-render.mjs';
+import {drawObject} from './extreme-render.mjs';
 const temperatureListeners=new Set();
 let temperaturePreset=null;
 const $=id=>document.getElementById(id),root=$('extreme');
-const abstractTemperature=$('thermalCanvas');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const compactViewport=matchMedia('(max-width:600px)');
 const state={kind:'blackhole',mass:10*C.sun,k:.1,disk:true,geometry:false,pulsar:false,angle:22,zoom:1,quality:compactViewport.matches?'low':'high',speed:1,paused:reduced.matches,exhibit:true};
-let raf=null,previous=null,nextDraw=null,time=0,rendered=0,objectSeen=true,thermalSeen=!!abstractTemperature;
+let raf=null,previous=null,nextDraw=null,time=0,rendered=0,objectSeen=true;
 // Celsius conversion subtracts numbers near 273 K: allow their rounding error only in this UI boundary.
 const sliderMinimumTolerance=2*Number.EPSILON*273.15;
 const decimal=n=>n.toLocaleString(locale(),{maximumFractionDigits:3,minimumFractionDigits:3,useGrouping:false});
@@ -103,12 +102,16 @@ function refresh(keepMass=false){
  $('hawkingReadout').textContent=state.kind==='blackhole'?
   tx`Hawking-Temperatur: ${scientific(b.hawking,'K')} – theoretische Strahlungstemperatur für entfernte Beobachter, keine gewöhnliche Materialtemperatur und nicht die Temperatur der illustrierten Scheibe.`:
   b.kind==='wolf'?t('v0925.wolf.density'):t('Dichte ist M/(4πR³/3): sphärische Volumennäherung, keine lokale Dichte oder Zustandsgleichung. Leuchten ist illustrativ.');
- $('extremePlay').textContent=state.paused?t('Animation starten'):t('Animation pausieren');
+ const button=$('extremePlay'),moving=canAnimate();
+ button.disabled=!moving;
+ button.dataset.paused=String(state.paused||!moving);
+ button.setAttribute('aria-label',t(!moving?'identity.staticIllustration':state.paused?'Animation starten':'Animation pausieren'));
  $('extremeStatus').textContent=state.geometry&&state.kind==='blackhole'?t('SCHEMATISCHE SCHWARZSCHILD-GEOMETRIE'):t('v0925.illustration');
  describeObject(b);comparison();paint();sync();
 }
-function paint(){const paintStart=performance.now();if(!root.classList.contains('active')||document.hidden||!(objectSeen||thermalSeen))return;if(objectSeen)(hasStellarExample(state.kind)?drawStellarExample:drawObject)($('extremeCanvas'),state,time);if(thermalSeen)drawThermal(abstractTemperature,state.k,time,state.quality);rendered++;root.dataset.rendered=String(rendered);root.dataset.paintMs=(performance.now()-paintStart).toFixed(3)}
-function active(){return root.classList.contains('active')&&!document.hidden&&(thermalSeen||objectSeen&&(state.kind!=='blackhole'||state.disk&&!state.geometry))&&!state.paused}
+function paint(){const paintStart=performance.now();if(!root.classList.contains('active')||document.hidden||!objectSeen)return;(hasStellarExample(state.kind)?drawStellarExample:drawObject)($('extremeCanvas'),state,time);rendered++;root.dataset.rendered=String(rendered);root.dataset.paintMs=(performance.now()-paintStart).toFixed(3)}
+function canAnimate(){return state.kind!=='blackhole'||state.disk&&!state.geometry}
+function active(){return root.classList.contains('active')&&!document.hidden&&objectSeen&&canAnimate()&&!state.paused}
 function sync(){if(raf!==null){cancelAnimationFrame(raf);raf=null}previous=null;nextDraw=null;if(active())raf=requestAnimationFrame(tick);root.dataset.animating=String(active())}
 function tick(now){
  raf=null;
@@ -123,7 +126,7 @@ function tick(now){
  }
  raf=requestAnimationFrame(tick);
 }
-function temperature(k,editing=null,preserveError=false,preset=null){if(!Number.isFinite(k)||k<0||k>1e12){$('temperatureError').textContent=t('Gültiger Laborbereich: 0 bis 10¹² Kelvin. Eingabe wurde nicht übernommen.');return false}if(!preserveError){$('temperatureError').textContent='';temperaturePreset=preset}state.k=k;$('temperatureTransferValue').value=String(k);if(editing!=='kelvin'&&editing!=='both')$('kelvinInput').value=k;if(editing!=='celsius'&&editing!=='both')$('celsiusInput').value=Number(kelvinToCelsius(k).toFixed(3));$('kelvinReadout').textContent=scientific(k,'K');$('celsiusReadout').textContent=decimal(kelvinToCelsius(k))+' °C';$('temperatureSlider').value=k===0?-3:Math.max(-3,Math.log10(k));$('zeroNote').textContent=k===0?t('0 K: theoretischer absoluter Nullpunkt, außerhalb der Logskala. Keine Aussage, dass Quantenbewegung aufhört.'):k<.001-sliderMinimumTolerance?t('Unterhalb des Sliderbereichs (0,001 K); direkte Eingabe bleibt gültig.'):t('Logskala 10⁻³ bis 10¹² K; Beispiele sind unterschiedliche physikalische Situationen, keine universelle Stoffskala.');paint();for(const fn of temperatureListeners)fn();return true}
+function temperature(k,editing=null,preserveError=false,preset=null){if(!Number.isFinite(k)||k<0||k>1e12){$('temperatureError').textContent=t('Gültiger Laborbereich: 0 bis 10¹² Kelvin. Eingabe wurde nicht übernommen.');return false}if(!preserveError){$('temperatureError').textContent='';temperaturePreset=preset}state.k=k;$('temperatureTransferValue').value=String(k);if(editing!=='kelvin'&&editing!=='both')$('kelvinInput').value=k;if(editing!=='celsius'&&editing!=='both')$('celsiusInput').value=Number(kelvinToCelsius(k).toFixed(3));$('kelvinReadout').textContent=scientific(k,'K');$('celsiusReadout').textContent=decimal(kelvinToCelsius(k))+' °C';$('temperatureSlider').value=k===0?-3:Math.max(-3,Math.log10(k));$('zeroNote').textContent=k===0?t('0 K: theoretischer absoluter Nullpunkt, außerhalb der Logskala. Keine Aussage, dass Quantenbewegung aufhört.'):k<.001-sliderMinimumTolerance?t('Unterhalb des Sliderbereichs (0,001 K); direkte Eingabe bleibt gültig.'):t('Logskala 10⁻³ bis 10¹² K; Beispiele sind unterschiedliche physikalische Situationen, keine universelle Stoffskala.');for(const fn of temperatureListeners)fn();return true}
 $('pulsarOn').onchange=()=>{state.pulsar=$('pulsarOn').checked;refresh()};$('extremeCenter').onclick=()=>{state.zoom=1;state.angle=22;$('extremeZoom').value=1;$('extremeAngle').value=22;paint()};
 $('extremeObject').onchange=()=>{state.kind=$('extremeObject').value;refresh()};
 function massInput(keep=false){const m=Number($('extremeMass').value);try{compactObject('blackhole',m);state.mass=m;$('massError').textContent='';refresh(keep)}catch{$('massError').textContent=t('Masse muss endlich sein: 1 bis 10⁴¹ kg. Bisheriger Wert bleibt aktiv.')}}
@@ -132,7 +135,7 @@ document.querySelectorAll('[data-extreme-mass]').forEach(b=>b.onclick=()=>{state
 $('diskOn').onchange=()=>{state.disk=$('diskOn').checked;refresh()};$('geometryOn').onchange=()=>{state.geometry=$('geometryOn').checked;refresh()};$('extremeAngle').oninput=()=>{state.angle=Number($('extremeAngle').value);paint()};$('extremeZoom').oninput=()=>{state.zoom=Number($('extremeZoom').value);paint()};$('extremeSpeed').oninput=()=>{state.speed=Number($('extremeSpeed').value)};$('extremePlay').onclick=()=>{state.paused=!state.paused;refresh()};$('comparisonMode').onchange=comparison;
 $('extremeToBlackHole').onclick=()=>{
  const tab=document.querySelector('[data-tab="blackhole"]');
- tab?.click();tab?.focus();
+ tab?.click();$('heading-blackhole')?.focus();
 };
 function kelvinInputValue(){
  const raw=$('kelvinInput').value,k=Number(raw);
@@ -144,7 +147,7 @@ $('celsiusInput').oninput=()=>{const raw=$('celsiusInput').value,c=Number(raw);$
 $('kelvinInput').onchange=()=>temperature(kelvinInputValue());$('celsiusInput').onchange=()=>{try{temperature(celsiusToKelvin($('celsiusInput').value.trim()===''?NaN:Number($('celsiusInput').value)))}catch{$('temperatureError').textContent=t('Celsius muss endlich und mindestens −273,15 °C sein.')}};$('temperatureSlider').oninput=()=>temperature(temperatureAt((Number($('temperatureSlider').value)+3)/15));document.querySelectorAll('[data-kelvin]').forEach(b=>b.onclick=()=>temperature(Number(b.dataset.kelvin),null,false,b.dataset.kelvin));
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{paint();sync()}));document.addEventListener('visibilitychange',()=>{paint();sync()});reduced.addEventListener('change',()=>{if(reduced.matches)state.paused=true;refresh()});
 window.addEventListener('resize',()=>{state.quality=compactViewport.matches?'low':'high';paint()});
-if(typeof IntersectionObserver==='function'){const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.target.id==='extremeCanvas')objectSeen=entry.isIntersecting;else thermalSeen=entry.isIntersecting}paint();sync()});observer.observe($('extremeCanvas'));if(abstractTemperature)observer.observe(abstractTemperature)}
+if(typeof IntersectionObserver==='function'){const observer=new IntersectionObserver(([entry])=>{objectSeen=entry.isIntersecting;paint();sync()});observer.observe($('extremeCanvas'))}
 // Initial state renders only after the lab is visible; no hidden animation loop.
 temperature(state.k);refresh();
 

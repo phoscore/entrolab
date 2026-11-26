@@ -57,7 +57,7 @@ test('Deuteron comparison uses nuclear CODATA energies, with the independent tab
 test('Published navigation retires Discovery and places the new lab between Entropy and Science',()=>{
  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
  const tabs=[...html.matchAll(/data-tab="(\w+)"/g)].map(match=>match[1]);
- assert.deepEqual(tabs,['gravity','blackhole','extreme','entropy','matter','explorer','science']);
+ assert.deepEqual(tabs,['gravity','blackhole','extreme','temperature','entropy','matter','explorer','science']);
  assert(!/id="helpToggle"|id="quickStart"|src="discovery\.mjs"/.test(html));
  assert.match(html,/<title>Reincarnated as a Proton<\/title>/);
  assert(de['v09.gas.chart']&&en['v09.qcd.fields']);

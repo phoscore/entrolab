@@ -26,7 +26,6 @@ label>span[data-i18n]{float:none;color:inherit}.panel-heading>span[data-i18n]{fo
 
 /* Compact controls keep a full touch target and the headline icon in the text flow. */
 .rules-icon{display:inline-block;width:.82em;height:.82em;vertical-align:-.06em}
-#extremePlay{width:auto;justify-self:start;min-height:44px;margin:0;padding:8px 12px;font-size:13px;line-height:1.4}
 .object-stage .art-disclaimer{padding:14px 18px;background:#111019;color:#d5c9e3}
 #objectImageDescription{margin:0;font-size:14px;line-height:1.6}
 #extremeToBlackHole{width:auto;max-width:100%;min-height:44px;margin:9px 0 0;padding:7px 10px;font-size:13px;text-align:left}

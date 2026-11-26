@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {resolve} from 'node:path';
@@ -6,7 +7,7 @@ import {browserHarness,physical} from './v08-browser-harness.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
 after(async()=>{await h?.close()});
-const select=(p,tab)=>p.locator('[data-tab='+tab+']').click();
+const select=(p,tab)=>chooseLab(p,tab);
 const inspect=(p,name)=>p.evaluate(key=>window[key].inspect(),name);
 const shot=(p,name)=>p.screenshot({path:resolve(h.output,'v09-'+name+'.png')});
 
@@ -14,9 +15,9 @@ test('v0.9 navigation: product title, retired tour, Matter order and cold temper
  const {p,context}=await h.lab();try{
   assert.equal(await p.title(),'Reincarnated as a Proton');
   assert.equal(await p.locator('#helpToggle,#quickStart,script[src="discovery.mjs"]').count(),0);
-  assert.deepEqual(await p.locator('[data-tab]').evaluateAll(els=>els.map(e=>e.dataset.tab)),['gravity','blackhole','extreme','entropy','matter','explorer','science']);
+  assert.deepEqual(await p.locator('[data-tab]').evaluateAll(els=>els.map(e=>e.dataset.tab)),['gravity','blackhole','extreme','temperature','entropy','matter','explorer','science']);
   await p.goto(h.url+'/?v09temp=1#temperature');await h.ready(p);
-  assert.equal(await p.locator('#extreme').evaluate(e=>e.classList.contains('active')),true);
+  assert.equal(await p.locator('#temperature').evaluate(e=>e.classList.contains('active')),true);
   assert.equal(await p.locator('#temperature .lab-jump').count(),0);await select(p,'matter');assert.equal(await p.evaluate(()=>location.hash),'#matter');
   await p.goto(h.url+'/?v09qcd=1#model-proton');await h.ready(p);
   assert.equal(await p.locator('#matter').evaluate(e=>e.classList.contains('active')),true);
@@ -30,7 +31,7 @@ test('v0.9 navigation: product title, retired tour, Matter order and cold temper
 test('v0.9 gas: 3D ratio, valid/invalid drafts, sample, resize and motion ownership',async()=>{
  const {p,context}=await h.lab({viewport:{width:390,height:900},reducedMotion:'no-preference',deviceScaleFactor:2});
  try{
-  const before=await physical(p);await select(p,'extreme');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
+  const before=await physical(p);await select(p,'temperature');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>window.entrolabGas?.inspect().frames>2);
   assert.equal((await inspect(p,'entrolabGas')).statistics[1].rms/(await inspect(p,'entrolabGas')).statistics[0].rms,2);
   await p.locator('#gasPause').press('Enter');const paused=await inspect(p,'entrolabGas');
@@ -47,7 +48,7 @@ test('v0.9 gas: 3D ratio, valid/invalid drafts, sample, resize and motion owners
   await p.locator('#gasPause').press('Enter');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>window.entrolabGas.inspect().scheduled);
   await select(p,'matter');assert.equal((await inspect(p,'entrolabGas')).scheduled,false);
-  await select(p,'extreme');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
+  await select(p,'temperature');await p.locator('#gasCanvas').scrollIntoViewIfNeeded();
   await p.locator('#gasPause').focus();
   await p.emulateMedia({reducedMotion:'reduce'});await p.waitForFunction(()=>!window.entrolabGas.inspect().scheduled&&document.getElementById('gasPause').disabled);
   assert.equal(await p.locator('#gasPause').isDisabled(),true);assert.equal(await p.evaluate(()=>document.activeElement.id),'gasA');
@@ -77,7 +78,7 @@ test('v0.9 observation and station layouts at 320/390/1440 with private screensh
   const {p,context}=await h.lab({viewport:{width,height:900}});try{
    for(const [tab,element,name] of [
     ['blackhole','.bh-illustration','black-hole'],
-    ['extreme','.gas-lab','gas'],
+    ['temperature','.gas-lab','gas'],
     ['matter','.matter-station','matter']
    ]){
     await select(p,tab);await p.locator(element).first().scrollIntoViewIfNeeded();
@@ -91,7 +92,7 @@ test('v0.9 observation and station layouts at 320/390/1440 with private screensh
       await p.locator('#bhView').selectOption('environment');
      }
     }
-    if(tab==='extreme'){await p.locator('#gasCanvas').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabGas.inspect().frames>0)}
+    if(tab==='temperature'){await p.locator('#gasCanvas').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabGas.inspect().frames>0)}
     if(width!==320)await p.locator(element).first().screenshot({path:resolve(h.output,`v09-${name}-${width}.png`)});
    }
    assert.deepEqual(h.errors,[]);
@@ -304,7 +305,7 @@ async function gasGeometry(p){
 test('v0.9 audit V09-02: hidden tab resizes desktop to 390 px and back without changing the gas model',async()=>{
  const {p,context}=await h.lab({viewport:{width:1360,height:900}});
  try{
-  await select(p,'extreme');
+  await select(p,'temperature');
   const desktop=await gasGeometry(p);
   await p.locator('#gasA').fill('250');
   await p.locator('#gasResample').click();
@@ -315,7 +316,7 @@ test('v0.9 audit V09-02: hidden tab resizes desktop to 390 px and back without c
    await select(p,'matter');
    await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
    await p.setViewportSize({width,height:900});
-   await select(p,'extreme');
+   await select(p,'temperature');
    const resized=await gasGeometry(p);
    if(width===390)assert(resized.width<desktop.width/2);
    else assert.deepEqual(resized,desktop);
@@ -333,13 +334,13 @@ test('v0.9 audit V09-02: hidden tab resizes desktop to 390 px and back without c
 test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paused and active gas state',async()=>{
  const {p,context}=await h.lab({viewport:{width:390,height:900},reducedMotion:'no-preference'});
  try{
-  await select(p,'extreme');
+  await select(p,'temperature');
   const mobile=await gasGeometry(p);
   await p.waitForFunction(()=>window.entrolabGas.inspect().time>0);
   await p.locator('#gasPause').evaluate(e=>e.click());
   const snapshot=gasModel(await inspect(p,'entrolabGas'));
   const cdp=await context.newCDPSession(p);
-  await p.locator('#extreme h1').scrollIntoViewIfNeeded();
+  await p.locator('#temperature h1').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
   const before=await inspect(p,'entrolabGas');
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:2,mobile:false});
@@ -348,7 +349,7 @@ test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paus
   assert(desktop.width>mobile.width*2);
   assert.equal(desktop.dpr,2);
   assert.deepEqual(gasModel(await inspect(p,'entrolabGas')),snapshot);
-  await p.locator('#extreme h1').scrollIntoViewIfNeeded();
+  await p.locator('#temperature h1').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>!window.entrolabGas.inspect().seen);
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:1360,height:900,deviceScaleFactor:1,mobile:false});
   const standard=await gasGeometry(p);

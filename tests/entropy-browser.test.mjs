@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 // Additional real Chromium cases; the seven v0.5 browser regressions are retained verbatim.
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,7 +17,7 @@ async function lab(options={}){const context=await browser.newContext({locale:'d
 async function ready(p){await p.waitForFunction(()=>window.entrolabEntropy&&window.entrolab&&document.querySelector('#checkRunStatus')?.dataset.run==='1');await p.evaluate(()=>document.fonts.ready)}
 const state=p=>p.evaluate(()=>window.entrolabEntropy.inspect());
 const wait=p=>p.waitForTimeout(1100); // Observe two genuine 500ms timer intervals, not a fake progress delay.
-async function entropy(p){await p.locator('[data-tab=entropy]').click();await p.locator('#entropyChambers').scrollIntoViewIfNeeded()}
+async function entropy(p){await chooseLab(p,'entropy');await p.locator('#entropyChambers').scrollIntoViewIfNeeded()}
 async function k(p,value){await p.locator('#entropyK').press('Home');for(let i=0;i<value;i++)await p.locator('#entropyK').press('ArrowRight')}
 
 test('v0.6 browser: exact entropy readouts, distinguishable microstates, bounded markers and reset',async()=>{
@@ -28,23 +29,23 @@ test('v0.6 browser: DE/EN during playback preserves state; invalid drafts, valid
 });
 
 test('v0.6 browser: real tab navigation and offscreen scrolling stop entropy ticks without catch-up',async()=>{
- const {page:p,context}=await lab();try{await entropy(p);await p.locator('#entropyPlay').click();await p.waitForFunction(()=>window.entrolabEntropy.inspect().steps>=1);await p.locator('[data-tab=blackhole]').click();await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const hidden=await state(p);await wait(p);assert.deepEqual(await state(p),hidden);await entropy(p);await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);await p.locator('#entropy .entropy-explanations details summary').click();await p.locator('footer').scrollIntoViewIfNeeded();const chamberBounds=await p.locator('#entropyChambers').boundingBox();assert(chamberBounds.y+chamberBounds.height<=0,'the complete chamber is actually outside the viewport');await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const offscreen=await state(p);await wait(p);assert.deepEqual(await state(p),offscreen);await p.locator('#entropyChambers').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);assert((await state(p)).steps<=offscreen.steps+1);await p.locator('#entropyPlay').click();assert.equal((await state(p)).scheduled,false)}finally{await context.close()}
+ const {page:p,context}=await lab();try{await entropy(p);await p.locator('#entropyPlay').click();await p.waitForFunction(()=>window.entrolabEntropy.inspect().steps>=1);await chooseLab(p,'blackhole');await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const hidden=await state(p);await wait(p);assert.deepEqual(await state(p),hidden);await entropy(p);await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);await p.locator('#entropy .entropy-explanations details summary').click();await p.locator('footer').scrollIntoViewIfNeeded();const chamberBounds=await p.locator('#entropyChambers').boundingBox();assert(chamberBounds.y+chamberBounds.height<=0,'the complete chamber is actually outside the viewport');await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const offscreen=await state(p);await wait(p);assert.deepEqual(await state(p),offscreen);await p.locator('#entropyChambers').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);assert((await state(p)).steps<=offscreen.steps+1);await p.locator('#entropyPlay').click();assert.equal((await state(p)).scheduled,false)}finally{await context.close()}
 });
 
 test('v0.6 browser: glossary context and keyboard return preserve lab state and original sandbox drafts',async()=>{
- const {page:p,context}=await lab();try{await entropy(p);await k(p,6);const before=await state(p);const link=p.locator('#entropy [data-explain]');await link.focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();await p.locator('[data-language=en]').click();await p.locator('#guideReturn').focus();await p.keyboard.press('Enter');assert.equal(await link.evaluate(e=>e===document.activeElement),true);assert.deepEqual(await state(p),before);await p.locator('[data-tab=gravity]').click();await p.locator('.edit-options summary').click();await p.locator('#velX').fill('42.7500');const model=await p.evaluate(()=>window.entrolab.inspect());await p.locator('#gravity [data-explain=guide-universe]').click();await p.keyboard.press('Escape');assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),model);assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-universe')}finally{await context.close()}
+ const {page:p,context}=await lab();try{await entropy(p);await k(p,6);const before=await state(p);const link=p.locator('#entropy [data-explain]');await link.focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();await p.locator('[data-language=en]').click();await p.locator('#guideReturn').focus();await p.keyboard.press('Enter');assert.equal(await link.evaluate(e=>e===document.activeElement),true);assert.deepEqual(await state(p),before);await chooseLab(p,'gravity');await p.locator('.edit-options summary').click();await p.locator('#velX').fill('42.7500');const model=await p.evaluate(()=>window.entrolab.inspect());await p.locator('#gravity [data-explain=guide-universe]').click();await p.keyboard.press('Escape');assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),model);assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-universe')}finally{await context.close()}
 });
 
 test('v0.6 browser: each button press really reloads isolated checks, updates live status and preserves IDs/forecast',async()=>{
  const {page:p,context}=await lab();try{
   // Exercise the same run entry point with an actual completed forecast still present.
   await p.locator('.instrument-controls summary').click();await p.locator('#predictionOn').check();await p.waitForFunction(()=>window.entrolab.inspect().forecast);const result=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');const a=body('sentinel','planet',1,0,0,0,0,'white'),before=window.entrolab.inspect();await window.entrolab.checks();const after=window.entrolab.inspect(),b=body('sentinel','planet',1,0,0,0,0,'white');return {before,after,ids:[a.id,b.id]}});assert.deepEqual(result.after,result.before);assert.equal(result.ids[1],result.ids[0]+1);
-  await p.locator('[data-tab=science]').click();let requests=0;await context.route('**/checks-worker.mjs',r=>{requests++;return r.continue()});const before=await p.evaluate(()=>window.entrolab.inspect());for(const run of [3,4]){await p.locator('#runTests').click();await p.waitForFunction(run=>document.getElementById('checkRunStatus').dataset.run===String(run)&&document.getElementById('checkRunStatus').getAttribute('aria-busy')==='false',run);assert.match(await p.locator('#checkRunStatus').textContent(),new RegExp('#'+run+'.*10/10'));assert.equal(await p.locator('#testResults span').count(),10);assert.equal(await p.evaluate(()=>document.activeElement.id),'runTests')}assert.equal(requests,2);assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),before);assert.equal(await p.locator('#checkRunStatus').getAttribute('role'),'status');assert.equal(await p.locator('#checkRunStatus').getAttribute('aria-live'),'polite');await p.locator('[data-language=en]').click();assert.match(await p.locator('#checkRunStatus').textContent(),/Check run #4 complete/);assert.equal(requests,2);
+  await chooseLab(p,'science');let requests=0;await context.route('**/checks-worker.mjs',r=>{requests++;return r.continue()});const before=await p.evaluate(()=>window.entrolab.inspect());for(const run of [3,4]){await p.locator('#runTests').click();await p.waitForFunction(run=>document.getElementById('checkRunStatus').dataset.run===String(run)&&document.getElementById('checkRunStatus').getAttribute('aria-busy')==='false',run);assert.match(await p.locator('#checkRunStatus').textContent(),new RegExp('#'+run+'.*10/10'));assert.equal(await p.locator('#testResults span').count(),10);assert.equal(await p.evaluate(()=>document.activeElement.id),'runTests')}assert.equal(requests,2);assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),before);assert.equal(await p.locator('#checkRunStatus').getAttribute('role'),'status');assert.equal(await p.locator('#checkRunStatus').getAttribute('aria-live'),'polite');await p.locator('[data-language=en]').click();assert.match(await p.locator('#checkRunStatus').textContent(),/Check run #4 complete/);assert.equal(requests,2);
  }finally{await context.close()}
 });
 
 test('v0.6 browser: blocked worker yields an honest translated failure and a real retry recovers',async()=>{
- const {page:p,context}=await lab();try{await p.locator('[data-tab=science]').click();await context.route('**/checks-worker.mjs',r=>r.fulfill({contentType:'text/javascript',body:'self.onmessage=()=>self.postMessage({error:true})'}));await p.locator('#runTests').click();await p.waitForFunction(()=>document.getElementById('checkRunStatus').dataset.run==='2');assert.match(await p.locator('#checkRunStatus').textContent(),/nicht abgeschlossen/);assert.equal(await p.locator('#testResults span').count(),0);await p.locator('[data-language=en]').click();assert.match(await p.locator('#checkRunStatus').textContent(),/could not complete/);await context.unroute('**/checks-worker.mjs');await p.locator('#runTests').click();await p.waitForFunction(()=>document.getElementById('checkRunStatus').dataset.run==='3');assert.match(await p.locator('#checkRunStatus').textContent(),/10\/10 passed/)}finally{await context.close()}
+ const {page:p,context}=await lab();try{await chooseLab(p,'science');await context.route('**/checks-worker.mjs',r=>r.fulfill({contentType:'text/javascript',body:'self.onmessage=()=>self.postMessage({error:true})'}));await p.locator('#runTests').click();await p.waitForFunction(()=>document.getElementById('checkRunStatus').dataset.run==='2');assert.match(await p.locator('#checkRunStatus').textContent(),/nicht abgeschlossen/);assert.equal(await p.locator('#testResults span').count(),0);await p.locator('[data-language=en]').click();assert.match(await p.locator('#checkRunStatus').textContent(),/could not complete/);await context.unroute('**/checks-worker.mjs');await p.locator('#runTests').click();await p.waitForFunction(()=>document.getElementById('checkRunStatus').dataset.run==='3');assert.match(await p.locator('#checkRunStatus').textContent(),/10\/10 passed/)}finally{await context.close()}
 });
 
 test('v0.6 browser: 320/390/fractional viewport, DPR and max N stay bounded with readable controls',{timeout:60000},async()=>{
@@ -73,21 +74,23 @@ test('review P2 browser: context return/Escape and lab navigation preserve visib
  for(const [width,locale] of [[1360,'de-DE'],[390,'en-GB']]){
   const {page:p,context}=await lab({viewport:{width,height:1000},locale});try{
    await entropy(p);await k(p,6);const before=await reviewModel(p);
+   const expectedFocus=width<=760?'labMenu':null;
    const firstId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('review sentinel','planet',1,0,0,0,0,'white').id});
    for(const target of ['blackhole','extreme','gravity','entropy']){
     const origin=p.locator('.view.active [data-explain]').first();await origin.press('Enter');
     assert.equal(await p.locator('#physicsGuide').evaluate(e=>e.open),true);
     await p.locator('#guideReturn').press('Enter');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
     await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
-    await origin.press('Enter');await p.locator(`[data-tab=${target}]`).press('Enter');
+    await origin.press('Enter');await chooseLab(p,target,'Enter');
     assert.equal(await p.locator('#physicsGuide').evaluate(e=>e.open),false,'navigation closes the stale context');
-    assert.equal(await p.locator('#guideReturn').isVisible(),false);assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),target);
+    assert.equal(await p.locator('#guideReturn').isVisible(),false);assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab??document.activeElement.id),expectedFocus??target);
     // A queued activation of the old, now hidden control must not restore stale focus.
     await p.locator('#guideReturn').evaluate(e=>e.click());await p.keyboard.press('Escape');
-    assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),target);
+    assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab??document.activeElement.id),expectedFocus??target);
     assert.equal(await p.evaluate(()=>!!document.activeElement.getClientRects().length),true);
     if(target==='blackhole')await p.screenshot({path:resolve(output,'review-context-focus-'+width+'.png')});
    }
+   if(expectedFocus)await p.locator('#labMenu').press('Enter');
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'matter');
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'explorer');
    await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>document.activeElement.dataset.tab),'science');
@@ -103,8 +106,8 @@ test('review P2 browser: native glossary collapse clears context; a newly opened
   await entropy(p);const before=await reviewModel(p);await p.locator('#entropy [data-explain]').press('Enter');
   await p.locator('#physicsGuide > summary').press('Enter');await p.waitForFunction(()=>document.getElementById('guideReturn').hidden);
   await p.locator('#physicsGuide > summary').press('Enter');assert.equal(await p.locator('#guideReturn').isVisible(),false);
-  await p.locator('[data-tab=blackhole]').click();const origin=p.locator('#blackhole [data-explain=guide-horizon]');await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
-  await p.locator('[data-tab=entropy]').click();assert.deepEqual(await reviewModel(p),before);
+  await chooseLab(p,'blackhole');const origin=p.locator('#blackhole [data-explain=guide-horizon]');await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
+  await chooseLab(p,'entropy');assert.deepEqual(await reviewModel(p),before);
   measurements.push({review:'native-collapse',contextCleared:true});
  }finally{await context.close()}
 });

@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdtemp,rm,writeFile } from 'node:fs/promises';
@@ -38,11 +39,11 @@ async function profile(h,baselineDir,{width,height,cpu},version,scenes){
     if(sky==='paused')pauseRule=await p.addStyleTag({content:'#cosmicBackground::before{animation-play-state:paused!important}'});
     const object=scene.startsWith('object:')?scene.split(':')[1]:null;
     if(scene==='background'){
-     if(!await p.locator('#gravity').evaluate(e=>e.classList.contains('active')))await p.locator('[data-tab=gravity]').click();
+     if(!await p.locator('#gravity').evaluate(e=>e.classList.contains('active')))await chooseLab(p,'gravity');
      await p.evaluate(()=>window.scrollTo(0,0));
     }
     if(object){
-     if(!await p.locator('#extreme').evaluate(e=>e.classList.contains('active')))await p.locator('[data-tab=extreme]').click();
+     if(!await p.locator('#extreme').evaluate(e=>e.classList.contains('active')))await chooseLab(p,'extreme');
      await p.locator('#extremeObject').selectOption(object);
      await p.locator('#extremeCanvas').scrollIntoViewIfNeeded();
      await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');

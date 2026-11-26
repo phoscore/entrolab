@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
@@ -41,7 +42,7 @@ async function capture(which,site,width){
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
   const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(site.url);
-  const startupBegan=Date.now();await page.locator('[data-tab=explorer]').click();
+  const startupBegan=Date.now();await chooseLab(page,'explorer');
   await page.locator('#exCanvas').scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>{const s=window.entrolabExplorer?.inspect();return s?.atlas.status==='density'&&s.atlas.visible===50635&&s.objectCount===22;});
   const startupMs=Date.now()-startupBegan;

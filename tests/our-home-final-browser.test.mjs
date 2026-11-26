@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
@@ -55,7 +56,7 @@ async function settle(p){
   await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
 }
 async function open(p){
-  await click(p,'[data-tab=explorer]');
+  await chooseLab(p,'explorer');
   await click(p,'#exSolarMode');
   await click(p,'#sol3d');
   await settle(p);

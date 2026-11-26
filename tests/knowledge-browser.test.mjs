@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
@@ -48,7 +49,7 @@ test('energy browser: mechanical and existing thermal deep links stay distinct o
 
 test('v0.8 browser: canonical glossary preserves legacy focus return and dynamic model back/Escape',async()=>{
  const {p,context}=await h.lab();try{
-  await p.locator('[data-tab=entropy]').click();const before=await physical(p);
+  await chooseLab(p,'entropy');const before=await physical(p);
   await p.locator('#entropyExplain').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');
   await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();
   await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'entropyExplain');
@@ -120,7 +121,7 @@ test('v0.8 browser: narrow/fractional DPR knowledge and deep links have no overf
  for(const [width,dpr]of [[320,1],[390,2],[320.5,1.25]]){
   const {p,context}=await h.lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr});try{
    let f=p;if(!Number.isInteger(width)){await p.goto(h.url+'/__fractional');f=await(await p.$('iframe')).contentFrame();await h.ready(f)}
-   await f.locator('[data-tab=science]').click();await f.locator('[data-language=en]').click();
+   await chooseLab(f,'science');await f.locator('[data-language=en]').click();
    await f.locator('#model-thermal > details > summary').click();
    const result=await f.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,focus:document.activeElement.tagName,keys:[...document.querySelectorAll('[data-i18n]')].filter(e=>e.getClientRects().length&&/^k\./.test(e.textContent)).map(e=>e.textContent)}));
    assert(result.scroll<=result.width+1,JSON.stringify(result));assert.deepEqual(result.keys,[]);assert.notEqual(result.focus,'BODY');
@@ -143,7 +144,7 @@ test('v0.8 browser: candidate images decode at recorded sizes on 320/390px and d
 
 test('v0.8 browser: global glossary to model and back restores the actual link, open disclosures and original lab return',async()=>{
  const {p,context}=await h.lab();try{
-  await p.locator('[data-tab=entropy]').click();const before=await physical(p);
+  await chooseLab(p,'entropy');const before=await physical(p);
   for(const exit of ['return','escape']){
    await p.locator('#entropyExplain').click();const dd=p.locator('#guide-entropy + dd');
    if(!await dd.locator('details').evaluate(e=>e.open))await dd.locator('details > summary').click();

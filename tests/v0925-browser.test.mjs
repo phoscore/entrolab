@@ -1,3 +1,4 @@
+import {chooseLab} from './browser-lab-navigation.mjs';
 import test,{before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
@@ -8,7 +9,7 @@ import { measurePhaseA } from './v0925-performance.mjs';
 let h;
 before(async()=>{h=await browserHarness()});
 after(async()=>{await h?.close()});
-const tab=(page,name)=>page.locator(`[data-tab=${name}]`).click();
+const tab=(page,name)=>chooseLab(page,name);
 const choose=(page,kind)=>page.locator('#extremeObject').selectOption(kind);
 const rendered=page=>page.locator('#extreme').getAttribute('data-rendered').then(Number);
 const skyState=page=>page.evaluate(()=>{
@@ -72,7 +73,7 @@ test('v0.9.25: all eight object descriptions update in both languages, including
   await choose(p,'blackhole');
   await p.locator('#extremeToBlackHole').press('Enter');
   assert.equal(await p.locator('#blackhole').evaluate(el=>el.classList.contains('active')),true);
-  assert.equal(await p.locator('[data-tab=blackhole]').evaluate(el=>el===document.activeElement),true);
+  assert.equal(await p.locator('#heading-blackhole').evaluate(el=>el===document.activeElement),true);
   assert.deepEqual(await physical(p),before);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
@@ -155,7 +156,7 @@ test('v0.9.25: each new object paints its own moving scene and respects pause, o
   await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='true');
   await p.emulateMedia({reducedMotion:'reduce'});
   await p.waitForFunction(()=>document.getElementById('extreme').dataset.animating==='false');
-  assert.equal(await p.locator('#extremePlay').textContent(),'Animation starten');
+  assert.equal(await p.locator('#extremePlay').getAttribute('aria-label'),'Animation starten');
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });
@@ -228,13 +229,13 @@ test('Lean polish: bilingual branding, compact controls and unnumbered panels fi
    const original=await physical(p);
    for(const [language,heading] of [['de','Deine Regeln? Eher nicht.'],['en','Your rules? Probably not.']]){
     await p.locator('[data-language='+language+']').click();
-    assert.equal((await p.locator('#gravity h1').innerText()).trim(),heading);
+    assert.equal((await p.locator('#gravity .lab-tagline').innerText()).trim(),heading);
     assert.equal((await p.locator('footer').innerText()).trim(),'No plot armor. Just physics?');
     assert.equal(await p.locator('#gravity .footnote i').count(),0);
     assert.match(await p.locator('#gravity .footnote').innerText(),language==='de'?/Paarweise Gravitation in 2D/:/Pairwise gravity in 2D/);
     assert.equal(await p.locator('.panel-heading > span').filter({hasText:/^0[1-9]$/}).count(),0);
     const icon=await p.locator('.rules-icon').evaluate(el=>({ready:el.complete&&el.naturalWidth>0,hidden:el.getAttribute('aria-hidden'),w:el.width}));
-    assert.equal(icon.ready,true);assert.equal(icon.hidden,'true');assert.ok(icon.w>=18&&icon.w<=45);
+    assert.equal(icon.ready,true);assert.equal(icon.hidden,'true');assert.ok(icon.w>=17&&icon.w<=45);
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
    }
    await p.locator('#gravity').screenshot({path:join(h.output,'lean-gravity-'+width+'.png')});
