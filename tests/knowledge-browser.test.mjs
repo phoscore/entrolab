@@ -122,7 +122,7 @@ test('v0.8 browser: narrow/fractional DPR knowledge and deep links have no overf
   const {p,context}=await h.lab({viewport:{width:Number.isInteger(width)?width:500,height:900},deviceScaleFactor:dpr});try{
    let f=p;if(!Number.isInteger(width)){await p.goto(h.url+'/__fractional');f=await(await p.$('iframe')).contentFrame();await h.ready(f)}
    await chooseLab(f,'science');await f.locator('[data-language=en]').click();
-   await f.locator('#model-thermal > details > summary').click();
+   await f.locator('#model-thermal > .knowledge-advanced > summary').click();
    const result=await f.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,focus:document.activeElement.tagName,keys:[...document.querySelectorAll('[data-i18n]')].filter(e=>e.getClientRects().length&&/^k\./.test(e.textContent)).map(e=>e.textContent)}));
    assert(result.scroll<=result.width+1,JSON.stringify(result));assert.deepEqual(result.keys,[]);assert.notEqual(result.focus,'BODY');
    h.measurements.push({kind:'knowledge-layout',requestedWidth:width,dpr,...result});
@@ -147,10 +147,10 @@ test('v0.8 browser: global glossary to model and back restores the actual link, 
   await chooseLab(p,'entropy');const before=await physical(p);
   for(const exit of ['return','escape']){
    await p.locator('#entropyExplain').click();const dd=p.locator('#guide-entropy + dd');
-   if(!await dd.locator('details').evaluate(e=>e.open))await dd.locator('details > summary').click();
+   if(!await dd.locator('.knowledge-advanced').evaluate(e=>e.open))await dd.locator('.knowledge-advanced > summary').click();
    const link=dd.locator('[data-model-link]'),id=await link.getAttribute('id');await link.click();assert.equal(await p.locator('.view.active').getAttribute('id'),'science');
    if(exit==='return')await p.locator('#guideReturn').click();else await p.keyboard.press('Escape');
-   assert.equal(await p.locator('.view.active').getAttribute('id'),'entropy');assert.equal(await p.evaluate(()=>document.activeElement.id),id);assert.equal(await p.locator('#physicsGuide').getAttribute('open'),'');assert.equal(await dd.locator('details').getAttribute('open'),'');
+   assert.equal(await p.locator('.view.active').getAttribute('id'),'entropy');assert.equal(await p.evaluate(()=>document.activeElement.id),id);assert.equal(await p.locator('#physicsGuide').getAttribute('open'),'');assert.equal(await dd.locator('.knowledge-advanced').getAttribute('open'),'');
    await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>document.activeElement.id),'entropyExplain');assert.equal(await p.locator('#physicsGuide').getAttribute('open'),null);assert.deepEqual(await physical(p),before);
   }
  }finally{await context.close()}

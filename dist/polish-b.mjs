@@ -87,7 +87,7 @@ function updateReference(){
  const entry=references.get($('extremeObject').value);
  if(!entry)return;
  const [title,copy,...links]=entry;
- name.textContent=t(title);description.textContent=copy[language()==='de'?0:1];
+ name.textContent=$('extremeObject').value==='sun'?t(title):title;description.textContent=copy[language()==='de'?0:1];
  sources.replaceChildren(...links.map((url,i)=>link((language()==='de'?'Quelle ':'Source ')+(i+1),url)));
 }
 $('extremeObject').addEventListener('change',updateReference);

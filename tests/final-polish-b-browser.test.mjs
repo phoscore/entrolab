@@ -49,8 +49,9 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await shot(field,'field');
   for(const id of ['fieldX','fieldY'])await p.locator('#'+id).fill('0');
   assert.equal(await arrow.getAttribute('d'),null);
+  assert.match(await field.locator('[aria-live]').textContent(),/0,2/);
   await chooseLab(p,'blackhole');
-  const singular=p.locator('#blackhole details.polish-b-panel').filter({hasText:/Unvollständigkeit/});
+  const singular=p.locator('#blackhole details.polish-b-panel').filter({has:p.getByText('Was bedeutet eine Singularität?',{exact:true})});
   await singular.locator('summary').press('Enter');
   await shot(singular,'singularities');
   await chooseLab(p,'extreme');
@@ -65,7 +66,7 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await shot(gas,'gas');
   assert.equal(await p.evaluate(()=>entrolabGas.inspect().scheduled),false);
   await p.emulateMedia({reducedMotion:'no-preference'});
-  await gas.locator('button').first().click();
+  await p.locator('#gasPause').click();
   await p.waitForFunction(()=>entrolabGas.inspect().frames>2);
   await chooseLab(p,'gravity');
   await p.waitForFunction(()=>!entrolabGas.inspect().scheduled);

@@ -1,7 +1,7 @@
 export const polishB={
  "polishB.simple": [
   "Einfacher verstehen",
-  "Understand it simply"
+  "A simpler explanation"
  ],
  "polishB.invalidMarkers": [
   "N muss eine ganze Zahl von 1 bis {max} sein. Der Zustand bleibt erhalten.",
@@ -21,10 +21,6 @@ export const polishB={
  "polishB.markerHint": [
   "Eine neue Markerzahl setzt alle Marker nach links. Der k-Regler setzt die ersten k nach links und pausiert. Ab 33 Markern zeigen Balken die Anteile pro Kammer.",
   "A new count puts all markers on the left. The k slider pauses and places the first k markers on the left. From 33 markers, the bars show each chamber’s share."
- ],
- "polishB.microstate": [
-  "Vollständige Markerfolge",
-  "Full marker sequence"
  ],
  "polishB.exact": [
   "Exakte Gesamtzahl",
@@ -207,8 +203,8 @@ export const polishB={
   "An electric field shows which way a tiny positive test charge would be pushed. The source is a stationary point charge in vacuum. The arrow shows the direction at the probe, and the number gives the strength in N/C. This demo excludes distances below 0.2 m."
  ],
  "polishB.fieldNear": [
-  "Messpunkt im ausgesparten Nahbereich.",
-  "Probe is inside the excluded near region."
+  "Messpunkt im ausgesparten Nahbereich (unter 0,2 m).",
+  "Probe is inside the excluded near region (below 0.2 m)."
  ],
  "polishB.matterTitle": [
   "Felder, Teilchen und gebundene Systeme",
@@ -223,8 +219,8 @@ export const polishB={
   "What is a singularity?"
  ],
  "polishB.sing": [
-  "In der Allgemeinen Relativitätstheorie ist eine Raumzeit singulär, wenn bestimmte frei fallende Bahnen oder Lichtwege nach endlicher Eigenzeit beziehungsweise endlichem Bahnparameter enden, ohne sich in der Raumzeit fortsetzen zu lassen. Der Ereignishorizont dagegen ist eine Grenze dafür, welche Signale ferne Beobachter erreichen können. Das ideale Schwarzschild-Loch hat im Inneren eine Krümmungssingularität. Die exakte rotierende Kerr-Lösung besitzt eine kompliziertere innere Struktur mit einer Ringsingularität. Keine davon ist als Objekt unendlicher Dichte experimentell bestätigt. Bei extremen Krümmungen könnte Quantengravitation die klassische Beschreibung ändern. Wie genau, ist offen.",
-  "A spacetime is singular in general relativity if some free-fall or light paths end after a finite proper time or affine parameter and cannot be continued within that spacetime. An event horizon, by contrast, marks which signals can reach distant observers. The ideal Schwarzschild hole has an interior curvature singularity. The exact rotating Kerr solution has a more complicated interior containing a ring singularity. Neither has been experimentally confirmed as an object of infinite density. A theory of quantum gravity could change the classical description at extreme curvature. How it would do so remains open."
+  "In der Allgemeinen Relativitätstheorie ist eine Raumzeit singulär, wenn bestimmte frei fallende Bahnen oder Lichtwege nach endlicher Eigenzeit beziehungsweise endlichem Bahnparameter enden, ohne sich in der Raumzeit fortsetzen zu lassen. Das heißt geodätische Unvollständigkeit. Der Ereignishorizont dagegen ist eine Grenze dafür, welche Signale ferne Beobachter erreichen können. Das ideale Schwarzschild-Loch hat im Inneren eine Krümmungssingularität. Die exakte rotierende Kerr-Lösung besitzt eine kompliziertere innere Struktur mit einer Ringsingularität. Keine davon ist als Objekt unendlicher Dichte experimentell bestätigt. Bei extremen Krümmungen könnte Quantengravitation die klassische Beschreibung ändern. Wie genau, ist offen.",
+  "A spacetime is singular in general relativity if some free-fall or light paths end after a finite proper time or affine parameter and cannot be continued within that spacetime. This is called geodesic incompleteness. An event horizon, by contrast, marks which signals can reach distant observers. The ideal Schwarzschild hole has an interior curvature singularity. The exact rotating Kerr solution has a more complicated interior containing a ring singularity. Neither has been experimentally confirmed as an object of infinite density. A theory of quantum gravity could change the classical description at extreme curvature. How it would do so remains open."
  ],
  "polishB.gasEnergy": [
   "Mittlere translatorische Energie je Teilchen in Kammer A: {a} J, in Kammer B: {b} J.",
