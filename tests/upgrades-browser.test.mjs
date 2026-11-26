@@ -169,7 +169,7 @@ test('v085 audit science: keyboard expansion of a different model and a glossary
   const {p,context}=await h.lab({legacyTour:true});try{
    await p.locator('[data-language='+lang+']').click();const before=await physical(p);
    await begin(p,'science');await chooseLab(p,'science','Enter');await p.locator('#discoveryNext').click();
-   const next=p.locator('#discoveryNext'),chapter=p.locator('#model-blackhole details > summary');
+   const next=p.locator('#discoveryNext'),chapter=p.locator('#model-blackhole .knowledge-advanced > summary');
    assert.match(await p.locator('#discoveryText').textContent(),lang==='de'?/Begriffslink/:/term link/);
    await p.locator('#discoveryLocate').click();assert.equal(await next.isEnabled(),false);
    await p.locator('#article-index-proton').press('Enter');assert.equal(await next.isEnabled(),false);await p.keyboard.press('Escape');

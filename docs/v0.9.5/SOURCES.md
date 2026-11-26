@@ -30,3 +30,5 @@ Die begrenzten Datenabfragen sind Offline-Vorbereitung. Produktion, Browser und 
 ## Our Home Finalization
 
 [Voyager forecasts and the Apophis encounter](OUR-HOME-FINALIZATION.md) documents the additional Horizons captures, model context and checks.
+
+See [Final Polish B – Physics for Everyone](FINAL-POLISH-B.md) for learning content, physical model assumptions, observed reference sources and validation.

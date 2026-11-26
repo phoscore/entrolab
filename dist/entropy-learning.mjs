@@ -13,7 +13,8 @@ export function initEntropyLearning(doc=globalThis.document){
  const detail=(key,id)=>{const e=node('details',null,'learning-panel');if(id)e.id=id;e.append(node('summary',key));return e};
  const listen=(e,type,fn)=>{e.addEventListener(type,fn);cleanup.push(()=>e.removeEventListener(type,fn))};
  const number=v=>new Intl.NumberFormat(locale(),typeof v==='bigint'?{maximumFractionDigits:0}:{maximumSignificantDigits:6}).format(v);
- const percent=v=>new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:6}).format(v);
+ const compactOmega=(v,n)=>n<=32||v<10000n?number(v):'≈ '+new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:6}).format(Number(v));
+ const percent=v=>v<.0001?new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:6}).format(v*100)+' %':new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:6}).format(v);
  const link=(model,label='k.ui.model')=>{const a=node('a',label,'knowledge-model-link');a.href='#'+modelById[model].target;a.dataset.modelLink=modelById[model].target;return a};
 
  // Independent four-marker example. It never reads or writes the live markers.
@@ -43,12 +44,16 @@ export function initEntropyLearning(doc=globalThis.document){
  const comparisonButtons={};
  for(const id of ['balanced','edge']){const b=node('button','k.learning.compare.'+id,'secondary');b.type='button';b.dataset.compare=id;listen(b,'click',()=>{choice=id;renderComparison()});actions.append(b);comparisonButtons[id]=b}
  const comparisonText=node('div');comparisonText.id='comparisonReadout';
- compare.append(actions,comparisonText,node('p','k.learning.compare.note'),node('p','k.learning.compare.units'),node('p','k.learning.compare.next'),link('markers'));demo.after(compare);owned.push(compare);
+ const compareNote=node('p','k.learning.compare.note');
+ compare.append(actions,comparisonText,compareNote,node('p','k.learning.compare.units'),node('p','k.learning.compare.next'),link('markers'));demo.after(compare);owned.push(compare);
  function renderComparison(){
   const r=liveComparison(Number(root.dataset.n)||12,choice);
-  comparisonText.replaceChildren(...[['labelBalanced',r.balanced],['labelEdge',r.edge]].map(([label,row])=>{const p=node('p');p.textContent=t('k.learning.compare.row',{label:t('k.learning.compare.'+label),k:row.k,omega:number(row.omega),probability:percent(row.probability),entropy:number(row.entropy)});return p}));
+  comparisonText.replaceChildren(...[['labelBalanced',r.balanced],['labelEdge',r.edge]].map(([label,row])=>{const p=node('p');p.textContent=t('k.learning.compare.row',{label:t('k.learning.compare.'+label),k:row.k,omega:compactOmega(row.omega,r.n),probability:percent(row.probability),entropy:number(row.entropy)});return p}));
   for(const [id,b]of Object.entries(comparisonButtons))b.setAttribute('aria-pressed',String(choice===id));
-  for(const e of doc.querySelectorAll('#entropyChart [data-k], #entropyTable [data-k]')){if(compare.open&&Number(e.dataset.k)===r.selected.k)e.dataset.comparison='true';else delete e.dataset.comparison}
+  compareNote.dataset.i18n=r.n>32?'polishB.denseComparison':'k.learning.compare.note';
+  compareNote.textContent=t(compareNote.dataset.i18n);
+  for(const marker of doc.querySelectorAll('#entropyChart [data-comparison-k]'))marker.setAttribute('visibility',compare.open&&Number(marker.dataset.comparisonK)===r.selected.k?'visible':'hidden');
+  for(const e of doc.querySelectorAll('#entropyChart [data-k], #entropyTable [data-k]')){if(r.n<=32&&compare.open&&Number(e.dataset.k)===r.selected.k)e.dataset.comparison='true';else delete e.dataset.comparison}
   compare.dataset.selectedK=r.selected.k;compare.dataset.n=r.n;
  }
  listen(compare,'toggle',renderComparison);
@@ -85,7 +90,7 @@ export function initEntropyLearning(doc=globalThis.document){
  listen(bridgeButton,'click',()=>{const original=doc.querySelector('[data-entropy-view=thermal]');original?.click();original?.focus()});
  for(const e of [demo,compare,balance,extras])listen(e,'keydown',event=>{if(event.key!=='Escape'||event.defaultPrevented)return;const d=event.target.closest('details');if(d&&e.contains(d)&&d.open){d.open=false;d.querySelector(':scope > summary')?.focus();event.preventDefault();event.stopPropagation()}});
  const unsubscribe=onLanguageChange(()=>{renderDemo();renderComparison();renderBalance(true)});renderDemo();renderComparison();renderBalance(true);
- const controller={inspect:()=>({demo:[...state],comparison:choice,subscriptions:disposed?0:1,observers:disposed?0:2,timers:0,mounted:!disposed}),dispose(){if(disposed)return;disposed=true;unsubscribe();markerObserver.disconnect();thermalObserver.disconnect();for(const off of cleanup)off();for(const e of owned)e.remove();for(const e of doc.querySelectorAll('[data-comparison]'))delete e.dataset.comparison;instances.delete(doc)}};
+ const controller={inspect:()=>({demo:[...state],comparison:choice,subscriptions:disposed?0:1,observers:disposed?0:2,timers:0,mounted:!disposed}),dispose(){if(disposed)return;disposed=true;unsubscribe();markerObserver.disconnect();thermalObserver.disconnect();for(const off of cleanup)off();for(const e of owned)e.remove();for(const e of doc.querySelectorAll('[data-comparison]'))delete e.dataset.comparison;for(const marker of doc.querySelectorAll('#entropyChart [data-comparison-k]'))marker.setAttribute('visibility','hidden');instances.delete(doc)}};
  instances.set(doc,controller);return controller;
 }
 if(globalThis.document){initEntropyLearning();globalThis.entrolabLearning={inspect:()=>instances.get(globalThis.document)?.inspect()??{mounted:false,subscriptions:0,observers:0,timers:0}}}

@@ -433,8 +433,8 @@ const messages={
     "Not every neutron star is an observed pulsar. The animation calculates neither light paths nor nuclear matter."
   ],
   "k.model.temperature.title": [
-    "Temperaturskala und sichere Brücke",
-    "Temperature scale and safe transfer"
+    "Was Temperatur misst",
+    "What temperature measures"
   ],
   "k.model.temperature.overview": [
     "Temperaturgrößenordnungen verstehen, ohne Temperatur mit Gesamtenergie zu verwechseln.",
@@ -469,8 +469,8 @@ const messages={
     "Many concrete patterns can share the same left count. Frequency follows from the chosen counting convention."
   ],
   "k.model.markers.method": [
-    "N = 1–32 Boolean-Marker; BigInt-Zählung. Pro Mischschritt unabhängiger Seitenwechsel mit q=1/4. Die stationäre Verteilung ist binomial.",
-    "N = 1–32 Boolean markers; BigInt counting. Each mixing step independently flips each marker with q=1/4. The stationary distribution is binomial."
+    "N = 1–512 Boolean-Marker; BigInt-Zählung. Pro Mischschritt unabhängiger Seitenwechsel mit q=1/4. Die stationäre Verteilung ist binomial.",
+    "N = 1–512 Boolean markers; BigInt counting. Each mixing step independently flips each marker with q=1/4. The stationary distribution is binomial."
   ],
   "k.model.markers.units": [
     "N, k, Ω und ln Ω dimensionslos. Schritte sind keine Sekunden, Bildpositionen keine Gasbahnen.",

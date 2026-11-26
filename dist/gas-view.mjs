@@ -28,9 +28,9 @@ export function initGasView(doc = globalThis.document) {
    <button type="button" class="secondary" id="gasCopy" data-i18n="v09.gas.copy" aria-describedby="gasTransfer"></button>
   </div>
   <p id="gasError" class="error" role="status"></p><p id="gasTransfer" class="hint"></p>
-  <p id="gasMetrics" class="experiment-values" role="status"></p><p id="gasSampleMetrics" class="hint"></p>
+  <p id="gasMetrics" class="experiment-values" role="status"></p><p id="gasEnergy" class="experiment-values"></p><p id="gasSampleMetrics" class="hint"></p>
   <figure class="experiment-figure gas-chart"><h4 data-i18n="v09.gas.chart"></h4><svg id="gasChart" viewBox="0 0 520 176" aria-hidden="true"></svg>
-   <figcaption><span data-i18n="v09.gas.axes"></span><br><span data-i18n="v09.gas.legend"></span></figcaption>
+   <figcaption><span data-i18n="v09.gas.axes"></span><br><span data-i18n="v09.gas.legend"></span></figcaption><p class="hint" data-i18n="polishB.gas"></p>
   </figure>
   <details><summary data-i18n="v09.modelDetails"></summary><p data-i18n="v09.gas.formula"></p><p data-i18n="v09.gas.limits"></p>
    <a href="https://openstax.org/books/university-physics-volume-2/pages/2-4-distribution-of-molecular-speeds" target="_blank" rel="noopener">OpenStax · Distribution of Molecular Speeds</a>
@@ -94,6 +94,8 @@ export function initGasView(doc = globalThis.document) {
   });
   $('gasChart').innerHTML = draw.join('');
   put('gasMetrics', t('v09.gas.metrics', {a: number(statistics[0].rms), b: number(statistics[1].rms), ratio: number(statistics[1].rms / statistics[0].rms, 3)}));
+  const energy = new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:3});
+  put('gasEnergy',t('polishB.gasEnergy',{a:energy.format(statistics[0].energy),b:energy.format(statistics[1].energy)}));
   const mean = sample.reduce((sum, p) => sum + p.speed, 0) / sample.length;
   put('gasSampleMetrics', t('v09.gas.sampleMetrics', {n: sample.length, a: number(mean * statistics[0].sigma),
    b: number(mean * statistics[1].sigma), tailA: samples[0].tail, tailB: samples[1].tail}));

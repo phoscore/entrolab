@@ -7,3 +7,12 @@
 /* Five navigation entries must also fit with wider system-font fallback. */
 @media(max-width:600px){nav{grid-template-columns:repeat(2,minmax(0,1fr))}.tab{min-width:0;overflow-wrap:anywhere}.entropy-metrics label{overflow-wrap:anywhere}}
 .entropy-chart h2,.entropy-explanations h2{overflow-wrap:anywhere;hyphens:auto}
+
+.entropy-presets{display:flex;flex-wrap:wrap;gap:.35rem}
+.entropy-presets button{padding:.3rem .65rem}
+.entropy-dense{display:none}
+.entropy-chambers[data-dense=true]{height:208px}
+.entropy-chambers[data-dense=true] .entropy-dense{position:absolute;inset:55px 8px 10px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.entropy-dense span{border-radius:5px;border:1px solid #58506c;background:linear-gradient(to top,#9364c9 var(--filled,0%),#171322 var(--filled,0%))}
+.entropy-dense span+span{background:linear-gradient(to top,#4d9e99 var(--filled,0%),#171322 var(--filled,0%))}
+#entropyTable td{overflow-wrap:anywhere;max-width: min(100px,25vw)}
