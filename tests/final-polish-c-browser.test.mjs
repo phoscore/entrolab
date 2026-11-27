@@ -34,6 +34,10 @@ test('all eight headings share their order, bilingual explanations and local inp
      await help.locator(':scope > summary').press('Enter');
      await help.locator('.knowledge-simple summary').press('Enter');
      assert.match(await help.locator('.knowledge-simple').innerText(),id==='explorer'?/streetlights/:/tiny positive charge/);
+     if(id==='matter'){
+      await help.locator('.knowledge-advanced summary').press('Enter');
+      assert.match(await help.locator('.knowledge-advanced').innerText(),/N\/C/);
+     }
      await shot(help,id+'-help');
     }else if(width===1440){
      const term=(await help.getAttribute('href')).slice(1);
@@ -208,12 +212,28 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
     try{
      await p.waitForFunction(old=>entrolabExplorer.inspect().neighborhood.free.position.some((x,i)=>Math.abs(x-old[i])>.01),enter.free.position);
     }finally{await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+    const rate=p.locator('#snFreeSpeedText');
+    for(const lang of ['en','de']){
+     await p.locator('[data-language='+lang+']').click();
+     assert.equal(await rate.evaluate(output=>{
+      const a=output.getBoundingClientRect(),b=output.parentElement.querySelector('label').getBoundingClientRect();
+      return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+     }),false);
+    }
+    await canvas.scrollIntoViewIfNeeded();
     await shot(p.locator('#snFreeControls'),'stellar-touch-'+width);
    }
    await shot(canvas,'stellar-free-'+width);
    const beforeLook=(await sn(p)).free;
    const box=await canvas.boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
-   await p.mouse.move(x,y);await p.mouse.down();await p.mouse.move(x+40,y+23,{steps:4});await p.mouse.up();
+   if(width<760){
+    const touch=async(type,points)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points});
+    await touch('touchStart',[{x,y}]);
+    await touch('touchMove',[{x:x+40,y:y+23}]);
+    await touch('touchEnd',[]);
+   }else{
+    await p.mouse.move(x,y);await p.mouse.down();await p.mouse.move(x+40,y+23,{steps:4});await p.mouse.up();
+   }
    const looked=(await sn(p)).free;
    assert.notEqual(looked.yaw,beforeLook.yaw);
    assert.deepEqual(looked.position,beforeLook.position);
