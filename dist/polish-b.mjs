@@ -15,14 +15,23 @@ function section(id,title,paragraph){
 }
 function link(name,href){const a=node('a',name);a.href=href;return a}
 const copyIndex=()=>language()==='de'?1:2;
-const questionGroups=new Map();
+const headerQuestions=new Set(['entropy','matter','explorer','science']);
+const questionLocations={
+ gravity:'.workspace',blackhole:'.bh-image-frame',extreme:'.extreme-stage',
+ temperature:'#gasExperiment',entropy:'#why-thermal',matter:'#matterExperiments',
+ explorer:'#exContent',science:'.science-grid',
+};
 for(const [i,row] of questions.entries()){
  const [lab]=row;
- if(!questionGroups.has(lab)){
-  const group=node('details');group.className='panel polish-b-panel';group.append(localized('summary','polishB.questions'));
-  $(lab).append(group);questionGroups.set(lab,group);
- }
+ const view=$(lab),group=node('details'),summary=node('summary');
+ const inHeader=headerQuestions.delete(lab);
+ group.className='polish-b-panel '+(inHeader?'lab-header-question':'lab-followup-question');
+ group.dataset.labQuestion='';
+ group.append(summary);
+ if(inHeader)view.querySelector('.lab-tagline').after(group);
+ else view.querySelector(questionLocations[lab]).before(group);
  const field=node('fieldset'),legend=node('legend'),feedback=node('p');
+ legend.className='lab-question-legend';
  feedback.setAttribute('role','status');field.append(legend);
  const choices=[];
  // Alternate answer order while keeping the conceptual answer stable.
@@ -32,12 +41,12 @@ for(const [i,row] of questions.entries()){
   label.append(input,name);field.append(label);choices.push([input,index,name]);
  }
  const render=()=>{
-  const words=row[copyIndex()];legend.textContent=words[0];
+  const words=row[copyIndex()];summary.textContent=legend.textContent=words[0];
   for(const [,index,name] of choices)name.textContent=words[index];
   const checked=choices.find(([input])=>input.checked);
   feedback.textContent=checked?t(checked[1]===1?'polishB.correct':'polishB.tryAgain')+words[3]:'';
  };
- field.append(feedback);field.addEventListener('change',render);labels.push(render);questionGroups.get(lab).append(field);
+ field.append(feedback);field.addEventListener('change',render);labels.push(render);group.append(field);
 }
 
 section('blackhole','polishB.singTitle','polishB.sing').append(link('Einstein Online · Black holes','https://www.einstein-online.info/en/spotlight/black-holes/'));
@@ -93,9 +102,24 @@ function updateReference(){
 $('extremeObject').addEventListener('change',updateReference);
 $('extreme').addEventListener('click',event=>{if(event.target.closest('[data-extreme-mass]'))updateReference()});
 labels.push(updateReference);
-const explorer=$('explorer'), explorerQuestions=questionGroups.get('explorer');
-new MutationObserver(()=>{
- if(explorerQuestions.parentNode!==explorer)explorer.append(explorerQuestions);
-}).observe(explorer,{childList:true});
+// HTML number inputs share these parsing instructions without changing their validation.
+for(const fields of [
+ ['mass','posX','posY','velX','velY'],['bhMass'],['extremeMass'],
+ ['kelvinInput','celsiusInput','comparisonKelvinB','gasA','gasB'],
+ ['thermalA','thermalB','thermalCA','thermalCB','thermalG'],['photonA','photonB'],
+]){
+ const hint=localized('p','polishC.number');
+ hint.id=fields[0]+'-format';hint.className='input-convention local-number-format';
+ const first=$(fields[0]);
+ const anchor=first.closest('.thermal-inputs, .experiment-controls, label')??
+   document.querySelector('label[for="'+first.id+'"]')??first;
+ anchor.before(hint);
+ for(const id of fields){
+  const input=$(id);
+  if(!input)continue;
+  const tokens=input.getAttribute('aria-describedby');
+  input.setAttribute('aria-describedby',[tokens,hint.id].filter(Boolean).join(' '));
+ }
+}
 const refresh=()=>labels.forEach(fn=>fn());
 onLanguageChange(refresh);refresh();

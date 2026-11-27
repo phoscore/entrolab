@@ -1,6 +1,6 @@
 export const phaseA = {
  'v0925.nullFiction': ['Null · Fiktion','Null · Fiction'],
- 'v0925.version': ['v0.9.25','v0.9.25'],
+ 'identity.version': ['v0.9.5 RC','v0.9.5 RC'],
  'v0925.brown': ['Brauner Zwerg','Brown dwarf'],
  'v0925.supergiant': ['Roter Überriese','Red supergiant'],
  'v0925.magnetar': ['Magnetar · Neutronenstern','Magnetar · neutron star'],

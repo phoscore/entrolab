@@ -84,3 +84,7 @@ npm run test:browser
 ## Vorgemerkt für einen eigenen All-Sky-Designschritt
 
 Nutzerfeedback zum All-Sky-Screenshot vom 15. November 2026. Die derzeitige Atlasoptik wirkt überladen und weniger einladend als beabsichtigt. Einen späteren Designpass auf die Hierarchie von Dichteflächen, Markern, Abdeckungshinweisen und Bedienelementen begrenzen. Wissenschaftliche Lesbarkeit, Kataloge und Orientierung erhalten. Dieser Feedbackpunkt gehört zur All-Sky-Ansicht. Die Raumkarte ist eine eigene Perspektive.
+
+## Freie Kamera
+
+**Freie Kamera** ergänzt den Orbit-Modus. WASD/QE oder die sechs Richtungstasten verschieben den Beobachter in galaktischen XYZ-Parsec. Ziehen und Pfeiltasten ändern den Blick. Die Geschwindigkeitsanzeige verwendet pc oder Lj pro realer Sekunde. Sonne, Auswahl und Übersicht bleiben als Rückkehrpunkte verfügbar. Der Maßstabsbalken erscheint im Orbit-Modus. [Steuerung, Grenzen und Prüfung](FINAL-POLISH-C.md#stellar-neighborhood).

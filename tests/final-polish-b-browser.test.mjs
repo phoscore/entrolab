@@ -10,7 +10,7 @@ before(async()=>{h=await browserHarness()});
 after(async()=>{await h?.close()});
 const shot=(locator,id,options)=>locator.screenshot({path:join(h.output,'polish-b-'+id+'.png'),...options});
 const size=(p,n)=>p.locator('#entropyN').fill(String(n));
-const questions=(p,id)=>p.locator('#'+id+' details.polish-b-panel').filter({has:p.locator('fieldset')});
+const questions=(p,id)=>p.locator('#'+id+' details.polish-b-panel').filter({has:p.locator('fieldset')}).first();
 const screenshots=['gravity','blackhole','extreme','temperature','entropy','matter','explorer','science'];
 
 test('Physics for Everyone: localized disclosures, questions and live demonstrations',{timeout:90000},async()=>{
@@ -33,7 +33,7 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await model.locator('summary').press('Enter');
   await shot(model,'model');
   await chooseLab(p,'entropy');
-  await p.locator('#entropy [data-explain]').first().press('Enter');
+  await p.locator('#entropyExplain').first().press('Enter');
   const term=p.locator('#guide-entropy + dd');
   await term.locator('.knowledge-simple summary').press('Enter');
   await term.locator('.knowledge-advanced summary').first().press('Enter');
@@ -77,7 +77,7 @@ test('Physics for Everyone: localized disclosures, questions and live demonstrat
   await chooseLab(p,'gravity');
   await p.waitForFunction(()=>!entrolabGas.inspect().scheduled);
   await p.locator('[data-language=en]').click();
-  assert.match(await questions(p,'gravity').locator('summary').textContent(),/predict|happen/i);
+  assert.match(await questions(p,'gravity').locator('summary').textContent(),/attraction|gravity/i);
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });

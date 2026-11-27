@@ -33,7 +33,7 @@ async function bh(p){await chooseLab(p,'blackhole');await p.locator('#bhIllustra
 const metrics=p=>p.locator('#bhRadius,#bhTemp,#bhPower,#bhLife').allTextContents();
 test('v085 BH: two modes and optional angle preserve all four calculator values, models and independent Extreme drafts',async()=>{const {p,context}=await h.lab();try{
  await chooseLab(p,'extreme');await p.locator('#extremeMass').fill('4.400e30');await p.locator('#extremeMass').press('Tab');const draft=await p.locator('#extremeMass').inputValue();await bh(p);const m=await metrics(p),before=await physical(p);
- await p.locator('.bh-illustration details > summary').click();await p.locator('#bhViewAngle').fill('60');await p.locator('#bhViewDisk').uncheck();await p.locator('#bhView').selectOption('light');assert(await p.locator('#bhViewAngle').isDisabled());assert(await p.locator('#bhViewPause').isDisabled());
+ await p.locator('.bh-illustration details:has(#bhViewAngle) > summary').click();await p.locator('#bhViewAngle').fill('60');await p.locator('#bhViewDisk').uncheck();await p.locator('#bhView').selectOption('light');assert(await p.locator('#bhViewAngle').isDisabled());assert(await p.locator('#bhViewPause').isDisabled());
  await p.locator('[data-language=en]').click();assert.match(await p.locator('.bh-illustration figcaption').textContent(),/no calculated light paths/);assert.equal(await p.locator('#bhView').inputValue(),'light');await p.locator('[data-language=de]').click();assert.deepEqual(await metrics(p),m);assert.deepEqual(await physical(p),before);
  await chooseLab(p,'extreme');assert.equal(await p.locator('#extremeMass').inputValue(),draft);await bh(p);await p.locator('#bhMass').fill('1');await p.locator('#bhMass').press('Tab');await p.locator('#bhView').selectOption('environment');assert.match(await p.locator('#bhViewMeaning').textContent(),/winzigen Massen/);assert.equal((await p.evaluate(()=>window.entrolabBlackHoleView.inspect())).angle,60);
 }finally{await context.close()}});
@@ -119,7 +119,7 @@ test('v085 audit BH: disk-off freezes frames until real visual changes and resum
    const inspect=()=>p.evaluate(()=>window.entrolabBlackHoleView.inspect());
    const visible=async()=>{await p.locator('#bhIllustration').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabBlackHoleView.inspect().seen)};
    await bh(p);const values=await metrics(p),before=await physical(p);
-   await p.locator('.bh-illustration details > summary').click();
+   await p.locator('.bh-illustration details:has(#bhViewAngle) > summary').click();
    const disk=p.locator('#bhViewDisk'),angle=p.locator('#bhViewAngle');
    await disk.uncheck();await visible();const staticView=await inspect();
    assert.equal(staticView.disk,false);assert.equal(staticView.scheduled,false);

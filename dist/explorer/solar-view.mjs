@@ -24,7 +24,7 @@ import {smallBodyCopy,groupNames,beltNames,smallBodies,smallBodyById,SMALL_MIN,S
   rebuildSmallTargets,updateSmallPanel,beltFitPoints,paintBelts,orbitalArc,paintSmallArc,paintSmallMarker} from './small-bodies-view.mjs';
 
 import {orbitToFree,freeToOrbit,aimFree,moveFree,freeNear,freeSpeed} from './free-camera.mjs';
-import {bindFreeControls,freeCopy} from './free-camera-controls.mjs';
+import {bindFreeControls,freeControlsMarkup,freeCopy} from './free-camera-controls.mjs';
 
 import {sampleVector} from './encounter-model.mjs';
 import {loadEncounter,loadForecast,extendVoyager,ENCOUNTER,FORECAST} from './our-home-data.mjs';
@@ -255,17 +255,7 @@ export function mountSolar(root) {
           <p class="ex-small" id="helioMarkerEpoch" data-solar="helioMarkerEpoch"></p>
         </div>
         <div class="ex-map ex-solar-map"><canvas id="solCanvas" tabindex="0" aria-describedby="solHelp solLimit"></canvas></div>
-        <section class="ex-free" id="solFreeControls" hidden>
-          <div class="ex-free-speed">
-            <label for="solFreeSpeed" data-solar="freeSpeed"></label>
-            <input id="solFreeSpeed" type="range" min="-8" max="8" step="1" value="0">
-            <output id="solFreeSpeedText" for="solFreeSpeed"></output>
-          </div>
-          <div class="ex-free-axis">
-            ${[['KeyA','freeLeft'],['KeyD','freeRight'],['KeyQ','freeDown'],['KeyE','freeUp'],['KeyW','freeForward'],['KeyS','freeBack']].map(([code,key])=>
-              `<button type="button" data-free-direction="${code}" data-solar="${key}"></button>`).join('')}
-          </div>
-        </section>
+        ${freeControlsMarkup('sol','data-solar')}
         <div class="ex-map-foot"><span data-solar="model"></span><span id="solScaleNote"></span><strong id="solPairSummary" hidden></strong></div>
         <div class="ex-zoom"><label for="solZoom" data-solar="zoom"></label><input id="solZoom" type="range" min="0" max="${MAX_ZOOM}" step="0.01" value="0"><output id="solZoomValue"></output></div>
         <div class="ex-solar-viewbar ex-flight-controls" role="group" id="solFlightControls" hidden>
@@ -1034,7 +1024,6 @@ export function mountSolar(root) {
     $('solInner').textContent=t(system?'moonInner':'inner');
     $('solFrames').hidden = view!=='3d'||Boolean(system||voyager||beyond);
     $('solOrbitPoses').hidden = Boolean(galactic||free);
-    $('solFree').textContent=t(free?'freeOrbit':'freeMode');
     $('solFree').setAttribute('aria-pressed',String(Boolean(free)));
     $('solFreeControls').hidden=!free;
     $('solFreeControls').setAttribute('aria-label',t('freeControls'));

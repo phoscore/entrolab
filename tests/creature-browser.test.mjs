@@ -247,8 +247,9 @@ test('Null: mobile and desktop art neither shifts the lab nor intersects guide t
     const range=document.createRange();
     range.selectNodeContents(document.querySelector('#physicsGuide > summary > span:first-child'));
     const text=range.getBoundingClientRect();
-    const hint=document.querySelector('.input-convention').getBoundingClientRect();
-    return {section:[section.x,section.y,section.width],safe:text.right<slot.left&&slot.bottom<=hint.top,
+    const hint=document.querySelector('#mass-format').getBoundingClientRect();
+    const clearOfHint=!hint.width||slot.bottom<=hint.top||slot.top>=hint.bottom||slot.right<=hint.left||slot.left>=hint.right;
+    return {section:[section.x,section.y,section.width],safe:text.right<slot.left&&clearOfHint,
      overflow:document.documentElement.scrollWidth>innerWidth+1,hit:!!document.elementFromPoint(slot.left+slot.width/2,slot.top+slot.height/2)?.closest('.null-slot')};
    });
    const before=await placement();

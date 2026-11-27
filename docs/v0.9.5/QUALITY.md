@@ -56,3 +56,5 @@ The [Heliosphere verification](HELIOSPHERE.md#implementation-and-checks) exercis
 [Free camera and interaction checks](FREE-CAMERA.md) and [ephemeris verification](OUR-HOME-FINALIZATION.md#offline-verification) cover the new rendering and data paths.
 
 See [Final Polish B – Physics for Everyone](FINAL-POLISH-B.md) for learning content, physical model assumptions, observed reference sources and validation.
+
+[Final Polish C](FINAL-POLISH-C.md) adds checks for the stellar observer camera, native accessibility-tree evidence, lab layout and illustration controls. The review pairs performance and screenshot artifacts with the candidate commit.

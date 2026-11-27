@@ -2,10 +2,78 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {NEIGHBORHOOD_URL,loadNeighborhood} from '../dist/explorer/neighborhood-data.mjs';
+import {aimFree,freeSpeed,freeToOrbit,moveFree,orbitToFree} from '../dist/explorer/free-camera.mjs';
+import {spaceBasis} from '../dist/explorer/solar-space.mjs';
 import {distanceDisplay,neighborhoodDirection,neighborhoodFocus,neighborhoodGroups,neighborhoodHit,
-  neighborhoodHome,neighborhoodProjector,neighborhoodRotate,neighborhoodZoom} from '../dist/explorer/neighborhood-space.mjs';
+  neighborhoodHome,neighborhoodProjector,neighborhoodRotate,neighborhoodZoom,neighborhoodFitDistance,
+  NEIGHBORHOOD_FREE_LIMITS,NEIGHBORHOOD_MAX_ZOOM} from '../dist/explorer/neighborhood-space.mjs';
 
 const close=(a,b,epsilon=1e-10)=>assert.ok(Math.abs(a-b)<=epsilon,`${a} ≠ ${b}`);
+
+test('parsec free camera clips near geometry and preserves eye and data through transitions',()=>{
+  const width=390,height=440,base=neighborhoodFitDistance(width,height);
+  const orbit={...neighborhoodHome(),focus:[1,-3,2],zoom:1};
+  const free=orbitToFree(orbit,base);
+  const point=[1,2,-3];
+  const first=neighborhoodProjector(orbit,width,height).project(point);
+  const second=neighborhoodProjector(orbit,width,height,free).project(point);
+  for(const key of ['x','y','depth'])close(first[key],second[key]);
+  const limits=NEIGHBORHOOD_FREE_LIMITS;
+  const [right,up,toward]=spaceBasis(free);
+  for(const [i,vector] of [right,up,toward.map(v=>-v)].entries()){
+    const axis=[0,0,0];axis[i]=1;
+    const moved=moveFree(free,axis,3,2,limits);
+    moved.position.forEach((v,j)=>close(v-free.position[j],6*vector[j]));
+    assert.deepEqual(aimFree(moved,38,20).position,moved.position);
+  }
+  assert.equal(freeSpeed(free,8,limits),50);
+  assert(moveFree(free,[1,0,0],50,1e6,limits).position.every(v=>Math.abs(v)<=limits.position));
+  const turned=aimFree(free,70,-110);
+  const resized=neighborhoodFitDistance(320,640);
+  const back=orbitToFree(freeToOrbit(turned,resized,NEIGHBORHOOD_MAX_ZOOM),resized);
+  back.position.forEach((v,i)=>close(v,turned.position[i]));
+  const inside={position:[0,0,0],yaw:0,pitch:0,depth:20};
+  const clipped=neighborhoodProjector(orbit,width,height,inside);
+  assert.equal(clipped.project([1,0,0]),null);
+  assert.equal(clipped.project([-.01,0,0]),null);
+  assert.ok(clipped.project([-2,0,0]));
+  close(clipped.segment([1,0,0],[-1,0,0])[0].depth,.05);
+  assert.deepEqual(point,[1,2,-3]);
+});
+
+test('returning from Orbit bounds both ends of each stellar axis before movement',()=>{
+  const distance=neighborhoodFitDistance(970,650);
+  const limits=NEIGHBORHOOD_FREE_LIMITS;
+  const faces=[
+    [0, 1,Math.PI,0],[0,-1,0,0],
+    [1, 1,-Math.PI/2,0],[1,-1,Math.PI/2,0],
+    [2, 1,0,-Math.PI/2+.001],[2,-1,0,Math.PI/2-.001],
+  ];
+  for(const [axis,sign,yaw,pitch] of faces){
+    const position=[12,-23,34];
+    position[axis]=sign*1000;
+    const free={position,yaw,pitch,depth:distance};
+    const orbit=freeToOrbit(free,distance,NEIGHBORHOOD_MAX_ZOOM);
+    orbitToFree(orbit,distance,limits).position.forEach((value,i)=>close(value,position[i]));
+    const rotated=axis===2?
+      neighborhoodRotate(orbit,0,pitch/.007):
+      neighborhoodRotate(orbit,Math.PI/2/.007,0);
+    const unbounded=orbitToFree(rotated,distance);
+    assert(sign*unbounded.position[axis]>1010);
+    const bounded=orbitToFree(rotated,distance,limits);
+    assert.equal(bounded.position[axis],sign*1000);
+    bounded.position.forEach((value,i)=>{if(i!==axis)close(value,unbounded.position[i]);});
+    assert.deepEqual([bounded.yaw,bounded.pitch,bounded.depth],[rotated.yaw,rotated.pitch,distance]);
+
+    const [right,up]=spaceBasis(bounded);
+    const direction=axis===2?up:right;
+    const inward=sign*direction[axis]>0?-1:1;
+    const movement=axis===2?[0,inward,0]:[inward,0,0];
+    const first=moveFree(bounded,movement,3,.2,limits);
+    first.position.forEach((value,i)=>close(value,bounded.position[i]+.6*inward*direction[i]));
+    assert(sign*first.position[axis]<1000);
+  }
+});
 
 test('perspective keeps a right-handed orthonormal basis with the Galactic orientation',()=>{
   const width=320,height=450;

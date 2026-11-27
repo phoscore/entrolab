@@ -33,7 +33,7 @@ test('v0.6 browser: real tab navigation and offscreen scrolling stop entropy tic
 });
 
 test('v0.6 browser: glossary context and keyboard return preserve lab state and original sandbox drafts',async()=>{
- const {page:p,context}=await lab();try{await entropy(p);await k(p,6);const before=await state(p);const link=p.locator('#entropy [data-explain]');await link.focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();await p.locator('[data-language=en]').click();await p.locator('#guideReturn').focus();await p.keyboard.press('Enter');assert.equal(await link.evaluate(e=>e===document.activeElement),true);assert.deepEqual(await state(p),before);await chooseLab(p,'gravity');await p.locator('.edit-options summary').click();await p.locator('#velX').fill('42.7500');const model=await p.evaluate(()=>window.entrolab.inspect());await p.locator('#gravity [data-explain=guide-universe]').click();await p.keyboard.press('Escape');assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),model);assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-universe')}finally{await context.close()}
+ const {page:p,context}=await lab();try{await entropy(p);await k(p,6);const before=await state(p);const link=p.locator('#entropyExplain');await link.focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();await p.locator('[data-language=en]').click();await p.locator('#guideReturn').focus();await p.keyboard.press('Enter');assert.equal(await link.evaluate(e=>e===document.activeElement),true);assert.deepEqual(await state(p),before);await chooseLab(p,'gravity');await p.locator('.edit-options summary').click();await p.locator('#velX').fill('42.7500');const model=await p.evaluate(()=>window.entrolab.inspect());await p.locator('#gravity [data-explain=guide-universe]').click();await p.keyboard.press('Escape');assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),model);assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-universe')}finally{await context.close()}
 });
 
 test('v0.6 browser: each button press really reloads isolated checks, updates live status and preserves IDs/forecast',async()=>{
@@ -103,7 +103,7 @@ test('review P2 browser: context return/Escape and lab navigation preserve visib
 
 test('review P2 browser: native glossary collapse clears context; a newly opened explanation returns to its own visible origin',async()=>{
  const {page:p,context}=await lab();try{
-  await entropy(p);const before=await reviewModel(p);await p.locator('#entropy [data-explain]').press('Enter');
+  await entropy(p);const before=await reviewModel(p);await p.locator('#entropyExplain').press('Enter');
   await p.locator('#physicsGuide > summary').press('Enter');await p.waitForFunction(()=>document.getElementById('guideReturn').hidden);
   await p.locator('#physicsGuide > summary').press('Enter');assert.equal(await p.locator('#guideReturn').isVisible(),false);
   await chooseLab(p,'blackhole');const origin=p.locator('#blackhole [data-explain=guide-horizon]');await origin.press('Enter');await p.keyboard.press('Escape');assert.equal(await origin.evaluate(e=>e===document.activeElement),true);
