@@ -1,6 +1,6 @@
-#explorer{--ex-line:#293b49;--ex-muted:#a5b6c4;--ex-ice:#99e7e0;padding-top:12px}
-#explorer *{min-width:0}
-#explorer h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;letter-spacing:-1.8px;margin:0 0 8px}
+#explorer{--ex-line:#293b49;--ex-muted:#a5b6c4;--ex-ice:#99e7e0}
+#exContent *{min-width:0}
+#exContent h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;letter-spacing:-1.8px;margin:0 0 8px}
 #explorer .ex-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin:14px 0 26px}
 #explorer .ex-heading p{max-width:620px;margin:6px 0;color:var(--ex-muted);line-height:1.6}
 #explorer .ex-kicker{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ex-ice);margin-bottom:12px}
@@ -12,7 +12,7 @@
 #explorer button{border:1px solid var(--ex-line);border-radius:7px;background:#142130;color:#e8f5f4;min-height:36px;padding:8px 12px}
 #explorer button:hover{background:#203448;border-color:#4f7683}
 #explorer button:disabled{opacity:.45;cursor:default}
-#explorer :focus-visible{outline:2px solid #99e7e0;outline-offset:3px}
+#exContent :focus-visible{outline:2px solid #99e7e0;outline-offset:3px}
 #explorer .ex-map{position:relative;background:radial-gradient(ellipse at 50% 40%,#112335 0%,#09121d 65%,#070e17 100%);height:clamp(360px,46vw,560px)}
 #explorer canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #explorer canvas[data-interacting=true]{touch-action:none;cursor:grabbing}
@@ -42,9 +42,9 @@
 #explorer .ex-inspector dl{margin:10px 0}
 #explorer dt{font-size:11px;color:var(--ex-muted);margin:12px 0 5px}
 #explorer dd{margin:0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
-#explorer details{margin-top:14px;border-top:1px solid var(--ex-line);padding-top:10px}
-#explorer summary{cursor:pointer;color:#bccdd9;font-size:12px;line-height:1.6}
-#explorer a{color:#a2dedc;overflow-wrap:anywhere}
+#exContent details{margin-top:14px;border-top:1px solid var(--ex-line);padding-top:10px}
+#exContent summary{cursor:pointer;color:#bccdd9;font-size:12px;line-height:1.6}
+#exContent a{color:#a2dedc;overflow-wrap:anywhere}
 #explorer .ex-notes{padding:16px 20px;border-top:1px solid var(--ex-line);color:var(--ex-muted);font-size:12px;line-height:1.7}
 #explorer .ex-notes p{margin:8px 0}
 #explorer .ex-error{padding:20px;color:#ffbdb5}
