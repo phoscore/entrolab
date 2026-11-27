@@ -30,11 +30,11 @@ test('all eight headings share their order, bilingual explanations and local inp
     await p.locator('[data-language=en]').click();
     assert.match(await help.textContent(),/What does this mean/);
     assert.match(await p.locator('.brand small').textContent(),/v0\.9\.5 RC/);
-    if(width===1440&&id==='explorer'){
+    if(width===1440&&['explorer','matter'].includes(id)){
      await help.locator(':scope > summary').press('Enter');
      await help.locator('.knowledge-simple summary').press('Enter');
-     assert.match(await help.locator('.knowledge-simple').innerText(),/streetlights/);
-     await shot(help,'explorer-help');
+     assert.match(await help.locator('.knowledge-simple').innerText(),id==='explorer'?/streetlights/:/tiny positive charge/);
+     await shot(help,id+'-help');
     }else if(width===1440){
      const term=(await help.getAttribute('href')).slice(1);
      await help.press('Enter');
@@ -42,13 +42,20 @@ test('all eight headings share their order, bilingual explanations and local inp
      const definition=p.locator('#'+term+' + dd');
      assert.equal(await definition.locator('.knowledge-advanced').count(),1);
      await definition.locator('.knowledge-simple summary').press('Enter');
-     if(id==='matter')await shot(definition,'knowledge-help');
+     if(id==='entropy')await shot(definition,'knowledge-help');
      await p.locator('#guideReturn').press('Enter');
      assert.equal(await help.evaluate(el=>el===document.activeElement),true);
     }
     await p.locator('[data-language=de]').click();
    }
    await chooseLab(p,'gravity');
+   if(width===1440){
+    const question=p.locator('#gravity .lab-followup-question');
+    await question.locator('summary').press('Enter');
+    await question.locator('input').first().press('Space');
+    assert.notEqual(await question.getByRole('status').textContent(),'');
+    await shot(question,'learning-question-feedback');
+   }
    assert.match(await p.locator('#mass').getAttribute('aria-describedby'),/mass-format/);
    await p.locator('.edit-options > summary').press('Enter');
    await shot(p.locator('#mass-format'),'local-input-'+width);

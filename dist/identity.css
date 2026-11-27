@@ -74,9 +74,20 @@
 .page-heading:has(.lab-title) .badge { border-color:color-mix(in srgb,var(--lab-accent) 38%,#1e2230) }
 .page-heading:has(.lab-title) { margin-bottom:.22rem }
 .lab-help { margin:0 0 .7rem; min-height:44px }
-.neighborhood-context { max-width:63ch }
-.neighborhood-context > summary { min-height:44px; padding:.5rem 0; color:var(--lab-accent); cursor:pointer }
-.page-heading .lab-header-question { padding:.22rem 0; margin:.25rem 0 .55rem; max-width:63ch }
+.lab-inline-help { max-width:63ch }
+.lab-inline-help > summary { min-height:44px; padding:.5rem 0; color:var(--lab-accent); cursor:pointer }
+.page-heading :is(.learning-question,.lab-header-question) {
+ min-width:0; max-width:76ch; margin:.4rem 0 .55rem; padding:0;
+ font-size:.9rem; line-height:1.6;
+}
+.page-heading :is(.learning-question,.lab-header-question)>summary {
+ min-height:44px; padding:.5rem .7rem; overflow-wrap:anywhere;
+ border:1px solid color-mix(in srgb,var(--lab-accent) 42%,#272031);
+ border-radius:.5rem; background:#17121e; color:var(--lab-accent); font-weight:500;
+}
+.page-heading :is(.learning-question,.lab-header-question)>summary:focus-visible {
+ outline:2px solid var(--lab-accent); outline-offset:2px;
+}
 .lab-followup-question { max-width:67ch; padding:.4rem .65rem; margin:.5rem 0 .8rem }
 .lab-header-question > summary,.lab-followup-question > summary { cursor:pointer }
 .lab-question-legend {
