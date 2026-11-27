@@ -1,0 +1,10 @@
+export const polishC={
+  'polishC.help':['Was bedeutet das?','What does this mean?'],
+  'polishC.number':['Dezimalpunkt verwenden, z. B. 0.1. Tausendertrennzeichen weglassen.','Use a decimal point, for example 0.1. Leave out thousands separators.'],
+  'polishC.temperatureLead':['Vergleiche Temperaturen und sieh, wie sich ein klassisches Gas bei verschiedenen Temperaturen verhält.','Compare temperatures and see how a classical gas behaves at different temperatures.'],
+  'polishC.explorerLead':['Erkunde Blickrichtungen am Himmel, unser Sonnensystem und die räumliche Umgebung der Sonne.','Explore directions in the sky, our Solar System and the space around the Sun.'],
+  'polishC.explorerDefinition':['Die Himmelskarte speichert Richtungen. Die räumlichen Ansichten verwenden zusätzlich Entfernungen oder berechnete Positionen.','The sky map records directions. The spatial views also use distances or calculated positions.'],
+  'polishC.explorerSimple':['Zwei Straßenlaternen können hintereinander am selben Punkt im Foto erscheinen. Wenn du zur Seite gehst, zeigt sich der Abstand. Auch auf der Himmelskarte können nahe Bildpunkte zu weit voneinander entfernten Objekten gehören.','Two streetlights can appear to line up in a photo. Move sideways and their separation becomes clear. Nearby points on the sky map can likewise belong to objects far apart in space.'],
+  'polishC.explorerAdvanced':['Die Winkelkarte nutzt katalogisierte ICRS-Blickrichtungen. Die Sonnenumgebung kombiniert Gaia-Richtungen von J2016.0 mit geschätzten geometrischen Entfernungen. Deren Unsicherheiten und die Auswahlgrenzen stehen im Inspector und in der Datenbeschreibung.','The angular map uses catalogued ICRS directions. Stellar Neighborhood combines Gaia directions at J2016.0 with estimated geometric distances. Distance uncertainties and sample limits are available in the inspector and data notes.'],
+  'polishC.explorerSource':['Sonnenumgebung: Daten und Quellen','Stellar Neighborhood data and sources'],
+};

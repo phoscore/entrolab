@@ -1,7 +1,13 @@
 import {rotateSpace, spaceCamera, spaceProjector} from './solar-space.mjs';
+import {freeNear} from './free-camera.mjs';
 import {NEIGHBORHOOD_RADIUS, PC_TO_LY} from './foundation/neighborhood-format.mjs';
 
 export const NEIGHBORHOOD_MAX_ZOOM = 2.4;
+export const NEIGHBORHOOD_FREE_LIMITS = Object.freeze({
+  position:1000, nearMin:.001, nearMax:.05, speedMin:.0001, speedMax:50,
+});
+export const neighborhoodFitDistance = (width,height) =>
+  NEIGHBORHOOD_RADIUS * Math.hypot(1, .9*height/(.40*Math.min(width,height)));
 export const neighborhoodHome = () => spaceCamera();
 export const neighborhoodRotate = (camera, dx, dy) => rotateSpace(camera, dx, -dy);
 export function neighborhoodZoom(camera, zoom) {
@@ -12,15 +18,20 @@ export function neighborhoodFocus(camera, position) {
   if (position.length !== 3 || !Array.from(position).every(Number.isFinite)) throw new RangeError('Invalid neighborhood focus');
   return {...camera, focus:Array.from(position), zoom:Math.max(.55, camera.zoom)};
 }
-export function neighborhoodProjector(camera, width, height) {
+export function neighborhoodProjector(camera, width, height, free=null) {
   if (![width,height,camera.yaw,camera.pitch,camera.zoom,...camera.focus].every(Number.isFinite) ||
       width<=0 || height<=0 || camera.focus.length!==3 || camera.zoom<0 || camera.zoom>NEIGHBORHOOD_MAX_ZOOM) {
     throw new RangeError('Invalid neighborhood camera');
   }
+  if (free && (free.position.length!==3 || free.depth<=0 ||
+      ![...free.position,free.depth,free.yaw,free.pitch].every(Number.isFinite))) {
+    throw new RangeError('Invalid neighborhood observer');
+  }
   // Fit a bounding sphere in the shorter dimension, including the perspective expansion at its silhouette.
-  const distance = NEIGHBORHOOD_RADIUS * Math.hypot(1, .9*height/(.40*Math.min(width,height)));
-  const project = spaceProjector(camera,width,height,distance);
-  return {distance:distance/10**camera.zoom, project:position=>(
+  const distance = neighborhoodFitDistance(width,height);
+  const view = free ? {...free,nearPlane:freeNear(free,NEIGHBORHOOD_FREE_LIMITS)} : camera;
+  const project = spaceProjector(view,width,height,distance);
+  return {distance:free?.depth??distance/10**camera.zoom, segment:project.segment, project:position=>(
     position.length===3 && Number.isFinite(position[0]) && Number.isFinite(position[1]) &&
       Number.isFinite(position[2]) ? project(position) : null
   )};

@@ -11,6 +11,20 @@ export const freeCopy={
   freeControls:['Freie Kamerasteuerung','Free camera controls'],
 };
 
+export function freeControlsMarkup(prefix,localize){
+  return `<section class="ex-free" id="${prefix}FreeControls" hidden>
+    <div class="ex-free-speed">
+      <label for="${prefix}FreeSpeed" ${localize}="freeSpeed"></label>
+      <input id="${prefix}FreeSpeed" type="range" min="-8" max="8" step="1" value="0">
+      <output id="${prefix}FreeSpeedText" for="${prefix}FreeSpeed"></output>
+    </div>
+    <div class="ex-free-axis">
+      ${[['KeyA','freeLeft'],['KeyD','freeRight'],['KeyQ','freeDown'],['KeyE','freeUp'],['KeyW','freeForward'],['KeyS','freeBack']]
+        .map(([code,key])=>`<button type="button" data-free-direction="${code}" ${localize}="${key}"></button>`).join('')}
+    </div>
+  </section>`;
+}
+
 export function bindFreeControls({canvas,controls,listen,enabled,look,move,wake}){
   const keys=new Set(), pointers=new Map();
   let last=null;

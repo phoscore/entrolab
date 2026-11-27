@@ -72,6 +72,17 @@
 }
 .page-heading:has(.lab-title) p:not(.lab-tagline) { font-size:.86rem; line-height:1.5; max-width:63ch }
 .page-heading:has(.lab-title) .badge { border-color:color-mix(in srgb,var(--lab-accent) 38%,#1e2230) }
+.page-heading:has(.lab-title) { margin-bottom:.22rem }
+.lab-help { margin:0 0 .7rem; min-height:44px }
+.neighborhood-context { max-width:63ch }
+.neighborhood-context > summary { min-height:44px; padding:.5rem 0; color:var(--lab-accent); cursor:pointer }
+.page-heading .lab-header-question { padding:.22rem 0; margin:.25rem 0 .55rem; max-width:63ch }
+.lab-followup-question { max-width:67ch; padding:.4rem .65rem; margin:.5rem 0 .8rem }
+.lab-header-question > summary,.lab-followup-question > summary { cursor:pointer }
+.lab-question-legend {
+ position:absolute; inline-size:1px; block-size:1px; overflow:hidden; clip-path:inset(50%);
+}
+.local-number-format { grid-column:1/-1; margin:.15rem 0 .4rem; font-size:.8rem; line-height:1.4 }
 #temperature.thermal-lab { margin-top:0; border-top:0 }
 #temperature .thermal-layout { margin-bottom:1.2rem }
 .object-image-frame,.bh-image-frame { position:relative }
@@ -87,8 +98,9 @@
 }
 .motion-toggle::after { content:""; grid-area:1/1; z-index:1; width:12px; height:13px; background:currentColor }
 .motion-toggle[data-paused=true]::after { clip-path:polygon(15% 0,100% 50%,15% 100%) }
-.motion-toggle[data-paused=false]::after { clip-path:polygon(0 0,34% 0,34% 100%,0 100%,0 0,66% 0,100% 0,100% 100%,66% 100%) }
+.motion-toggle[data-paused=false]::after { background:linear-gradient(to right,currentColor 0 33%,transparent 33% 67%,currentColor 67% 100%) }
 .motion-toggle:disabled { opacity:.65 }
+.motion-toggle:disabled::after { width:9px; height:2px; clip-path:none; background:currentColor }
 .motion-toggle:hover:not(:disabled)::before { background:#262239 }
 @media (min-width:1240px) {
  .site-header { grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"brand navigation languages" }

@@ -1,3 +1,4 @@
+import {polishC} from './polish-c-text.mjs';
 import {polishB} from './polish-b-text.mjs';
 import {phaseA} from './phase-a-text.mjs';
 import {reimagined} from './reimagined-text.mjs';
@@ -5,6 +6,7 @@ import {upgradeDE,upgradeEN} from './upgrade-text.mjs';
 import {knowledgeDE,knowledgeEN} from './knowledge-text.mjs';
 // German source messages are stable keys. Values are plain text, never HTML.
 export const de=Object.freeze({
+  ...Object.fromEntries(Object.entries(polishC).map(([key,[de]])=>[key,de])),
   ...Object.fromEntries(Object.entries(polishB).map(([key,pair])=>[key,pair[0]])),
   "identity.staticIllustration": "Statische Illustration",
   "identity.gravity": "Gravity Sandbox",
@@ -569,6 +571,7 @@ export const de=Object.freeze({
   "Selbst ausprobieren": "Selbst ausprobieren"
 });
 export const en=Object.freeze({
+  ...Object.fromEntries(Object.entries(polishC).map(([key,[,en]])=>[key,en])),
   ...Object.fromEntries(Object.entries(polishB).map(([key,pair])=>[key,pair[1]])),
   "identity.staticIllustration": "Static illustration",
   "identity.gravity": "Gravity Sandbox",

@@ -32,3 +32,5 @@ Die begrenzten Datenabfragen sind Offline-Vorbereitung. Produktion, Browser und 
 [Voyager forecasts and the Apophis encounter](OUR-HOME-FINALIZATION.md) documents the additional Horizons captures, model context and checks.
 
 See [Final Polish B – Physics for Everyone](FINAL-POLISH-B.md) for learning content, physical model assumptions, observed reference sources and validation.
+
+[Final Polish C](FINAL-POLISH-C.md) ergänzt Bedienung und Darstellung der vorhandenen Sternpositionen. Der standortbezogene Gaia-Datensatz und seine Attribution verwenden denselben gepinnten Release.

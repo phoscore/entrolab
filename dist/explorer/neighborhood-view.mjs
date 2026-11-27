@@ -5,10 +5,16 @@ import {loadNeighborhood,neighborhoodLoader,neighborhoodDetails,NEIGHBORHOOD_URL
 import {NEIGHBORHOOD_EPOCH,NEIGHBORHOOD_RADIUS,NEIGHBORHOOD_MAX_G,PC_TO_LY,neighborhoodIndex} from './foundation/neighborhood-format.mjs';
 import {paintNeighborhood} from './neighborhood-paint.mjs';
 import {distanceDisplay,neighborhoodDirection,neighborhoodFocus,neighborhoodHit,neighborhoodHome,
-  neighborhoodRotate,neighborhoodZoom,NEIGHBORHOOD_MAX_ZOOM} from './neighborhood-space.mjs';
+  neighborhoodRotate,neighborhoodZoom,neighborhoodFitDistance,NEIGHBORHOOD_FREE_LIMITS,NEIGHBORHOOD_MAX_ZOOM} from './neighborhood-space.mjs';
+import {aimFree,freeSpeed,freeToOrbit,moveFree,orbitToFree} from './free-camera.mjs';
+import {bindFreeControls,freeControlsMarkup,freeCopy} from './free-camera-controls.mjs';
 const valueOf=(el,value)=>{if(el.textContent!==value)el.textContent=value;};
 const formatter=['de-DE','en-GB'].map(locale=>new Intl.NumberFormat(locale,{maximumSignificantDigits:8}));
 const copy={
+  ...freeCopy,
+  observer:['Beobachter','Observer'],
+  viewCenter:['Blickpunkt','View centre'],
+  realSecond:['pro realer Sekunde','per real second'],
   title:['Sonnenumgebung','Stellar Neighborhood'],
   origin:['Sonne im Ursprung','Sun at the origin'],
   intro:['Geschätzte Positionen um die Sonne · statische 3D-Karte · Gaia J2016.0','Estimated positions around the Sun · static 3D map · Gaia J2016.0'],
@@ -88,10 +94,11 @@ export function mountNeighborhood(root,{onSky}) {
       </header>
       <div class="ex-layout sn-layout"><div class="ex-left">
         <div class="sn-toolbar"><div class="ex-controls"><button id="snOut" type="button">−</button><button id="snIn" type="button">+</button>
-          <button id="snHome" type="button" data-sn="fit"></button><button id="snSun" type="button" data-sn="solarFocus"></button><button id="snCenter" type="button" data-sn="center" disabled></button></div>
+          <button id="snHome" type="button" data-sn="fit"></button><button id="snSun" type="button" data-sn="solarFocus"></button><button id="snCenter" type="button" data-sn="center" disabled></button><button id="snFree" type="button" aria-pressed="false"></button></div>
           <div class="sn-options"><label><span data-sn="units"></span><select id="snUnit"><option value="pc" data-sn="pc"></option><option value="ly" data-sn="ly" selected></option></select></label>
           <label><input id="snConnection" type="checkbox" checked><span data-sn="connection"></span></label></div></div>
         <div class="ex-map sn-map"><canvas id="snCanvas" tabindex="0" aria-describedby="snAxes snHelp snHow"></canvas></div>
+        ${freeControlsMarkup('sn','data-sn')}
         <div class="sn-caption"><p id="snAxes"></p><p id="snHow" data-sn="how"></p><p id="snCount"></p><p id="snHidden"></p><p id="snStatus" role="status"></p>
           <button type="button" id="snRetry" data-sn="retry" hidden></button></div>
         <div class="ex-zoom"><label for="snZoom" data-sn="zoom"></label><input id="snZoom" type="range" min="0" max="${NEIGHBORHOOD_MAX_ZOOM}" step=".01" value="0"></div>
@@ -109,6 +116,7 @@ export function mountNeighborhood(root,{onSky}) {
   const listen=(target,type,callback,options={})=>target.addEventListener(type,callback,{...options,signal:controller.signal});
   let active=false,disposed=false,seen=true,job=null,loader=null,data=null,status='loading',frame=null,detailRev=0;
   let width=1,height=1,camera=neighborhoodHome(),unit='ly',selected=-1,pivot=-1,detail=null,detailState='idle';
+  let free=null,freeLevel=0;
   let visible=0,overlap=0,limited=0,marks=[],origin=null,sunVisible=false,draws=0,duration=0,shown=[],listKey=null;
   let names=new Map(),groupRows=[];
 
@@ -222,6 +230,7 @@ export function mountNeighborhood(root,{onSky}) {
     for(const item of root.querySelectorAll('[data-sn]')) item.textContent=t(item.dataset.sn);
     $('snIn').setAttribute('aria-label',t('in'));$('snOut').setAttribute('aria-label',t('out'));
     canvas.setAttribute('aria-label',t('title')+' · 3D');
+    cameraControls();
     refreshNames();
     valueOf($('snCut'),`r₅₀ ≤ ${n(NEIGHBORHOOD_RADIUS)} pc · Gaia G ≤ ${n(NEIGHBORHOOD_MAX_G)} mag`);
     showList();showDetail();summary();invalidate();
@@ -229,20 +238,24 @@ export function mountNeighborhood(root,{onSky}) {
   function invalidate() {
     if(active&&seen&&!document.hidden&&frame===null)frame=requestAnimationFrame(draw);
   }
-  function draw() {
+  function draw(time) {
     frame=null;
     if(!active||!seen||document.hidden||!ctx)return;
+    freeInput.tick(time);
     const began=performance.now();
-    const drawn=paintNeighborhood(ctx,{width,height,camera,unit,data,selected,names,connection:$('snConnection').checked,
+    const drawn=paintNeighborhood(ctx,{width,height,camera,free,unit,data,selected,names,connection:$('snConnection').checked,
       labels:{sun:t('sun'),number:n,unit:unitName(),scale:t('scale'),selected:selected>=0?nameAt(selected):'',
         connection:selected>=0?approximate(selected):''}});
     ({marks,visible,overlap,limited,origin,inView:sunVisible}=drawn);
-    const {longitude,latitude}=neighborhoodDirection(camera);
-    valueOf($('snAxes'),`${t('pivot')} · ${pivot>=0?nameAt(pivot):t('sun')}  |  ${t('looking')} l ${n(Math.round(longitude)%360)}°, b ${n(Math.round(latitude)||0)}°${sunVisible?'':' · '+t('outside')}`);
+    const {longitude,latitude}=neighborhoodDirection(free??camera);
+    const pose=free?`${t('freeMode')} · ${t('observer')} XYZ (${free.position.map(shortNumber).join(' / ')}) pc`:
+      `${t('pivot')} · ${pivot>=0?nameAt(pivot):pivot===-1?t('sun'):t('viewCenter')}`;
+    valueOf($('snAxes'),`${pose}  |  ${t('looking')} l ${n(Math.round(longitude)%360)}°, b ${n(Math.round(latitude)||0)}°${sunVisible?'':' · '+t('outside')}`);
     $('snZoom').value=String(camera.zoom);
     $('snOut').disabled=camera.zoom<=0;
     $('snIn').disabled=camera.zoom>=NEIGHBORHOOD_MAX_ZOOM;
     summary();showList();draws++;duration=performance.now()-began;
+    if(freeInput.moving())invalidate();
   }
   function resize() {
     const rect=canvas.getBoundingClientRect();
@@ -254,7 +267,7 @@ export function mountNeighborhood(root,{onSky}) {
   }
   function center() {
     if(!data||selected<0)return;
-    pivot=selected;camera=neighborhoodFocus(camera,vector(selected));invalidate();
+    pivot=selected;reposition(neighborhoodFocus(currentOrbit(),vector(selected)));
   }
   async function choose(row,focusMap=true) {
     if(!data||!active||!loader)return;
@@ -289,8 +302,7 @@ export function mountNeighborhood(root,{onSky}) {
   function stop() {
     job?.abort();job=null;
     detailRev++;loader?.dispose();loader=null;
-    if(frame!==null)cancelAnimationFrame(frame);
-    frame=null;cancelOrbit();
+    suspendInput();
   }
   function setActive(value) {
     if(disposed||active===value)return;
@@ -298,8 +310,48 @@ export function mountNeighborhood(root,{onSky}) {
     if(value) {resize();void start();} else stop();
   }
   const setCamera=next=>{camera=next;invalidate();};
-  const fit=()=>{pivot=-1;setCamera(neighborhoodHome());};
-  const centerSun=()=>{pivot=-1;setCamera({...camera,focus:[0,0,0]});};
+  const baseDistance=()=>neighborhoodFitDistance(width,height);
+  const currentOrbit=()=>free?freeToOrbit(free,baseDistance(),NEIGHBORHOOD_MAX_ZOOM):camera;
+  const speed=()=>freeSpeed(free,freeLevel,NEIGHBORHOOD_FREE_LIMITS);
+  const positionFormatter=['de-DE','en-GB'].map(locale=>new Intl.NumberFormat(locale,{maximumSignificantDigits:4}));
+  const shortNumber=value=>positionFormatter[lang()].format(value);
+  function cameraControls(){
+    const isFree=Boolean(free);
+    valueOf($('snFree'),t(isFree?'freeOrbit':'freeMode'));
+    $('snFree').setAttribute('aria-pressed',String(isFree));
+    $('snFreeControls').hidden=!isFree;
+    $('snFreeControls').setAttribute('aria-label',t('freeControls'));
+    $('snZoom').parentElement.hidden=isFree;
+    $('snIn').hidden=$('snOut').hidden=isFree;
+    valueOf($('snHelp'),t(isFree?'freeHelp':'help'));
+    if(free){
+      const rate=shortNumber(speed()*(unit==='ly'?PC_TO_LY:1))+' '+unitName()+' '+t('realSecond');
+      valueOf($('snFreeSpeedText'),rate);
+      $('snFreeSpeed').setAttribute('aria-valuetext',rate);
+    }
+  }
+  function look(dx,dy){free=aimFree(free,dx,dy);invalidate();}
+  const freeInput=bindFreeControls({canvas,controls:$('snFreeControls'),listen,
+    enabled:()=>Boolean(free&&active&&seen&&!document.hidden),look,
+    move:(axis,seconds)=>{free=moveFree(free,axis,speed(),seconds,NEIGHBORHOOD_FREE_LIMITS);},
+    wake:invalidate,
+  });
+  function reposition(next){
+    if(free){freeInput.release();free=orbitToFree(next,baseDistance());cameraControls();}
+    setCamera(next);
+  }
+  function toggleCamera(){
+    cancelOrbit();freeInput.release();
+    if(free){
+      const next=currentOrbit();
+      if(next.focus.some((value,i)=>Math.abs(value-camera.focus[i])>1e-9))pivot=-2;
+      camera=next;free=null;
+    }
+    else free=orbitToFree(camera,baseDistance());
+    cameraControls();invalidate();
+  }
+  const fit=()=>{pivot=-1;reposition(neighborhoodHome());};
+  const centerSun=()=>{pivot=-1;reposition({...currentOrbit(),focus:[0,0,0]});};
   const zoomTo=zoom=>setCamera(neighborhoodZoom(camera,zoom));
   const zoomBy=delta=>zoomTo(camera.zoom+delta);
   const pointers=new Map();
@@ -313,17 +365,25 @@ export function mountNeighborhood(root,{onSky}) {
     pointers.clear();resetOrbit();canvas.dataset.interacting='false';
     for(const id of captured)if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
   }
+  function suspendInput(){
+    if(frame!==null)cancelAnimationFrame(frame);
+    frame=null;cancelOrbit();freeInput.release();
+  }
   listen(canvas,'pointerdown',event=>{
-    if(event.button!==0||pointers.size>=2)return;
+    if(event.button!==0||pointers.size>=(free?1:2))return;
     canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId,[event.clientX,event.clientY]);moved=pointers.size>1;
     resetOrbit();canvas.dataset.interacting='true';
   });
   listen(canvas,'pointermove',event=>{
     if(!pointers.has(event.pointerId)||!gesture)return;
+    const previous=pointers.get(event.pointerId);
     pointers.set(event.pointerId,[event.clientX,event.clientY]);
     const [a,b]=pointers.values();
-    if(b){
+    if(free){
+      moved ||= Math.hypot(a[0]-gesture.point[0],a[1]-gesture.point[1])>4;
+      if(moved)look(a[0]-previous[0],previous[1]-a[1]);
+    }else if(b){
       const separation=Math.hypot(a[0]-b[0],a[1]-b[1]);
       setCamera(neighborhoodZoom(gesture.camera,gesture.camera.zoom+Math.log10(Math.max(1,separation)/Math.max(1,gesture.separation))));
     }else{
@@ -346,13 +406,15 @@ export function mountNeighborhood(root,{onSky}) {
     if(!pointers.size)canvas.dataset.interacting='false';
   });
   listen(canvas,'wheel',event=>{
-    if(document.activeElement!==canvas)return;
+    if(free||document.activeElement!==canvas)return;
     event.preventDefault();
     const scale=event.deltaMode===1?16:event.deltaMode===2?height:1;
     zoomBy(-Math.max(-.4,Math.min(.4,event.deltaY*scale*.001)));
   },{passive:false});
   const arrows={ArrowLeft:[-36,0],ArrowRight:[36,0],ArrowUp:[0,-36],ArrowDown:[0,36]};
   listen(canvas,'keydown',event=>{
+    if(freeInput.onMapKey(event))return;
+    if(free&&!['Home','Escape'].includes(event.key))return;
     if(Object.hasOwn(arrows,event.key)){
       event.preventDefault();setCamera(neighborhoodRotate(camera,...arrows[event.key]));
     }else if(['+','=','-','Home','Escape'].includes(event.key)){
@@ -362,11 +424,14 @@ export function mountNeighborhood(root,{onSky}) {
       else zoomBy(event.key==='-'?-.25:.25);
     }
   });
+  listen($('snFree'),'click',toggleCamera);
+  listen($('snFreeSpeed'),'input',()=>{freeLevel=Number($('snFreeSpeed').value);cameraControls();});
+  listen(canvas,'blur',cancelOrbit);listen(window,'blur',cancelOrbit);
   listen($('snIn'),'click',()=>zoomBy(.25));listen($('snOut'),'click',()=>zoomBy(-.25));
   listen($('snZoom'),'input',()=>zoomTo(Number($('snZoom').value)));
   listen($('snHome'),'click',fit);listen($('snCenter'),'click',center);listen($('snRetry'),'click',()=>void start());
   listen($('snSun'),'click',centerSun);
-  listen($('snUnit'),'change',()=>{unit=$('snUnit').value;showDetail();showList();invalidate();});
+  listen($('snUnit'),'change',()=>{unit=$('snUnit').value;cameraControls();showDetail();showList();invalidate();});
   listen($('snConnection'),'change',invalidate);
   listen(search,'input',()=>{groupRows=[];showList();});
   listen(search,'keydown',event=>{if(event.key==='Enter'&&shown.length===1){event.preventDefault();void choose(shown[0]);}});
@@ -376,18 +441,18 @@ export function mountNeighborhood(root,{onSky}) {
     if(event.target.closest('[data-sn-sky]')&&detail)onSky(detail);
   });
   listen(document,'visibilitychange',()=>{
-    if(document.hidden&&frame!==null){cancelAnimationFrame(frame);frame=null;}
+    if(document.hidden)suspendInput();
     else invalidate();
   });
   const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(canvas);
   const intersection=new IntersectionObserver(entries=>{
     seen=entries[0].isIntersecting;
-    if(seen)invalidate();else if(frame!==null){cancelAnimationFrame(frame);frame=null;}
+    if(seen)invalidate();else suspendInput();
   });
   intersection.observe(canvas);
   const unsubscribe=onLanguageChange(localize);
   localize();
-  return {setActive,inspect:()=>({active,status,unit,origin,sunVisible,pivot,camera:{...camera,focus:[...camera.focus]},total:data?.ids.length??0,visible,overlap,limited,markers:marks.length,
+  return {setActive,inspect:()=>({active,status,unit,origin,sunVisible,pivot,free:free?{...free,position:[...free.position]}:null,freeLevel,camera:{...camera,focus:[...camera.focus]},total:data?.ids.length??0,visible,overlap,limited,markers:marks.length,
     sample:data?marks.slice(0,12).map(({row,x,y,depth,members})=>({id:idAt(row),x,y,depth,members:members.map(idAt)})):[],
     overlapSample:data?marks.filter(m=>m.members.length>1&&m.x>20&&m.x<width-20&&m.y>50&&m.y<height-40&&
       (!sunVisible||Math.hypot(m.x-origin[0],m.y-origin[1])>8)).slice(0,4)

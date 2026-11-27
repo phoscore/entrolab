@@ -1,4 +1,5 @@
 import {niceStep} from './camera.mjs';
+import {spaceBasis} from './solar-space.mjs';
 import {placeLabels,drawLabels} from './labels.mjs';
 import {PC_TO_LY} from './foundation/neighborhood-format.mjs';
 import {neighborhoodGroups,neighborhoodProjector} from './neighborhood-space.mjs';
@@ -14,19 +15,20 @@ function glow(ctx,x,y,r,color) {
   ctx.fillRect(x-r,y-r,2*r,2*r);
 }
 
-export function paintNeighborhood(ctx,{width,height,camera,unit,data,selected,names,connection,labels}) {
+export function paintNeighborhood(ctx,{width,height,camera,free=null,unit,data,selected,names,connection,labels}) {
   ctx.clearRect(0,0,width,height);
-  const {project,distance}=neighborhoodProjector(camera,width,height);
+  const {project,distance,segment}=neighborhoodProjector(camera,width,height,free);
   const {marks,visible,overlap,limited}=neighborhoodGroups(project,width,height,data,selected,names);
   const sun=project([0,0,0]);
   const chosen=selected>=0&&data ? project(data.xyz.subarray(3*selected,3*selected+3)) : null;
   ctx.font='11px "DM Sans",sans-serif';
 
-  if (connection && sun && chosen) {
+  const line=connection&&selected>=0&&data ? segment([0,0,0],data.xyz.subarray(3*selected,3*selected+3)) : null;
+  if (line) {
     ctx.strokeStyle='#f3c98689';ctx.setLineDash([4,5]);
-    ctx.beginPath();ctx.moveTo(sun.x,sun.y);ctx.lineTo(chosen.x,chosen.y);ctx.stroke();ctx.setLineDash([]);
-    const x=(sun.x+chosen.x)/2,y=(sun.y+chosen.y)/2;
-    if (Math.hypot(sun.x-chosen.x,sun.y-chosen.y)>84 && x>50 && x<width-80 && y>60 && y<height-40) {
+    ctx.beginPath();ctx.moveTo(line[0].x,line[0].y);ctx.lineTo(line[1].x,line[1].y);ctx.stroke();ctx.setLineDash([]);
+    const x=(line[0].x+line[1].x)/2,y=(line[0].y+line[1].y)/2;
+    if (sun && chosen && Math.hypot(sun.x-chosen.x,sun.y-chosen.y)>84 && x>50 && x<width-80 && y>60 && y<height-40) {
       ctx.fillStyle='#f5dba5';ctx.fillText(labels.connection,x+6,y-6);
     }
   }
@@ -63,19 +65,23 @@ export function paintNeighborhood(ctx,{width,height,camera,unit,data,selected,na
   // Small orientation glyph uses the same camera basis, centred on the camera pivot.
   const axisSize=distance*24/(height*.9);
   const centre=[40,37];
+  const [right,up]=spaceBasis(free??camera);
   for (const [axis,color] of ['#efb486','#a7d0c2','#aebfeb'].entries()) {
-    const point=project(camera.focus.map((v,i)=>v+(axis===i?axisSize:0)));
-    const x=centre[0]+point.x-width/2,y=centre[1]+point.y-height/2;
+    const point=free?null:project(camera.focus.map((v,i)=>v+(axis===i?axisSize:0)));
+    const x=centre[0]+(free?24*right[axis]:point.x-width/2);
+    const y=centre[1]+(free?-24*up[axis]:point.y-height/2);
     ctx.strokeStyle=ctx.fillStyle=color;
     ctx.beginPath();ctx.moveTo(...centre);ctx.lineTo(x,y);ctx.stroke();
     if (Math.hypot(x-centre[0],y-centre[1])>7) ctx.fillText('XYZ'[axis],x+3,y+3);
   }
 
-  const factor=unit==='ly'?PC_TO_LY:1;
-  const pixelsPerUnit=height*.9/distance/factor;
-  const step=niceStep(Math.min(38,width*.07)/pixelsPerUnit);
-  ctx.strokeStyle=ctx.fillStyle='#bfd4e5';
-  ctx.beginPath();ctx.moveTo(16,height-15);ctx.lineTo(16+step*pixelsPerUnit,height-15);ctx.stroke();
-  ctx.fillText(labels.number(step)+' '+labels.unit+' · '+labels.scale,16,height-22);
+  if(!free){
+    const factor=unit==='ly'?PC_TO_LY:1;
+    const pixelsPerUnit=height*.9/distance/factor;
+    const step=niceStep(Math.min(38,width*.07)/pixelsPerUnit);
+    ctx.strokeStyle=ctx.fillStyle='#bfd4e5';
+    ctx.beginPath();ctx.moveTo(16,height-15);ctx.lineTo(16+step*pixelsPerUnit,height-15);ctx.stroke();
+    ctx.fillText(labels.number(step)+' '+labels.unit+' · '+labels.scale,16,height-22);
+  }
   return {marks,visible,overlap,limited,origin:sun?[sun.x,sun.y]:null,inView:inView(sun,width,height)};
 }
