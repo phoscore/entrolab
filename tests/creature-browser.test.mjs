@@ -332,6 +332,8 @@ test('Null 3.5: one figure visits eight real laboratory headings in safe space',
    const heading=p.locator('[data-null-anchor='+area+']');
    await heading.scrollIntoViewIfNeeded();
    await p.waitForFunction(area=>window.entrolabCreature.inspect().place===area&&window.nullAudit.pending()===1,area);
+   // The Explorer mounts asynchronously. Compare the same initialized view before and after the visit.
+   if(area==='explorer')await p.waitForFunction(()=>window.entrolabExplorer);
    const before=await physical(p);
    const visual=await p.evaluate(()=>{
     const blackhole=Array.from(document.querySelectorAll('#blackhole input,#blackhole output,#bhTemp')).map(e=>e.value??e.textContent);

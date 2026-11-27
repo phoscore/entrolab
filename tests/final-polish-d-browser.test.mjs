@@ -17,6 +17,7 @@ test('all lab headers share typography, geometry and accessible theme colours in
      let reference;
      for(const id of labs){
       await chooseLab(p,id);
+      if(id==='explorer')await p.waitForFunction(()=>document.querySelector('link[data-explorer-style]')?.sheet);
       const header=p.locator('#'+id+' .lab-header');
       const styles=await header.evaluate(el=>{
        const pick=s=>el.querySelector(s);
