@@ -16,6 +16,7 @@ test('all eight headings share their order, bilingual explanations and local inp
  for(const width of [1440,390,320]){
   const {p,context}=await h.lab({viewport:{width,height:980},hasTouch:width<760});
   try{
+   await shot(p.locator('.site-header'),'release-candidate-'+width);
    for(const id of labs){
     await chooseLab(p,id,width<760?'tap':undefined);
     const lab=p.locator('#'+id),heading=lab.locator('.page-heading');
@@ -34,11 +35,14 @@ test('all eight headings share their order, bilingual explanations and local inp
      await help.locator('.knowledge-simple summary').press('Enter');
      assert.match(await help.locator('.knowledge-simple').innerText(),/streetlights/);
      await shot(help,'explorer-help');
-    }else if(width===1440&&id==='matter'){
+    }else if(width===1440){
+     const term=(await help.getAttribute('href')).slice(1);
      await help.press('Enter');
-     assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-energy');
-     await p.locator('#guide-energy + dd .knowledge-simple summary').press('Enter');
-     await shot(p.locator('#guide-energy + dd'),'knowledge-help');
+     assert.equal(await p.evaluate(()=>document.activeElement.id),term);
+     const definition=p.locator('#'+term+' + dd');
+     assert.equal(await definition.locator('.knowledge-advanced').count(),1);
+     await definition.locator('.knowledge-simple summary').press('Enter');
+     if(id==='matter')await shot(definition,'knowledge-help');
      await p.locator('#guideReturn').press('Enter');
      assert.equal(await help.evaluate(el=>el===document.activeElement),true);
     }
@@ -46,6 +50,7 @@ test('all eight headings share their order, bilingual explanations and local inp
    }
    await chooseLab(p,'gravity');
    assert.match(await p.locator('#mass').getAttribute('aria-describedby'),/mass-format/);
+   await p.locator('.edit-options > summary').press('Enter');
    await shot(p.locator('#mass-format'),'local-input-'+width);
    await chooseLab(p,'extreme');
    assert.equal(await p.locator('#extreme .lab-jump[href="#temperature"]').count(),0);
@@ -66,12 +71,16 @@ test('Chromium accessibility tree gives short and exact chamber labels in both l
    for(const [key,left,right] of [['End',512,0],['Home',0,512]]){
     await p.locator('#entropyK').press(key);
     const chamber=p.locator('#entropyChambers'),name=await chamber.getAttribute('aria-label');
-    assert(name.length<90&&name.includes(String(left))&&name.includes(String(right)));
+    assert.equal(name,lang==='de'?`Links ${left}, rechts ${right}; 512 unterscheidbare Marker.`:
+      `Left ${left}, right ${right}; 512 distinguishable markers.`);
     assert.equal(await p.getByRole('img',{name,exact:true}).count(),1);
     const readTree=async()=> (await cdp.send('Accessibility.getFullAXTree')).nodes;
     const closed=await readTree();
-    assert(closed.some(x=>!x.ignored&&x.role.value==='image'&&x.name.value===name));
-    assert.equal(closed.some(x=>!x.ignored&&/^([LR] ){511}[LR]$/.test(x.name?.value??'')),false);
+    const image=closed.find(x=>!x.ignored&&x.role.value==='image'&&x.name.value===name);
+    assert(image);
+    assert((image.description?.value??'').length<90);
+    assert.equal(closed.some(x=>!x.ignored&&[x.name?.value,x.description?.value]
+      .some(value=>/^([LR] ){511}[LR]$/.test(value??''))),false);
     const summary=p.locator('.entropy-micro > summary');
     await summary.press('Enter');
     assert(await p.locator('#entropyMicrostate').isVisible());
@@ -99,9 +108,9 @@ test('motion symbols show two distinct bars, one play triangle and a disabled ma
     assert.equal(await button.getAttribute('data-paused'),'false');
     assert.equal((await icon()).clip,'none');
     assert.match((await icon()).image,/transparent|rgba\(0, 0, 0, 0\)/);
-    if(width===1440){
+    {
      const old=await p.addStyleTag({content:'.motion-toggle[data-paused=false]::after { background:currentColor; clip-path:polygon(0 0,34% 0,34% 100%,0 100%,0 0,66% 0,100% 0,100% 100%,66% 100%) }'});
-     await shot(button,'motion-before-'+lab);
+     await shot(button,'motion-before-'+lab+'-'+width);
      await old.evaluate(el=>el.remove());
     }
     await shot(button,'motion-running-'+lab+'-'+width);
@@ -114,8 +123,15 @@ test('motion symbols show two distinct bars, one play triangle and a disabled ma
      await p.locator('#bhView').selectOption('light');
      assert(await button.isDisabled());
      assert.equal((await icon()).height,'2px');
-     await shot(button,'motion-static-'+width);
+     await shot(button,'motion-static-blackhole-'+width);
      await p.locator('#bhView').selectOption('environment');
+     assert.equal(await button.getAttribute('data-paused'),'true');
+    }else{
+     await p.locator('#geometryOn').check();
+     assert(await button.isDisabled());
+     assert.equal((await icon()).height,'2px');
+     await shot(button,'motion-static-extreme-'+width);
+     await p.locator('#geometryOn').uncheck();
      assert.equal(await button.getAttribute('data-paused'),'true');
     }
    }
@@ -131,7 +147,7 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
    const cdp=await context.newCDPSession(p);
    if(width<760)await cdp.send('Emulation.setCPUThrottlingRate',{rate:4});
    await chooseLab(p,'explorer');
-   await p.waitForFunction(()=>entrolabExplorer?.inspect().atlas.total===50635);
+   await p.waitForFunction(()=>window.entrolabExplorer?.inspect().atlas.total===50635);
    if(width===1440)await shot(p.locator('#exCanvas'),'edges-all-sky');
    await p.locator('#exNeighborhoodMode').click();
    const canvas=p.locator('#snCanvas');
@@ -194,6 +210,11 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
    const looked=(await sn(p)).free;
    assert.notEqual(looked.yaw,beforeLook.yaw);
    assert.deepEqual(looked.position,beforeLook.position);
+   await canvas.press('ArrowRight');await canvas.press('ArrowUp');
+   const keyed=(await sn(p)).free;
+   assert(Math.sin(keyed.yaw-looked.yaw)<0);
+   assert(keyed.pitch<looked.pitch);
+   assert.deepEqual(keyed.position,looked.position);
    await shot(canvas,'stellar-look-'+width);
    const free=await sample();
    assert.equal(await p.locator('#snDistance').textContent(),distance);

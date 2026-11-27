@@ -1,5 +1,6 @@
 const motionKeys={KeyA:[-1,0,0],KeyD:[1,0,0],KeyQ:[0,-1,0],KeyE:[0,1,0],KeyW:[0,0,1],KeyS:[0,0,-1]};
-const lookKeys={ArrowLeft:[-25,0],ArrowRight:[25,0],ArrowUp:[0,25],ArrowDown:[0,-25]};
+// The camera looks opposite its outward basis vector. Keyboard aim follows the screen axes.
+const lookKeys={ArrowLeft:[25,0],ArrowRight:[-25,0],ArrowUp:[0,-25],ArrowDown:[0,25]};
 
 export const freeCopy={
   freeOrbit:['Orbit','Orbit'],freeMode:['Freie Kamera','Free camera'],

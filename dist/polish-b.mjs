@@ -111,7 +111,8 @@ for(const fields of [
  const hint=localized('p','polishC.number');
  hint.id=fields[0]+'-format';hint.className='input-convention local-number-format';
  const first=$(fields[0]);
- const anchor=first.closest('label')??document.querySelector('label[for="'+first.id+'"]')??first;
+ const anchor=first.closest('.thermal-inputs, .experiment-controls, label')??
+   document.querySelector('label[for="'+first.id+'"]')??first;
  anchor.before(hint);
  for(const id of fields){
   const input=$(id);
