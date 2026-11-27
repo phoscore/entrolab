@@ -56,7 +56,7 @@ test('returning from Orbit bounds both ends of each stellar axis before movement
     const orbit=freeToOrbit(free,distance,NEIGHBORHOOD_MAX_ZOOM);
     orbitToFree(orbit,distance,limits).position.forEach((value,i)=>close(value,position[i]));
     const rotated=axis===2?
-      neighborhoodRotate(orbit,0,-pitch/.007):
+      neighborhoodRotate(orbit,0,pitch/.007):
       neighborhoodRotate(orbit,Math.PI/2/.007,0);
     const unbounded=orbitToFree(rotated,distance);
     assert(sign*unbounded.position[axis]>1010);
