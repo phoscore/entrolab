@@ -317,7 +317,7 @@ export function mountNeighborhood(root,{onSky}) {
   const shortNumber=value=>positionFormatter[lang()].format(value);
   function cameraControls(){
     const isFree=Boolean(free);
-    valueOf($('snFree'),t(isFree?'freeOrbit':'freeMode'));
+    valueOf($('snFree'),t('freeMode'));
     $('snFree').setAttribute('aria-pressed',String(isFree));
     $('snFreeControls').hidden=!isFree;
     $('snFreeControls').setAttribute('aria-label',t('freeControls'));

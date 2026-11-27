@@ -1024,7 +1024,6 @@ export function mountSolar(root) {
     $('solInner').textContent=t(system?'moonInner':'inner');
     $('solFrames').hidden = view!=='3d'||Boolean(system||voyager||beyond);
     $('solOrbitPoses').hidden = Boolean(galactic||free);
-    $('solFree').textContent=t(free?'freeOrbit':'freeMode');
     $('solFree').setAttribute('aria-pressed',String(Boolean(free)));
     $('solFreeControls').hidden=!free;
     $('solFreeControls').setAttribute('aria-label',t('freeControls'));

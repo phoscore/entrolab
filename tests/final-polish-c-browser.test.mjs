@@ -114,6 +114,11 @@ test('motion symbols show two distinct bars, one play triangle and a disabled ma
     await p.locator('#'+stage).scrollIntoViewIfNeeded();
     const button=p.locator('#'+id);
     const icon=()=>button.evaluate(el=>{const css=getComputedStyle(el,'::after');return {clip:css.clipPath,image:css.backgroundImage,height:css.height};});
+    const checkStatic=async()=>{
+     assert(await button.isDisabled());
+     assert.equal((await icon()).height,'2px');
+     assert.deepEqual(await button.evaluate(el=>[getComputedStyle(el).opacity,getComputedStyle(el,'::before').backgroundColor]),['1','rgb(16, 17, 29)']);
+    };
     const size=await button.boundingBox();
     assert(size.width>=44&&size.height>=44);
     assert.equal(await button.getAttribute('data-paused'),'false');
@@ -132,15 +137,13 @@ test('motion symbols show two distinct bars, one play triangle and a disabled ma
     await shot(button,'motion-paused-'+lab+'-'+width);
     if(lab==='blackhole'){
      await p.locator('#bhView').selectOption('light');
-     assert(await button.isDisabled());
-     assert.equal((await icon()).height,'2px');
+     await checkStatic();
      await shot(button,'motion-static-blackhole-'+width);
      await p.locator('#bhView').selectOption('environment');
      assert.equal(await button.getAttribute('data-paused'),'true');
     }else{
      await p.locator('#geometryOn').check();
-     assert(await button.isDisabled());
-     assert.equal((await icon()).height,'2px');
+     await checkStatic();
      await shot(button,'motion-static-extreme-'+width);
      await p.locator('#geometryOn').uncheck();
      assert.equal(await button.getAttribute('data-paused'),'true');
@@ -173,23 +176,28 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
    const resources=async()=>{await cdp.send('HeapProfiler.collectGarbage');return cdp.send('Memory.getDOMCounters');};
    const initial=await resources();
    const sample=async()=>p.evaluate(async()=>{
-    const canvas=document.getElementById('snCanvas'),draws=[],input=[];
+    const canvas=document.getElementById('snCanvas'),draws=[],input=[],candidates=[],markers=[];
     for(let i=0;i<12;i++){
      const start=performance.now();
      canvas.dispatchEvent(new KeyboardEvent('keydown',{key:i%2?'ArrowLeft':'ArrowRight',bubbles:true}));
      await new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)));
      const state=entrolabExplorer.inspect().neighborhood;
      draws.push(state.duration);input.push(performance.now()-start);
+     candidates.push(state.visible);markers.push(state.markers);
     }
-    return {draws,input};
+    return {draws,input,candidates,markers};
    });
    await canvas.scrollIntoViewIfNeeded();
    const orbit=await sample();
    const toggle=p.locator('#snFree');
+   assert.equal(await p.getByRole('button',{name:'Freie Kamera',pressed:false,exact:true}).count(),1);
    await toggle.click();
+   assert.equal(await p.getByRole('button',{name:'Freie Kamera',pressed:true,exact:true}).count(),1);
    assert.match(await p.locator('#snFreeSpeedText').textContent(),/Lj.*Sekunde/);
    const enter=await sn(p);
    assert(enter.free.position.every(Number.isFinite));
+   await canvas.scrollIntoViewIfNeeded();
+   const freeOverview=await sample();
    await p.locator('#snFreeSpeed').fill('8');
    if(width===1440){
     await canvas.focus();
@@ -254,6 +262,7 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
    await p.keyboard.up('w');
    await p.locator('#snSun').click();
    await toggle.click();
+   assert.equal(await p.getByRole('button',{name:'Freie Kamera',pressed:false,exact:true}).count(),1);
    await p.locator('#snHome').click();
    await canvas.scrollIntoViewIfNeeded();
    await p.waitForFunction(()=>entrolabExplorer.inspect().neighborhood.sunVisible);
@@ -266,7 +275,7 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
    const final=await resources();
    assert(final.nodes<initial.nodes+250);
    assert(final.jsEventListeners<=initial.jsEventListeners+5);
-   reports.push({width,throttle:width<760?4:1,orbit,free,initial,final,
+   reports.push({width,throttle:width<760?4:1,orbit,freeOverview,free,initial,final,
     markerCandidates:idle.visible,drawn:idle.markers,catalogueBytes:idle.positionBytes,canvasBytes:idle.canvasBytes,cycles:100});
   }finally{await context.close()}
  }

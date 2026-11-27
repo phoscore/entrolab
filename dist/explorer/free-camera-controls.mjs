@@ -3,7 +3,7 @@ const motionKeys={KeyA:[-1,0,0],KeyD:[1,0,0],KeyQ:[0,-1,0],KeyE:[0,1,0],KeyW:[0,
 const lookKeys={ArrowLeft:[25,0],ArrowRight:[-25,0],ArrowUp:[0,-25],ArrowDown:[0,25]};
 
 export const freeCopy={
-  freeOrbit:['Orbit','Orbit'],freeMode:['Freie Kamera','Free camera'],
+  freeMode:['Freie Kamera','Free camera'],
   freeSpeed:['Bewegungstempo','Movement speed'],
   freeLeft:['Links','Left'],freeRight:['Rechts','Right'],
   freeUp:['Aufwärts','Up'],freeDown:['Abwärts','Down'],

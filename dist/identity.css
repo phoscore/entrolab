@@ -110,7 +110,8 @@
 .motion-toggle::after { content:""; grid-area:1/1; z-index:1; width:12px; height:13px; background:currentColor }
 .motion-toggle[data-paused=true]::after { clip-path:polygon(15% 0,100% 50%,15% 100%) }
 .motion-toggle[data-paused=false]::after { background:linear-gradient(to right,currentColor 0 33%,transparent 33% 67%,currentColor 67% 100%) }
-.motion-toggle:disabled { opacity:.65 }
+.motion-toggle:disabled { opacity:1; color:#aba5bb }
+.motion-toggle:disabled::before { background:#10111d }
 .motion-toggle:disabled::after { width:9px; height:2px; clip-path:none; background:currentColor }
 .motion-toggle:hover:not(:disabled)::before { background:#262239 }
 @media (min-width:1240px) {
