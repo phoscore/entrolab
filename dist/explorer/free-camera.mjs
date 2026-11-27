@@ -3,10 +3,11 @@ import {spaceBasis} from './solar-space.mjs';
 const solarLimits=Object.freeze({position:1_000_000,nearMin:1e-10,nearMax:.001,speedMin:1e-11,speedMax:1e4});
 const clamped=(value,min,max)=>Math.max(min,Math.min(max,value));
 const offset=(position,direction,scale)=>position.map((v,i)=>v+direction[i]*scale);
+const boundPosition=(position,limit)=>position.map(value=>clamped(value,-limit,limit));
 
-export function orbitToFree(orbit,distance){
+export function orbitToFree(orbit,distance,{position:limit=Infinity}={}){
   const depth=distance/10**orbit.zoom;
-  const position=offset(orbit.focus,spaceBasis(orbit)[2],depth);
+  const position=boundPosition(offset(orbit.focus,spaceBasis(orbit)[2],depth),limit);
   return {position,yaw:orbit.yaw,pitch:orbit.pitch,depth};
 }
 
@@ -33,5 +34,6 @@ export function moveFree(camera,[right,up,forward],speed,seconds,limits=solarLim
   if(!length)return camera;
   const [r,u,t]=spaceBasis(camera);
   const step=speed*seconds/Math.max(1,length);
-  return {...camera,position:camera.position.map((v,i)=>clamped(v+step*(r[i]*right+u[i]*up-t[i]*forward),-limits.position,limits.position))};
+  const position=camera.position.map((v,i)=>v+step*(r[i]*right+u[i]*up-t[i]*forward));
+  return {...camera,position:boundPosition(position,limits.position)};
 }

@@ -282,3 +282,68 @@ test('Stellar Neighborhood moves in parsecs, retains science state and cleans up
  await writeFile(join(h.output,'polish-c-performance.json'),JSON.stringify(reports,null,2));
  assert.deepEqual(h.errors,[]);
 });
+
+test('stellar Free camera applies the parsec boundary before the first movement after Orbit',{timeout:90000},async()=>{
+ const {p,context}=await h.lab({viewport:{width:1440,height:980}});
+ try{
+  await chooseLab(p,'explorer');
+  await p.locator('#exNeighborhoodMode').click();
+  const canvas=p.locator('#snCanvas'),toggle=p.locator('#snFree');
+  await canvas.scrollIntoViewIfNeeded();
+  await p.waitForFunction(()=>entrolabExplorer.inspect().neighborhood?.visible===2753);
+  const home=(await sn(p)).camera;
+  await toggle.click();
+  await p.locator('#snFreeSpeed').fill('8');
+  await canvas.scrollIntoViewIfNeeded();
+  for(let i=0;i<5;i++)await canvas.press('ArrowLeft');
+  for(let i=0;i<3;i++)await canvas.press('ArrowUp');
+  await p.keyboard.down('w');
+  try{
+   await p.waitForFunction(()=>entrolabExplorer.inspect().neighborhood.free.position[0]===-1000,null,{timeout:45000});
+  }finally{await p.keyboard.up('w');}
+  const atBoundary=(await sn(p)).free;
+  await toggle.click();
+  await canvas.press('ArrowRight');
+  await canvas.press('ArrowRight');
+  const orbit=(await sn(p)).camera;
+  const rawX=orbit.focus[0]+Math.cos(orbit.yaw)*Math.cos(orbit.pitch)*atBoundary.depth;
+  assert(rawX < -1001,'Orbit rotation must put the unbounded eye outside the cube');
+  await toggle.click();
+  const entered=(await sn(p)).free;
+  assert.equal(entered.position[0],-1000);
+  assert(entered.position.every(value=>Math.abs(value)<=1000));
+  assert.deepEqual([entered.yaw,entered.pitch],[orbit.yaw,orbit.pitch]);
+  assert(Math.abs(entered.depth-atBoundary.depth)<1e-9);
+
+  await p.locator('#snFreeControls [data-free-direction=KeyW]').press('Space');
+  const first=(await sn(p)).free;
+  assert.equal(first.position[0],-1000);
+  const delta=first.position.map((value,i)=>value-entered.position[i]);
+  assert(Math.abs(delta[1]+10*Math.cos(entered.pitch)*Math.sin(entered.yaw))<1e-9);
+  assert(Math.abs(delta[2]+10*Math.sin(entered.pitch))<1e-9);
+  await p.locator('#snFreeControls [data-free-direction=KeyS]').press('Space');
+  assert((await sn(p)).free.position[0]>-1000);
+
+  const search=p.locator('#snSearch');
+  await search.fill('35227046884571776');
+  await search.press('Enter');
+  await p.waitForFunction(()=>entrolabExplorer.inspect().neighborhood.detailState==='ready');
+  const selection=await sn(p);
+  assert.equal(selection.selected,'35227046884571776');
+  const assertCentered=({free,camera})=>{
+   assert(free.position.every(value=>Math.abs(value)<=1000));
+   assert(Math.abs(Math.hypot(...free.position.map((value,i)=>value-camera.focus[i]))-free.depth)<1e-9);
+  };
+  assertCentered(selection);
+  await p.locator('#snSun').click();
+  const sun=await sn(p);
+  assert.deepEqual(sun.camera.focus,[0,0,0]);
+  assertCentered(sun);
+  await p.locator('#snHome').click();
+  const overview=await sn(p);
+  assertCentered(overview);
+  assert.deepEqual(overview.camera,home);
+  assert.equal(overview.selected,selection.selected);
+ }finally{await context.close()}
+ assert.deepEqual(h.errors,[]);
+});

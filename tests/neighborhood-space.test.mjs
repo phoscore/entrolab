@@ -41,6 +41,40 @@ test('parsec free camera clips near geometry and preserves eye and data through 
   assert.deepEqual(point,[1,2,-3]);
 });
 
+test('returning from Orbit bounds both ends of each stellar axis before movement',()=>{
+  const distance=neighborhoodFitDistance(970,650);
+  const limits=NEIGHBORHOOD_FREE_LIMITS;
+  const faces=[
+    [0, 1,Math.PI,0],[0,-1,0,0],
+    [1, 1,-Math.PI/2,0],[1,-1,Math.PI/2,0],
+    [2, 1,0,-Math.PI/2+.001],[2,-1,0,Math.PI/2-.001],
+  ];
+  for(const [axis,sign,yaw,pitch] of faces){
+    const position=[12,-23,34];
+    position[axis]=sign*1000;
+    const free={position,yaw,pitch,depth:distance};
+    const orbit=freeToOrbit(free,distance,NEIGHBORHOOD_MAX_ZOOM);
+    orbitToFree(orbit,distance,limits).position.forEach((value,i)=>close(value,position[i]));
+    const rotated=axis===2?
+      neighborhoodRotate(orbit,0,-pitch/.007):
+      neighborhoodRotate(orbit,Math.PI/2/.007,0);
+    const unbounded=orbitToFree(rotated,distance);
+    assert(sign*unbounded.position[axis]>1010);
+    const bounded=orbitToFree(rotated,distance,limits);
+    assert.equal(bounded.position[axis],sign*1000);
+    bounded.position.forEach((value,i)=>{if(i!==axis)close(value,unbounded.position[i]);});
+    assert.deepEqual([bounded.yaw,bounded.pitch,bounded.depth],[rotated.yaw,rotated.pitch,distance]);
+
+    const [right,up]=spaceBasis(bounded);
+    const direction=axis===2?up:right;
+    const inward=sign*direction[axis]>0?-1:1;
+    const movement=axis===2?[0,inward,0]:[inward,0,0];
+    const first=moveFree(bounded,movement,3,.2,limits);
+    first.position.forEach((value,i)=>close(value,bounded.position[i]+.6*inward*direction[i]));
+    assert(sign*first.position[axis]<1000);
+  }
+});
+
 test('perspective keeps a right-handed orthonormal basis with the Galactic orientation',()=>{
   const width=320,height=450;
   const camera={...neighborhoodHome(),yaw:0,pitch:0};

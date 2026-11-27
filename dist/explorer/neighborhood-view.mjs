@@ -311,6 +311,7 @@ export function mountNeighborhood(root,{onSky}) {
   }
   const setCamera=next=>{camera=next;invalidate();};
   const baseDistance=()=>neighborhoodFitDistance(width,height);
+  const enterFree=orbit=>orbitToFree(orbit,baseDistance(),NEIGHBORHOOD_FREE_LIMITS);
   const currentOrbit=()=>free?freeToOrbit(free,baseDistance(),NEIGHBORHOOD_MAX_ZOOM):camera;
   const speed=()=>freeSpeed(free,freeLevel,NEIGHBORHOOD_FREE_LIMITS);
   const positionFormatter=['de-DE','en-GB'].map(locale=>new Intl.NumberFormat(locale,{maximumSignificantDigits:4}));
@@ -337,7 +338,7 @@ export function mountNeighborhood(root,{onSky}) {
     wake:invalidate,
   });
   function reposition(next){
-    if(free){freeInput.release();free=orbitToFree(next,baseDistance());cameraControls();}
+    if(free){freeInput.release();free=enterFree(next);cameraControls();}
     setCamera(next);
   }
   function toggleCamera(){
@@ -347,7 +348,7 @@ export function mountNeighborhood(root,{onSky}) {
       if(next.focus.some((value,i)=>Math.abs(value-camera.focus[i])>1e-9))pivot=-2;
       camera=next;free=null;
     }
-    else free=orbitToFree(camera,baseDistance());
+    else free=enterFree(camera);
     cameraControls();invalidate();
   }
   const fit=()=>{pivot=-1;reposition(neighborhoodHome());};
