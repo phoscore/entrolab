@@ -14,6 +14,16 @@ const tab=(p,id)=>chooseLab(p,id);
 const art=p=>p.locator('#creature');
 const frames=p=>art(p).evaluate(e=>e.getAnimations({subtree:true}).map(a=>a.animationName));
 const sky=p=>p.locator('#cosmicBackground').evaluate(e=>getComputedStyle(e,'::before').animationPlayState);
+async function domSamples(p,cdp){
+ const samples=[];
+ for(let i=0;i<3;i++){
+  await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await cdp.send('HeapProfiler.collectGarbage');
+  samples.push(await cdp.send('Memory.getDOMCounters'));
+ }
+ return samples;
+}
+const maxCounter=(samples,key)=>Math.max(...samples.map(sample=>sample[key]));
 
 async function seekPose(p,elapsedMs){
  const times=await art(p).evaluate(async (e,elapsedMs)=>{
@@ -288,8 +298,6 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
   });
   await reset(p);
   await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1);
-  await cd.send('HeapProfiler.collectGarbage');
-  const counters=await cd.send('Memory.getDOMCounters');
   const stats=await p.evaluate(async()=>{
    const audit=window.nullAudit,{initCreature}=await import('/creature-ui.mjs');
    let maxTimers=0,maxFigures=0;
@@ -299,22 +307,32 @@ test('Null: hours of visits, repeated navigation and mount/dispose keep one owne
     maxFigures=Math.max(maxFigures,document.querySelectorAll('#creature:not([hidden])').length);
    }
    const visits=window.entrolabCreature.inspect().visits;
-   for(let i=0;i<100;i++){
-    initCreature().dispose();
-    if(audit.pending())throw Error('timer survived dispose');
-    audit.mount();
-   }
-   return {visits,maxTimers,maxFigures,slots:document.querySelectorAll('.null-slot').length,pending:audit.pending()};
+   return {visits,maxTimers,maxFigures};
   });
   assert.equal(stats.visits,250);
-  assert.deepEqual({...stats,visits:0},{visits:0,maxTimers:1,maxFigures:1,slots:1,pending:1});
-  await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  await cd.send('HeapProfiler.collectGarbage');
-  const after=await cd.send('Memory.getDOMCounters');
-  assert.equal(after.documents,counters.documents);
-  assert(after.jsEventListeners<=counters.jsEventListeners+5,JSON.stringify({counters,after}));
-  assert(after.nodes<=counters.nodes+35,JSON.stringify({counters,after}));
-  console.log('Null 3.5 resource proof '+JSON.stringify({counters,after,...stats}));
+  assert.deepEqual(stats,{visits:250,maxTimers:1,maxFigures:1});
+  await cd.send('HeapProfiler.enable');
+  const cycleBatch=async count=>p.evaluate(async count=>{
+   const audit=window.nullAudit,{initCreature}=await import('/creature-ui.mjs');
+   for(let i=0;i<count;i++){
+    initCreature().dispose();
+    if(audit.pending()!==0)throw Error('timer survived dispose');
+    audit.mount();
+    const state=window.entrolabCreature.inspect();
+    if(state.timers!==1||state.figures!==1||document.querySelectorAll('.null-slot').length!==1||document.querySelectorAll('#creature').length!==1)throw Error('remount did not retain exactly one Null owner');
+   }
+  },count);
+  await cycleBatch(10); // Warm lazy module, controller, and DOM allocation paths before baseline.
+  const baselineSamples=await domSamples(p,cd),baseline={nodes:Math.min(...baselineSamples.map(s=>s.nodes)),jsEventListeners:Math.min(...baselineSamples.map(s=>s.jsEventListeners))};
+  const checkpoints=[];
+  for(const count of [25,25,50]){
+   await cycleBatch(count);
+   const samples=await domSamples(p,cd);
+   assert(maxCounter(samples,'jsEventListeners')<=baseline.jsEventListeners+5,JSON.stringify({baseline,samples}));
+   assert(maxCounter(samples,'nodes')<=baseline.nodes+35,JSON.stringify({baseline,samples}));
+   checkpoints.push({cycles:checkpoints.reduce((sum,x)=>sum+x.batch,0)+count,batch:count,samples});
+  }
+  console.log('Null 3.5 resource proof '+JSON.stringify({warmup:10,baselineSamples,checkpoints,...stats}));
   const nextId=await p.evaluate(async()=>{const {body}=await import('/physics.mjs');return body('sentinel','planet',1e-6,0,0,0,0,'#fff').id});
   assert.equal(nextId,firstId+1);
   assert.deepEqual(await physical(p),before);

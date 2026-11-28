@@ -21,13 +21,39 @@ before(async()=>{
 after(async()=>{await writeFile(resolve(output,'measurements.json'),JSON.stringify({measurements,errors},null,2));await browser?.close();if(server)await new Promise(done=>server.close(done))});
 async function lab(options={}){
  const context=await browser.newContext({locale:'de-DE',viewport:{width:1360,height:1000},reducedMotion:'reduce',...options});
- await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
- const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(url);await ready(page);
- return {page,context};
+ const externalRequests=[];
+ await context.route('**/*',route=>{const requestURL=new URL(route.request().url());if(requestURL.origin!==new URL(url).origin){externalRequests.push(requestURL.href);return route.abort()}return route.continue()});
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.on('request',request=>{if(new URL(request.url()).origin!==new URL(url).origin)externalRequests.push(request.url())});await page.goto(url);await ready(page);
+ return {page,context,externalRequests};
 }
 async function ready(frame){await frame.waitForFunction(()=>window.entrolab&&document.getElementById('extremeRadius').textContent);await frame.evaluate(()=>document.fonts.ready)}
 async function frames(frame,count){return frame.evaluate(async count=>{for(let i=0;i<count;i++)await new Promise(requestAnimationFrame)},count)}
 const state=page=>page.evaluate(()=>window.entrolab.inspect());
+
+test('local typography: both licensed fonts load locally and every lab remains usable offline',async()=>{
+ const {page,context,externalRequests}=await lab({viewport:{width:390,height:844}});
+ try{
+  for(const id of ['gravity','blackhole','extreme','temperature','entropy','matter','explorer','science'])await chooseLab(page,id);
+  const fonts=await page.evaluate(async()=>{
+   await document.fonts.ready;
+   return {loaded:[...document.fonts].filter(face=>face.family==='DM Sans'||face.family==='Space Grotesk').map(face=>[face.family,face.status]),resources:performance.getEntriesByType('resource').map(entry=>entry.name).filter(name=>name.includes('/fonts/'))};
+  });
+  assert(fonts.loaded.some(([family,status])=>family==='DM Sans'&&status==='loaded'),JSON.stringify(fonts));
+  assert(fonts.loaded.some(([family,status])=>family==='Space Grotesk'&&status==='loaded'),JSON.stringify(fonts));
+  assert(fonts.resources.some(name=>name.includes('DM-Sans%5Bopsz,wght%5D.ttf')||name.includes('DM-Sans[opsz,wght].ttf')),JSON.stringify(fonts.resources));
+  assert(fonts.resources.some(name=>name.includes('Space-Grotesk%5Bwght%5D.ttf')||name.includes('Space-Grotesk[wght].ttf')),JSON.stringify(fonts.resources));
+  assert.deepEqual(externalRequests,[]);
+  const errorStart=errors.length;
+  await context.setOffline(true);
+  for(const id of ['science','gravity','blackhole','extreme','temperature','entropy','matter','explorer']){
+   await chooseLab(page,id);
+   assert.equal(await page.locator('#'+id+'.view.active').count(),1,id);
+   await page.locator('[data-language=en]').click();
+   await page.locator('[data-language=de]').click();
+  }
+  assert.equal(errors.length,errorStart);
+ }finally{await context.close()}
+});
 
 test('browser P2: paused canvas/controls stay stable over 120 frames at narrow/fractional sizes and DPRs',{timeout:120000},async()=>{
  for(const dpr of [1,1.25,2])for(const width of [320,320.5,390.25,1360]){

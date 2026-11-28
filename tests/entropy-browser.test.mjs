@@ -32,6 +32,47 @@ test('v0.6 browser: real tab navigation and offscreen scrolling stop entropy tic
  const {page:p,context}=await lab();try{await entropy(p);await p.locator('#entropyPlay').click();await p.waitForFunction(()=>window.entrolabEntropy.inspect().steps>=1);await chooseLab(p,'blackhole');await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const hidden=await state(p);await wait(p);assert.deepEqual(await state(p),hidden);await entropy(p);await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);await p.locator('#entropy .entropy-explanations details summary').click();await p.locator('footer').scrollIntoViewIfNeeded();const chamberBounds=await p.locator('#entropyChambers').boundingBox();assert(chamberBounds.y+chamberBounds.height<=0,'the complete chamber is actually outside the viewport');await p.waitForFunction(()=>!window.entrolabEntropy.inspect().scheduled);const offscreen=await state(p);await wait(p);assert.deepEqual(await state(p),offscreen);await p.locator('#entropyChambers').scrollIntoViewIfNeeded();await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);assert((await state(p)).steps<=offscreen.steps+1);await p.locator('#entropyPlay').click();assert.equal((await state(p)).scheduled,false)}finally{await context.close()}
 });
 
+test('Entropy native lifecycle: 100 controller remounts remove listeners and preserve a single timer owner',async()=>{
+ const {page:p,context}=await lab();
+ try{
+  await entropy(p);
+  const cdp=await context.newCDPSession(p);await cdp.send('HeapProfiler.enable');
+  const cycleBatch=count=>p.evaluate(async count=>{
+   const {initEntropy}=await import('/entropy-ui.mjs');
+   for(let i=0;i<count;i++){
+    const previous=window.entrolabEntropy?.controller;
+    const mounted=initEntropy(document);
+    if(!mounted||mounted===previous||window.entrolabEntropy?.controller!==mounted)throw Error('Entropy remount did not establish one current controller');
+    if(window.entrolabEntropy.inspect().n!==12||window.entrolabEntropy.inspect().scheduled)throw Error('Entropy remount changed the baseline state or scheduled work');
+    mounted.dispose();mounted.dispose();
+    if(window.entrolabEntropy!==undefined)throw Error('disposed Entropy controller still owns the window entry');
+    const restored=initEntropy(document);
+    if(!restored||window.entrolabEntropy?.controller!==restored)throw Error('Entropy controller could not remount');
+   }
+  },count);
+  const samples=async()=>{
+   const values=[];
+   for(let i=0;i<3;i++){
+    await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await cdp.send('HeapProfiler.collectGarbage');values.push(await cdp.send('Memory.getDOMCounters'));
+   }
+   return values;
+  };
+  await cycleBatch(10);
+  const warmup=await samples(),baseline={nodes:Math.min(...warmup.map(s=>s.nodes)),jsEventListeners:Math.min(...warmup.map(s=>s.jsEventListeners))},checkpoints=[];
+  for(const count of [25,25,50]){
+   await cycleBatch(count);const current=await samples();
+   assert(Math.max(...current.map(s=>s.jsEventListeners))<=baseline.jsEventListeners+8,JSON.stringify({baseline,current}));
+   assert(Math.max(...current.map(s=>s.nodes))<=baseline.nodes+100,JSON.stringify({baseline,current}));
+   checkpoints.push({cycles:checkpoints.reduce((sum,x)=>sum+x.batch,0)+count,batch:count,samples:current});
+  }
+  assert.equal((await state(p)).n,12);
+  assert.equal((await state(p)).scheduled,false);
+  measurements.push({kind:'entropy-controller-remount-100',warmup:10,baseline,warmupSamples:warmup,checkpoints});
+  assert.deepEqual(errors,[]);
+ }finally{await context.close()}
+});
+
 test('v0.6 browser: glossary context and keyboard return preserve lab state and original sandbox drafts',async()=>{
  const {page:p,context}=await lab();try{await entropy(p);await k(p,6);const before=await state(p);const link=p.locator('#entropyExplain');await link.focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'guide-entropy');await p.locator('#physicsGuide [data-i18n="Advanced · Fluktuationen"]').click();await p.locator('[data-language=en]').click();await p.locator('#guideReturn').focus();await p.keyboard.press('Enter');assert.equal(await link.evaluate(e=>e===document.activeElement),true);assert.deepEqual(await state(p),before);await chooseLab(p,'gravity');await p.locator('.edit-options summary').click();await p.locator('#velX').fill('42.7500');const model=await p.evaluate(()=>window.entrolab.inspect());await p.locator('#gravity [data-explain=guide-universe]').click();await p.keyboard.press('Escape');assert.equal(await p.locator('#velX').inputValue(),'42.7500');assert.deepEqual(await p.evaluate(()=>window.entrolab.inspect()),model);assert.equal(await p.evaluate(()=>document.activeElement.dataset.explain),'guide-universe')}finally{await context.close()}
 });

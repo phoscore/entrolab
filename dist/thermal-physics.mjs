@@ -10,11 +10,12 @@ function logRemainder(x){if(Math.abs(x)>=.001)return Math.log1p(x)-x;let term=-x
 export function thermalAt(p,time){
  validateThermal(p);if(!bounded(time,THERMAL_LIMITS.time))throw new RangeError('Time must be finite and in [0,1e12] seconds');
  const {a,b,ca,cb,g}=p,sum=ca+cb,effective=ca*cb/sum,delta=a-b,rate=g/effective,eq=delta===0?a:(ca*a+cb*b)/sum;
- const fraction=-Math.expm1(-rate*time),q=effective*delta*fraction;
+ const exponent=-rate*time,relaxation=Math.exp(exponent),fraction=-Math.expm1(exponent),q=effective*delta*fraction;
  const ta=fraction===1?eq:a-q/ca,tb=fraction===1?eq:b+q/cb;
+ const remainingDelta=delta*relaxation,equilibrium=delta===0;
  const xa=-q/(ca*a),xb=q/(cb*b),sa=ca*Math.log1p(xa),sb=cb*Math.log1p(xb);
  // No positivity clamp: retain a numerically stable evaluation of the actual sum.
  const entropy=q*delta/(a*b)+ca*logRemainder(xa)+cb*logRemainder(xb);
- const energy=ca*ta+cb*tb,initialEnergy=ca*a+cb*b,power=g*(ta-tb),production=g*(ta-tb)**2/(ta*tb);
- return {time,ta,tb,eq,tau:1/rate,q,power,energy,initialEnergy,energyError:energy-initialEnergy,sa,sb,entropy,production};
+ const energy=ca*ta+cb*tb,initialEnergy=ca*a+cb*b,power=g*remainingDelta,production=g*remainingDelta**2/(ta*tb);
+ return {time,ta,tb,eq,tau:1/rate,q,power,energy,initialEnergy,energyError:energy-initialEnergy,sa,sb,entropy,production,remainingDelta,equilibrium};
 }

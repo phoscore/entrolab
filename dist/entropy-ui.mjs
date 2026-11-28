@@ -1,17 +1,22 @@
 import {arrangement,distribution,macrostate,randomStep,sampleArrangement,MAX_MARKERS} from './entropy.mjs';
 import {t,locale,onLanguageChange} from './i18n.mjs';
+const entropyOwners=new WeakMap();
 export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTimeout,clearTimer=globalThis.clearTimeout,rng=Math.random}={}){
+ const trackOwner=doc!==null&&(typeof doc==='object'||typeof doc==='function');
+ if(trackOwner)entropyOwners.get(doc)?.dispose();
  const $=id=>doc.getElementById(id),root=$('entropy');
- let state=arrangement(12),steps=0,playing=false,seen=true,timer=null,invalid=false;
+ let state=arrangement(12),steps=0,playing=false,seen=true,timer=null,invalid=false,disposed=false;
  let rows=distribution(12),markers=[];
+ const releases=[];
+ function listen(target,type,handler,options){target.addEventListener(type,handler,options);releases.push(()=>target.removeEventListener(type,handler,options))}
  const format=(v,digits=4)=>new Intl.NumberFormat(locale(),{maximumFractionDigits:digits}).format(v);
  const percent=p=>p<.0001?new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:4}).format(100*p)+' %':new Intl.NumberFormat(locale(),{style:'percent',maximumSignificantDigits:5}).format(p);
  const formatInteger=(value,n)=>n<=32||value<10000n?format(value,0):'≈ '+new Intl.NumberFormat(locale(),{notation:'scientific',maximumSignificantDigits:5}).format(Number(value));
- const active=()=>root.classList.contains('active')&&!$('particleExperiment').hidden&&!doc.hidden&&seen;
+ const active=()=>!disposed&&root.classList.contains('active')&&!$('particleExperiment').hidden&&!doc.hidden&&seen;
  const inspect=()=>({state:[...state],steps,playing,n:state.length,k:macrostate(state),scheduled:timer!==null});
- function schedule(){if(timer===null&&playing&&active())timer=setTimer(()=>{timer=null;if(playing&&active()){state=randomStep(state,rng);steps++;render()}schedule();flags()},500);flags()}
- function flags(){root.dataset.playing=String(playing);root.dataset.scheduled=String(timer!==null);root.dataset.step=String(steps);if(root.dataset.n!==String(state.length))root.dataset.n=String(state.length);root.dataset.k=String(macrostate(state))}
- function sync(){if(timer!==null){clearTimer(timer);timer=null}schedule();renderStatus()}
+ function schedule(){if(!disposed&&timer===null&&playing&&active())timer=setTimer(()=>{timer=null;if(!disposed&&playing&&active()){state=randomStep(state,rng);steps++;render()}if(!disposed){schedule();flags()}},500);flags()}
+ function flags(){if(disposed)return;root.dataset.playing=String(playing);root.dataset.scheduled=String(timer!==null);root.dataset.step=String(steps);if(root.dataset.n!==String(state.length))root.dataset.n=String(state.length);root.dataset.k=String(macrostate(state))}
+ function sync(){if(disposed)return;if(timer!==null){clearTimer(timer);timer=null}schedule();renderStatus()}
  function renderStatus(){const key=playing?(active()?'Mischt · Schritt {step}':'Ausgeblendet · Schritt {step}'):'Pausiert · Schritt {step}';$('entropyStatus').textContent=t(key,{step:format(steps,0)});$('entropyPlay').textContent=t(playing?'Mischen pausieren':'Automatisch mischen');$('entropyPlay').setAttribute('aria-pressed',String(playing));flags()}
  function svg(tag,attributes={},text){const node=doc.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attributes))node.setAttribute(k,String(v));if(text!==undefined)node.textContent=text;return node}
  function build(){
@@ -60,21 +65,36 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
   const message=invalid?t('polishB.invalidMarkers',{max:MAX_MARKERS}):'';$('entropyError').textContent=message;$('entropyN').setCustomValidity(message);$('entropyN').setAttribute('aria-invalid',String(invalid));renderStatus();
  }
  function pause(){playing=false;sync()}
- $('entropyPlay').onclick=()=>{playing=!playing;sync()};
- $('entropyStep').onclick=()=>{pause();state=randomStep(state,rng);steps++;render()};
- $('entropyReset').onclick=()=>{pause();state=arrangement(state.length);steps=0;invalid=false;$('entropyN').value=state.length;render()};
- $('entropyN').oninput=()=>{const text=$('entropyN').value.trim(),n=Number(text);invalid=text===''||!Number.isInteger(n)||n<1||n>MAX_MARKERS;if(invalid){render();return}pause();state=arrangement(n);steps=0;if(rows.length!==n+1)build();render()};
- for(const button of doc.querySelectorAll('[data-marker-count]'))button.onclick=()=>{
+ listen($('entropyPlay'),'click',()=>{playing=!playing;sync()});
+ listen($('entropyStep'),'click',()=>{pause();state=randomStep(state,rng);steps++;render()});
+ listen($('entropyReset'),'click',()=>{pause();state=arrangement(state.length);steps=0;invalid=false;$('entropyN').value=state.length;render()});
+ function changeMarkerCount(){const text=$('entropyN').value.trim(),n=Number(text);invalid=text===''||!Number.isInteger(n)||n<1||n>MAX_MARKERS;if(invalid){render();return}pause();state=arrangement(n);steps=0;if(rows.length!==n+1)build();render()}
+ listen($('entropyN'),'input',changeMarkerCount);
+ for(const button of doc.querySelectorAll('[data-marker-count]'))listen(button,'click',()=>{
   $('entropyN').value=button.dataset.markerCount;
-  $('entropyN').oninput();
- };
- $('entropyK').oninput=()=>{pause();state=arrangement(state.length,Number($('entropyK').value));render()};
- $('entropyResample').onclick=()=>{pause();state=sampleArrangement(state.length,macrostate(state),rng);render()};
- for(const b of doc.querySelectorAll('[data-tab]'))b.addEventListener('click',sync);
- doc.addEventListener('visibilitychange',sync);doc.addEventListener('entropy-view-change',sync);
- const motion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');motion?.addEventListener('change',e=>{if(e.matches){pause();render()}});
- let observer;if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{seen=entries[0].isIntersecting;sync()});observer.observe($('entropyChambers'))}
- const unsubscribe=onLanguageChange(()=>{build();render()});build();render();
- return {inspect,dispose(){pause();observer?.disconnect();unsubscribe()}};
+  changeMarkerCount();
+ });
+ listen($('entropyK'),'input',()=>{pause();state=arrangement(state.length,Number($('entropyK').value));render()});
+ listen($('entropyResample'),'click',()=>{pause();state=sampleArrangement(state.length,macrostate(state),rng);render()});
+ for(const b of doc.querySelectorAll('[data-tab]'))listen(b,'click',sync);
+ listen(doc,'visibilitychange',sync);listen(doc,'entropy-view-change',sync);
+ const motion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
+ if(motion)listen(motion,'change',e=>{if(e.matches){pause();render()}});
+ let observer;if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{if(disposed)return;seen=entries[0].isIntersecting;sync()});observer.observe($('entropyChambers'))}
+ const unsubscribe=onLanguageChange(()=>{if(disposed)return;build();render()});build();render();
+ const controller={inspect,dispose(){
+  if(disposed)return;
+  if(timer!==null){clearTimer(timer);timer=null}
+  playing=false;
+  root.dataset.playing='false';root.dataset.scheduled='false';
+  disposed=true;
+  observer?.disconnect();unsubscribe();
+  for(const release of releases.splice(0).reverse())release();
+  if(trackOwner&&entropyOwners.get(doc)===controller)entropyOwners.delete(doc);
+  if(doc===globalThis.document&&globalThis.entrolabEntropy?.controller===controller)delete globalThis.entrolabEntropy;
+ }};
+ if(trackOwner)entropyOwners.set(doc,controller);
+ if(doc===globalThis.document)globalThis.entrolabEntropy={inspect,dispose:controller.dispose,controller};
+ return controller;
 }
-if(globalThis.document){const lab=initEntropy();globalThis.entrolabEntropy={inspect:lab.inspect}}
+if(globalThis.document)initEntropy();

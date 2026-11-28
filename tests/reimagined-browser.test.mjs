@@ -370,3 +370,47 @@ test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paus
   assert.deepEqual(h.errors,[]);
  }finally{await context.close()}
 });
+
+test('gravity input bounds reject unresolved coordinates and Newtonian speeds on both axes',async()=>{
+ for(const [field,value,pattern]of [
+  ['posX','1e16',/binary64|Float64|Binär64/],
+  ['posY','-1e16',/binary64|Float64|Binär64/],
+  ['velX','3000',/0\.01 c/],
+  ['velY','-3000',/0\.01 c/]
+ ]){
+  const {p,context}=await h.lab({viewport:{width:390,height:900}});
+  try{
+   const before=selectedBody(await gravityState(p));
+   await p.locator('.edit-options > summary').click();
+   await p.locator('#'+field).fill(value);
+   await p.locator('#editForm button[type=submit]').click();
+   assert.match(await p.locator('#editError').textContent(),pattern,field);
+   assert.deepEqual(selectedBody(await gravityState(p)),before,field);
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390,field);
+   assert.deepEqual(h.errors,[]);
+  }finally{await context.close()}
+ }
+});
+
+test('gravity placement rejects an out-of-domain world coordinate without inserting a body',async()=>{
+ const {p,context}=await h.lab({viewport:{width:390,height:900}});
+ try{
+  const before=await gravityState(p);
+  const view=await p.evaluate(()=>{
+   const canvas=document.getElementById('universe');
+   canvas.dispatchEvent(new WheelEvent('wheel',{clientX:-50000,clientY:0,deltaY:100000,cancelable:true}));
+   return window.entrolab.inspect().view;
+  });
+  assert(Math.abs(view.x)>3.52e6,JSON.stringify(view));
+  await p.locator('.adding-options > summary').click();
+  await p.locator('#add').click();
+  await p.locator('#universe').click();
+  assert.match(await p.locator('#addError').textContent(),/3\.51844e\+6 AU/);
+  assert.equal((await gravityState(p)).bodies.length,before.bodies.length);
+  await p.locator('[data-language=en]').click();
+  assert.match(await p.locator('#addError').textContent(),/binary64/);
+  assert.equal((await gravityState(p)).bodies.length,before.bodies.length);
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390);
+  assert.deepEqual(h.errors,[]);
+ }finally{await context.close()}
+});
