@@ -256,15 +256,36 @@ test('v0.9 audit V09-01: pending fields and invalid drafts survive both manual a
 test('v0.9 audit V09-01: paused speed label and display switches update without an idle loop',async()=>{
  const {p,context}=await h.lab({reducedMotion:'no-preference'});
  try{
+  // Use a fast but valid time multiplier so the paused fixture contains trail history.
+  await p.locator('#speed').fill('3');
   await startGravity(p);
   await pauseBetweenDiagnostics(p);
   await p.locator('details.display-options > summary').click();
   await p.locator('#universe').scrollIntoViewIfNeeded();
   await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
-  const canvas=()=>p.locator('#universe').evaluate(e=>e.toDataURL());
-  const settled=await gravityRender(p), stopped=await gravityState(p);
   await p.locator('#speed').fill('2');
   assert.equal(await p.locator('#speedLabel').textContent(),'100 Tage/s');
+  const canvas=()=>p.locator('#universe').evaluate(e=>e.toDataURL());
+  const zoomRange=await p.evaluate(()=>{
+   const rect=document.querySelector('#universe').getBoundingClientRect();
+   return {scale:window.entrolab.inspect().view.scale,maximum:rect.height/(2*.387)*.98};
+  });
+  const targetScale=Math.min(440,zoomRange.maximum*.92);
+  assert(targetScale>400,`canvas is too short for a visible trail fixture; target=${targetScale}`);
+  if(zoomRange.scale<targetScale){
+   const rect=await p.locator('#universe').boundingBox();
+   await p.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);
+   await p.mouse.wheel(0,-Math.log(targetScale/zoomRange.scale)*1000);
+   await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
+  }
+  const scale=(await gravityState(p)).view.scale;
+  assert(scale>400&&scale<=zoomRange.maximum,`test fixture needs visible trail resolution; scale=${scale}, maximum=${zoomRange.maximum}`);
+  assert.equal(await p.evaluate(()=>{
+   const scale=window.entrolab.inspect().view.scale;
+   return window.entrolab.getBodies().some(body=>body.trail.some((point,index)=>index>0&&!point.breakBefore&&
+    Math.hypot((point.x-body.trail[index-1].x)*scale,(point.y-body.trail[index-1].y)*scale)>24));
+  }),true,'test fixture needs a recorded trail segment visible at the current zoom');
+  const settled=await gravityRender(p), stopped=await gravityState(p);
   assert.deepEqual(await gravityRender(p),settled);
   for(const id of ['labels','grid','trails']){
    const before=await canvas(), {frame}=await gravityRender(p);
@@ -371,47 +392,4 @@ test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paus
  }finally{await context.close()}
 });
 
-test('gravity input bounds reject unresolved coordinates and Newtonian speeds on both axes',async()=>{
- for(const [field,value,pattern,width,language]of [
-  ['posX','1e16',/binary64|Float64|Binär64/,320,'de'],
-  ['posY','-1e16',/binary64|Float64|Binär64/,1440,'en'],
-  ['velX','3000',/0[.,]01 c/,390,'de'],
-  ['velY','-3000',/0[.,]01 c/,1440,'en']
- ]){
-  const {p,context}=await h.lab({viewport:{width,height:900},locale:language==='de'?'de-DE':'en-GB'});
-  try{
-   const before=selectedBody(await gravityState(p));
-   await p.locator('.edit-options > summary').click();
-   await p.locator('#'+field).fill(value);
-   await p.locator('#editForm button[type=submit]').click();
-   assert.match(await p.locator('#editError').textContent(),pattern,field);
-   await p.locator('#editError').screenshot({path:resolve(h.output,`gravity-input-${field}-${language}-${width}.png`)});
-   assert.deepEqual(selectedBody(await gravityState(p)),before,field);
-   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),width,field);
-   assert.deepEqual(h.errors,[]);
-  }finally{await context.close()}
- }
-});
-
-test('gravity placement rejects an out-of-domain world coordinate without inserting a body',async()=>{
- const {p,context}=await h.lab({viewport:{width:390,height:900}});
- try{
-  const before=await gravityState(p);
-  const view=await p.evaluate(()=>{
-   const canvas=document.getElementById('universe');
-   canvas.dispatchEvent(new WheelEvent('wheel',{clientX:-50000,clientY:0,deltaY:100000,cancelable:true}));
-   return window.entrolab.inspect().view;
-  });
-  assert(Math.abs(view.x)>3.52e6,JSON.stringify(view));
-  await p.locator('.adding-options > summary').click();
-  await p.locator('#add').click();
-  await p.locator('#universe').click();
-  assert.match(await p.locator('#addError').textContent(),/3\.51844e\+6 AU/);
-  assert.equal((await gravityState(p)).bodies.length,before.bodies.length);
-  await p.locator('[data-language=en]').click();
-  assert.match(await p.locator('#addError').textContent(),/binary64/);
-  assert.equal((await gravityState(p)).bodies.length,before.bodies.length);
-  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390);
-  assert.deepEqual(h.errors,[]);
- }finally{await context.close()}
-});
+test('gravi

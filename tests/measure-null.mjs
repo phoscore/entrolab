@@ -33,11 +33,17 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
   if(phaseB)await p.evaluate(async()=>{
    const {initCreature}=await import('/creature-ui.mjs');
    initCreature().dispose();
-   let next=null;
-   let rolls=[];
-   initCreature(document,{random:()=>rolls.shift()??.5,schedule:fn=>(next=fn,1),cancel:()=>{next=null}});
-   window.startNullBenchmark=roll=>{rolls=[roll,.5];window.advanceNullBenchmark()};
+   let next=null,rolls=[],controller=null;
+   const options={random:()=>rolls.shift()??.5,schedule:fn=>(next=fn,1),cancel:()=>{next=null}};
+   window.resetNullBenchmark=()=>{controller?.dispose();controller=initCreature(document,options);return controller};
+   window.startNullBenchmark=roll=>{window.resetNullBenchmark();rolls=[roll,.5];window.advanceNullBenchmark()};
    window.advanceNullBenchmark=()=>{const callback=next;next=null;callback()};
+   window.resetNullBenchmark();
+  });
+  else await p.evaluate(async()=>{
+   const {initCreature}=await import('/creature-ui.mjs');
+   let controller=initCreature();
+   window.resetNullBenchmark=()=>{controller?.dispose();controller=initCreature();return controller};
   });
   if(phaseB)await p.waitForFunction(()=>window.entrolabCreature.inspect().timers===1,null,{timeout:3500});
   else await p.waitForFunction(()=>!document.querySelector('#creature').getAnimations({subtree:true}).length);
@@ -48,6 +54,7 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
     if(scene!=='idle'){
      if(phaseB)await p.evaluate(roll=>window.startNullBenchmark(roll),{entrance:.31,mischief:.19,curiosity:.48}[scene]);
      else await p.evaluate(()=>{
+      window.resetNullBenchmark();
       document.querySelector('#creaturePreferencesSummary').click();
       document.querySelector('#nullPreviewRift').click();
      });
