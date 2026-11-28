@@ -32,13 +32,14 @@ test('gravity inspector limits preserve Float64 resolution and the Newtonian spe
  assert.equal(MAX_SPEED_KMS,C.c*.01/1000);
 });
 
-test('release README and locally hosted font assets match the v0.9.5 RC',()=>{
+test('release README, site version and locally hosted fonts match final v0.9.5',()=>{
  const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
  const readme=read('README.md');
  for(const label of ['Gravity Sandbox','Singularities','Extreme Objects','Extreme Temperature Lab','Entrolab','Matter & Fields','Cosmic Explorer','Model & Sources'])assert(readme.includes(label),label);
  assert.match(readme,/--branch main https:\/\/github\.com\/phoscore\/entrolab\.git/);
  assert.match(readme,/1[–-]512 distinguishable markers/);
- assert.match(readme,/v0\.9\.5 RC/);
+ assert.match(readme,/\*\*Current state: v0\.9\.5\.\*\*/);
+ assert.match(read('dist/index.html'),/<small data-i18n="identity\.version">v0\.9\.5<\/small>/);
  assert(readme.includes(`${MAX_POSITION_AU} AU`));
  for(const term of ['Maxwell–Boltzmann','two-photon invariant mass','deuteron binding','individual probabilities for each k'])assert(readme.includes(term),term);
  assert(!/private source|branch develop|v0\.8\s+is the current/i.test(readme));

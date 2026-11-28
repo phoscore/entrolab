@@ -20,6 +20,7 @@ test('polish A: eight persistent lab views and their identity fit desktop and bo
    const menu=p.locator('#labMenu'),tabs=p.locator('#labChoices .tab');
    assert.equal(await menu.isVisible(),narrow);
    assert.equal(await tabs.count(),8);
+   assert.equal(await p.locator('[data-i18n="identity.version"]').textContent(),'v0.9.5');
    assert.equal(await tabs.filter({visible:true}).count(),narrow?0:8);
    const logo=await p.locator('.brand .logo').boundingBox();
    const wordmark=await p.locator('.brand-name').boundingBox();
@@ -73,6 +74,7 @@ test('polish A: eight persistent lab views and their identity fit desktop and bo
    }
    assert.equal(colours.size,8);
    await p.locator('[data-language=en]').click();
+   assert.equal(await p.locator('[data-i18n="identity.version"]').textContent(),'v0.9.5');
    assert.equal(await p.locator('main .view.active h1').textContent(),'Models & Sources');
    assert.equal(await p.locator('#labMenuName').textContent(),'Models & Sources');
    assert.equal(await p.locator('footer').textContent(),'No plot armor. Just physics?');
