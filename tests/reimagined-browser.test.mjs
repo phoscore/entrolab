@@ -273,8 +273,13 @@ test('v0.9 audit V09-01: paused speed label and display switches update without 
   const targetScale=Math.min(440,zoomRange.maximum*.92);
   assert(targetScale>400,`canvas is too short for a visible trail fixture; target=${targetScale}`);
   if(zoomRange.scale<targetScale){
-   const rect=await p.locator('#universe').boundingBox();
-   await p.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);
+   const point=await p.evaluate(()=>{
+    const canvas=document.querySelector('#universe'),rect=canvas.getBoundingClientRect();
+    const {view}=window.entrolab.inspect(),sun=window.entrolab.getBodies().find(body=>body.name==='Sonne');
+    return {x:rect.left+rect.width/2+(sun.x-view.x)*view.scale,
+     y:rect.top+rect.height/2-(sun.y-view.y)*view.scale};
+   });
+   await p.mouse.move(point.x,point.y);
    await p.mouse.wheel(0,-Math.log(targetScale/zoomRange.scale)*1000);
    await p.waitForFunction(()=>!window.entrolab.renderInfo().scheduled);
   }
