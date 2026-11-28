@@ -26,7 +26,7 @@ test.after(async()=>{await browser?.close();if(server)await new Promise(resolve=
 async function page(options={}){
   const context=await browser.newContext({viewport:{width:1440,height:1100},locale:'de-DE',reducedMotion:'reduce',...options});
   await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
-  const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));
+  const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push({message:e.message,url:p.url(),stack:(e.stack??'').split('\n').slice(0,5).join('\n')}));
   await p.goto(url);
   await p.waitForFunction(()=>window.entrolab&&window.entrolabThermal&&window.entrolabEntropy);
   if (!(await p.evaluate(()=>window.entrolab.inspect().paused))) await p.locator('#play').click();

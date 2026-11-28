@@ -23,7 +23,7 @@ async function lab(options={}){
  const context=await browser.newContext({locale:'de-DE',viewport:{width:1360,height:1000},reducedMotion:'reduce',...options});
  const externalRequests=[];
  await context.route('**/*',route=>{const requestURL=new URL(route.request().url());if(requestURL.origin!==new URL(url).origin){externalRequests.push(requestURL.href);return route.abort()}return route.continue()});
- const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.on('request',request=>{if(new URL(request.url()).origin!==new URL(url).origin)externalRequests.push(request.url())});await page.goto(url);await ready(page);
+ const page=await context.newPage();page.on('pageerror',e=>errors.push({message:e.message,url:page.url(),stack:(e.stack??'').split('\n').slice(0,5).join('\n')}));await page.on('request',request=>{if(new URL(request.url()).origin!==new URL(url).origin)externalRequests.push(request.url())});await page.goto(url);await ready(page);
  return {page,context,externalRequests};
 }
 async function ready(frame){await frame.waitForFunction(()=>window.entrolab&&document.getElementById('extremeRadius').textContent);await frame.evaluate(()=>document.fonts.ready)}
@@ -51,7 +51,7 @@ test('local typography: both licensed fonts load locally and every lab remains u
    await page.locator('[data-language=en]').click();
    await page.locator('[data-language=de]').click();
   }
-  assert.equal(errors.length,errorStart);
+  assert.equal(errors.length,errorStart,JSON.stringify(errors.slice(errorStart)));
  }finally{await context.close()}
 });
 
