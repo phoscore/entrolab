@@ -83,10 +83,10 @@ test('Explorer browser: lazy loading, real source selection, aliases and unchang
 });
 
 test('Explorer browser: one stylesheet 503 is removed, retry restores CSS without losing other lab state',async()=>{
- for(const language of ['de','en']){
+ for(const width of [390,1440])for(const language of ['de','en']){
   const failureStart=explorerCssFailures;
   failExplorerCss=1;
-  const {p,context,errors}=await page({viewport:{width:390,height:900}});
+  const {p,context,errors}=await page({viewport:{width,height:900}});
   try{
    await p.locator('[data-language='+language+']').click();
    await chooseLab(p,'entropy');
@@ -96,6 +96,7 @@ test('Explorer browser: one stylesheet 503 is removed, retry restores CSS withou
    await p.locator('.explorer-load-error').waitFor();
    const error=await p.locator('.explorer-load-error').textContent();
    assert.match(error,language==='de'?/Explorer-Ressourcen konnten nicht geladen werden/:/Explorer resources could not be loaded/);
+   await p.locator('.explorer-load-error').screenshot({path:join(output,`explorer-503-error-${language}-${width}.png`)});
    assert.equal(await p.locator('link[data-explorer-style]').count(),0);
    assert.equal(await p.evaluate(()=>window.entrolabExplorer??null),null);
    assert.equal(explorerCssFailures,failureStart+1);
@@ -115,6 +116,7 @@ test('Explorer browser: one stylesheet 503 is removed, retry restores CSS withou
    assert.equal(await p.evaluate(controller=>window.entrolabExplorer===controller,mounted),true);
    assert.equal(await p.locator('#exCanvas').count(),1);
    assert.deepEqual(await p.evaluate(()=>window.entrolabEntropy.inspect()),entropyBefore);
+   await p.locator('#explorer').screenshot({path:join(output,`explorer-503-recovered-${language}-${width}.png`)});
    assert.deepEqual(errors,[]);
   }finally{await context.close()}
  }

@@ -372,21 +372,22 @@ test('v0.9 audit V09-02: offscreen resize and emulated DPR changes preserve paus
 });
 
 test('gravity input bounds reject unresolved coordinates and Newtonian speeds on both axes',async()=>{
- for(const [field,value,pattern]of [
-  ['posX','1e16',/binary64|Float64|Binär64/],
-  ['posY','-1e16',/binary64|Float64|Binär64/],
-  ['velX','3000',/0\.01 c/],
-  ['velY','-3000',/0\.01 c/]
+ for(const [field,value,pattern,width,language]of [
+  ['posX','1e16',/binary64|Float64|Binär64/,320,'de'],
+  ['posY','-1e16',/binary64|Float64|Binär64/,1440,'en'],
+  ['velX','3000',/0[.,]01 c/,390,'de'],
+  ['velY','-3000',/0[.,]01 c/,1440,'en']
  ]){
-  const {p,context}=await h.lab({viewport:{width:390,height:900}});
+  const {p,context}=await h.lab({viewport:{width,height:900},locale:language==='de'?'de-DE':'en-GB'});
   try{
    const before=selectedBody(await gravityState(p));
    await p.locator('.edit-options > summary').click();
    await p.locator('#'+field).fill(value);
    await p.locator('#editForm button[type=submit]').click();
    assert.match(await p.locator('#editError').textContent(),pattern,field);
+   await p.locator('#editError').screenshot({path:resolve(h.output,`gravity-input-${field}-${language}-${width}.png`)});
    assert.deepEqual(selectedBody(await gravityState(p)),before,field);
-   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),390,field);
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),width,field);
    assert.deepEqual(h.errors,[]);
   }finally{await context.close()}
  }

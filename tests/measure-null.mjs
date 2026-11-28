@@ -53,6 +53,10 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
      });
     }
     await p.waitForTimeout(scene==='mischief'||scene==='curiosity'?2150:100);
+    if(scene!=='idle')await p.waitForFunction(()=>{
+     const figure=document.querySelector('#creature');
+     return figure&&!figure.hidden&&figure.getAnimations({subtree:true}).length>0;
+    },null,{timeout:5000});
     const before=await metrics();
     const sample=await p.evaluate(async()=>{
      const initial=window.entrolab.renderInfo().frame,modelTime=window.entrolab.inspect().elapsed;
@@ -68,7 +72,7 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
     });
     const after=await metrics();
     assert.equal(sample.modelTimeDelta,0);
-    assert.equal(sample.animations>0,scene!=='idle');
+    assert.equal(sample.animations>0,scene!=='idle',JSON.stringify({version,width,cpu,scene,run,sample}));
     if(scene==='mischief'||scene==='curiosity')assert.equal(sample.sequence,scene);
     rows.push({version,width,cpu,scene,run,...sample,
      taskMs:(after.TaskDuration-before.TaskDuration)*1000,scriptMs:(after.ScriptDuration-before.ScriptDuration)*1000});

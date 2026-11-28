@@ -30,7 +30,8 @@ test('thermal browser: analytical values, explicit apply, validation and DE/EN p
 });
 
 test('thermal browser: rounded display is distinguished from analytical near-equilibrium heat flow',async()=>{
- const {page:p,context}=await lab({viewport:{width:390,height:900}});
+ for(const width of [390,1440]){
+ const {page:p,context}=await lab({viewport:{width,height:900}});
  try{
   await openHeat(p);
   await p.locator('#thermalA').fill('400');
@@ -43,9 +44,11 @@ test('thermal browser: rounded display is distinguished from analytical near-equ
   assert.equal(await p.locator('#thermalTA').textContent(),await p.locator('#thermalTB').textContent());
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/runden.*denselben Wert|round to the same value/i);
   assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'false');
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-de.png`)});
   await p.locator('[data-language=en]').click();
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/analytical remaining ΔT/);
-  assert.equal(await heat(p),nearState);
+  assert.deepEqual(await heat(p),nearState);
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-en.png`)});
   await p.locator('#thermalB').fill('400');
   await p.locator('#thermalApply').click();
   const exact=await heat(p);
@@ -54,9 +57,11 @@ test('thermal browser: rounded display is distinguished from analytical near-equ
   assert.equal(exact.result.production,0);
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/exactly equal/);
   assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'true');
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-exact-${width}-en.png`)});
   await p.locator('[data-language=de]').click();
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/exakt gleich/);
- }finally{await context.close()}
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-exact-${width}-de.png`)});
+ }finally{await context.close()}}
 });
 
 test('thermal browser: transfer only drafts the chosen valid temperature and preserves both independent models',async()=>{
