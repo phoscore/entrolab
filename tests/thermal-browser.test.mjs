@@ -29,6 +29,50 @@ test('thermal browser: analytical values, explicit apply, validation and DE/EN p
  const {page:p,context}=await lab();try{await openHeat(p);const before=await otherModels(p);await p.locator('#thermalStep').click();let r=await heat(p);assert.equal(r.time,10);assert(Math.abs(r.result.ta-(320+30*Math.exp(-.2)))<1e-11);assert(r.result.entropy>0);assert.match(await p.locator('#thermalDirection').textContent(),/A → B/);await p.locator('#thermalA').fill('700');await p.locator('#thermalApply').click();const state=await heat(p);assert.deepEqual(state,r);assert.match(await p.locator('#thermalError').textContent(),/250–600/);await p.locator('[data-language=en]').click();assert.equal(await p.locator('#thermalA').inputValue(),'700');assert.deepEqual(await heat(p),state);assert.match(await p.locator('#thermalError').textContent(),/Finite/);assert.equal(await p.locator('#thermalA').evaluate(e=>e.validationMessage),await p.locator('#thermalError').textContent());await p.locator('#thermalA').fill('400');await p.locator('#thermalApply').click();r=await heat(p);assert.equal(r.params.a,400);assert.equal(r.time,0);assert.equal(r.playing,false);assert.equal(await p.locator('#thermalError').textContent(),'');assert.deepEqual(await otherModels(p),before);await p.locator('#thermalStep').click();await p.locator('#thermalReset').click();assert.equal((await heat(p)).params.a,400);assert.equal((await heat(p)).time,0)}finally{await context.close()}
 });
 
+test('thermal browser: rounded display is distinguished from analytical near-equilibrium heat flow',async()=>{
+ for(const width of [390,1440]){
+ const {page:p,context}=await lab({viewport:{width,height:900}});
+ try{
+  await openHeat(p);
+  await p.locator('#thermalA').fill('400');
+  await p.locator('#thermalB').fill('400.00000000000006');
+  await p.locator('#thermalApply').click();
+  const nearState=await heat(p);
+  assert.equal(nearState.result.equilibrium,false);
+  assert.notEqual(nearState.result.remainingDelta,0);
+  assert.notEqual(nearState.result.power,0);
+  const assertAccessiblePower=async()=>{
+   const visible=await p.locator('#thermalPower').textContent();
+   const accessibility=await p.locator('#thermalStage').ariaSnapshot();
+   assert(accessibility.includes(visible),accessibility);
+   assert.doesNotMatch(accessibility,/[−-]0 W/);
+  };
+  await assertAccessiblePower();
+  assert.equal(await p.locator('#thermalTA').textContent(),await p.locator('#thermalTB').textContent());
+  assert.match(await p.locator('#thermalPrecisionNote').textContent(),/runden.*denselben Wert|round to the same value/i);
+  assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'false');
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-de.png`)});
+  await p.locator('[data-language=en]').click();
+  await assertAccessiblePower();
+  assert.match(await p.locator('#thermalPrecisionNote').textContent(),/analytical remaining ΔT/);
+  assert.deepEqual(await heat(p),nearState);
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-en.png`)});
+  await p.locator('#thermalB').fill('400');
+  await p.locator('#thermalApply').click();
+  const exact=await heat(p);
+  assert.equal(exact.result.equilibrium,true);
+  assert.equal(exact.result.power,0);
+  await assertAccessiblePower();
+  assert.equal(exact.result.production,0);
+  assert.match(await p.locator('#thermalPrecisionNote').textContent(),/exactly equal/);
+  assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'true');
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-exact-${width}-en.png`)});
+  await p.locator('[data-language=de]').click();
+  assert.match(await p.locator('#thermalPrecisionNote').textContent(),/exakt gleich/);
+  await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-exact-${width}-de.png`)});
+ }finally{await context.close()}}
+});
+
 test('thermal browser: transfer only drafts the chosen valid temperature and preserves both independent models',async()=>{
  const {page:p,context}=await lab();try{await openHeat(p);await p.locator('#thermalStep').click();const before=await heat(p);await chooseLab(p,'temperature');assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);for(const value of ['0','.001','2.725','1e12','249.99','600.01']){await p.locator('#kelvinInput').fill(value);assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);assert.match(await p.locator('#thermalBridgeNote').textContent(),/250–600/)}await p.locator('#kelvinInput').fill('350');assert.equal(await p.locator('#thermalTransfer').isEnabled(),true);await p.locator('#kelvinInput').fill('-1');assert.equal(await p.locator('#thermalTransfer').isEnabled(),false);assert.match(await p.locator('#thermalBridgeNote').textContent(),/ungültige/);await p.locator('[data-kelvin="293.15"]').click();await p.locator('#thermalTransferTarget').selectOption('b');await p.locator('#thermalTransfer').click();assert.equal(await p.locator('#thermalB').inputValue(),'293.15');assert.equal(await p.evaluate(()=>document.activeElement.id),'thermalB');assert.deepEqual(await heat(p),before);assert.match(await p.locator('#thermalTransferNote').textContent(),/293,15/);await p.locator('[data-language=en]').click();assert.match(await p.locator('#thermalTransferNote').textContent(),/293.15/);await chooseLab(p,'temperature');assert.equal(await p.locator('#kelvinInput').inputValue(),'293.15');await openHeat(p);await p.locator('#thermalApply').click();assert.equal((await heat(p)).params.b,293.15);assert.equal((await heat(p)).time,0);assert.equal((await heat(p)).playing,false)}finally{await context.close()}
 });

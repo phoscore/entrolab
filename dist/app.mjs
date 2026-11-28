@@ -4,6 +4,7 @@ import {predict} from './prediction.mjs';
 import {number,scientific,length,modelStatus} from './display.mjs';
 import {GravityTrail,traceGravityTrail} from './gravity-trail.mjs';
 import {C,G,EPS,blackHole,body,radius,scenario,step,safeStep,energy} from './physics.mjs';
+import {gravityInputError,MAX_POSITION_AU} from './gravity-input.mjs';
 import {createSelfChecks} from './self-checks.mjs';
 import {t,tx,onLanguageChange,bodyLabel,registerBodyLabels,translateText} from './i18n.mjs';
 const $=id=>document.getElementById(id),num=number,sci=scientific;
@@ -12,6 +13,7 @@ const editFields={mass:'m',posX:'x',posY:'y',velX:'vx',velY:'vy'};
 const draftFields=new Set();
 const kmPerSecond=C.AU/C.day/1000;
 let instrumentBase=null,lastStep=null,forecast=null,predictionGeneration=0,predictionBusy=false;
+let lastEditError=null,lastAddError=null;
 let bs=[],selected,paused=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false,adding=false,newType='planet',elapsed=0,collisions=0,baseline=0,view={x:0,y:0,scale:100},last=0,accum=0,frame=0,tab='gravity',limited=false;
 let gravityRaf=null,gravitySeen=true,gravityDirty=true;
 const canvas=$('universe'),ctx=canvas.getContext('2d');let W=600,H=500,dpr=1;
@@ -25,7 +27,7 @@ function fill(force=false){
  $('selectedName').textContent=b?bodyLabel(b):t('Leerer Raum');
  $('selectedType').textContent=b?{planet:t('PLANET'),star:t('STERN'),hole:t('SCHWARZES LOCH')}[b.type]:t('KÖRPER HINZUFÜGEN');
  $('selectedDot').style.color=b?.color??'#777';
- if(force){draftFields.clear();$('editError').textContent=''}
+ if(force){draftFields.clear();lastEditError=null;$('editError').textContent=''}
  if(!b)return;
  for(const [id,key] of Object.entries(editFields)){
   if(draftFields.has(id))continue;
@@ -87,14 +89,17 @@ $('editForm').onsubmit=event=>{
  const changes={};
  for(const id of draftFields){
   const value=$(id).valueAsNumber,key=editFields[id];
-  if(!Number.isFinite(value)||key==='m'&&(value<1e-15||value>1e11)){
-   $('editError').textContent=t('Endliche Zahlen mit Dezimalpunkt eingeben; Masse zwischen 10⁻¹⁵ und 10¹¹ M☉.');
-   return;
-  }
+  if(!Number.isFinite(value)){lastEditError={key:'gravity.input.finite'};$('editError').textContent=t(lastEditError.key);return}
   changes[key]=key==='vx'||key==='vy'?value*(1000*C.day/C.AU):value;
  }
+ const validation=gravityInputError({...b,...changes});
+ if(validation){
+  lastEditError={key:validation,params:validation==='gravity.input.position'?{limit:String(MAX_POSITION_AU)}:{}};
+  $('editError').textContent=t(lastEditError.key,lastEditError.params);
+  return;
+ }
  // Apply only user edits, never rounded or older display values for the other fields.
- Object.assign(b,changes);
+ Object.assign(b,changes);lastEditError=null;$('editError').textContent='';
  accum=0;rebase();fill(true);diagnostics(false);
 };
 $('delete').onclick=()=>{bs=bs.filter(b=>b.id!==selected);rebase();list()};
@@ -106,7 +111,7 @@ const toScreen=b=>({x:W/2+(b.x-view.x)*view.scale,y:H/2-(b.y-view.y)*view.scale}
 let drag=null;
 canvas.onpointerdown=e=>{const r=canvas.getBoundingClientRect();drag={sx:e.clientX-r.left,sy:e.clientY-r.top,x:e.clientX-r.left,y:e.clientY-r.top,vx:view.x,vy:view.y,adding};canvas.setPointerCapture(e.pointerId);requestGravityDraw()};
 canvas.onpointermove=e=>{if(!drag)return;let r=canvas.getBoundingClientRect();drag.x=e.clientX-r.left;drag.y=e.clientY-r.top;if(!drag.adding){view.x=drag.vx-(drag.x-drag.sx)/view.scale;view.y=drag.vy+(drag.y-drag.sy)/view.scale}requestGravityDraw()};
-canvas.onpointerup=e=>{if(!drag)return;let d=drag;drag=null;requestGravityDraw();if(d.adding){if(bs.length>=60){$('addHint').textContent=t('Limit: 60 Körper für flüssige Berechnungen.');return}let p=toWorld(d.sx,d.sy),v=toWorld(d.x,d.y);let b=body({planet:'Planet',star:'Stern',hole:'Schwarzes Loch'}[newType]+' '+(bs.length+1),newType,newType==='planet'?C.earth/C.sun:1,p.x,p.y,(v.x-p.x)/30,(v.y-p.y)/30,{planet:'#82d9e1',star:'#ffd19a',hole:'#b99aff'}[newType]);bs.push(b);registerBodyLabels([b]);selected=b.id;rebase();list();setAdding(false)}else if(Math.hypot(d.x-d.sx,d.y-d.sy)<5){let near=bs.map(b=>({b,d:Math.hypot(toScreen(b).x-d.x,toScreen(b).y-d.y)})).sort((a,b)=>a.d-b.d)[0];if(near?.d<22){selected=near.b.id;list()}}};canvas.onpointercancel=()=>{drag=null;requestGravityDraw()};
+canvas.onpointerup=e=>{if(!drag)return;let d=drag;drag=null;requestGravityDraw();if(d.adding){if(bs.length>=60){lastAddError={key:'Limit: 60 Körper für flüssige Berechnungen.',params:{}};$('addError').textContent=t(lastAddError.key);return}let p=toWorld(d.sx,d.sy),v=toWorld(d.x,d.y),mass=newType==='planet'?C.earth/C.sun:1,velocity={vx:(v.x-p.x)/30,vy:(v.y-p.y)/30};const validation=gravityInputError({m:mass,x:p.x,y:p.y,...velocity});if(validation){const params=validation==='gravity.input.position'?{limit:String(MAX_POSITION_AU)}:{};lastAddError={key:validation,params};$('addError').textContent=t(validation,params);return}lastAddError=null;$('addError').textContent='';let b=body({planet:'Planet',star:'Stern',hole:'Schwarzes Loch'}[newType]+' '+(bs.length+1),newType,mass,p.x,p.y,velocity.vx,velocity.vy,{planet:'#82d9e1',star:'#ffd19a',hole:'#b99aff'}[newType]);bs.push(b);registerBodyLabels([b]);selected=b.id;rebase();list();setAdding(false)}else if(Math.hypot(d.x-d.sx,d.y-d.sy)<5){let near=bs.map(b=>({b,d:Math.hypot(toScreen(b).x-d.x,toScreen(b).y-d.y)})).sort((a,b)=>a.d-b.d)[0];if(near?.d<22){selected=near.b.id;list()}}};canvas.onpointercancel=()=>{drag=null;requestGravityDraw()};
 canvas.addEventListener('wheel',e=>{e.preventDefault();const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,p=toWorld(x,y);view.scale=Math.max(.01,Math.min(1e9,view.scale*Math.exp(-e.deltaY*.001)));let q=toWorld(x,y);view.x+=p.x-q.x;view.y+=p.y-q.y;requestGravityDraw()},{passive:false});
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await canvas.parentElement.requestFullscreen()}catch{$('pointerHint').textContent=t('Vollbild wird hier nicht unterstützt.')}};
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;if(tab!=='gravity')cancelPrediction();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===tab));document.querySelectorAll('.tab').forEach(t=>{t.classList.toggle('active',t===b);t.setAttribute('aria-pressed',String(t===b))});if(tab==='blackhole')drawLab();syncGravity()});
@@ -164,7 +169,7 @@ function scheduleGravity(){if(gravityRaf===null&&tab==='gravity'&&!document.hidd
 function syncGravity(){if(gravityRaf!==null&&typeof cancelAnimationFrame==='function'){cancelAnimationFrame(gravityRaf);gravityRaf=null}last=0;requestGravityDraw()}
 document.addEventListener('visibilitychange',syncGravity);
 globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{if(e.matches)setPaused(true)});
-onLanguageChange(()=>{for(const id of ['objectList','referenceBody'])for(const option of $(id).options??[]){const b=bs.find(b=>b.id===Number(option.value));option.textContent=b?bodyLabel(b):t('Keine Referenz')}const b=bs.find(b=>b.id===selected);$('selectedName').textContent=b?bodyLabel(b):t('Leerer Raum');$('selectedType').textContent=b?{planet:t('PLANET'),star:t('STERN'),hole:t('SCHWARZES LOCH')}[b.type]:t('KÖRPER HINZUFÜGEN');$('scenarioHint').textContent=t(experimentInfo[$('scenario').value]);for(const id of ['predictionNote','baselineNote','addHint','pointerHint','editError'])$(id).textContent=translateText($(id).textContent);if(instrumentBase&&!numericalFault)$('baselineNote').textContent=t(instrumentBase.reason)+t(' · Baseline neu gesetzt.');if(forecast)renderPrediction();setAdding(adding);renderBHValidity();updatePlayback();diagnostics(false);drawLab();renderChecks();renderCheckStatus();requestGravityDraw()});
+onLanguageChange(()=>{for(const id of ['objectList','referenceBody'])for(const option of $(id).options??[]){const b=bs.find(b=>b.id===Number(option.value));option.textContent=b?bodyLabel(b):t('Keine Referenz')}const b=bs.find(b=>b.id===selected);$('selectedName').textContent=b?bodyLabel(b):t('Leerer Raum');$('selectedType').textContent=b?{planet:t('PLANET'),star:t('STERN'),hole:t('SCHWARZES LOCH')}[b.type]:t('KÖRPER HINZUFÜGEN');$('scenarioHint').textContent=t(experimentInfo[$('scenario').value]);for(const id of ['predictionNote','baselineNote','addHint','pointerHint'])$(id).textContent=translateText($(id).textContent);$('editError').textContent=lastEditError?t(lastEditError.key,lastEditError.params):translateText($('editError').textContent);$('addError').textContent=lastAddError?t(lastAddError.key,lastAddError.params):translateText($('addError').textContent);if(instrumentBase&&!numericalFault)$('baselineNote').textContent=t(instrumentBase.reason)+t(' · Baseline neu gesetzt.');if(forecast)renderPrediction();setAdding(adding);renderBHValidity();updatePlayback();diagnostics(false);drawLab();renderChecks();renderCheckStatus();requestGravityDraw()});
 const bodySnapshots=()=>bs.map(b=>({...b,trail:gravityTrails.get(b)?.snapshot()??[]}));
 window.entrolab={checks:runChecks,blackHole,getBodies:()=>structuredClone(bodySnapshots()),renderInfo:()=>({frame,tab,scheduled:gravityRaf!==null}),inspect:()=>structuredClone({bodies:bodySnapshots(),selected,paused,elapsed,collisions,view,forecast,predictionGeneration})};
 

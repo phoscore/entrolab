@@ -8,13 +8,22 @@ import {resolve, relative, extname, sep, join} from 'node:path';
 const {chromium}=await import(process.env.ENTROLAB_PLAYWRIGHT_MODULE??'playwright');
 const root=fileURLToPath(new URL('../dist/',import.meta.url));
 const output=fileURLToPath(new URL('../browser-results/',import.meta.url));
-let server,browser,url;
+let server,browser,url,failExplorerCss=0,explorerCssFailures=0;
+let cacheableFailure=false,cssRequests=[],holdCss=null;
 test.before(async()=>{
   await mkdir(output,{recursive:true});
   server=createServer(async(req,res)=>{try{
     const pathname=new URL(req.url,'http://localhost').pathname;
     const file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));
     if(relative(root,file).split(sep).includes('..')){res.writeHead(403).end();return;}
+    if(pathname==='/explorer.css'){
+      cssRequests.push(req.url);
+      if(failExplorerCss>0){
+        failExplorerCss--;explorerCssFailures++;
+        res.writeHead(503,{'Content-Type':'text/css','Cache-Control':cacheableFailure?'public, max-age=120':'no-store'}).end();return;
+      }
+      if(holdCss)await holdCss.promise;
+    }
     const bytes=await readFile(file);
     res.writeHead(200,{'Content-Type':({'.html':'text/html','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'})[extname(file)]??'application/octet-stream','Cache-Control':'no-store'}).end(bytes);
   }catch{res.writeHead(404).end();}});
@@ -22,10 +31,11 @@ test.before(async()=>{
   browser=await chromium.launch({headless:true,...(process.env.ENTROLAB_CHROMIUM_EXECUTABLE?{executablePath:process.env.ENTROLAB_CHROMIUM_EXECUTABLE}:{})});
 });
 test.after(async()=>{await browser?.close();if(server)await new Promise(resolve=>server.close(resolve));});
-async function page(options={}){
+async function page({nativeCache=false,...options}={}){
   const context=await browser.newContext({viewport:{width:1440,height:1100},locale:'de-DE',reducedMotion:'reduce',...options});
-  await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
-  const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));
+  // Playwright routing disables the HTTP cache, even for a different domain.
+  if(!nativeCache)await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//,route=>route.abort());
+  const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push({message:e.message,url:p.url(),stack:(e.stack??'').split('\n').slice(0,5).join('\n')}));
   await p.goto(url);
   await p.waitForFunction(()=>window.entrolab&&window.entrolabThermal&&window.entrolabEntropy);
   if (!(await p.evaluate(()=>window.entrolab.inspect().paused))) await p.locator('#play').click();
@@ -38,6 +48,68 @@ async function open(p){
   await p.waitForFunction(()=>window.entrolabExplorer.inspect().groups.length>0);
 }
 const inspect=p=>p.evaluate(()=>window.entrolabExplorer.inspect());
+
+test('JP57 Explorer: native HTTP cache keeps the 503 until a keyboard retry requests a fresh URL',async()=>{
+  cssRequests=[];failExplorerCss=1;cacheableFailure=true;
+  const {p,context,errors}=await page({nativeCache:true});
+  try {
+    await chooseLab(p,'explorer');
+    await p.locator('#explorerRetry').waitFor();
+    assert.deepEqual(cssRequests,['/explorer.css']);
+    // A new document in the same Chromium context reuses the cached error.
+    await p.goto(url);
+    await chooseLab(p,'explorer');
+    await p.locator('#explorerRetry').waitFor();
+    assert.deepEqual(cssRequests,['/explorer.css']);
+    await p.locator('#explorerRetry').press('Enter');
+    await p.waitForFunction(()=>window.entrolabExplorer?.inspect().objectCount===22);
+    assert.deepEqual(cssRequests.slice(0,1),['/explorer.css']);
+    assert.equal(cssRequests.length,2);
+    assert.match(cssRequests[1],/^\/explorer\.css\?retry=.+/);
+    assert.equal(await p.locator('#heading-explorer').evaluate(el=>el===document.activeElement),true);
+    assert.equal(await p.locator('link[data-explorer-loaded=true]').count(),1);
+    assert.equal(await p.locator('#exCanvas').count(),1);
+    assert.deepEqual(errors,[]);
+  }finally{cacheableFailure=false;failExplorerCss=0;await context.close();}
+});
+
+test('JP57 Explorer: repeated failure restores focus and a delayed retry respects lab and focus changes',async()=>{
+  cssRequests=[];failExplorerCss=2;
+  const {p,context,errors}=await page();
+  try {
+    await chooseLab(p,'entropy');
+    await p.locator('[data-marker-count="512"]').click();
+    await p.locator('#entropyStep').click();
+    const snapshot=()=>p.evaluate(()=>({gravity:window.entrolab.inspect().bodies,entropy:window.entrolabEntropy.inspect(),thermal:window.entrolabThermal.inspect()}));
+    const before=await snapshot();
+    await chooseLab(p,'explorer');
+    await p.locator('#explorerRetry').press('Enter');
+    await p.waitForFunction(()=>document.activeElement?.id==='explorerRetry');
+    assert.equal(cssRequests.length,2);
+    assert.equal(await p.locator('link[data-explorer-style]').count(),0);
+    const delayed=Promise.withResolvers();
+    holdCss=delayed;
+    try {
+      const request=p.waitForRequest(r=>new URL(r.url()).pathname==='/explorer.css');
+      await p.locator('#explorerRetry').press('Enter');
+      await request;
+      await chooseLab(p,'gravity');
+      await chooseLab(p,'explorer');
+      await chooseLab(p,'gravity');
+      assert.equal(cssRequests.length,3);
+      await p.locator('#play').focus();
+      delayed.resolve();
+      await p.waitForFunction(()=>!!window.entrolabExplorer);
+      assert.equal(await p.evaluate(()=>document.activeElement.id),'play');
+      assert.equal((await inspect(p)).objectCount,0);
+      assert.deepEqual(await snapshot(),before);
+      await open(p);
+      assert.equal(await p.locator('#exCanvas').count(),1);
+      assert.equal(new Set(cssRequests).size,3);
+      assert.deepEqual(errors,[]);
+    }finally{delayed.resolve();holdCss=null;}
+  }finally{failExplorerCss=0;await context.close();}
+});
 async function openSolar(p) {
   await p.locator('#exSolarMode').click();
   await p.locator('#solCanvas').scrollIntoViewIfNeeded();
@@ -79,6 +151,46 @@ test('Explorer browser: lazy loading, real source selection, aliases and unchang
     await p.locator('#explorer').screenshot({path:join(output,'explorer-desktop.png')});
     await writeFile(join(output,'explorer-performance.json'),JSON.stringify({browser:browser.version(),coldOpenMs,resources,lastDrawMs:state.duration},null,2)+'\n');
   }finally{await context.close();}
+});
+
+test('Explorer browser: one stylesheet 503 is removed, retry restores CSS without losing other lab state',async()=>{
+ for(const width of [390,1440])for(const language of ['de','en']){
+  const failureStart=explorerCssFailures;
+  failExplorerCss=1;
+  const {p,context,errors}=await page({viewport:{width,height:900}});
+  try{
+   await p.locator('[data-language='+language+']').click();
+   await chooseLab(p,'entropy');
+   await p.locator('[data-marker-count="64"]').click();
+   const entropyBefore=await p.evaluate(()=>window.entrolabEntropy.inspect());
+   await chooseLab(p,'explorer');
+   await p.locator('.explorer-load-error').waitFor();
+   const error=await p.locator('.explorer-load-error').textContent();
+   assert.match(error,language==='de'?/Explorer-Ressourcen konnten nicht geladen werden/:/Explorer resources could not be loaded/);
+   await p.locator('.explorer-load-error').screenshot({path:join(output,`explorer-503-error-${language}-${width}.png`)});
+   assert.equal(await p.locator('link[data-explorer-style]').count(),0);
+   assert.equal(await p.evaluate(()=>window.entrolabExplorer??null),null);
+   assert.equal(explorerCssFailures,failureStart+1);
+   const alternate=language==='de'?'en':'de';
+   await p.locator('[data-language='+alternate+']').click();
+   assert.match(await p.locator('.explorer-load-error').textContent(),alternate==='de'?/Explorer-Ressourcen konnten nicht geladen werden/:/Explorer resources could not be loaded/);
+   await p.locator('[data-language='+language+']').click();
+   await chooseLab(p,'gravity');
+   await chooseLab(p,'explorer');
+   assert.equal(await p.locator('.explorer-load-error').count(),1,'leaving and returning keeps the explicit retry state');
+   await p.locator('#explorerRetry').click();
+   await p.waitForFunction(()=>window.entrolabExplorer?.inspect().objectCount===22&&!window.entrolabExplorer.inspect().failed);
+   const loaded=await p.evaluate(()=>({links:document.querySelectorAll('link[data-explorer-style]').length,rules:[...document.styleSheets].find(s=>s.ownerNode?.dataset.explorerStyle!==undefined)?.cssRules.length??0,canvases:document.querySelectorAll('#exCanvas').length,display:getComputedStyle(document.querySelector('#exCanvas')).display}));
+   assert.equal(loaded.links,1);assert(loaded.rules>0);assert.equal(loaded.canvases,1);assert.equal(loaded.display,'block');
+   const mounted=await p.evaluateHandle(()=>window.entrolabExplorer);
+   await chooseLab(p,'gravity');await chooseLab(p,'explorer');
+   assert.equal(await p.evaluate(controller=>window.entrolabExplorer===controller,mounted),true);
+   assert.equal(await p.locator('#exCanvas').count(),1);
+   assert.deepEqual(await p.evaluate(()=>window.entrolabEntropy.inspect()),entropyBefore);
+   await p.locator('#explorer').screenshot({path:join(output,`explorer-503-recovered-${language}-${width}.png`)});
+   assert.deepEqual(errors,[]);
+  }finally{await context.close()}
+ }
 });
 
 test('Explorer browser: pointer anchor, keyboard, resize, idle and tab lifecycle',async()=>{

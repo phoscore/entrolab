@@ -1,147 +1,59 @@
-# ENTROLAB 🌌
+# Reincarnated as a Proton
 
-Interaktiver Physik-Spielplatz von cosmic insignificance: Gravitation, idealisierte Schwarze Löcher, extreme Himmelskörper und zwei getrennte Entropie-Lehrmodelle für Wahrscheinlichkeit und Wärmeausgleich. Browser-Titel: **entrolab - emptiness pro max**.
+**Entrolab** is a bilingual, interactive physics and astronomy learning project by cosmic insignificance. It puts explicit models, their assumptions, and their limits beside the visualizations.
 
-## Entwicklungsstand und Ausprobieren
+**Current state: v0.9.5 RC.** The public site is [entrolab.pages.dev](https://entrolab.pages.dev/); the public source repository is [github.com/phoscore/entrolab](https://github.com/phoscore/entrolab).
 
-**v0.8 auf `feature/v0.8-learning-foundation` ist ein isolierter Prüfstand.** Grundlage ist die freigegebene v0.7 auf `main` (`8b856086877ea21579cf7d74190ad08155d70c7f`) mit dem genehmigten Planungsstand. Die Assetvarianten wurden am 09.11.2026 ausdrücklich freigegeben; Phase E ist integriert. Schritte 01–04 liegen vollständig zur unabhängigen Prüfung vor. Kein Merge, Produktionsdeployment oder aktives öffentliches Rebranding; die vorhandene öffentliche Cloudflare-Branchvorschau wird gesondert geprüft. v0.8.5 bleibt Planung. [Umsetzungsvertrag](docs/v0.8/Umsetzungsvertrag_v0.8.md) und [Qualitätsbericht](docs/Qualitaetsupdate_v0.8.md).
+## Run the site
 
-Die Anwendung ist buildlos: moderner Browser mit ES-Modulen, BigInt und Modul-Workern; Python 3 für einen lokalen HTTP-Server. Keine Paketinstallation und kein Backend zum Benutzen nötig.
+The application is static and has no build step or backend. Serve the `dist` directory over HTTP so ES modules and module workers work:
 
 ```sh
-git clone --branch feature/v0.8-learning-foundation https://github.com/phoscore/entrolab.git
+git clone --branch main https://github.com/phoscore/entrolab.git
 cd entrolab
 python -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
-Unter Windows gegebenenfalls `py` statt `python` verwenden. Dann <http://localhost:8000> öffnen. Wegen der ES-Module und Worker nicht über `file://` starten. Das private Repository benötigt beim Klonen einen berechtigten GitHub-Zugang.
+On Windows, use `py` if `python` is not available. Open <http://127.0.0.1:8000>. Do not open `dist/index.html` with `file://`.
 
-Schriftarten von Google Fonts sind optional; Systemschrift funktioniert ohne sie. Die Berechnungen brauchen kein Internet. Externe Quellenlinks benötigen eine Verbindung. Eine restriktive eigene Content-Security-Policy muss lokale Modul-Worker erlauben; andernfalls melden die Selbstchecks einen Fehler, ohne die Sandbox als Ersatz-Rechenumgebung zu benutzen.
+The calculations, data packages, and fonts used by the page are served locally; normal use does not require a third-party font service or an internet connection. External reference links need a connection when opened.
 
-## Labs und Bedienung
+## The eight areas
 
-- **Gravity Sandbox:** fünf Szenarien, Sterne/Planeten/Schwarze Löcher hinzufügen und bearbeiten, Pause/Tempo/Reset, Flugbahnen, Zoom/Vollbild, Messinstrumente und begrenzte numerische Bahnvorhersage. Körper per Klick oder Inspektor wählen. Beim Platzieren bestimmt Ziehen die Anfangsgeschwindigkeit.
-- **Black Hole Lab:** Schwarzschild-Radius und Hawking-Temperatur; Leistung und Lebensdauer als ausdrückliche Modellschätzungen; Größen- und logarithmische Funktionsdiagramme.
-- **Extreme Objects:** künstlerische Schwarzes-Loch- und Sternansichten, schematische Geometrie und optionaler schematischer Pulsar, Radienvergleich sowie Kelvin/Celsius-Temperaturlabor. Artwork ist keine GR- oder Emissionssimulation.
-- **Entropy Lab · Teilchen & Wahrscheinlichkeit:** standardmäßig zwölf nummerierte, unterscheidbare Marker in zwei gleich großen Kammern. `N` ist auf 1–32 begrenzt. Alle links starten, `k` manuell wählen, einzelne Zufallsschritte, automatisch mischen, pausieren und zurücksetzen. Mikrozustand anzeigen oder bei gleichem `k` neu auslosen. Exakte Multiplizität, Gleichgewichtsverteilung, Datentabelle und dimensionslose Modellentropie vergleichen.
-- **Entropy Lab · Wärme & Entropie:** zwei idealisierte, gemeinsam isolierte Körper mit einstellbaren Anfangstemperaturen (250–600 K), konstanten Wärmekapazitäten und Wärmeleitwert. Analytischer Temperaturverlauf, vorzeichenbehaftete Wärmeleistung/übertragene Energie, Gesamtenergie und thermodynamisches ΔS in J/K. Start/Pause, Zehn-Sekunden-Schritte und Reset; neue Parameter/Beispiele bleiben bis „Übernehmen“ ein Entwurf. Das Extreme Temperature Lab kann ausschließlich zulässige Kelvinwerte für A oder B vormerken. Extreme Werte werden erklärt abgewiesen, niemals angepasst.
-- **Erste Schritte:** vier freiwillige Schritte mit dezent hervorgehobenen echten Bedienelementen. Die Anleitung führt keine Modelländerung selbst aus, bewahrt beim Sprachwechsel den Schritt und lässt sich jederzeit schließen/erneut öffnen.
-- **v0.8-Lernhilfen:** eine geschlossene Hauptfrage und eine freiwillige Prognose pro fachlichem Kontext; „Steuerelement finden“ fokussiert den echten Regler, wendet nichts an. Separate N=4-Demo mit A–D, optionaler Makrozustandsvergleich und Energie-/Entropiebalken lesen bestehende Ergebnisse, ohne die beiden Modelle zu vermischen. Vier Alltagsvertiefungen, vorsichtige Grenzfragen und 29 gemeinsame Fachbegriffe (mechanische und thermische Energie getrennt) in DE/EN.
-- **Kontexthilfe:** „Was bedeutet das?“ öffnet das bestehende Glossar und fokussiert den passenden Begriff; „Zurück zum Labor“ oder Escape führt zum Ausgangslink zurück. Advanced-Infos sind freiwillig aufklappbar. Ein gemeinsames Wissensfundament verbindet kurze Begriffe mit sechs Modellkapiteln, Formeln, Quellen und Rücksprung. Direkte Fachlinks und verschachtelte Glossar-/Quellenwege sind tastaturbedienbar.
-- **Modell & Quellen:** zehn isolierte modellinterne Selbstchecks. Jeder Lauf zeigt einen Ausführungszähler, Ergebnisstatus und eine Screenreader-Meldung. Das ist weder die gesamte CI-Suite noch eine vollständige Physikverifikation.
+- **Gravity Sandbox** — edit and place bodies in a two-dimensional Newtonian model; inspect energy, momentum, angular momentum, and bounded short forecasts.
+- **Singularities (Black Hole Lab)** - explore Schwarzschild radius, Hawking temperature, idealized photon power, and lifetime estimates.
+- **Extreme Objects** — compare selected astrophysical examples and explore clearly labeled illustrative renderings.
+- **Entropy Lab** — two separate lessons: a stochastic two-chamber model with **1–512 distinguishable markers**, and an isolated two-body heat-transfer model.
+- **Extreme Temperature Lab** — explore Kelvin and Celsius values, selected material data, temperature scales, and a Maxwell–Boltzmann ideal-gas comparison without turning those examples into a material-phase solver.
+- **Matter & Fields** — inspect a small electrostatic field model, the two-photon invariant mass, and deuteron binding.
+- **Cosmic Explorer** — explore the selected sky catalogs, stellar neighborhood, solar-system states, and spacecraft trajectories.
+- **Model & Sources** — read model assumptions, references, source records, and run the page's isolated self-checks.
 
-DE/EN im Kopfbereich; auch dynamische Werte, Diagrammbeschriftungen und Fehler sind lokalisiert. Eingaben verwenden in beiden Sprachen einen **Dezimalpunkt**, etwa `0.1` oder `1e9`. Noch nicht angewendete Entwürfe bleiben beim Sprachwechsel erhalten. Der Browser-Titel bleibt in beiden Sprachen identisch. Fokusmodus in Sandbox/Extreme Objects, Escape zum Verlassen. Reduced Motion startet bestehende Simulationen pausiert und unterdrückt Markerübergänge; automatisches Entropy-Mischen und Wärme-Abspielen beginnen immer erst nach ausdrücklicher Auswahl. Beim Wechsel zu Reduced Motion pausiert das Wärmeexperiment; seine dekorativen Farb-/Flusseffekte werden unterdrückt.
+The interface is available in German and English. At more than 32 Entropy markers, the display uses chamber fill bars in place of individual markers and connects the individual probabilities for each k with a curve. The current macrostate keeps its exact multiplicity.
 
-## Wissenschaftliche Grundlagen und Grenzen
+## Scientific models and limits
 
-Die Sandbox berechnet paarweise gewöhnliche dreidimensionale Newton-Gravitation in einer Ebene, intern in AU, Sonnenmassen und Tagen. Velocity Verlet mit adaptiven Schritten und Plummer-Glättung `ε = 10⁻⁷ AU` (≈ 15 km) bleibt unverändert. Adaptive Schritte liefern keine garantierte Fehlerschranke. Kollisionen werden über Modellradien als vollkommen unelastische Verschmelzungen behandelt; Masse/linearer Impuls bleiben erhalten, aufgelöster Bahndrehimpuls/Bewegungsenergie nicht. Große Schritte können Kontakte weiterhin übersehen. Keine GR, Gezeitenzerreißung, Materialphysik oder echte Ephemeriden.
+- **Gravity:** pairwise Newtonian gravity in a plane, with AU, solar masses, and days; adaptive Velocity Verlet and Plummer softening `ε = 10⁻⁷ AU`. Contacts merge as perfectly inelastic collisions. The model has no general relativity, tides, material response, or guaranteed integration-error bound; large steps can miss a contact. Inspector edits and new placements retain the mass domain `10⁻¹⁵–10¹¹ M☉`, limit each coordinate to `|x|, |y| ≤ 3518437.2088832 AU`, and limit total speed to `0.01 c` (approximately 2,998 km/s). At the coordinate limit, binary64 spacing stays below 1% of the force-softening length; at `0.01 c`, the first relativistic corrections are of order `10⁻⁴`. These broad input bounds do not limit the regular solar-system and stellar scenarios.
+- **Black holes and extreme objects:** the black-hole calculator assumes an uncharged, non-rotating Schwarzschild hole. Hawking power and lifetime are idealized photon-only estimates without greybody factors, extra particle species, or accretion. Selected stellar and compact-object values are examples with source-specific uncertainties, not new fits to the underlying literature. Illustrations are not general-relativistic or emission simulations.
+- **Entropy:** the particle model counts `Ω(k) = C(N,k)` and displays `S/k_B = ln Ω`, a dimensionless Boltzmann model entropy for the coarse macrostate. Each discrete step independently switches each marker with probability `q = 1/4`; the step rate is a presentation choice, not physical time. This is not a gas trajectory or a heat-flow model.
+- **Heat transfer:** two internally uniform bodies exchange heat in an isolated pair with constant heat capacities and constant conductance. The teaching domain is 250–600 K, `C = 1–10⁶ J/K`, and `G_th = 0.001–1000 W/K`. There are no phase changes, radiation, work, external losses, temperature-dependent capacities, or internal gradients. Small changes can fall below the displayed temperature precision while the analytical heat flow remains nonzero.
+- **Maxwell–Boltzmann gas:** compares sampled speeds with the classical three-dimensional speed density for an ideal monatomic gas with representative argon mass at 30–3000 K. The sample particles do not interact.
+- **Matter & Fields:** the two-photon lesson derives system invariant mass from energies and opening angle. The deuteron lesson shows binding energy from the rest-mass difference between the bound nucleus and a free proton plus neutron. The field view is a simplified electrostatic model; it is not a plasma, quantum-field, or material-response simulation.
+- **Cosmic Explorer:** published catalogs are selected, versioned samples, not complete surveys. Distances and classifications retain their documented uncertainty and selection limits. Planet positions use a documented approximation over its stated interval, not Horizons precision. Galactic motion is a local linear tangent approximation, not a long-term orbit. Voyager data are bounded by their published time coverage.
 
-Bahnvorhersage: separate Kopie, höchstens zwölf Körper, 1.500 Schritte und 301 Punkte; Horizonte 10/60/180 Tage. Keine reale Zukunftsprognose und keine laufende Neuberechnung. Näher am Horizont oder bei relativistischen Geschwindigkeiten ist die Newton-Sandbox physikalisch unzuverlässig.
+All scientific colors and diagrams follow their own model meanings; decorative artwork is identified separately. Historical documents under `docs/` describe the version named in each document and do not replace the current product limits above.
 
-Der BH-Rechner setzt ungeladene, nicht rotierende Löcher voraus. Leistung/Lebensdauer verwenden die idealisierte Photonen-Schwarzkörper-Näherung im leeren Universum, ohne Greybody-Faktoren, zusätzliche Teilchenarten oder Akkretion. Keine Vorhersage der letzten Quantenphase. Sternmassen/-radien sind gewählte Beispiele, keine gelöste Zustandsgleichung. Temperaturbilder sind abstrakte Illustrationen; Kelvin/Celsius wird mit dem exakt definierten Offset 273,15 umgerechnet.
+## Development checks
 
-**Entropy Lab:** `Ω(k) = C(N,k)`, insgesamt `2^N` individuelle Zuordnungen; im Gleichgewicht `P_eq(k) = Ω(k)/2^N`. Pro diskretem Schritt wechselt jeder Marker unabhängig und symmetrisch mit `q = 1/4` die Kammer. Die stationäre Verteilung ist binomial; sie ist **nicht** die anfängliche oder bedingte nächste Schrittverteilung. `S/k_B = ln Ω` bezeichnet ausschließlich eine dimensionslose Boltzmann-Modellentropie der groben `k`-Beschreibung. Einzelne Schritte können sie verringern. Keine realen Gasbahnen, Energien, Wärmeflüsse, Temperatur, Diffusionskoeffizienten oder kalibrierte physikalische Zeit. Nicht mit gravitativer oder Bekenstein-Hawking-Entropie gleichsetzen. Ausführlich: [Qualitätsbericht v0.6](docs/Qualitaetsupdate_v0.6.md).
-
-**Wärme & Entropie:** `dQ/dt = G_th(T_A−T_B)`, `C_A dT_A/dt = −dQ/dt`, `C_B dT_B/dt = +dQ/dt`. Die analytische Relaxation hat `T_eq = (C_A T_A0 + C_B T_B0)/(C_A+C_B)` und `τ = 1/[G_th(1/C_A+1/C_B)]`. Gesamtenergie `U=C_A T_A+C_B T_B` ist bis auf Rundung konstant; der Nullpunkt ist Modellkonvention. `ΔS_i=C_i ln(T_i/T_i0)`, Gesamtänderung in J/K, getrennt von `S/k_B` des Markermodells. Numerisch stabile `expm1`-/`log1p`-Auswertung ohne Entropie-Clamping. Gewählte Bereiche: T 250–600 K, C 1–10⁶ J/K, G_th 0,001–1000 W/K, Modellzeit 0–10¹² s. Keine Phasenwechsel, Strahlung, Arbeit, Außenverluste, inneren Temperaturgradienten oder Materialkalibrierung. Die Grenzen sind didaktisch, kein allgemeiner Materialgültigkeitsnachweis. Detaillierte Ableitung, Quellen, Referenzwerte und Messungen: [Qualitätsbericht v0.7](docs/Qualitaetsupdate_v0.7.md).
-
-## Tests reproduzieren
-
-Node.js 22 oder neuer:
-
-```sh
-node scripts/test.mjs
-node scripts/verify-original.mjs
-node scripts/benchmark.mjs
-node scripts/check-benchmarks.mjs
-node scripts/measure-thermal.mjs
-```
-
-Der reguläre Einstieg enthält **186 Prüfungen**: zehn Original-Selbstchecks und 176 Node-Fälle. Die vier zusätzlichen Fälle des Nachaudits prüfen mechanische und thermische Energiezuordnung samt unabhängiger SI-Referenz. Alle 159 Prüfungen der Audit-Basis bleiben erhalten; 27 neue Fälle prüfen Assets, Quellen, Erklärungen, unabhängige Zählung, Bilanzprojektionen und den rein dekorativen Monster-Lifecycle. Die zwölf vollständigen numerischen Benchmarks werden unter identischer Laufzeit exakt gegen den genehmigten historischen Stand verglichen; sechs Originalprüfungen verifizieren den archivierten Originalcommit. Quellen, Referenzen und Toleranzen werden nicht gelockert. Ein vollständiger Git-Klon ist für diese beiden historischen Prüfeinstiege erforderlich. `--working-tree` nur beim historischen Erstsicherungsstand verwenden.
-
-
-Für die zusätzlichen realen Chromium-Tests (nur Entwicklungsabhängigkeit, Playwright exakt per Lockfile):
-
-```sh
-npm ci --ignore-scripts --no-audit --no-fund
-npx playwright install --with-deps chromium
-npm run test:browser
-```
-
-Die Browser-Suite enthält **65 Fälle**: alle 38 Fälle der Audit-Basis und 27 neue Chromium-Fälle zu Wissens-/Fokusnavigation, freiwilligen Fragen, Zustandsbewahrung, N=4, Großzahlen, Bilanz, Monster-Modi, Lifecycle und 320/390/fractional-Ansichten. Screenshots und JSON-Messwerte unter `browser-results/` werden in CI als Artefakt aufgehoben. Zusätzlich vergleicht `node scripts/measure-v08-browser.mjs` dieselben Szenen auf derselben Maschine mit der Planungsbasis: acht 30-Sekunden-Stichproben in wechselnder Reihenfolge. Keine Garantie für beliebige Hardware, Safari oder reale Assistenztechnik; tatsächliche Resultate und Grenzen im [Qualitätsbericht v0.8](docs/Qualitaetsupdate_v0.8.md).
-
-Die lokale Asset-Sichtvorschau liegt unter <http://localhost:8000/asset-review.html>. Sie lädt das unveränderte Original und die drei abgeleiteten Kandidaten; die freigegebenen WebP-Ableitungen sind als eine dekorative Figur integriert. „Monster“ im Kopfbereich bietet Dezente Bewegung, Ruhig oder Aus. Reduced Motion bleibt statisch; Fokusmodus, Eingaben und offene Einstellungen unterdrücken die Figur. Sie ist keine physikalische Messanzeige. 
-
-Die CI erstellt außerdem `entrolab-v08-source.zip` im privaten Artefakt `chromium-review-measurements`. Herunterladen, entpacken und denselben Python-Befehl im Ordner `entrolab-v08` ausführen. Das ZIP enthält alle versionierten Projektdateien; historische Git-Prüfungen benötigen weiterhin den vollständigen Klon. Kein Deployment.
-
-## Projektstruktur
-
-| Datei | Aufgabe |
-| --- | --- |
-| `dist/knowledge.mjs`, `knowledge-text.mjs` | Gemeinsame Inhalte, Quellen-IDs und Schlüssel des bestehenden DE/EN-Systems |
-| `dist/knowledge-ui.mjs`, `guide.mjs` | Begriffe, Modellkapitel, Fachlinks und Fokus-Rückwege |
-| `dist/explanations-ui.mjs` | Sechs freiwillige Laborfragen und Prognosen ohne Modellschreibzugriff |
-| `dist/learning-math.mjs`, `entropy-learning.mjs` | Unabhängige N=4-Demo, Makrovergleich und reine Bilanzprojektion |
-| `dist/creature-ui.mjs`, `creature-policy.mjs`, `creature.css` | Eine dekorative Figur, eigener begrenzter Zustand, DE/EN, Ruhig/Aus/Reduced Motion; kein Physik- oder RNG-Zugriff |
-| `dist/physics.mjs` | Unveränderter Physikkern und Integrator |
-| `dist/experiments.mjs`, `instruments.mjs`, `prediction.mjs` | Szenarien, Diagnostik, begrenzte Vorhersage |
-| `dist/app.mjs` | Sandbox, BH-Rechner und Selbstcheck-Anzeige |
-| `dist/checks.mjs`, `checks-worker.mjs`, `self-checks.mjs` | Originalrechnungen, isolierter Worker, Ablauf-/Fehlerkontrolle |
-| `dist/extreme-*.mjs` | Daten, berechnete Werte und illustrative Renderer |
-| `dist/entropy.mjs` | Reine Zählmathematik und stochastische Zustandsfunktionen |
-| `dist/entropy-ui.mjs`, `entropy.css` | Kammern, Diagramm, Bedienung und Timer-Lifecycle |
-| `dist/thermal-physics.mjs`, `thermal-ui.mjs`, `thermal.css` | Getrenntes analytisches Wärme-/Entropiemodell und Oberfläche |
-| `dist/discovery.mjs` | Freiwillige Anleitung mit tatsächlichen Bedienhandlungen |
-| `scripts/measure-thermal.mjs` | Reproduzierbare Bilanz-/RK4-Messwerte ohne Referenzänderung |
-| `dist/i18n.mjs`, `translations.mjs`, `ux.mjs`, `guide.mjs` | Sprache, Fokus, Hilfen und Kontextrückweg |
-| `dist/index.html`, `favicon.svg` | Oberfläche, fester Browser-Titel und originales künstlerisches Logo |
-| `scripts/test.mjs`, `.github/workflows/tests.yml` | Reguläre Suite und Browser-CI ohne Deployment |
-| `docs/` | Pläne, Qualitätsberichte, Quellen und unveränderte historische Referenzen |
-
-## Original und Freigabe schützen
-
-Original v0.1: Commit `be2502d51a449de3e515faaf72ab5954b1a739d4`, zusätzlich unter `archive/v0.1`. Die sechs Originaldateien einschließlich historischer Hosting-Konfiguration sind über `docs/v0.1-original.sha256` und `docs/v0.1-original-commit.txt` gebunden. Diese Referenzen niemals auf neuere Versionen umstellen. `verify-original.mjs` liest ausdrücklich den Original-Commit; der v0.7-Auftrag verschiebt weder Archive noch Tags.
-
-Die bestehende Cloudflare-Branchvorschau ist öffentlich lesbar und vom Eigentümer unter den dokumentierten Sicherheitsbedingungen akzeptiert; das private GitHub-Repository und seine CI-Artefakte sind davon getrennt. Featurebranch-Pushes können automatisch Vorschauen deployen. Nachbesserungscommits verwenden deshalb `[CF-Pages-Skip]`; neue Vorschauen/Produktionsdeployment benötigen weiterhin eigene Freigabe.
-
-GitHub ist die zentrale Versionsverwaltung. Größere Änderungen auf Entwicklungsbranches, nachvollziehbare Commits und unabhängiger Review vor Freigabe. `main` nur nach ausdrücklicher Eigentümerfreigabe ändern/mergen. **Cloudflare Pages veröffentlicht `main` automatisch auf der bestehenden Produktionsseite.** Deshalb sind Merge und Produktionsveröffentlichung gesonderte Freigabeschritte; diese Entwicklung führt beides nicht aus. Kein neuer Hosting-Standort, kein Release, kein Force-Push und keine eigenmächtige Sichtbarkeitsänderung. Die historische `.openai/hosting.json` wird nicht als Deployment-Auftrag benutzt.
-
-Korrekte Modelle und dokumentierte Grenzen haben Vorrang. Künstlerische Effekte und Humor sind ausdrücklich von berechneter Physik getrennt. „90 % wissenschaftlich fundiert“ ist eine Gestaltungspräferenz, keine gemessene Genauigkeitsgarantie.
-
-## Quellen und bisherige Berichte
-
-- [OpenStax Vol. 2 §1.6: Wärmeübertragung](https://openstax.org/books/university-physics-volume-2/pages/1-6-mechanisms-of-heat-transfer), [§1.4: Kalorimetrie](https://openstax.org/books/university-physics-volume-2/pages/1-4-heat-transfer-specific-heat-and-calorimetry), [§4.6: Entropie](https://openstax.org/books/university-physics-volume-2/pages/4-6-entropy) — Lehrbuchprinzipien; konstante C/G_th und Modellgrenzen sind eigene explizite Annahmen.
-- [OpenStax §15.7: Mikrozustände und Boltzmann-Entropie](https://openstax.org/books/college-physics-ap-courses/pages/15-7-statistical-interpretation-of-entropy-and-the-second-law-of-thermodynamics-the-underlying-explanation) — statistische Grundlagen; die `q = 1/4`-Schrittregel ist eine eigene, explizite Modellwahl.
-- [OpenStax §13.1: Newtonsche Gravitation](https://openstax.org/books/university-physics-volume-1/pages/13-1-newtons-law-of-universal-gravitation).
-- [NASA/JPL: astronomische Einheit](https://ssd.jpl.nasa.gov/glossary/au.html), [NASA: Sternreste/Pulsare](https://science.nasa.gov/exoplanets/stars/), [NASA: BH-Geometrie](https://science.nasa.gov/universe/black-holes/anatomy/).
-- [NIST: Konstanten](https://physics.nist.gov/cuu/Constants/), [Universität Zürich: Hawking-Strahlung](https://www.physik.uzh.ch/groups/jetzer/notes/PHY529_ART_III.pdf), [JILA: Hawking-Strahlung](https://jila.colorado.edu/~ajsh/courses/bh/hawk.html).
-- Historische Qualitätsberichte: [v0.2](docs/Qualitaetsupdate_v0.2.md), [Review-Abschluss v0.2](docs/Reviewabschluss_v0.2.md), [v0.3](docs/Qualitaetsupdate_v0.3.md), [v0.4](docs/Qualitaetsupdate_v0.4.md), [v0.5](docs/Qualitaetsupdate_v0.5.md), [Codex-Review v0.5](docs/CodexReview_v0.5.md), [v0.6 samt Reviewkorrekturen](docs/Qualitaetsupdate_v0.6.md). Ihre damaligen Testzahlen/Entwicklungsstände sind keine aktuellen Versionsangaben.
-
-
-## v0.8.5 unabhängig ausprobieren (Entwicklungsstand)
-
-Basis: freigegebene v0.8 (`25e72c639d66677c1629886141e3671a4c696ef6`). Neuer Branch: `feature/v0.8.5-lab-upgrades`. Kein Produktionsdeployment; alle Entwicklungskommitte unterdrücken Pages-Builds.
-
-```sh
-git clone --branch feature/v0.8.5-lab-upgrades https://github.com/phoscore/entrolab.git
-cd entrolab
-python -m http.server 8000 --bind 127.0.0.1 --directory dist
-```
-
-Auf Windows gegebenenfalls `py` statt `python`. Im Browser `http://localhost:8000` öffnen. App benötigt weder Paketinstallation noch Build. Source-ZIP aus dem privaten CI-Artefakt `chromium-review-measurements` entpacken und im enthaltenen Projektordner denselben Python-Befehl ausführen; historische Git-Prüfungen benötigen den vollständigen Klon.
-
-- **Erste Schritte:** freiwilligen Schnellstart oder einen der sieben Laborwege wählen. Nur eigene Bedienhandlungen verändern Modelle; Zurück/Überspringen/Schließen jederzeit möglich. Wiederaufnahme während der laufenden Seite.
-- **Black Hole:** vier bestehende Rechenwerte, darunter Umgebung / Licht & Horizont. Blickwinkel unter „Ansicht & Animation“, rein schematisch; Bewegung pausierbar, Reduced Motion statisch.
-- **Extreme Temperature:** neue Kontextkarte; optional zwei Temperaturen vergleichen oder Material Explorer öffnen. Wasser/Ethanol/Aluminium/Eisen beziehen sich auf1 atm und begrenzte Tabellenfenster. Keine Kopplung von Materialphasen an den Wärme-Solver.
-- **Modell & Quellen:** freiwilliger Artikel zur Protonenmasse, QCD und dem getrennten mathematischen Yang–Mills-Problem. Direktlink `/#model-proton`.
+Node and npm are needed for development checks, not for normal site use. The browser suite uses Playwright with Chromium.
 
 ```sh
 node scripts/test.mjs
 node scripts/check-benchmarks.mjs
 node scripts/verify-original.mjs
 npm ci --ignore-scripts --no-audit --no-fund
-npx playwright install --with-deps chromium
+npx playwright install chromium
 npm run test:browser
-node scripts/measure-v085-browser.mjs
 ```
 
-[Qualitätsbericht mit Quellen, tatsächlich ausgeführten Prüfungen und Grenzen](docs/Qualitaetsupdate_v0.8.5.md). Keine Merge-/Releasefreigabe aus dieser Anleitung ableiten. Originalarchiv und Monster-Master bleiben unverändert.
+The Explorer data and its reproducible offline builds are checked with the scripts in `scripts/`; the source pins, licenses, and known limits are documented under `docs/v0.9.5/`.

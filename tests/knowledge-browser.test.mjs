@@ -96,24 +96,40 @@ test('v0.8 browser: cold science/model/term fragments and browser back/forward r
 test('v0.8 browser: 100 knowledge/guide mount-dispose cycles retain one owner and bounded native DOM/listeners',async()=>{
  const {p,context}=await h.lab();try{
   const before=await physical(p),cdp=await context.newCDPSession(p);
-  await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.collectGarbage');
-  const countersBefore=await cdp.send('Memory.getDOMCounters'),heapBefore=await cdp.send('Runtime.getHeapUsage');
-  await p.evaluate(async()=>{
+  await cdp.send('HeapProfiler.enable');
+  const cycleBatch=async count=>p.evaluate(async count=>{
    const {initKnowledge}=await import('/knowledge-ui.mjs'),{initGuide}=await import('/guide.mjs');
-   for(let i=0;i<100;i++){
+   for(let i=0;i<count;i++){
     const a=initKnowledge();if(a!==initKnowledge())throw Error('duplicate knowledge owner');
     a.dispose();a.dispose();if(a.inspect().subscriptions!==0)throw Error('knowledge subscription retained');
     const g=initGuide();g.dispose();g.dispose();if(g.inspect().subscriptions!==0)throw Error('guide subscription retained');
     initGuide();initKnowledge();
+    const state=window.entrolabKnowledge.inspect();
+    if(!state.mounted||state.subscriptions!==1||state.timers!==0||document.querySelectorAll('.knowledge-model').length!==6||document.querySelectorAll('.knowledge-glossary').length!==1)throw Error('knowledge/guide owner invariant failed');
    }
-  });
-  await cdp.send('HeapProfiler.collectGarbage');const countersAfter=await cdp.send('Memory.getDOMCounters'),heapAfter=await cdp.send('Runtime.getHeapUsage');
+  },count);
+  const sample=async()=>{
+   const samples=[];
+   for(let i=0;i<3;i++){
+    await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await cdp.send('HeapProfiler.collectGarbage');samples.push(await cdp.send('Memory.getDOMCounters'));
+   }
+   return samples;
+  };
+  await cycleBatch(10); // Warm allocation and subscription paths before taking the counter baseline.
+  const countersBefore=await sample(),baseline={nodes:Math.min(...countersBefore.map(s=>s.nodes)),jsEventListeners:Math.min(...countersBefore.map(s=>s.jsEventListeners))},heapBefore=await cdp.send('Runtime.getHeapUsage');
+  const checkpoints=[];
+  for(const count of [25,25,50]){
+   await cycleBatch(count);const countersAfter=await sample();
+   assert(Math.max(...countersAfter.map(s=>s.jsEventListeners))<=baseline.jsEventListeners+8,JSON.stringify({baseline,countersAfter}));
+   assert(Math.max(...countersAfter.map(s=>s.nodes))<=baseline.nodes+100,JSON.stringify({baseline,countersAfter}));
+   checkpoints.push({cycles:checkpoints.reduce((sum,x)=>sum+x.batch,0)+count,batch:count,samples:countersAfter});
+  }
+  const heapAfter=await cdp.send('Runtime.getHeapUsage');
   assert.equal(await p.locator('.knowledge-model').count(),6);assert.equal(await p.locator('.knowledge-glossary').count(),1);
   const duplicates=await p.evaluate(()=>{const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);return ids.filter((id,i)=>ids.indexOf(id)!==i)});assert.deepEqual(duplicates,[]);
-  assert(countersAfter.jsEventListeners<=countersBefore.jsEventListeners+8,JSON.stringify({countersBefore,countersAfter}));
-  assert(countersAfter.nodes<=countersBefore.nodes+100,JSON.stringify({countersBefore,countersAfter}));
   assert.deepEqual(await physical(p),before);
-  h.measurements.push({kind:'mount-dispose-100',countersBefore,countersAfter,heapBefore,heapAfter,limit:'single bounded GC sample; not a universal leak proof'});
+  h.measurements.push({kind:'mount-dispose-100',warmup:10,countersBefore,checkpoints,heapBefore,heapAfter,limit:'three post-GC samples per checkpoint; native counters do not replace owner/subscription invariants'});
  }finally{await context.close()}
 });
 

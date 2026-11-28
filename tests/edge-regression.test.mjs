@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import vm from 'node:vm';
 import * as physics from '../dist/physics.mjs';
+import {gravityInputError,MAX_POSITION_AU} from '../dist/gravity-input.mjs';
 import {GravityTrail,traceGravityTrail} from '../dist/gravity-trail.mjs';
 import * as display from '../dist/display.mjs';
 import {experiment,experimentInfo} from '../dist/experiments.mjs';
@@ -30,7 +31,7 @@ function app(){
  const el=id=>{if(!elements.has(id))elements.set(id,new Element(id));return elements.get(id)};
  el('scenario').value='binary';el('speed').value='0';el('trails').checked=true;
  const window={addEventListener(){}};
- const scope=vm.createContext({...i18n,...physics,GravityTrail,traceGravityTrail,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
+ const scope=vm.createContext({...i18n,...physics,gravityInputError,MAX_POSITION_AU,GravityTrail,traceGravityTrail,...display,experiment,experimentInfo,makeBaseline,readDiagnostics,predict,checks,createSelfChecks,window,structuredClone,devicePixelRatio:1,
   document:{getElementById:el,createElement:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},activeElement:null},
   Option:class extends Element{constructor(text,value){super();this.textContent=text;this.value=value}},
   ResizeObserver:class{observe(){}},requestAnimationFrame:callback=>frames.push(callback),setTimeout(){}});
@@ -38,12 +39,14 @@ function app(){
  new vm.Script(source,{filename:'dist/app.mjs'}).runInContext(scope);
  let now=100;
  return {el,window,get gradients(){return gradients},tick(){assert.equal(frames.length,1,'exactly one pending frame');frames.shift()(now);now+=16},
+  injectBody(index,changes){Object.assign(vm.runInContext('bs',scope)[index],changes);vm.runInContext('rebase()',scope)},
   edit(index,x,vy){el('objectList').value=window.entrolab.getBodies()[index].id;el('objectList').onchange();el('posX').value=String(x);if(vy!==undefined)el('velY').value=String(vy);el('editForm').handlers.input({target:el('posX')});el('editForm').onsubmit({preventDefault(){}})}};
 }
 
 test('animation: extreme coordinates stop safely and reset + play resumes without reload',()=>{
  const a=app();a.el('play').onclick(); // Pause while editing, as in the original browser reproduction.
- a.edit(0,1e308);a.edit(1,-1e308);
+ // Bypass the guarded UI only to retain coverage of the runtime's corrupted-state safety path.
+ a.injectBody(0,{x:1e308});a.injectBody(1,{x:-1e308});
  a.el('play').onclick();a.tick();a.tick();
  assert.equal(a.el('runLabel').textContent,'NUMERISCHES LIMIT');
  assert.equal(a.el('play').disabled,true);
@@ -59,7 +62,7 @@ test('animation: extreme coordinates stop safely and reset + play resumes withou
 });
 
 test('animation: overflowed camera fit remains render-safe and reset restores drawing',()=>{
- const a=app();a.el('play').onclick();a.edit(0,1e308);a.edit(1,1e308);a.el('fit').onclick();
+ const a=app();a.el('play').onclick();a.injectBody(0,{x:1e308});a.injectBody(1,{x:1e308});a.el('fit').onclick();
  a.tick();a.el('reset').onclick();const draws=a.gradients;a.tick();assert(a.gradients>draws);
 });
 

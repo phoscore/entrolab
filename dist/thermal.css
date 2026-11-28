@@ -4,3 +4,5 @@
 @media(prefers-reduced-motion:no-preference){.thermal-stage article{transition:background-color .2s linear}.thermal-stage[data-running=true] .heat-flow>b{animation:heat-breathe 1.5s ease-in-out infinite}@keyframes heat-breathe{50%{opacity:.55}}}
 
 @media(max-width:420px){.thermal-chart svg text{font-size:26px}}
+
+#thermalPrecisionNote:empty{display:none}
