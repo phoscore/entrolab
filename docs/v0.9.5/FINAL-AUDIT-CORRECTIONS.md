@@ -28,7 +28,7 @@ Font provenance: the DM Sans and Space Grotesk variable-font binaries were copie
 
 ## Verification record
 
-Verified commit: `49cacdca2005d862fd9690a9782cb745d2cc1b21` (audit corrections; final test-fixture follow-ups are included in the current branch head recorded by the PR).
+Verified implementation head: `7545e974e5cea700a7906a4ec1a604f39f4c0523` (tree `b7bcf50104eeb32a112b2b728c3294df0ba8c0d2`). The report update is documentation-only and follows this tested implementation tree.
 
 | Check | Result | Scope |
 |---|---|---|
@@ -38,8 +38,11 @@ Verified commit: `49cacdca2005d862fd9690a9782cb745d2cc1b21` (audit corrections; 
 | `node scripts/cosmic-data.mjs verify` | **PASS** | 22 packaged objects; 19 sky directions; missing/negative parallax cases retained. |
 | Focused regression run | **PASS · 38/38** | Gravity precision, Entropy lifecycle, thermal high-precision boundaries, README and local fonts. |
 | Defensive Gravity runtime tests | **PASS · 4/4** | Invalid-state stop/reset, overflowed fit recovery, prediction underflow, and collision trails. |
-| Native Chromium suite and screenshot review | **Pending PR CI** | `.github/workflows/tests.yml` installs Playwright Chromium, runs the full browser suite, and uploads `browser-results/` for review. |
+| Native Chromium suite | **PASS — full suite** | GitHub Actions run [#405](https://github.com/phoscore/entrolab/actions/runs/46094849530), job `Chromium UX regressions`, on the verified implementation head above. The `Physics and data integrity` job also passed. |
+| Native Chromium screenshot review | **PASS — reviewed** | Reviewed the run’s `chromium-review-measurements` artifact (artifact ID `15242967734`) for Explorer recovery/error, Gravity validation, Entropy layout, and Thermal near/exact-equilibrium states. Captures include German and English, mobile at 320/390 CSS px, and desktop at 1440 CSS px (Entropy desktop capture at 1360 CSS px). No clipping, overlap, or illegible validation state was observed in the inspected screens. |
 
-The checked-in Windows working tree has `core.autocrlf=true`; exact-source reproduction checks were therefore run in a separate LF checkout of the exact commit, matching GitHub's Ubuntu workflow. The main working tree remains clean. Local npm/Playwright and the native browser-control pipe are unavailable in this session, so Chromium runtime and screenshot evidence are taken from the PR workflow artifact rather than represented as locally completed checks.
+The checked-in Windows working tree has `core.autocrlf=true`; exact-source reproduction checks were therefore run in a separate LF checkout, matching GitHub's Ubuntu workflow. Chromium runtime and screenshot evidence come from the successful native Playwright Chromium run and its uploaded artifact, not from a local interactive browser session.
 
-The native review covers Gravity, Entropy, Thermal and Explorer in German and English at 320, 390, 768 and 1440 CSS pixels. No scientific data package, benchmark source, or simulation colour convention is modified in this branch.
+The browser regressions exercise localized Explorer failure/retry and recovery; Gravity boundary validation on all axes; Entropy repeated mount/dispose; Thermal near-equilibrium and exact-equilibrium distinctions; and offline/local font loading with no third-party requests. A test-harness-only follow-up stabilized two existing Chromium checks: the Null visual comparison now waits for the visible animation and resets the controller between independent samples; the Gravity trail-pixel check advances the simulation to establish a measurable path before checking rendered pixels. Their functional and pixel assertions remain enabled.
+
+No scientific data package, benchmark source, or simulation colour convention is modified in this branch. The application remains v0.9.5 RC; no merge or release has been performed.
