@@ -39,6 +39,8 @@ test('release README and locally hosted font assets match the v0.9.5 RC',()=>{
  assert.match(readme,/--branch main https:\/\/github\.com\/phoscore\/entrolab\.git/);
  assert.match(readme,/1[–-]512 distinguishable markers/);
  assert.match(readme,/v0\.9\.5 RC/);
+ assert(readme.includes(`${MAX_POSITION_AU} AU`));
+ for(const term of ['Maxwell–Boltzmann','two-photon invariant mass','deuteron binding','individual probabilities for each k'])assert(readme.includes(term),term);
  assert(!/private source|branch develop|v0\.8\s+is the current/i.test(readme));
  const css=read('dist/style.css');
  assert.match(css,/@font-face/);assert.match(css,/\.\/fonts\/DM-Sans\[opsz,wght\]\.ttf/);assert.match(css,/\.\/fonts\/Space-Grotesk\[wght\]\.ttf/);

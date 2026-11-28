@@ -42,7 +42,7 @@ test('v0.8 knowledge: untouched engines and transfer policy remain pinned beside
  const expected={
   'physics.mjs':'b361f3dd0c938c30b4090d19ae16aacce87286ca',
   'entropy.mjs':'2f126c850b22a51fcbe5a1d137ed70d0f691d480',
-  'thermal-physics.mjs':'cac3cf6a83912218b0e4f6ab1b7dbacae6ef4fc6',
+  'thermal-physics.mjs':'c2cc7824f9b988b4c95412417657a50d56652db3',
   'thermal-view.mjs':'e22285a703e4a00b40cab4d0707caa329ea11e1e',
   'extreme-data.mjs':'97273d2acef3983f62d8d0444e69920a2af890b4',
   'prediction.mjs':'2b68556547a3c73165dcefabcc6012be1df58478',

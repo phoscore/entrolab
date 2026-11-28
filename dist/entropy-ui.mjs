@@ -81,7 +81,7 @@ export function initEntropy(doc=globalThis.document,{setTimer=globalThis.setTime
  const motion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
  if(motion)listen(motion,'change',e=>{if(e.matches){pause();render()}});
  let observer;if(typeof IntersectionObserver==='function'){observer=new IntersectionObserver(entries=>{if(disposed)return;seen=entries[0].isIntersecting;sync()});observer.observe($('entropyChambers'))}
- const unsubscribe=onLanguageChange(()=>{if(disposed)return;build();render()});build();render();
+ const unsubscribe=onLanguageChange(()=>{if(disposed)return;build();render()});$('entropyN').value=state.length;build();render();
  const controller={inspect,dispose(){
   if(disposed)return;
   if(timer!==null){clearTimer(timer);timer=null}

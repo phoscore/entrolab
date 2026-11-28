@@ -36,6 +36,22 @@ test('Entropy native lifecycle: 100 controller remounts remove listeners and pre
  const {page:p,context}=await lab();
  try{
   await entropy(p);
+  await p.locator('[data-marker-count="512"]').click();
+  assert.equal(await p.locator('#entropyN').inputValue(),'512');
+  await p.locator('#entropyPlay').click();
+  await p.waitForFunction(()=>window.entrolabEntropy.inspect().scheduled);
+  await p.evaluate(async()=>{
+   const previous=window.entrolabEntropy.controller;
+   const {initEntropy}=await import('/entropy-ui.mjs');
+   const next=initEntropy(document);
+   previous.dispose();
+   if(window.entrolabEntropy.controller!==next)throw Error('Old controller cleared the new owner');
+  });
+  assert.equal(await p.locator('#entropyN').inputValue(),'12');
+  assert.equal(await p.locator('#entropyK').getAttribute('max'),'12');
+  assert.equal(await p.locator('.entropy-marker').count(),12);
+  assert.equal(await p.locator('#entropyChart [data-k]').count(),13);
+  assert.equal((await state(p)).scheduled,false);
   const cdp=await context.newCDPSession(p);await cdp.send('HeapProfiler.enable');
   const cycleBatch=count=>p.evaluate(async count=>{
    const {initEntropy}=await import('/entropy-ui.mjs');

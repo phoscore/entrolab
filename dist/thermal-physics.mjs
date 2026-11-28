@@ -7,15 +7,21 @@ export const transferableTemperature=x=>bounded(x,THERMAL_LIMITS.temperature);
 export function validateThermal(p){if(!p||typeof p!=='object')throw new TypeError('Thermal parameter object required');for(const [key,range]of [['a','temperature'],['b','temperature'],['ca','capacity'],['cb','capacity'],['g','conductance']])if(!bounded(p[key],THERMAL_LIMITS[range]))throw new RangeError('Invalid thermal parameter: '+key);return p}
 // Accurate log(1+x)-x when the first-order terms in total entropy cancel.
 function logRemainder(x){if(Math.abs(x)>=.001)return Math.log1p(x)-x;let term=-x*x/2,sum=term;for(let n=3;n<=12;n++){term*=-x*(n-1)/n;sum+=term}return sum}
+// Keep the exponential normal until the final multiply for subnormal results.
+function scaledDecay(value,exponent){
+ const result=exponent < -700 ? (value*Math.exp(-600))*Math.exp(exponent+600) : value*Math.exp(exponent);
+ return result===0?0:result;
+}
 export function thermalAt(p,time){
  validateThermal(p);if(!bounded(time,THERMAL_LIMITS.time))throw new RangeError('Time must be finite and in [0,1e12] seconds');
  const {a,b,ca,cb,g}=p,sum=ca+cb,effective=ca*cb/sum,delta=a-b,rate=g/effective,eq=delta===0?a:(ca*a+cb*b)/sum;
- const exponent=-rate*time,relaxation=Math.exp(exponent),fraction=-Math.expm1(exponent),q=effective*delta*fraction;
+ const exponent=-rate*time,fraction=-Math.expm1(exponent),q=effective*delta*fraction;
  const ta=fraction===1?eq:a-q/ca,tb=fraction===1?eq:b+q/cb;
- const remainingDelta=delta*relaxation,equilibrium=delta===0;
+ const remainingDelta=scaledDecay(delta,exponent),equilibrium=delta===0;
  const xa=-q/(ca*a),xb=q/(cb*b),sa=ca*Math.log1p(xa),sb=cb*Math.log1p(xb);
  // No positivity clamp: retain a numerically stable evaluation of the actual sum.
  const entropy=q*delta/(a*b)+ca*logRemainder(xa)+cb*logRemainder(xb);
- const energy=ca*ta+cb*tb,initialEnergy=ca*a+cb*b,power=g*remainingDelta,production=g*remainingDelta**2/(ta*tb);
+ const energy=ca*ta+cb*tb,initialEnergy=ca*a+cb*b;
+ const power=scaledDecay(g*delta,exponent),production=scaledDecay(g*delta**2/(ta*tb),2*exponent);
  return {time,ta,tb,eq,tau:1/rate,q,power,energy,initialEnergy,energyError:energy-initialEnergy,sa,sb,entropy,production,remainingDelta,equilibrium};
 }

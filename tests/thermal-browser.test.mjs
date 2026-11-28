@@ -41,11 +41,19 @@ test('thermal browser: rounded display is distinguished from analytical near-equ
   assert.equal(nearState.result.equilibrium,false);
   assert.notEqual(nearState.result.remainingDelta,0);
   assert.notEqual(nearState.result.power,0);
+  const assertAccessiblePower=async()=>{
+   const visible=await p.locator('#thermalPower').textContent();
+   const accessibility=await p.locator('#thermalStage').ariaSnapshot();
+   assert(accessibility.includes(visible),accessibility);
+   assert.doesNotMatch(accessibility,/[−-]0 W/);
+  };
+  await assertAccessiblePower();
   assert.equal(await p.locator('#thermalTA').textContent(),await p.locator('#thermalTB').textContent());
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/runden.*denselben Wert|round to the same value/i);
   assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'false');
   await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-de.png`)});
   await p.locator('[data-language=en]').click();
+  await assertAccessiblePower();
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/analytical remaining ΔT/);
   assert.deepEqual(await heat(p),nearState);
   await p.locator('#thermalStage').screenshot({path:resolve(output,`thermal-boundary-near-${width}-en.png`)});
@@ -54,6 +62,7 @@ test('thermal browser: rounded display is distinguished from analytical near-equ
   const exact=await heat(p);
   assert.equal(exact.result.equilibrium,true);
   assert.equal(exact.result.power,0);
+  await assertAccessiblePower();
   assert.equal(exact.result.production,0);
   assert.match(await p.locator('#thermalPrecisionNote').textContent(),/exactly equal/);
   assert.equal(await p.locator('#thermalStage').getAttribute('data-equilibrium'),'true');

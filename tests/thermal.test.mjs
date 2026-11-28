@@ -40,6 +40,19 @@ test('thermal: analytic flux and production retain high-precision values when ro
  const exact=thermalAt({...p,b:p.a},1234.5);
  assert.equal(exact.equilibrium,true);assert.equal(exact.power,0);assert.equal(exact.production,0);
 });
+test('thermal: subnormal rates survive intermediate underflow and round to unsigned zero only at the representability limit',()=>{
+ const p={a:600,b:250,ca:1e6,cb:1e6,g:1000};
+ // Decimal references from 350000 exp(-746) and (122500000 / 425²) exp(-746).
+ assert.equal(thermalAt(p,373000).power,3.634e-319);
+ assert.equal(thermalAt(p,186500).production,7.07e-322);
+ const last=thermalAt(p,378500);
+ assert.equal(last.remainingDelta,0);
+ assert.equal(last.power,Number.MIN_VALUE);
+ assert.equal(thermalAt({...p,a:p.b,b:p.a},378500).power,-Number.MIN_VALUE);
+ const underflow=thermalAt({...p,a:p.b,b:p.a},379500);
+ assert.equal(underflow.power,0);
+ assert.equal(underflow.equilibrium,false);
+});
 test('thermal: malformed/out-of-model parameters and times are rejected without changing input',()=>{for(const key of ['a','b','ca','cb','g'])for(const v of [NaN,Infinity,-Infinity,0,-1,'350',null,undefined])assert.throws(()=>thermalAt({...d,[key]:v},1));for(const a of [0,.001,249.99,600.01,1e12])assert.throws(()=>validateThermal({...d,a}));for(const t of [-1,NaN,Infinity,'1',1e13])assert.throws(()=>thermalAt(d,t));const p={...d};const s=JSON.stringify(p);thermalAt(p,10);assert.equal(JSON.stringify(p),s);assert.equal(THERMAL_LIMITS.temperature[0],250)});
 test('thermal: extreme-temperature transfer is explicit and bounded, never clamped',()=>{for(const k of [250,293.15,350,600])assert.equal(transferableTemperature(k),true);for(const k of [-0,0,-1,.001,.1,2.725,249.99,600.01,1e12,Infinity,NaN,'350'])assert.equal(transferableTemperature(k),false)});
 

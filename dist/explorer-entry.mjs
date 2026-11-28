@@ -2,6 +2,8 @@
 const panel = document.getElementById('explorer');
 const content = document.getElementById('exContent');
 let viewer = null, pending = false, failed = false, styleLink = null;
+let retryCount = 0;
+const stylesheetTimeoutMs = 15000;
 const english = () => document.documentElement.lang === 'en';
 
 function localizeState() {
@@ -20,6 +22,7 @@ function loadingState() {
   status.setAttribute('role', 'status');
   status.textContent = english() ? 'Loading the Cosmic Explorer…' : 'Cosmic Explorer wird geladen…';
   content.replaceChildren(status);
+  return status;
 }
 
 function errorState() {
@@ -32,11 +35,12 @@ function errorState() {
   retry.type = 'button';
   retry.addEventListener('click', () => {
     failed = false;
-    void sync();
+    void sync(retry);
   }, {once: true});
   box.append(message, retry);
   content.replaceChildren(box);
   localizeState();
+  return retry;
 }
 
 function hasExplorerRules(link) {
@@ -44,7 +48,7 @@ function hasExplorerRules(link) {
   catch { return false; }
 }
 
-function loadStylesheet() {
+function loadStylesheet(retry) {
   if (hasExplorerRules(styleLink)) return Promise.resolve();
   if (styleLink) {
     styleLink.remove();
@@ -52,40 +56,52 @@ function loadStylesheet() {
   }
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = new URL('./explorer.css', import.meta.url).href;
+  const url = new URL('./explorer.css', import.meta.url);
+  if (retry) url.searchParams.set('retry', `${Date.now()}-${++retryCount}`);
+  link.href = url.href;
   link.dataset.explorerStyle = '';
   styleLink = link;
   return new Promise((resolve, reject) => {
-    let settled = false;
+    const cleanup = () => {
+      clearTimeout(timer);
+      link.removeEventListener('load', loaded);
+      link.removeEventListener('error', fail);
+    };
     const fail = () => {
-      if (settled) return;
-      settled = true;
+      cleanup();
       link.remove();
       if (styleLink === link) styleLink = null;
       reject(new Error('Explorer stylesheet did not load.'));
     };
-    link.addEventListener('load', () => {
+    const loaded = () => {
       if (!hasExplorerRules(link)) { fail(); return; }
-      settled = true;
+      cleanup();
       link.dataset.explorerLoaded = 'true';
       resolve();
-    }, {once: true});
-    link.addEventListener('error', fail, {once: true});
+    };
+    const timer = setTimeout(fail, stylesheetTimeoutMs);
+    link.addEventListener('load', loaded);
+    link.addEventListener('error', fail);
     document.head.append(link);
   });
 }
 
-async function sync() {
+async function sync(retry = null) {
   const active = panel.classList.contains('active');
   if (viewer) { viewer.setActive(active); return; }
   if (!active || pending || failed) return;
   pending = true;
-  loadingState();
-  const retry = content.querySelector('#explorerRetry');
-  if (retry) retry.disabled = true;
+  const restoreFocus = retry && document.activeElement === retry;
+  const status = loadingState();
+  if (restoreFocus) {
+    status.tabIndex = -1;
+    status.focus({preventScroll: true});
+  }
+  const ownsFocus = () => panel.classList.contains('active') && document.activeElement === status;
   try {
-    await loadStylesheet();
+    await loadStylesheet(retry);
     const {mountExplorer} = await import('./explorer/viewer.mjs');
+    const focusOnSuccess = ownsFocus();
     const mounted = mountExplorer(content);
     if (!mounted || typeof mounted.setActive !== 'function') {
       mounted?.dispose?.();
@@ -94,9 +110,12 @@ async function sync() {
     viewer = mounted;
     window.entrolabExplorer = viewer;
     viewer.setActive(panel.classList.contains('active'));
+    if (focusOnSuccess) document.getElementById('heading-explorer').focus();
   } catch {
     failed = true;
-    errorState();
+    const focusOnError = ownsFocus();
+    const button = errorState();
+    if (focusOnError) button.focus();
   } finally {
     pending = false;
   }

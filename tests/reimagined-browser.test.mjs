@@ -413,6 +413,13 @@ test('gravity input bounds reject unresolved coordinates and Newtonian speeds on
    assert.match(await p.locator('#editError').textContent(),pattern,field);
    await p.locator('#editError').screenshot({path:resolve(h.output,`gravity-input-${field}-${language}-${width}.png`)});
    assert.deepEqual(selectedBody(await gravityState(p)),before,field);
+   if(field.startsWith('pos')){
+    const [,limit]=/([0-9]+\.[0-9]+) AU/.exec(await p.locator('#editError').textContent());
+    await p.locator('#'+field).fill(limit);
+    await p.locator('#editForm button[type=submit]').click();
+    assert.equal(await p.locator('#editError').textContent(),'');
+    assert.equal(selectedBody(await gravityState(p))[field==='posX'?'x':'y'],Number(limit));
+   }
    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth),width,field);
    assert.deepEqual(h.errors,[]);
   }finally{await context.close()}
@@ -432,7 +439,7 @@ test('gravity placement rejects an out-of-domain world coordinate without insert
   await p.locator('.adding-options > summary').click();
   await p.locator('#add').click();
   await p.locator('#universe').click();
-  assert.match(await p.locator('#addError').textContent(),/3\.51844e\+6 AU/);
+  assert.match(await p.locator('#addError').textContent(),/3518437\.2088832 AU/);
   assert.equal((await gravityState(p)).bodies.length,before.bodies.length);
   await p.locator('[data-language=en]').click();
   assert.match(await p.locator('#addError').textContent(),/binary64/);
