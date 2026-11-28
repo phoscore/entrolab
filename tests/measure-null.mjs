@@ -52,11 +52,23 @@ async function measure(h,base,version,width,cpu,scenes=['idle','entrance']){
       document.querySelector('#nullPreviewRift').click();
      });
     }
-    await p.waitForTimeout(scene==='mischief'||scene==='curiosity'?2150:100);
-    if(scene!=='idle')await p.waitForFunction(()=>{
-     const figure=document.querySelector('#creature');
-     return figure&&!figure.hidden&&figure.getAnimations({subtree:true}).length>0;
-    },null,{timeout:5000});
+    if(scene==='mischief'||scene==='curiosity')await p.waitForTimeout(2150);
+    else if(scene==='idle')await p.waitForTimeout(100);
+    if(scene!=='idle')try{
+     await p.waitForFunction(()=>{
+      const figure=document.querySelector('#creature');
+      return figure&&!figure.hidden&&figure.getAnimations({subtree:true}).length>0;
+     },null,{timeout:3000});
+    }catch(error){
+     const state=await p.evaluate(()=>{
+      const figure=document.querySelector('#creature');
+      return {hidden:figure?.hidden,sequence:figure?.dataset.sequence,moving:figure?.dataset.moving,
+       phase:figure?.dataset.phase,animations:figure?.getAnimations({subtree:true}).map(animation=>({name:animation.animationName,state:animation.playState,currentTime:animation.currentTime})),
+       reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,
+       mode:document.querySelector('#creatureMode')?.value,previewDisabled:document.querySelector('#nullPreviewRift')?.disabled};
+     });
+     throw new Error(`Null ${version}/${width}px ${scene} run ${run} did not enter an active animation: ${JSON.stringify(state)}`,{cause:error});
+    }
     const before=await metrics();
     const sample=await p.evaluate(async()=>{
      const initial=window.entrolab.renderInfo().frame,modelTime=window.entrolab.inspect().elapsed;
