@@ -1,4 +1,8 @@
-# Cosmic Explorer · Phase 1
+# v0.9.5 documentation
+
+See the [v0.9.5 release notes](RELEASE-NOTES.md) for the complete development summary, model scope and audit record. The original Phase 1 data contract follows.
+
+## Cosmic Explorer · Phase 1
 
 Diese Etappe setzt die [Roadmap aus PR #9](https://github.com/phoscore/entrolab/pull/9) auf Basis von `f705e551f845dd1d33af6ca95b6b430722efcde1` um. Die [Quellenmatrix](SOURCES.md), das folgende Datenschema und der [Qualitätsbericht](QUALITY.md) beschreiben den Stand. Der Katalogbau liegt außerhalb von `dist/` und benötigt Node.js ≥22. Die Website lädt keine Explorer-Dateien.
 

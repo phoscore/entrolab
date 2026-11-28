@@ -2,7 +2,9 @@
 
 **Entrolab** is a bilingual, interactive physics and astronomy learning project by cosmic insignificance. It puts explicit models, their assumptions, and their limits beside the visualizations.
 
-**Current state: v0.9.5 RC.** The public site is [entrolab.pages.dev](https://entrolab.pages.dev/); the public source repository is [github.com/phoscore/entrolab](https://github.com/phoscore/entrolab).
+**Current state: v0.9.5.** The public site is [entrolab.pages.dev](https://entrolab.pages.dev/); the public source repository is [github.com/phoscore/entrolab](https://github.com/phoscore/entrolab).
+
+See the [v0.9.5 release notes](docs/v0.9.5/RELEASE-NOTES.md) for changes since v0.9.25, the independent audit record and the remaining verification limits.
 
 ## Run the site
 
