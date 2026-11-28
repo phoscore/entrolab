@@ -16,7 +16,8 @@ test('all eight headings share their order, bilingual explanations and local inp
  for(const width of [1440,390,320]){
   const {p,context}=await h.lab({viewport:{width,height:980},hasTouch:width<760});
   try{
-   await shot(p.locator('.site-header'),'release-candidate-'+width);
+   assert.equal(await p.locator('.brand small').textContent(),'v0.9.5');
+   await shot(p.locator('.site-header'),'release-version-'+width);
    for(const id of labs){
     await chooseLab(p,id,width<760?'tap':undefined);
     const lab=p.locator('#'+id),heading=lab.locator('.page-heading');
@@ -29,7 +30,7 @@ test('all eight headings share their order, bilingual explanations and local inp
     assert.equal(await lab.locator('details.learning-question, details[data-lab-question]').count(),id==='entropy'?4:2);
     await p.locator('[data-language=en]').click();
     assert.match(await help.textContent(),/What does this mean/);
-    assert.match(await p.locator('.brand small').textContent(),/v0\.9\.5 RC/);
+    assert.equal(await p.locator('.brand small').textContent(),'v0.9.5');
     if(width===1440&&['explorer','matter'].includes(id)){
      await help.locator(':scope > summary').press('Enter');
      await help.locator('.knowledge-simple summary').press('Enter');
